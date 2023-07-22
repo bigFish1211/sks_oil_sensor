@@ -1,0 +1,8 @@
+../Src/flash.c:14:6:NMEAChecksum	32	static
+../Src/flash.c:26:13:flash_lock	8	static
+../Src/flash.c:30:13:flash_unlock	8	static
+../Src/flash.c:37:5:flashEraserPage	16	static
+../Src/flash.c:69:5:flashWiteWord	16	static
+../Src/flash.c:79:5:flash_ProgramDoubleWord	32	static,ignoring_inline_asm
+../Src/flash.c:93:5:FlashWritePage	32	static
+../Src/flash.c:112:5:FlashReadPage	32	static

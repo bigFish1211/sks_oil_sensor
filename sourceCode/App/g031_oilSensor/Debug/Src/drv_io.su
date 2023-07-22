@@ -1,0 +1,5 @@
+../Src/drv_io.c:13:6:gpio_clock_init	8	static
+../Src/drv_io.c:21:6:gpio_pin_int	16	static
+../Src/drv_io.c:32:6:GpioInterruptInit	16	static
+../Src/drv_io.c:36:6:gpio_write	16	static
+../Src/drv_io.c:47:9:gpio_read	16	static

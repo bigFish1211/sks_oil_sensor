@@ -1,0 +1,6 @@
+../Core/Src/register_uart.c:16:6:pc_Int	16	static
+../Core/Src/register_uart.c:20:6:pc_putArray	16	static
+../Core/Src/register_uart.c:24:13:uart1_Int	48	static
+../Core/Src/register_uart.c:81:13:uart1_PutChar	24	static
+../Core/Src/register_uart.c:89:13:uart1_PutString	16	static
+../Core/Src/register_uart.c:96:13:uart1_putArray	16	static

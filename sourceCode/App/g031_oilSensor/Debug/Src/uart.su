@@ -1,0 +1,7 @@
+D:/github/sks_oil_sensor/sourceCode/App/g031_oilSensor/Drivers/CMSIS/Include/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
+D:/github/sks_oil_sensor/sourceCode/App/g031_oilSensor/Drivers/CMSIS/Include/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
+../Src/uart.c:29:13:COMX0_pin_init	16	static
+../Src/uart.c:57:13:uartx_init	24	static
+../Src/uart.c:78:6:usart_x0_init	16	static
+../Src/uart.c:85:6:usart_x0_sendChar	16	static
+../Src/uart.c:90:6:USART1_IRQHandler	16	static

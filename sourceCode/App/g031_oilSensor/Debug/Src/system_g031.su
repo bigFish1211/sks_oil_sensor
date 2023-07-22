@@ -1,0 +1,7 @@
+D:/github/sks_oil_sensor/sourceCode/App/g031_oilSensor/Drivers/CMSIS/Include/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
+D:/github/sks_oil_sensor/sourceCode/App/g031_oilSensor/Drivers/CMSIS/Include/core_cm0plus.h:1056:26:SysTick_Config	16	static
+../Src/system_g031.c:23:6:systemInit	8	static
+../Src/system_g031.c:28:13:SysTick_CLKSourceConfig	16	static
+../Src/system_g031.c:35:13:systickConfig	8	static
+../Src/system_g031.c:40:13:SetSysClock	8	static
+../Src/system_g031.c:85:6:RCC_DeInit	8	static
