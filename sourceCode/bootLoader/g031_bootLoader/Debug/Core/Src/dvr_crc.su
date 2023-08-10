@@ -1,0 +1,7 @@
+../Core/Src/dvr_crc.c:10:6:CRC_ClockInit	8	static
+../Core/Src/dvr_crc.c:13:6:CRC_ResetDR	8	static
+../Core/Src/dvr_crc.c:18:10:CRC_CalcCRC	16	static
+../Core/Src/dvr_crc.c:23:10:CRC_CalcBlockCRC	24	static
+../Core/Src/dvr_crc.c:31:10:CRC_GetCRC	8	static
+../Core/Src/dvr_crc.c:34:6:CRC_SetIDRegister	16	static
+../Core/Src/dvr_crc.c:37:9:CRC_GetIDRegister	8	static
