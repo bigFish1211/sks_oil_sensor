@@ -5,6 +5,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Core/Src/common.c \
 ../Core/Src/download.c \
 ../Core/Src/drv_io.c \
 ../Core/Src/dvr_crc.c \
@@ -12,18 +13,15 @@ C_SRCS += \
 ../Core/Src/dvr_uart.c \
 ../Core/Src/main.c \
 ../Core/Src/mainTask.c \
-../Core/Src/stm32g0xx_hal_msp.c \
 ../Core/Src/syscalls.c \
 ../Core/Src/sysmem.c \
 ../Core/Src/system_g031.c \
-../Core/Src/system_stm32g0xx.c \
-../Core/Src/uart.c \
 ../Core/Src/upload.c \
-../Core/Src/wdg.c \
 ../Core/Src/xprintf.c \
 ../Core/Src/ymodem.c 
 
 OBJS += \
+./Core/Src/common.o \
 ./Core/Src/download.o \
 ./Core/Src/drv_io.o \
 ./Core/Src/dvr_crc.o \
@@ -31,18 +29,15 @@ OBJS += \
 ./Core/Src/dvr_uart.o \
 ./Core/Src/main.o \
 ./Core/Src/mainTask.o \
-./Core/Src/stm32g0xx_hal_msp.o \
 ./Core/Src/syscalls.o \
 ./Core/Src/sysmem.o \
 ./Core/Src/system_g031.o \
-./Core/Src/system_stm32g0xx.o \
-./Core/Src/uart.o \
 ./Core/Src/upload.o \
-./Core/Src/wdg.o \
 ./Core/Src/xprintf.o \
 ./Core/Src/ymodem.o 
 
 C_DEPS += \
+./Core/Src/common.d \
 ./Core/Src/download.d \
 ./Core/Src/drv_io.d \
 ./Core/Src/dvr_crc.d \
@@ -50,14 +45,10 @@ C_DEPS += \
 ./Core/Src/dvr_uart.d \
 ./Core/Src/main.d \
 ./Core/Src/mainTask.d \
-./Core/Src/stm32g0xx_hal_msp.d \
 ./Core/Src/syscalls.d \
 ./Core/Src/sysmem.d \
 ./Core/Src/system_g031.d \
-./Core/Src/system_stm32g0xx.d \
-./Core/Src/uart.d \
 ./Core/Src/upload.d \
-./Core/Src/wdg.d \
 ./Core/Src/xprintf.d \
 ./Core/Src/ymodem.d 
 
@@ -69,7 +60,7 @@ Core/Src/%.o Core/Src/%.su: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/download.d ./Core/Src/download.o ./Core/Src/download.su ./Core/Src/drv_io.d ./Core/Src/drv_io.o ./Core/Src/drv_io.su ./Core/Src/dvr_crc.d ./Core/Src/dvr_crc.o ./Core/Src/dvr_crc.su ./Core/Src/dvr_flash.d ./Core/Src/dvr_flash.o ./Core/Src/dvr_flash.su ./Core/Src/dvr_uart.d ./Core/Src/dvr_uart.o ./Core/Src/dvr_uart.su ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/mainTask.d ./Core/Src/mainTask.o ./Core/Src/mainTask.su ./Core/Src/stm32g0xx_hal_msp.d ./Core/Src/stm32g0xx_hal_msp.o ./Core/Src/stm32g0xx_hal_msp.su ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_g031.d ./Core/Src/system_g031.o ./Core/Src/system_g031.su ./Core/Src/system_stm32g0xx.d ./Core/Src/system_stm32g0xx.o ./Core/Src/system_stm32g0xx.su ./Core/Src/uart.d ./Core/Src/uart.o ./Core/Src/uart.su ./Core/Src/upload.d ./Core/Src/upload.o ./Core/Src/upload.su ./Core/Src/wdg.d ./Core/Src/wdg.o ./Core/Src/wdg.su ./Core/Src/xprintf.d ./Core/Src/xprintf.o ./Core/Src/xprintf.su ./Core/Src/ymodem.d ./Core/Src/ymodem.o ./Core/Src/ymodem.su
+	-$(RM) ./Core/Src/common.d ./Core/Src/common.o ./Core/Src/common.su ./Core/Src/download.d ./Core/Src/download.o ./Core/Src/download.su ./Core/Src/drv_io.d ./Core/Src/drv_io.o ./Core/Src/drv_io.su ./Core/Src/dvr_crc.d ./Core/Src/dvr_crc.o ./Core/Src/dvr_crc.su ./Core/Src/dvr_flash.d ./Core/Src/dvr_flash.o ./Core/Src/dvr_flash.su ./Core/Src/dvr_uart.d ./Core/Src/dvr_uart.o ./Core/Src/dvr_uart.su ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/mainTask.d ./Core/Src/mainTask.o ./Core/Src/mainTask.su ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_g031.d ./Core/Src/system_g031.o ./Core/Src/system_g031.su ./Core/Src/upload.d ./Core/Src/upload.o ./Core/Src/upload.su ./Core/Src/xprintf.d ./Core/Src/xprintf.o ./Core/Src/xprintf.su ./Core/Src/ymodem.d ./Core/Src/ymodem.o ./Core/Src/ymodem.su
 
 .PHONY: clean-Core-2f-Src
 

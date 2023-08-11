@@ -8,7 +8,6 @@
 #ifndef INC_WDG_H_
 #define INC_WDG_H_
 
-#include "main.h"
 
 void IWDG_Init(void);
 void IWDG_start(void);

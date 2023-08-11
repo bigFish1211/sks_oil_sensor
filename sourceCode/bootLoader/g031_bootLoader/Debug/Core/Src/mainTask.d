@@ -9,7 +9,7 @@ Core/Src/mainTask.o: ../Core/Src/mainTask.c ../Core/Inc/common.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/system_stm32g0xx.h \
  ../Core/Inc/dvr_uart.h ../Core/Inc/ymodem.h ../Core/Inc/global.h \
- ../Core/Inc/define.h
+ ../Core/Inc/define.h ../Core/Inc/system_g031.h
 ../Core/Inc/common.h:
 ../Core/Inc/dvr_flash.h:
 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g0xx.h:
@@ -24,3 +24,4 @@ Core/Src/mainTask.o: ../Core/Src/mainTask.c ../Core/Inc/common.h \
 ../Core/Inc/ymodem.h:
 ../Core/Inc/global.h:
 ../Core/Inc/define.h:
+../Core/Inc/system_g031.h:

@@ -24,8 +24,7 @@
 #define _YMODEM_H_
 
 /* Includes ------------------------------------------------------------------*/
-#include<stdio.h>
-#include<stdint.h>
+
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 #define PACKET_SEQNO_INDEX      (1)
@@ -56,8 +55,7 @@
 
 /* Exported macro ------------------------------------------------------------*/
 /* Exported functions ------------------------------------------------------- */
-int32_t Ymodem_Receive (uint8_t *);
-uint8_t Ymodem_Transmit (uint8_t *,const  uint8_t* , uint32_t );
+int32_t Ymodem_Receive ();
 
 #endif  /* _YMODEM_H_ */
 

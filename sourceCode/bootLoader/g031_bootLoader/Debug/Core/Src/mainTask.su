@@ -1,0 +1,2 @@
+../Core/Src/mainTask.c:17:6:mainTask	24	static,ignoring_inline_asm
+../Core/Src/mainTask.c:108:10:Str2Int	32	static

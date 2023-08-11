@@ -10,6 +10,7 @@
 
 #include <stdbool.h>
 #include "define.h"
+#include <stdint.h>
 
 extern volatile uint32_t ulMiliCount;
 extern volatile uint32_t ulSecCount;

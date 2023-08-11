@@ -16,11 +16,11 @@
 #define COMX0_APB_CLK              			APBENR2
 #define COMX0_CLK                  			RCC_APBENR2_USART1EN
 #define COMX0_TX_PIN               			9		//Pin A9
-#define COMX0_TX_PIN_AF            			PIN_AF_0
+#define COMX0_TX_PIN_AF            			PIN_AF_1
 #define COMX0_TX_GPIO_PORT         			GPIOA
 #define COMX0_TX_GPIO_CLK          			RCC_IOPENR_GPIOAEN
 #define COMX0_RX_PIN               			10
-#define COMX0_RX_PIN_AF            			PIN_AF_0
+#define COMX0_RX_PIN_AF            			PIN_AF_1
 #define COMX0_RX_GPIO_PORT         			GPIOA				//Pin A10
 #define COMX0_RX_GPIO_CLK          			RCC_IOPENR_GPIOAEN
 #define COMX0_IRQn                 			USART1_IRQn
@@ -45,8 +45,6 @@ void usart_x0_send(uint8_t c){
 void SerialPutChar(uint8_t c) {
 	usart_x0_send(c);
 }
-
-
 uint32_t SerialKeyPressed(uint8_t *key) {
 	if(USART_ISR_RXNE_RXFNE== (COMX0->ISR & USART_ISR_RXNE_RXFNE)){
 		*key = (uint8_t) COMX0->RDR;
