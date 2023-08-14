@@ -1,0 +1,6 @@
+common.c:36:10:FLASH_PagesMask	2
+common.c:54:6:FLASH_DisableWriteProtectionPages	1
+common.c:68:5:flash_verify_image	1
+common.c:86:6:flash_read_uboot_info	2
+common.c:100:6:flash_write_uboot_info	2
+common.c:112:5:flash_copy_image	5

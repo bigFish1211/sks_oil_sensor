@@ -60,8 +60,8 @@ all: main-build
 main-build: g031_SBL.elf secondary-outputs
 
 # Tool invocations
-g031_SBL.elf g031_SBL.map: $(OBJS) $(USER_OBJS) D:\github\sks_oil_sensor\sourceCode\bootLoader\g031_bootloader_yModem\STM32G031C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "g031_SBL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"D:\github\sks_oil_sensor\sourceCode\bootLoader\g031_bootloader_yModem\STM32G031C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="g031_SBL.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+g031_SBL.elf g031_SBL.map: $(OBJS) $(USER_OBJS) D:\gitHub\sks_oil_sensor\sourceCode\bootLoader\g031_bootloader_yModem\STM32G031C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "g031_SBL.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"D:\gitHub\sks_oil_sensor\sourceCode\bootLoader\g031_bootloader_yModem\STM32G031C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="g031_SBL.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

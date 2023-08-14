@@ -141,7 +141,7 @@ FLASH_Status FLASH_WaitForLastBankOperation(uint32_t Timeout) {
 
 FLASH_Status FLASH_ErasePage(uint32_t Page_Address) {
 	FLASH_Status status = FLASH_COMPLETE;
-	uint32_t pageNum = Page_Address/800;
+	uint32_t pageNum = (Page_Address-0x8000000)/0x800;
 	while ((FLASH->SR & FLASH_SR_BSY1));
 	FLASH->CR |= FLASH_CR_PER; //Page Erase Set
 	FLASH->CR |= (FLASH_CR_PNB & (pageNum << 3));
