@@ -1,0 +1,734 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"DateUtil.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_idivmod
+  18              		.section	.text.isleapyear,"ax",%progbits
+  19              		.align	1
+  20              		.global	isleapyear
+  21              		.code	16
+  22              		.thumb_func
+  24              	isleapyear:
+  25              	.LFB0:
+  26              		.file 1 "../Source - Copy/DateUtil.c"
+   1:../Source - Copy/DateUtil.c **** #include "stdio.h"
+   2:../Source - Copy/DateUtil.c **** #include "string.h"
+   3:../Source - Copy/DateUtil.c **** #include "Util.h"
+   4:../Source - Copy/DateUtil.c **** 
+   5:../Source - Copy/DateUtil.c **** char isleapyear(int year){   //ham kiem tra nam nhuan
+  27              		.loc 1 5 0
+  28              		.cfi_startproc
+  29 0000 10B5     		push	{r4, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 4, -8
+  33              		.cfi_offset 14, -4
+  34              	.LVL0:
+  35              		.loc 1 5 0
+  36 0002 041C     		mov	r4, r0
+   6:../Source - Copy/DateUtil.c ****     if((year %4 ==0) && ((year %100 !=0) || (year % 400==0))) return 1;
+   7:../Source - Copy/DateUtil.c ****     else return 0;
+  37              		.loc 1 7 0
+  38 0004 0020     		mov	r0, #0
+  39              	.LVL1:
+   6:../Source - Copy/DateUtil.c ****     if((year %4 ==0) && ((year %100 !=0) || (year % 400==0))) return 1;
+  40              		.loc 1 6 0
+  41 0006 A307     		lsl	r3, r4, #30
+  42 0008 0DD1     		bne	.L2
+   6:../Source - Copy/DateUtil.c ****     if((year %4 ==0) && ((year %100 !=0) || (year % 400==0))) return 1;
+  43              		.loc 1 6 0 is_stmt 0 discriminator 1
+  44 000a 201C     		mov	r0, r4
+  45 000c 6421     		mov	r1, #100
+  46 000e FFF7FEFF 		bl	__aeabi_idivmod
+  47 0012 0120     		mov	r0, #1
+  48 0014 0029     		cmp	r1, #0
+  49 0016 06D1     		bne	.L2
+   6:../Source - Copy/DateUtil.c ****     if((year %4 ==0) && ((year %100 !=0) || (year % 400==0))) return 1;
+  50              		.loc 1 6 0 discriminator 2
+  51 0018 C821     		mov	r1, #200
+  52 001a 201C     		mov	r0, r4
+  53 001c 4900     		lsl	r1, r1, #1
+  54 001e FFF7FEFF 		bl	__aeabi_idivmod
+  55 0022 4842     		neg	r0, r1
+  56 0024 4841     		adc	r0, r0, r1
+  57              	.L2:
+  58              		@ sp needed for prologue
+  59              	.LVL2:
+   8:../Source - Copy/DateUtil.c **** }
+  60              		.loc 1 8 0 is_stmt 1
+  61 0026 10BD     		pop	{r4, pc}
+  62              		.cfi_endproc
+  63              	.LFE0:
+  65              		.section	.text.truedate,"ax",%progbits
+  66              		.align	1
+  67              		.global	truedate
+  68              		.code	16
+  69              		.thumb_func
+  71              	truedate:
+  72              	.LFB1:
+   9:../Source - Copy/DateUtil.c **** 
+  10:../Source - Copy/DateUtil.c **** char truedate(int dd, int mm, int yy) {   //ham kiem tra ngay, thang nam nhap vao co hop le ko
+  73              		.loc 1 10 0
+  74              		.cfi_startproc
+  75 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  76              	.LCFI1:
+  77              		.cfi_def_cfa_offset 20
+  78              		.cfi_offset 4, -20
+  79              		.cfi_offset 5, -16
+  80              		.cfi_offset 6, -12
+  81              		.cfi_offset 7, -8
+  82              		.cfi_offset 14, -4
+  83              	.LVL3:
+  84 0002 85B0     		sub	sp, sp, #20
+  85              	.LCFI2:
+  86              		.cfi_def_cfa_offset 40
+  87              		.loc 1 10 0
+  88 0004 051C     		mov	r5, r0
+  89 0006 0F1C     		mov	r7, r1
+  90 0008 161C     		mov	r6, r2
+  11:../Source - Copy/DateUtil.c ****     char dayofmonth[13] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+  91              		.loc 1 11 0
+  92 000a 6846     		mov	r0, sp
+  93              	.LVL4:
+  94 000c 0F49     		ldr	r1, .L11
+  95              	.LVL5:
+  96 000e 0D22     		mov	r2, #13
+  97              	.LVL6:
+  98 0010 FFF7FEFF 		bl	memcpy
+  12:../Source - Copy/DateUtil.c ****     if(yy>= 2000){
+  99              		.loc 1 12 0
+ 100 0014 0E4B     		ldr	r3, .L11+4
+  11:../Source - Copy/DateUtil.c ****     char dayofmonth[13] = {31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+ 101              		.loc 1 11 0
+ 102 0016 041C     		mov	r4, r0
+  13:../Source - Copy/DateUtil.c ****         if(mm>=1 && mm<=12){
+  14:../Source - Copy/DateUtil.c ****             if(isleapyear(yy)) dayofmonth[2]++;
+  15:../Source - Copy/DateUtil.c ****             if(dd>0 && dd<=(int)dayofmonth[mm]) { 
+  16:../Source - Copy/DateUtil.c **** 				return 1;
+  17:../Source - Copy/DateUtil.c **** 			}  else {
+  18:../Source - Copy/DateUtil.c **** 				return 0;
+  19:../Source - Copy/DateUtil.c **** 			}
+  20:../Source - Copy/DateUtil.c ****         } else { 
+  21:../Source - Copy/DateUtil.c **** 			return 0;
+  22:../Source - Copy/DateUtil.c **** 		}
+  23:../Source - Copy/DateUtil.c ****     } else {
+  24:../Source - Copy/DateUtil.c **** 		return 0;
+ 103              		.loc 1 24 0
+ 104 0018 0020     		mov	r0, #0
+  12:../Source - Copy/DateUtil.c ****     if(yy>= 2000){
+ 105              		.loc 1 12 0
+ 106 001a 9E42     		cmp	r6, r3
+ 107 001c 14DD     		ble	.L6
+  13:../Source - Copy/DateUtil.c ****         if(mm>=1 && mm<=12){
+ 108              		.loc 1 13 0
+ 109 001e 791E     		sub	r1, r7, #1
+ 110 0020 0B29     		cmp	r1, #11
+ 111 0022 11D8     		bhi	.L6
+  14:../Source - Copy/DateUtil.c ****             if(isleapyear(yy)) dayofmonth[2]++;
+ 112              		.loc 1 14 0
+ 113 0024 301C     		mov	r0, r6
+ 114 0026 FFF7FEFF 		bl	isleapyear
+ 115 002a 0028     		cmp	r0, #0
+ 116 002c 02D0     		beq	.L7
+  14:../Source - Copy/DateUtil.c ****             if(isleapyear(yy)) dayofmonth[2]++;
+ 117              		.loc 1 14 0 is_stmt 0 discriminator 1
+ 118 002e A078     		ldrb	r0, [r4, #2]
+ 119 0030 0130     		add	r0, r0, #1
+ 120 0032 A070     		strb	r0, [r4, #2]
+ 121              	.L7:
+  18:../Source - Copy/DateUtil.c **** 				return 0;
+ 122              		.loc 1 18 0 is_stmt 1
+ 123 0034 0020     		mov	r0, #0
+  15:../Source - Copy/DateUtil.c ****             if(dd>0 && dd<=(int)dayofmonth[mm]) { 
+ 124              		.loc 1 15 0
+ 125 0036 8542     		cmp	r5, r0
+ 126 0038 06DD     		ble	.L6
+  15:../Source - Copy/DateUtil.c ****             if(dd>0 && dd<=(int)dayofmonth[mm]) { 
+ 127              		.loc 1 15 0 is_stmt 0 discriminator 1
+ 128 003a 6B46     		mov	r3, sp
+ 129 003c DE5D     		ldrb	r6, [r3, r7]
+ 130              	.LVL7:
+  10:../Source - Copy/DateUtil.c **** char truedate(int dd, int mm, int yy) {   //ham kiem tra ngay, thang nam nhap vao co hop le ko
+ 131              		.loc 1 10 0 is_stmt 1 discriminator 1
+ 132 003e EC0F     		lsr	r4, r5, #31
+ 133 0040 F217     		asr	r2, r6, #31
+ 134 0042 AE42     		cmp	r6, r5
+ 135 0044 5441     		adc	r4, r4, r2
+  16:../Source - Copy/DateUtil.c **** 				return 1;
+ 136              		.loc 1 16 0 discriminator 1
+ 137 0046 E0B2     		uxtb	r0, r4
+ 138              	.L6:
+  25:../Source - Copy/DateUtil.c **** 	}
+  26:../Source - Copy/DateUtil.c **** }
+ 139              		.loc 1 26 0
+ 140 0048 05B0     		add	sp, sp, #20
+ 141              		@ sp needed for prologue
+ 142              	.LVL8:
+ 143              	.LVL9:
+ 144 004a F0BD     		pop	{r4, r5, r6, r7, pc}
+ 145              	.L12:
+ 146              		.align	2
+ 147              	.L11:
+ 148 004c 00000000 		.word	.LANCHOR0
+ 149 0050 CF070000 		.word	1999
+ 150              		.cfi_endproc
+ 151              	.LFE1:
+ 153              		.section	.text.truetime,"ax",%progbits
+ 154              		.align	1
+ 155              		.global	truetime
+ 156              		.code	16
+ 157              		.thumb_func
+ 159              	truetime:
+ 160              	.LFB2:
+  27:../Source - Copy/DateUtil.c **** 
+  28:../Source - Copy/DateUtil.c **** char truetime(int h, int m, int s) {
+ 161              		.loc 1 28 0
+ 162              		.cfi_startproc
+ 163 0000 00B5     		push	{lr}
+ 164              	.LCFI3:
+ 165              		.cfi_def_cfa_offset 4
+ 166              		.cfi_offset 14, -4
+ 167              	.LVL10:
+ 168              		.loc 1 28 0
+ 169 0002 031C     		mov	r3, r0
+ 170 0004 0020     		mov	r0, #0
+ 171              	.LVL11:
+  29:../Source - Copy/DateUtil.c **** 	if(h >= 0 && h < 24) {
+ 172              		.loc 1 29 0
+ 173 0006 172B     		cmp	r3, #23
+ 174 0008 04D8     		bhi	.L14
+  30:../Source - Copy/DateUtil.c **** 		if(m >=0 && m < 60) {
+ 175              		.loc 1 30 0
+ 176 000a 3B29     		cmp	r1, #59
+ 177 000c 02D8     		bhi	.L14
+  31:../Source - Copy/DateUtil.c **** 			if(s >= 0 && s < 60) {
+  32:../Source - Copy/DateUtil.c **** 				return 1;
+ 178              		.loc 1 32 0
+ 179 000e 3B21     		mov	r1, #59
+ 180              	.LVL12:
+ 181 0010 9142     		cmp	r1, r2
+ 182 0012 4041     		adc	r0, r0, r0
+ 183              	.L14:
+ 184              		@ sp needed for prologue
+  33:../Source - Copy/DateUtil.c **** 			} else return 0;
+  34:../Source - Copy/DateUtil.c **** 		} else return 0;
+  35:../Source - Copy/DateUtil.c **** 	} else return 0;
+  36:../Source - Copy/DateUtil.c **** }
+ 185              		.loc 1 36 0
+ 186 0014 00BD     		pop	{pc}
+ 187              		.cfi_endproc
+ 188              	.LFE2:
+ 190              		.section	.text.getHour,"ax",%progbits
+ 191              		.align	1
+ 192              		.global	getHour
+ 193              		.code	16
+ 194              		.thumb_func
+ 196              	getHour:
+ 197              	.LFB3:
+  37:../Source - Copy/DateUtil.c **** 
+  38:../Source - Copy/DateUtil.c **** int getHour(char* dt) {
+ 198              		.loc 1 38 0
+ 199              		.cfi_startproc
+ 200 0000 07B5     		push	{r0, r1, r2, lr}
+ 201              	.LCFI4:
+ 202              		.cfi_def_cfa_offset 16
+ 203              		.cfi_offset 0, -16
+ 204              		.cfi_offset 1, -12
+ 205              		.cfi_offset 2, -8
+ 206              		.cfi_offset 14, -4
+ 207              	.LVL13:
+ 208              	.LBB2:
+  39:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+  40:../Source - Copy/DateUtil.c **** 
+  41:../Source - Copy/DateUtil.c **** 	for(char i = 0; i<2; i++) {
+  42:../Source - Copy/DateUtil.c **** 		tmpT[i] = dt[i];
+ 209              		.loc 1 42 0
+ 210 0002 0178     		ldrb	r1, [r0]
+ 211 0004 4278     		ldrb	r2, [r0, #1]
+ 212              	.LBE2:
+  39:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+ 213              		.loc 1 39 0
+ 214 0006 01AB     		add	r3, sp, #4
+ 215              	.LVL14:
+ 216              	.LBB3:
+ 217              		.loc 1 42 0
+ 218 0008 1970     		strb	r1, [r3]
+ 219              	.LVL15:
+ 220 000a 5A70     		strb	r2, [r3, #1]
+ 221              	.LVL16:
+ 222              	.LBE3:
+  43:../Source - Copy/DateUtil.c **** 	}
+  44:../Source - Copy/DateUtil.c **** 	return a_to_i(tmpT, 2);
+ 223              		.loc 1 44 0
+ 224 000c 181C     		mov	r0, r3
+ 225              	.LVL17:
+ 226 000e 0221     		mov	r1, #2
+ 227 0010 FFF7FEFF 		bl	a_to_i
+ 228              		@ sp needed for prologue
+  45:../Source - Copy/DateUtil.c **** }
+ 229              		.loc 1 45 0
+ 230 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 231              		.cfi_endproc
+ 232              	.LFE3:
+ 234              		.section	.text.getMinute,"ax",%progbits
+ 235              		.align	1
+ 236              		.global	getMinute
+ 237              		.code	16
+ 238              		.thumb_func
+ 240              	getMinute:
+ 241              	.LFB4:
+  46:../Source - Copy/DateUtil.c **** 
+  47:../Source - Copy/DateUtil.c **** int getMinute(char* dt) {
+ 242              		.loc 1 47 0
+ 243              		.cfi_startproc
+ 244 0000 07B5     		push	{r0, r1, r2, lr}
+ 245              	.LCFI5:
+ 246              		.cfi_def_cfa_offset 16
+ 247              		.cfi_offset 0, -16
+ 248              		.cfi_offset 1, -12
+ 249              		.cfi_offset 2, -8
+ 250              		.cfi_offset 14, -4
+ 251              	.LVL18:
+ 252              	.LBB4:
+  48:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+  49:../Source - Copy/DateUtil.c **** 	for(char i = 0; i<2; i++) {
+  50:../Source - Copy/DateUtil.c **** 		tmpT[i] = dt[i+3];
+ 253              		.loc 1 50 0
+ 254 0002 C178     		ldrb	r1, [r0, #3]
+ 255 0004 0279     		ldrb	r2, [r0, #4]
+ 256              	.LBE4:
+  48:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+ 257              		.loc 1 48 0
+ 258 0006 01AB     		add	r3, sp, #4
+ 259              	.LVL19:
+ 260              	.LBB5:
+ 261              		.loc 1 50 0
+ 262 0008 1970     		strb	r1, [r3]
+ 263              	.LVL20:
+ 264 000a 5A70     		strb	r2, [r3, #1]
+ 265              	.LVL21:
+ 266              	.LBE5:
+  51:../Source - Copy/DateUtil.c **** 	}
+  52:../Source - Copy/DateUtil.c **** 	return a_to_i(tmpT, 2);
+ 267              		.loc 1 52 0
+ 268 000c 181C     		mov	r0, r3
+ 269              	.LVL22:
+ 270 000e 0221     		mov	r1, #2
+ 271 0010 FFF7FEFF 		bl	a_to_i
+ 272              		@ sp needed for prologue
+  53:../Source - Copy/DateUtil.c **** }
+ 273              		.loc 1 53 0
+ 274 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 275              		.cfi_endproc
+ 276              	.LFE4:
+ 278              		.section	.text.getSecond,"ax",%progbits
+ 279              		.align	1
+ 280              		.global	getSecond
+ 281              		.code	16
+ 282              		.thumb_func
+ 284              	getSecond:
+ 285              	.LFB5:
+  54:../Source - Copy/DateUtil.c **** 
+  55:../Source - Copy/DateUtil.c **** int getSecond(char* dt) {
+ 286              		.loc 1 55 0
+ 287              		.cfi_startproc
+ 288 0000 07B5     		push	{r0, r1, r2, lr}
+ 289              	.LCFI6:
+ 290              		.cfi_def_cfa_offset 16
+ 291              		.cfi_offset 0, -16
+ 292              		.cfi_offset 1, -12
+ 293              		.cfi_offset 2, -8
+ 294              		.cfi_offset 14, -4
+ 295              	.LVL23:
+ 296              	.LBB6:
+  56:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+  57:../Source - Copy/DateUtil.c **** 	for(char i = 0; i<2; i++) {
+  58:../Source - Copy/DateUtil.c **** 		tmpT[i] = dt[i+6];
+ 297              		.loc 1 58 0
+ 298 0002 8179     		ldrb	r1, [r0, #6]
+ 299 0004 C279     		ldrb	r2, [r0, #7]
+ 300              	.LBE6:
+  56:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+ 301              		.loc 1 56 0
+ 302 0006 01AB     		add	r3, sp, #4
+ 303              	.LVL24:
+ 304              	.LBB7:
+ 305              		.loc 1 58 0
+ 306 0008 1970     		strb	r1, [r3]
+ 307              	.LVL25:
+ 308 000a 5A70     		strb	r2, [r3, #1]
+ 309              	.LVL26:
+ 310              	.LBE7:
+  59:../Source - Copy/DateUtil.c **** 	}
+  60:../Source - Copy/DateUtil.c **** 	return a_to_i(tmpT, 2);
+ 311              		.loc 1 60 0
+ 312 000c 181C     		mov	r0, r3
+ 313              	.LVL27:
+ 314 000e 0221     		mov	r1, #2
+ 315 0010 FFF7FEFF 		bl	a_to_i
+ 316              		@ sp needed for prologue
+  61:../Source - Copy/DateUtil.c **** }
+ 317              		.loc 1 61 0
+ 318 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 319              		.cfi_endproc
+ 320              	.LFE5:
+ 322              		.section	.text.istruetime,"ax",%progbits
+ 323              		.align	1
+ 324              		.global	istruetime
+ 325              		.code	16
+ 326              		.thumb_func
+ 328              	istruetime:
+ 329              	.LFB6:
+  62:../Source - Copy/DateUtil.c **** 
+  63:../Source - Copy/DateUtil.c **** char istruetime(char* dt) {
+ 330              		.loc 1 63 0
+ 331              		.cfi_startproc
+ 332 0000 70B5     		push	{r4, r5, r6, lr}
+ 333              	.LCFI7:
+ 334              		.cfi_def_cfa_offset 16
+ 335              		.cfi_offset 4, -16
+ 336              		.cfi_offset 5, -12
+ 337              		.cfi_offset 6, -8
+ 338              		.cfi_offset 14, -4
+ 339              	.LVL28:
+ 340              		.loc 1 63 0
+ 341 0002 041C     		mov	r4, r0
+ 342 0004 0023     		mov	r3, #0
+ 343              	.LVL29:
+ 344              	.L22:
+ 345              	.LBB8:
+  64:../Source - Copy/DateUtil.c **** 	for(char i = 0; i < 8; i++) {
+  65:../Source - Copy/DateUtil.c **** 		if(dt[i] == '_') {
+ 346              		.loc 1 65 0
+ 347 0006 E25C     		ldrb	r2, [r4, r3]
+ 348 0008 5F2A     		cmp	r2, #95
+ 349 000a 13D0     		beq	.L23
+ 350 000c 0133     		add	r3, r3, #1
+  64:../Source - Copy/DateUtil.c **** 	for(char i = 0; i < 8; i++) {
+ 351              		.loc 1 64 0
+ 352 000e 082B     		cmp	r3, #8
+ 353 0010 F9D1     		bne	.L22
+ 354              	.LBE8:
+  66:../Source - Copy/DateUtil.c **** 			return 0;
+  67:../Source - Copy/DateUtil.c **** 		}
+  68:../Source - Copy/DateUtil.c **** 	}	
+  69:../Source - Copy/DateUtil.c **** 	return truetime(getHour(dt), getMinute(dt), getSecond(dt));
+ 355              		.loc 1 69 0
+ 356 0012 201C     		mov	r0, r4
+ 357              	.LVL30:
+ 358 0014 FFF7FEFF 		bl	getHour
+ 359 0018 051C     		mov	r5, r0
+ 360 001a 201C     		mov	r0, r4
+ 361 001c FFF7FEFF 		bl	getMinute
+ 362 0020 061C     		mov	r6, r0
+ 363 0022 201C     		mov	r0, r4
+ 364 0024 FFF7FEFF 		bl	getSecond
+ 365 0028 311C     		mov	r1, r6
+ 366 002a 021C     		mov	r2, r0
+ 367 002c 281C     		mov	r0, r5
+ 368 002e FFF7FEFF 		bl	truetime
+ 369 0032 00E0     		b	.L21
+ 370              	.L23:
+ 371              	.LBB9:
+  66:../Source - Copy/DateUtil.c **** 			return 0;
+ 372              		.loc 1 66 0
+ 373 0034 0020     		mov	r0, #0
+ 374              	.L21:
+ 375              	.LBE9:
+ 376              		@ sp needed for prologue
+ 377              	.LVL31:
+  70:../Source - Copy/DateUtil.c **** }
+ 378              		.loc 1 70 0
+ 379 0036 70BD     		pop	{r4, r5, r6, pc}
+ 380              		.cfi_endproc
+ 381              	.LFE6:
+ 383              		.section	.text.getDay,"ax",%progbits
+ 384              		.align	1
+ 385              		.global	getDay
+ 386              		.code	16
+ 387              		.thumb_func
+ 389              	getDay:
+ 390              	.LFB7:
+  71:../Source - Copy/DateUtil.c **** 
+  72:../Source - Copy/DateUtil.c **** int getDay(char* dt) {
+ 391              		.loc 1 72 0
+ 392              		.cfi_startproc
+ 393 0000 07B5     		push	{r0, r1, r2, lr}
+ 394              	.LCFI8:
+ 395              		.cfi_def_cfa_offset 16
+ 396              		.cfi_offset 0, -16
+ 397              		.cfi_offset 1, -12
+ 398              		.cfi_offset 2, -8
+ 399              		.cfi_offset 14, -4
+ 400              	.LVL32:
+ 401              	.LBB10:
+  73:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+  74:../Source - Copy/DateUtil.c **** 	for(char i = 0; i<2; i++) {
+  75:../Source - Copy/DateUtil.c **** 		tmpT[i] = dt[i];
+ 402              		.loc 1 75 0
+ 403 0002 0178     		ldrb	r1, [r0]
+ 404 0004 4278     		ldrb	r2, [r0, #1]
+ 405              	.LBE10:
+  73:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+ 406              		.loc 1 73 0
+ 407 0006 01AB     		add	r3, sp, #4
+ 408              	.LVL33:
+ 409              	.LBB11:
+ 410              		.loc 1 75 0
+ 411 0008 1970     		strb	r1, [r3]
+ 412              	.LVL34:
+ 413 000a 5A70     		strb	r2, [r3, #1]
+ 414              	.LVL35:
+ 415              	.LBE11:
+  76:../Source - Copy/DateUtil.c **** 	}
+  77:../Source - Copy/DateUtil.c **** 	return a_to_i(tmpT, 2);
+ 416              		.loc 1 77 0
+ 417 000c 181C     		mov	r0, r3
+ 418              	.LVL36:
+ 419 000e 0221     		mov	r1, #2
+ 420 0010 FFF7FEFF 		bl	a_to_i
+ 421              		@ sp needed for prologue
+  78:../Source - Copy/DateUtil.c **** }
+ 422              		.loc 1 78 0
+ 423 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 424              		.cfi_endproc
+ 425              	.LFE7:
+ 427              		.section	.text.getMon,"ax",%progbits
+ 428              		.align	1
+ 429              		.global	getMon
+ 430              		.code	16
+ 431              		.thumb_func
+ 433              	getMon:
+ 434              	.LFB8:
+  79:../Source - Copy/DateUtil.c **** 
+  80:../Source - Copy/DateUtil.c **** int getMon(char* dt) {
+ 435              		.loc 1 80 0
+ 436              		.cfi_startproc
+ 437 0000 07B5     		push	{r0, r1, r2, lr}
+ 438              	.LCFI9:
+ 439              		.cfi_def_cfa_offset 16
+ 440              		.cfi_offset 0, -16
+ 441              		.cfi_offset 1, -12
+ 442              		.cfi_offset 2, -8
+ 443              		.cfi_offset 14, -4
+ 444              	.LVL37:
+ 445              	.LBB12:
+  81:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+  82:../Source - Copy/DateUtil.c **** 	for(char i = 0; i<2; i++) {
+  83:../Source - Copy/DateUtil.c **** 		tmpT[i] = dt[i+3];
+ 446              		.loc 1 83 0
+ 447 0002 C178     		ldrb	r1, [r0, #3]
+ 448 0004 0279     		ldrb	r2, [r0, #4]
+ 449              	.LBE12:
+  81:../Source - Copy/DateUtil.c **** 	char tmpT[2] = {0};
+ 450              		.loc 1 81 0
+ 451 0006 01AB     		add	r3, sp, #4
+ 452              	.LVL38:
+ 453              	.LBB13:
+ 454              		.loc 1 83 0
+ 455 0008 1970     		strb	r1, [r3]
+ 456              	.LVL39:
+ 457 000a 5A70     		strb	r2, [r3, #1]
+ 458              	.LVL40:
+ 459              	.LBE13:
+  84:../Source - Copy/DateUtil.c **** 	}
+  85:../Source - Copy/DateUtil.c **** 	return a_to_i(tmpT, 2);
+ 460              		.loc 1 85 0
+ 461 000c 181C     		mov	r0, r3
+ 462              	.LVL41:
+ 463 000e 0221     		mov	r1, #2
+ 464 0010 FFF7FEFF 		bl	a_to_i
+ 465              		@ sp needed for prologue
+  86:../Source - Copy/DateUtil.c **** }
+ 466              		.loc 1 86 0
+ 467 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 468              		.cfi_endproc
+ 469              	.LFE8:
+ 471              		.section	.text.getYear,"ax",%progbits
+ 472              		.align	1
+ 473              		.global	getYear
+ 474              		.code	16
+ 475              		.thumb_func
+ 477              	getYear:
+ 478              	.LFB9:
+  87:../Source - Copy/DateUtil.c **** 
+  88:../Source - Copy/DateUtil.c **** int getYear(char* dt) {
+ 479              		.loc 1 88 0
+ 480              		.cfi_startproc
+ 481 0000 07B5     		push	{r0, r1, r2, lr}
+ 482              	.LCFI10:
+ 483              		.cfi_def_cfa_offset 16
+ 484              		.cfi_offset 0, -16
+ 485              		.cfi_offset 1, -12
+ 486              		.cfi_offset 2, -8
+ 487              		.cfi_offset 14, -4
+ 488              	.LVL42:
+ 489              	.LBB14:
+  89:../Source - Copy/DateUtil.c **** 	char tmpT[4] = {0};
+  90:../Source - Copy/DateUtil.c **** 	for(char i = 0; i<4; i++) {
+  91:../Source - Copy/DateUtil.c **** 		tmpT[i] = dt[i+6];
+ 490              		.loc 1 91 0
+ 491 0002 8179     		ldrb	r1, [r0, #6]
+ 492 0004 C279     		ldrb	r2, [r0, #7]
+ 493              	.LBE14:
+  89:../Source - Copy/DateUtil.c **** 	char tmpT[4] = {0};
+ 494              		.loc 1 89 0
+ 495 0006 01AB     		add	r3, sp, #4
+ 496              	.LVL43:
+ 497              	.LBB15:
+ 498              		.loc 1 91 0
+ 499 0008 1970     		strb	r1, [r3]
+ 500              	.LVL44:
+ 501 000a 5A70     		strb	r2, [r3, #1]
+ 502              	.LVL45:
+ 503 000c 017A     		ldrb	r1, [r0, #8]
+ 504 000e 427A     		ldrb	r2, [r0, #9]
+ 505 0010 9970     		strb	r1, [r3, #2]
+ 506              	.LVL46:
+ 507 0012 DA70     		strb	r2, [r3, #3]
+ 508              	.LVL47:
+ 509              	.LBE15:
+  92:../Source - Copy/DateUtil.c **** 	}
+  93:../Source - Copy/DateUtil.c **** 	return a_to_i(tmpT, 4);
+ 510              		.loc 1 93 0
+ 511 0014 181C     		mov	r0, r3
+ 512              	.LVL48:
+ 513 0016 0421     		mov	r1, #4
+ 514 0018 FFF7FEFF 		bl	a_to_i
+ 515              		@ sp needed for prologue
+  94:../Source - Copy/DateUtil.c **** }
+ 516              		.loc 1 94 0
+ 517 001c 0EBD     		pop	{r1, r2, r3, pc}
+ 518              		.cfi_endproc
+ 519              	.LFE9:
+ 521              		.section	.text.istruedate,"ax",%progbits
+ 522              		.align	1
+ 523              		.global	istruedate
+ 524              		.code	16
+ 525              		.thumb_func
+ 527              	istruedate:
+ 528              	.LFB10:
+  95:../Source - Copy/DateUtil.c **** 
+  96:../Source - Copy/DateUtil.c **** char istruedate(char* dt) {
+ 529              		.loc 1 96 0
+ 530              		.cfi_startproc
+ 531 0000 70B5     		push	{r4, r5, r6, lr}
+ 532              	.LCFI11:
+ 533              		.cfi_def_cfa_offset 16
+ 534              		.cfi_offset 4, -16
+ 535              		.cfi_offset 5, -12
+ 536              		.cfi_offset 6, -8
+ 537              		.cfi_offset 14, -4
+ 538              	.LVL49:
+ 539              		.loc 1 96 0
+ 540 0002 041C     		mov	r4, r0
+ 541 0004 0023     		mov	r3, #0
+ 542              	.LVL50:
+ 543              	.L30:
+ 544              	.LBB16:
+  97:../Source - Copy/DateUtil.c **** 	for(char i = 0; i < 10; i++) {
+  98:../Source - Copy/DateUtil.c **** 		if(dt[i] == '_') {
+ 545              		.loc 1 98 0
+ 546 0006 E25C     		ldrb	r2, [r4, r3]
+ 547 0008 5F2A     		cmp	r2, #95
+ 548 000a 13D0     		beq	.L31
+ 549 000c 0133     		add	r3, r3, #1
+  97:../Source - Copy/DateUtil.c **** 	for(char i = 0; i < 10; i++) {
+ 550              		.loc 1 97 0
+ 551 000e 0A2B     		cmp	r3, #10
+ 552 0010 F9D1     		bne	.L30
+ 553              	.LBE16:
+  99:../Source - Copy/DateUtil.c **** 			return 0;
+ 100:../Source - Copy/DateUtil.c **** 		}
+ 101:../Source - Copy/DateUtil.c **** 	}	
+ 102:../Source - Copy/DateUtil.c **** 	return truedate(getDay(dt), getMon(dt), getYear(dt));
+ 554              		.loc 1 102 0
+ 555 0012 201C     		mov	r0, r4
+ 556              	.LVL51:
+ 557 0014 FFF7FEFF 		bl	getDay
+ 558 0018 051C     		mov	r5, r0
+ 559 001a 201C     		mov	r0, r4
+ 560 001c FFF7FEFF 		bl	getMon
+ 561 0020 061C     		mov	r6, r0
+ 562 0022 201C     		mov	r0, r4
+ 563 0024 FFF7FEFF 		bl	getYear
+ 564 0028 311C     		mov	r1, r6
+ 565 002a 021C     		mov	r2, r0
+ 566 002c 281C     		mov	r0, r5
+ 567 002e FFF7FEFF 		bl	truedate
+ 568 0032 00E0     		b	.L29
+ 569              	.L31:
+ 570              	.LBB17:
+  99:../Source - Copy/DateUtil.c **** 			return 0;
+ 571              		.loc 1 99 0
+ 572 0034 0020     		mov	r0, #0
+ 573              	.L29:
+ 574              	.LBE17:
+ 575              		@ sp needed for prologue
+ 576              	.LVL52:
+ 103:../Source - Copy/DateUtil.c **** }
+ 577              		.loc 1 103 0
+ 578 0036 70BD     		pop	{r4, r5, r6, pc}
+ 579              		.cfi_endproc
+ 580              	.LFE10:
+ 582              		.section	.rodata
+ 583              		.set	.LANCHOR0,. + 0
+ 584              	.LC0:
+ 585 0000 1F       		.byte	31
+ 586 0001 1F       		.byte	31
+ 587 0002 1C       		.byte	28
+ 588 0003 1F       		.byte	31
+ 589 0004 1E       		.byte	30
+ 590 0005 1F       		.byte	31
+ 591 0006 1E       		.byte	30
+ 592 0007 1F       		.byte	31
+ 593 0008 1F       		.byte	31
+ 594 0009 1E       		.byte	30
+ 595 000a 1F       		.byte	31
+ 596 000b 1E       		.byte	30
+ 597 000c 1F       		.byte	31
+ 598              		.text
+ 599              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 DateUtil.c
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:19     .text.isleapyear:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:24     .text.isleapyear:00000000 isleapyear
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:66     .text.truedate:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:71     .text.truedate:00000000 truedate
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:148    .text.truedate:0000004c $d
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:154    .text.truetime:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:159    .text.truetime:00000000 truetime
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:191    .text.getHour:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:196    .text.getHour:00000000 getHour
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:235    .text.getMinute:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:240    .text.getMinute:00000000 getMinute
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:279    .text.getSecond:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:284    .text.getSecond:00000000 getSecond
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:323    .text.istruetime:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:328    .text.istruetime:00000000 istruetime
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:384    .text.getDay:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:389    .text.getDay:00000000 getDay
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:428    .text.getMon:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:433    .text.getMon:00000000 getMon
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:472    .text.getYear:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:477    .text.getYear:00000000 getYear
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:522    .text.istruedate:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccintEoB.s:527    .text.istruedate:00000000 istruedate
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_idivmod
+memcpy
+a_to_i

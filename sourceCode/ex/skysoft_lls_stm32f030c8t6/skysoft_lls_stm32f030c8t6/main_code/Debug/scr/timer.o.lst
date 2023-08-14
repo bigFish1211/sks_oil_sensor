@@ -1,0 +1,434 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"timer.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.TIM2_base_Configuration,"ax",%progbits
+  18              		.align	1
+  19              		.global	TIM2_base_Configuration
+  20              		.code	16
+  21              		.thumb_func
+  23              	TIM2_base_Configuration:
+  24              	.LFB33:
+  25              		.file 1 "../scr/timer.c"
+   1:../scr/timer.c **** 
+   2:../scr/timer.c **** #include "timer.h"
+   3:../scr/timer.c **** #include <stdint.h>
+   4:../scr/timer.c **** #include "stm32f0xx_conf.h"
+   5:../scr/timer.c **** 
+   6:../scr/timer.c **** #define OIL_SENOR_IPU_PIN				GPIO_Pin_3
+   7:../scr/timer.c **** #define OIL_SENOR_IPU_PORT				GPIOA
+   8:../scr/timer.c **** #define OIL_SENOR_IPU_PIN_SOURCE		GPIO_Pin_3
+   9:../scr/timer.c **** #define OIL_SENOR_IPU_PIN_AF			GPIO_AF_3
+  10:../scr/timer.c **** void TIM2_base_Configuration(void) {
+  26              		.loc 1 10 0
+  27              		.cfi_startproc
+  28              		@ sp needed for prologue
+  11:../scr/timer.c **** #if 0
+  12:../scr/timer.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+  13:../scr/timer.c **** 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  14:../scr/timer.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+  15:../scr/timer.c **** 
+  16:../scr/timer.c **** 	/* Time base configuration */
+  17:../scr/timer.c **** 	TIM_TimeBaseStructure.TIM_Prescaler = 100-1;//((SystemCoreClock / 2) / 1000000) - 1; // frequency 
+  18:../scr/timer.c **** 	TIM_TimeBaseStructure.TIM_Period = 36 - 1;
+  19:../scr/timer.c **** 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  20:../scr/timer.c **** 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  21:../scr/timer.c **** 	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
+  22:../scr/timer.c **** 	
+  23:../scr/timer.c **** 	
+  24:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM2;
+  25:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  26:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  27:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  28:../scr/timer.c **** 	NVIC_Init(&NVIC_InitStructure);
+  29:../scr/timer.c **** 	
+  30:../scr/timer.c **** 	TIM_ITConfig(TIM2, TIM_IT_Update, ENABLE);
+  31:../scr/timer.c **** 	TIM_Cmd(TIM2, ENABLE);
+  32:../scr/timer.c **** #endif
+  33:../scr/timer.c **** }
+  29              		.loc 1 33 0
+  30 0000 7047     		bx	lr
+  31              		.cfi_endproc
+  32              	.LFE33:
+  34              		.section	.text.TIM1_Capture_Configuration,"ax",%progbits
+  35              		.align	1
+  36              		.global	TIM1_Capture_Configuration
+  37              		.code	16
+  38              		.thumb_func
+  40              	TIM1_Capture_Configuration:
+  41              	.LFB34:
+  34:../scr/timer.c **** 
+  35:../scr/timer.c **** 
+  36:../scr/timer.c **** void TIM1_Capture_Configuration(void) {
+  42              		.loc 1 36 0
+  43              		.cfi_startproc
+  44 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  45              	.LCFI0:
+  46              		.cfi_def_cfa_offset 20
+  47              		.cfi_offset 4, -20
+  48              		.cfi_offset 5, -16
+  49              		.cfi_offset 6, -12
+  50              		.cfi_offset 7, -8
+  51              		.cfi_offset 14, -4
+  37:../scr/timer.c **** 	TIM_ICInitTypeDef TIM_ICInitStructure;
+  38:../scr/timer.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  39:../scr/timer.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+  40:../scr/timer.c **** 	/* TIM1 clock enable */
+  41:../scr/timer.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+  52              		.loc 1 41 0
+  53 0002 8024     		mov	r4, #128
+  36:../scr/timer.c **** void TIM1_Capture_Configuration(void) {
+  54              		.loc 1 36 0
+  55 0004 87B0     		sub	sp, sp, #28
+  56              	.LCFI1:
+  57              		.cfi_def_cfa_offset 48
+  58              		.loc 1 41 0
+  59 0006 2001     		lsl	r0, r4, #4
+  60 0008 0121     		mov	r1, #1
+  42:../scr/timer.c **** 	/* GPIOA clock enable */
+  43:../scr/timer.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+  61              		.loc 1 43 0
+  62 000a 8026     		mov	r6, #128
+  41:../scr/timer.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE);
+  63              		.loc 1 41 0
+  64 000c FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  65              		.loc 1 43 0
+  66 0010 B002     		lsl	r0, r6, #10
+  67 0012 0121     		mov	r1, #1
+  68 0014 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  44:../scr/timer.c **** 	/* TIM1 channel 1 pin (PA.4) configuration */
+  45:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+  46:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  47:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  48:../scr/timer.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  69              		.loc 1 48 0
+  70 0018 0024     		mov	r4, #0
+  45:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+  71              		.loc 1 45 0
+  72 001a 03A9     		add	r1, sp, #12
+  49:../scr/timer.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  50:../scr/timer.c **** 	GPIO_Init(OIL_SENOR_IPU_PORT, &GPIO_InitStructure);
+  73              		.loc 1 50 0
+  74 001c 9023     		mov	r3, #144
+  46:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  75              		.loc 1 46 0
+  76 001e 0226     		mov	r6, #2
+  47:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  77              		.loc 1 47 0
+  78 0020 0320     		mov	r0, #3
+  45:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+  79              		.loc 1 45 0
+  80 0022 0827     		mov	r7, #8
+  46:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  81              		.loc 1 46 0
+  82 0024 0E71     		strb	r6, [r1, #4]
+  47:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  83              		.loc 1 47 0
+  84 0026 4871     		strb	r0, [r1, #5]
+  48:../scr/timer.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  85              		.loc 1 48 0
+  86 0028 8C71     		strb	r4, [r1, #6]
+  87              		.loc 1 50 0
+  88 002a D805     		lsl	r0, r3, #23
+  49:../scr/timer.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  89              		.loc 1 49 0
+  90 002c CC71     		strb	r4, [r1, #7]
+  45:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+  91              		.loc 1 45 0
+  92 002e 0397     		str	r7, [sp, #12]
+  93              		.loc 1 50 0
+  94 0030 FFF7FEFF 		bl	GPIO_Init
+  51:../scr/timer.c **** 	/* Connect TIM pins to AF2 */
+  52:../scr/timer.c **** 	GPIO_PinAFConfig(OIL_SENOR_IPU_PORT, OIL_SENOR_IPU_PIN_SOURCE, GPIO_AF_2);
+  95              		.loc 1 52 0
+  96 0034 9022     		mov	r2, #144
+  97 0036 D005     		lsl	r0, r2, #23
+  98 0038 391C     		mov	r1, r7
+  99 003a 321C     		mov	r2, r6
+ 100 003c FFF7FEFF 		bl	GPIO_PinAFConfig
+  53:../scr/timer.c **** 	/* TIM1 configuration: Input Capture mode ---------------------
+  54:../scr/timer.c **** 	 The external signal is connected to TIM1 CH1 pin (PA.08)
+  55:../scr/timer.c **** 	 The Rising edge is used as active edge,
+  56:../scr/timer.c **** 	 The TIM1 CCR1 is used to compute the frequency value
+  57:../scr/timer.c **** 	 ------------------------------------------------------------ */
+  58:../scr/timer.c **** 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+  59:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_BothEdge;
+ 101              		.loc 1 59 0
+ 102 0040 0A25     		mov	r5, #10
+  58:../scr/timer.c **** 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+ 103              		.loc 1 58 0
+ 104 0042 6946     		mov	r1, sp
+ 105              		.loc 1 59 0
+ 106 0044 4D80     		strh	r5, [r1, #2]
+  60:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+ 107              		.loc 1 60 0
+ 108 0046 0125     		mov	r5, #1
+  58:../scr/timer.c **** 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_1;
+ 109              		.loc 1 58 0
+ 110 0048 0C80     		strh	r4, [r1]
+ 111              		.loc 1 60 0
+ 112 004a 8D80     		strh	r5, [r1, #4]
+  61:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+ 113              		.loc 1 61 0
+ 114 004c CC80     		strh	r4, [r1, #6]
+  62:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+ 115              		.loc 1 62 0
+ 116 004e 0C81     		strh	r4, [r1, #8]
+  63:../scr/timer.c **** 	TIM_ICInit(TIM1, &TIM_ICInitStructure);
+ 117              		.loc 1 63 0
+ 118 0050 0B48     		ldr	r0, .L3
+ 119 0052 6946     		mov	r1, sp
+ 120 0054 FFF7FEFF 		bl	TIM_ICInit
+  64:../scr/timer.c **** 	/* Enable the TIM4 global Interrupt */
+  65:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
+ 121              		.loc 1 65 0
+ 122 0058 05A8     		add	r0, sp, #20
+ 123 005a 0E23     		mov	r3, #14
+  66:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+  67:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 124              		.loc 1 67 0
+ 125 005c 0122     		mov	r2, #1
+  65:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM1_CC_IRQn;
+ 126              		.loc 1 65 0
+ 127 005e 0370     		strb	r3, [r0]
+  66:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 128              		.loc 1 66 0
+ 129 0060 4470     		strb	r4, [r0, #1]
+ 130              		.loc 1 67 0
+ 131 0062 8270     		strb	r2, [r0, #2]
+  68:../scr/timer.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 132              		.loc 1 68 0
+ 133 0064 FFF7FEFF 		bl	NVIC_Init
+  69:../scr/timer.c **** 	/* Enable the CC2 Interrupt Request */
+  70:../scr/timer.c **** 	TIM_ITConfig(TIM1, TIM_IT_CC1, ENABLE);
+ 134              		.loc 1 70 0
+ 135 0068 311C     		mov	r1, r6
+ 136 006a 2A1C     		mov	r2, r5
+ 137 006c 0448     		ldr	r0, .L3
+ 138 006e FFF7FEFF 		bl	TIM_ITConfig
+  71:../scr/timer.c **** 	/* TIM enable counter */
+  72:../scr/timer.c **** 	TIM_Cmd(TIM1, ENABLE);
+ 139              		.loc 1 72 0
+ 140 0072 0348     		ldr	r0, .L3
+ 141 0074 291C     		mov	r1, r5
+ 142 0076 FFF7FEFF 		bl	TIM_Cmd
+  73:../scr/timer.c **** }
+ 143              		.loc 1 73 0
+ 144 007a 07B0     		add	sp, sp, #28
+ 145              		@ sp needed for prologue
+ 146 007c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 147              	.L4:
+ 148 007e C046     		.align	2
+ 149              	.L3:
+ 150 0080 002C0140 		.word	1073818624
+ 151              		.cfi_endproc
+ 152              	.LFE34:
+ 154              		.section	.text.TIM15_Capture_Configuration,"ax",%progbits
+ 155              		.align	1
+ 156              		.global	TIM15_Capture_Configuration
+ 157              		.code	16
+ 158              		.thumb_func
+ 160              	TIM15_Capture_Configuration:
+ 161              	.LFB35:
+  74:../scr/timer.c **** 
+  75:../scr/timer.c **** void TIM15_Capture_Configuration(void) {
+ 162              		.loc 1 75 0
+ 163              		.cfi_startproc
+ 164 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 165              	.LCFI2:
+ 166              		.cfi_def_cfa_offset 20
+ 167              		.cfi_offset 4, -20
+ 168              		.cfi_offset 5, -16
+ 169              		.cfi_offset 6, -12
+ 170              		.cfi_offset 7, -8
+ 171              		.cfi_offset 14, -4
+  76:../scr/timer.c **** 	TIM_ICInitTypeDef TIM_ICInitStructure;
+  77:../scr/timer.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  78:../scr/timer.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+  79:../scr/timer.c **** 	/* TIM1 clock enable */
+  80:../scr/timer.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM15, ENABLE);
+ 172              		.loc 1 80 0
+ 173 0002 8020     		mov	r0, #128
+  75:../scr/timer.c **** void TIM15_Capture_Configuration(void) {
+ 174              		.loc 1 75 0
+ 175 0004 87B0     		sub	sp, sp, #28
+ 176              	.LCFI3:
+ 177              		.cfi_def_cfa_offset 48
+ 178              		.loc 1 80 0
+ 179 0006 4002     		lsl	r0, r0, #9
+ 180 0008 0121     		mov	r1, #1
+ 181 000a FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  81:../scr/timer.c **** 	/* GPIOA clock enable */
+  82:../scr/timer.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+ 182              		.loc 1 82 0
+ 183 000e 8021     		mov	r1, #128
+ 184 0010 8802     		lsl	r0, r1, #10
+ 185 0012 0121     		mov	r1, #1
+ 186 0014 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  83:../scr/timer.c **** 	/* TIM1 channel 1 pin (PA.4) configuration */
+  84:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+  85:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  86:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  87:../scr/timer.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 187              		.loc 1 87 0
+ 188 0018 0024     		mov	r4, #0
+  84:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+ 189              		.loc 1 84 0
+ 190 001a 03A9     		add	r1, sp, #12
+  88:../scr/timer.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  89:../scr/timer.c **** 	GPIO_Init(OIL_SENOR_IPU_PORT, &GPIO_InitStructure);
+ 191              		.loc 1 89 0
+ 192 001c 9023     		mov	r3, #144
+  86:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 193              		.loc 1 86 0
+ 194 001e 0326     		mov	r6, #3
+  85:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 195              		.loc 1 85 0
+ 196 0020 0227     		mov	r7, #2
+ 197              		.loc 1 89 0
+ 198 0022 D805     		lsl	r0, r3, #23
+  84:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+ 199              		.loc 1 84 0
+ 200 0024 0825     		mov	r5, #8
+  85:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 201              		.loc 1 85 0
+ 202 0026 0F71     		strb	r7, [r1, #4]
+  86:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 203              		.loc 1 86 0
+ 204 0028 4E71     		strb	r6, [r1, #5]
+  87:../scr/timer.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 205              		.loc 1 87 0
+ 206 002a 8C71     		strb	r4, [r1, #6]
+  88:../scr/timer.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+ 207              		.loc 1 88 0
+ 208 002c CC71     		strb	r4, [r1, #7]
+  84:../scr/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+ 209              		.loc 1 84 0
+ 210 002e 0395     		str	r5, [sp, #12]
+ 211              		.loc 1 89 0
+ 212 0030 FFF7FEFF 		bl	GPIO_Init
+  90:../scr/timer.c **** 	/* Connect TIM pins to AF2 */
+  91:../scr/timer.c **** 	GPIO_PinAFConfig(OIL_SENOR_IPU_PORT, OIL_SENOR_IPU_PIN_SOURCE, OIL_SENOR_IPU_PIN_AF);
+ 213              		.loc 1 91 0
+ 214 0034 9022     		mov	r2, #144
+ 215 0036 D005     		lsl	r0, r2, #23
+ 216 0038 291C     		mov	r1, r5
+ 217 003a 321C     		mov	r2, r6
+ 218 003c FFF7FEFF 		bl	GPIO_PinAFConfig
+  92:../scr/timer.c **** 	/* TIM1 configuration: Input Capture mode ---------------------
+  93:../scr/timer.c **** 	 The external signal is connected to TIM1 CH1 pin (PA.08)
+  94:../scr/timer.c **** 	 The Rising edge is used as active edge,
+  95:../scr/timer.c **** 	 The TIM1 CCR1 is used to compute the frequency value
+  96:../scr/timer.c **** 	 ------------------------------------------------------------ */
+  97:../scr/timer.c **** 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+  98:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+  99:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+ 219              		.loc 1 99 0
+ 220 0040 0125     		mov	r5, #1
+  97:../scr/timer.c **** 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+ 221              		.loc 1 97 0
+ 222 0042 6846     		mov	r0, sp
+ 223 0044 0426     		mov	r6, #4
+ 224 0046 0680     		strh	r6, [r0]
+  98:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+ 225              		.loc 1 98 0
+ 226 0048 4480     		strh	r4, [r0, #2]
+ 227              		.loc 1 99 0
+ 228 004a 8580     		strh	r5, [r0, #4]
+ 100:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+ 229              		.loc 1 100 0
+ 230 004c C480     		strh	r4, [r0, #6]
+ 101:../scr/timer.c **** 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+ 231              		.loc 1 101 0
+ 232 004e 0481     		strh	r4, [r0, #8]
+ 102:../scr/timer.c **** 	TIM_ICInit(TIM15, &TIM_ICInitStructure);
+ 233              		.loc 1 102 0
+ 234 0050 6946     		mov	r1, sp
+ 235 0052 0B48     		ldr	r0, .L6
+ 236 0054 FFF7FEFF 		bl	TIM_ICInit
+ 103:../scr/timer.c **** 	/* Enable the TIM4 global Interrupt */
+ 104:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+ 237              		.loc 1 104 0
+ 238 0058 05A8     		add	r0, sp, #20
+ 105:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 106:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 239              		.loc 1 106 0
+ 240 005a 0123     		mov	r3, #1
+ 104:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+ 241              		.loc 1 104 0
+ 242 005c 1421     		mov	r1, #20
+ 243              		.loc 1 106 0
+ 244 005e 8370     		strb	r3, [r0, #2]
+ 104:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+ 245              		.loc 1 104 0
+ 246 0060 0170     		strb	r1, [r0]
+ 105:../scr/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 247              		.loc 1 105 0
+ 248 0062 4470     		strb	r4, [r0, #1]
+ 107:../scr/timer.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 249              		.loc 1 107 0
+ 250 0064 FFF7FEFF 		bl	NVIC_Init
+ 108:../scr/timer.c **** 	/* Enable the CC2 Interrupt Request */
+ 109:../scr/timer.c **** 	TIM_ITConfig(TIM15, TIM_IT_CC2, ENABLE);
+ 251              		.loc 1 109 0
+ 252 0068 311C     		mov	r1, r6
+ 253 006a 2A1C     		mov	r2, r5
+ 254 006c 0448     		ldr	r0, .L6
+ 255 006e FFF7FEFF 		bl	TIM_ITConfig
+ 110:../scr/timer.c **** 	/* TIM enable counter */
+ 111:../scr/timer.c **** 	TIM_Cmd(TIM15, ENABLE);
+ 256              		.loc 1 111 0
+ 257 0072 0348     		ldr	r0, .L6
+ 258 0074 291C     		mov	r1, r5
+ 259 0076 FFF7FEFF 		bl	TIM_Cmd
+ 112:../scr/timer.c **** }
+ 260              		.loc 1 112 0
+ 261 007a 07B0     		add	sp, sp, #28
+ 262              		@ sp needed for prologue
+ 263 007c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 264              	.L7:
+ 265 007e C046     		.align	2
+ 266              	.L6:
+ 267 0080 00400140 		.word	1073823744
+ 268              		.cfi_endproc
+ 269              	.LFE35:
+ 271              		.text
+ 272              	.Letext0:
+ 273              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 274              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\scr/stm32f0xx
+ 275              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 276              		.file 5 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 277              		.file 6 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+DEFINED SYMBOLS
+                            *ABS*:00000000 timer.c
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:18     .text.TIM2_base_Configuration:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:23     .text.TIM2_base_Configuration:00000000 TIM2_base_Configuration
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:35     .text.TIM1_Capture_Configuration:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:40     .text.TIM1_Capture_Configuration:00000000 TIM1_Capture_Configuration
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:150    .text.TIM1_Capture_Configuration:00000080 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:155    .text.TIM15_Capture_Configuration:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:160    .text.TIM15_Capture_Configuration:00000000 TIM15_Capture_Configuration
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccxPnYmQ.s:267    .text.TIM15_Capture_Configuration:00000080 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB2PeriphClockCmd
+RCC_AHBPeriphClockCmd
+GPIO_Init
+GPIO_PinAFConfig
+TIM_ICInit
+NVIC_Init
+TIM_ITConfig
+TIM_Cmd

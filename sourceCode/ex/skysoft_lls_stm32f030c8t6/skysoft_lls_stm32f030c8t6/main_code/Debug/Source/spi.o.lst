@@ -1,0 +1,1222 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"spi.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.SPI_SendByte,"ax",%progbits
+  18              		.align	1
+  19              		.code	16
+  20              		.thumb_func
+  22              	SPI_SendByte:
+  23              	.LFB38:
+  24              		.file 1 "../Source/spi.c"
+   1:../Source/spi.c **** #include "spi.h"
+   2:../Source/spi.c **** #include "global.h"
+   3:../Source/spi.c **** #include "stm32f0xx_conf.h"
+   4:../Source/spi.c **** #include "stm32f0xx.h"
+   5:../Source/spi.c **** #include "stm32f0xx_spi.h"
+   6:../Source/spi.c **** #include "xprintf.h"
+   7:../Source/spi.c **** 
+   8:../Source/spi.c **** #define SPI2_MOSI_PIN			GPIO_Pin_15
+   9:../Source/spi.c **** #define SPI2_MOSI_PORT			GPIOB
+  10:../Source/spi.c **** #define SPI2_MOSI_AF			GPIO_AF_0
+  11:../Source/spi.c **** #define SPI2_MOSI_SOURCE		GPIO_PinSource15
+  12:../Source/spi.c **** 
+  13:../Source/spi.c **** #define SPI2_MISO_PIN			GPIO_Pin_14
+  14:../Source/spi.c **** #define SPI2_MISO_PORT			GPIOB
+  15:../Source/spi.c **** #define SPI2_MISO_AF			GPIO_AF_0
+  16:../Source/spi.c **** #define SPI2_MISO_SOURCE		GPIO_PinSource14
+  17:../Source/spi.c **** 
+  18:../Source/spi.c **** #define SPI2_SCK_PIN			GPIO_Pin_13
+  19:../Source/spi.c **** #define SPI2_SCK_PORT			GPIOB
+  20:../Source/spi.c **** #define SPI2_SCK_AF				GPIO_AF_0
+  21:../Source/spi.c **** #define SPI2_SCK_SOURCE			GPIO_PinSource13
+  22:../Source/spi.c **** 
+  23:../Source/spi.c **** #define SPI2_CS_PIN 			GPIO_Pin_12
+  24:../Source/spi.c **** #define SPI2_CS_PORT 			GPIOB
+  25:../Source/spi.c **** 
+  26:../Source/spi.c **** #define SPI1_CS_PIN 			GPIO_Pin_12	
+  27:../Source/spi.c **** #define SPI1_CS_PORT 			GPIOC
+  28:../Source/spi.c **** 
+  29:../Source/spi.c **** #define SPI1_CS_LOW()       	GPIO_ResetBits(SPI1_CS_PORT, SPI1_CS_PIN)
+  30:../Source/spi.c **** #define SPI1_CS_HIGH()     	 	GPIO_SetBits(SPI1_CS_PORT, SPI1_CS_PIN)
+  31:../Source/spi.c **** 
+  32:../Source/spi.c **** #define SPI2_CS_LOW()       	GPIO_ResetBits(SPI2_CS_PORT, SPI2_CS_PIN)
+  33:../Source/spi.c **** #define SPI2_CS_HIGH()      	GPIO_SetBits(SPI2_CS_PORT, SPI2_CS_PIN)
+  34:../Source/spi.c **** 
+  35:../Source/spi.c **** #define SPI_DUMMY_BYTE         0x00
+  36:../Source/spi.c **** 
+  37:../Source/spi.c **** 
+  38:../Source/spi.c **** static void SPI1_Init(void);
+  39:../Source/spi.c **** static void SPI2_Init(void);
+  40:../Source/spi.c **** static uint8_t SPI_SendByte(SPI_TypeDef *SPIx, uint8_t byte, uint16_t timeout);
+  41:../Source/spi.c **** static uint8_t SPI_readByte(SPI_TypeDef *SPIx, uint8_t*byte, uint16_t timeout);
+  42:../Source/spi.c **** 
+  43:../Source/spi.c **** ///////////////////////////////////////////////////////////////////////////////////////////////////
+  44:../Source/spi.c **** 
+  45:../Source/spi.c **** void SPIx_init(SPI_TypeDef *SPIx){
+  46:../Source/spi.c **** 	if(SPIx == SPI1)
+  47:../Source/spi.c **** 			SPI1_Init();
+  48:../Source/spi.c **** 	if(SPIx == SPI2)
+  49:../Source/spi.c **** 			SPI2_Init();
+  50:../Source/spi.c **** 	//SPI2->CR2|=SPI_CR2_FRXTH;
+  51:../Source/spi.c **** 	//SPI2->CR2&=~SPI_CR2_FRXTH;
+  52:../Source/spi.c **** }
+  53:../Source/spi.c **** 
+  54:../Source/spi.c **** 
+  55:../Source/spi.c **** int SPIx_ReadRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeout
+  56:../Source/spi.c **** 	
+  57:../Source/spi.c **** 	reg |= 0x80;
+  58:../Source/spi.c **** 	
+  59:../Source/spi.c **** 	if(SPIx == SPI1){
+  60:../Source/spi.c **** 		SPI1_CS_LOW();
+  61:../Source/spi.c **** 	}
+  62:../Source/spi.c **** 	else
+  63:../Source/spi.c **** 	{
+  64:../Source/spi.c **** 		SPI2_CS_LOW();
+  65:../Source/spi.c **** 	}
+  66:../Source/spi.c **** 
+  67:../Source/spi.c **** 	if(!SPI_SendByte(SPIx,reg,timeout)){
+  68:../Source/spi.c **** 		xprintf("time out \r\n");
+  69:../Source/spi.c **** 		return 0;
+  70:../Source/spi.c **** 	}
+  71:../Source/spi.c **** 	
+  72:../Source/spi.c **** 	while(len){
+  73:../Source/spi.c **** 		
+  74:../Source/spi.c **** 		if(!SPI_readByte(SPIx,data, timeout)){
+  75:../Source/spi.c **** 			xprintf("time out \r\n");
+  76:../Source/spi.c **** 			return 0;
+  77:../Source/spi.c **** 		}
+  78:../Source/spi.c **** 		len--;
+  79:../Source/spi.c **** 		data++;
+  80:../Source/spi.c **** 	}
+  81:../Source/spi.c **** 	
+  82:../Source/spi.c **** 	if(SPIx == SPI1)
+  83:../Source/spi.c **** 	{
+  84:../Source/spi.c **** 		SPI1_CS_HIGH();
+  85:../Source/spi.c **** 	}
+  86:../Source/spi.c **** 	else
+  87:../Source/spi.c **** 	{
+  88:../Source/spi.c **** 		SPI2_CS_HIGH();	
+  89:../Source/spi.c **** 	}
+  90:../Source/spi.c **** 	
+  91:../Source/spi.c **** 	return 1;
+  92:../Source/spi.c **** }
+  93:../Source/spi.c **** #if 0
+  94:../Source/spi.c **** int SPIx_ReadRegister_t(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeo
+  95:../Source/spi.c **** 
+  96:../Source/spi.c **** 	reg |= 0x80;
+  97:../Source/spi.c **** 
+  98:../Source/spi.c **** 	if(SPIx == SPI1){
+  99:../Source/spi.c **** 		SPI1_CS_LOW();
+ 100:../Source/spi.c **** 	}
+ 101:../Source/spi.c **** 	else
+ 102:../Source/spi.c **** 	{
+ 103:../Source/spi.c **** 		SPI2_CS_LOW();
+ 104:../Source/spi.c **** 	}
+ 105:../Source/spi.c **** 
+ 106:../Source/spi.c **** 	uint32_t last_time =0;
+ 107:../Source/spi.c ****   /*!< Loop while DR register in not emplty */
+ 108:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 109:../Source/spi.c ****   while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET){
+ 110:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 111:../Source/spi.c **** 			return 0;
+ 112:../Source/spi.c **** 	}
+ 113:../Source/spi.c **** 
+ 114:../Source/spi.c ****   /*!< Send byte through the SPI1 peripheral */
+ 115:../Source/spi.c ****   SPI_SendData8(SPIx, reg);
+ 116:../Source/spi.c ****   /*!< Wait to receive a byte */
+ 117:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 118:../Source/spi.c ****   while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET){
+ 119:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 120:../Source/spi.c **** 			return 0;
+ 121:../Source/spi.c **** 	}
+ 122:../Source/spi.c ****   SPI_ReceiveData8(SPIx);
+ 123:../Source/spi.c ****   while(len){
+ 124:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 125:../Source/spi.c **** while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET){
+ 126:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 127:../Source/spi.c **** 			return 0;
+ 128:../Source/spi.c **** 	}
+ 129:../Source/spi.c **** /*!< Send byte through the SPI1 peripheral */
+ 130:../Source/spi.c **** SPI_SendData8(SPIx, SPI_DUMMY_BYTE);
+ 131:../Source/spi.c **** 
+ 132:../Source/spi.c **** /*!< Wait to receive a byte */
+ 133:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 134:../Source/spi.c **** while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET){
+ 135:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 136:../Source/spi.c **** 			return 0;
+ 137:../Source/spi.c **** 	}
+ 138:../Source/spi.c **** 
+ 139:../Source/spi.c **** *data=SPI_ReceiveData8(SPIx);
+ 140:../Source/spi.c **** data++;
+ 141:../Source/spi.c **** len--;
+ 142:../Source/spi.c ****   }
+ 143:../Source/spi.c **** 	if(SPIx == SPI1)
+ 144:../Source/spi.c **** 	{
+ 145:../Source/spi.c **** 		SPI1_CS_HIGH();
+ 146:../Source/spi.c **** 	}
+ 147:../Source/spi.c **** 	else
+ 148:../Source/spi.c **** 	{
+ 149:../Source/spi.c **** 		SPI2_CS_HIGH();
+ 150:../Source/spi.c **** 	}
+ 151:../Source/spi.c **** 
+ 152:../Source/spi.c **** 	return 1;
+ 153:../Source/spi.c **** }
+ 154:../Source/spi.c **** 
+ 155:../Source/spi.c **** int SPIx_WriteRegister_t(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t time
+ 156:../Source/spi.c **** 
+ 157:../Source/spi.c **** 	if(SPIx == SPI1){
+ 158:../Source/spi.c **** 		SPI1_CS_LOW();
+ 159:../Source/spi.c **** 	}
+ 160:../Source/spi.c **** 	else
+ 161:../Source/spi.c **** 	{
+ 162:../Source/spi.c **** 		SPI2_CS_LOW();
+ 163:../Source/spi.c **** 	}
+ 164:../Source/spi.c **** 
+ 165:../Source/spi.c **** 	uint32_t last_time =0;
+ 166:../Source/spi.c ****   /*!< Loop while DR register in not emplty */
+ 167:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 168:../Source/spi.c ****   while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET){
+ 169:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 170:../Source/spi.c **** 			return 0;
+ 171:../Source/spi.c **** 	}
+ 172:../Source/spi.c **** 
+ 173:../Source/spi.c ****   /*!< Send byte through the SPI1 peripheral */
+ 174:../Source/spi.c ****   SPI_SendData8(SPIx, reg);
+ 175:../Source/spi.c ****   /*!< Wait to receive a byte */
+ 176:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 177:../Source/spi.c ****   while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET){
+ 178:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 179:../Source/spi.c **** 			return 0;
+ 180:../Source/spi.c **** 	}
+ 181:../Source/spi.c ****   SPI_ReceiveData8(SPIx);
+ 182:../Source/spi.c ****   while(len){
+ 183:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 184:../Source/spi.c **** while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET){
+ 185:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 186:../Source/spi.c **** 			return 0;
+ 187:../Source/spi.c **** 	}
+ 188:../Source/spi.c **** 
+ 189:../Source/spi.c **** /*!< Send byte through the SPI1 peripheral */
+ 190:../Source/spi.c **** SPI_SendData8(SPIx, *data);
+ 191:../Source/spi.c **** 
+ 192:../Source/spi.c **** /*!< Wait to receive a byte */
+ 193:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 194:../Source/spi.c **** while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET){
+ 195:../Source/spi.c **** 		if(last_time<ulMiliCount)
+ 196:../Source/spi.c **** 			return 0;
+ 197:../Source/spi.c **** 	}
+ 198:../Source/spi.c **** 
+ 199:../Source/spi.c **** 	SPI_ReceiveData8(SPIx);
+ 200:../Source/spi.c **** data++;
+ 201:../Source/spi.c **** len--;
+ 202:../Source/spi.c ****   }
+ 203:../Source/spi.c **** 	if(SPIx == SPI1)
+ 204:../Source/spi.c **** 	{
+ 205:../Source/spi.c **** 		SPI1_CS_HIGH();
+ 206:../Source/spi.c **** 	}
+ 207:../Source/spi.c **** 	else
+ 208:../Source/spi.c **** 	{
+ 209:../Source/spi.c **** 		SPI2_CS_HIGH();
+ 210:../Source/spi.c **** 	}
+ 211:../Source/spi.c **** 
+ 212:../Source/spi.c **** 	return 1;
+ 213:../Source/spi.c **** }
+ 214:../Source/spi.c **** #endif
+ 215:../Source/spi.c **** 
+ 216:../Source/spi.c **** int SPIx_WriteRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeou
+ 217:../Source/spi.c **** 	
+ 218:../Source/spi.c **** 	if(SPIx == SPI1)
+ 219:../Source/spi.c **** 		SPI1_CS_LOW();
+ 220:../Source/spi.c **** 	else
+ 221:../Source/spi.c **** 		SPI2_CS_LOW();	
+ 222:../Source/spi.c **** 	
+ 223:../Source/spi.c **** 	if(!SPI_SendByte(SPIx,reg,timeout)){
+ 224:../Source/spi.c **** 		xprintf("time out \r\n");
+ 225:../Source/spi.c **** 		return 0;
+ 226:../Source/spi.c **** 	}
+ 227:../Source/spi.c **** 	while(len){
+ 228:../Source/spi.c **** 		
+ 229:../Source/spi.c **** 		if(!SPI_SendByte(SPIx,*data, timeout)){
+ 230:../Source/spi.c **** 			xprintf("time out \r\n");
+ 231:../Source/spi.c **** 			return 0;
+ 232:../Source/spi.c **** 		}
+ 233:../Source/spi.c **** 		len--;
+ 234:../Source/spi.c **** 		data++;
+ 235:../Source/spi.c **** 	}
+ 236:../Source/spi.c **** 	
+ 237:../Source/spi.c **** 	if(SPIx == SPI1)
+ 238:../Source/spi.c **** 		SPI1_CS_HIGH();
+ 239:../Source/spi.c **** 	else
+ 240:../Source/spi.c **** 		SPI2_CS_HIGH();
+ 241:../Source/spi.c **** 
+ 242:../Source/spi.c **** 	return 1;
+ 243:../Source/spi.c **** }
+ 244:../Source/spi.c **** 
+ 245:../Source/spi.c **** ///////////////////////////////////////////////////////////////////////////////////////////////////
+ 246:../Source/spi.c **** static void SPI1_Init(void){
+ 247:../Source/spi.c **** }
+ 248:../Source/spi.c **** 
+ 249:../Source/spi.c **** static void SPI2_Init(void) {
+ 250:../Source/spi.c **** 	
+ 251:../Source/spi.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA|RCC_AHBPeriph_GPIOB|RCC_AHBPeriph_GPIOC|RCC_AHBPeriph_GP
+ 252:../Source/spi.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+ 253:../Source/spi.c **** 	
+ 254:../Source/spi.c **** 	SPI_InitTypeDef SPI_InitStructure;
+ 255:../Source/spi.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+ 256:../Source/spi.c **** 	
+ 257:../Source/spi.c **** 	/* Configure SCK and MOSI pins as Alternate Function Push Pull */
+ 258:../Source/spi.c **** 
+ 259:../Source/spi.c **** 	  /* Configure SD_SPI pins: SCK */
+ 260:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_SCK_PIN;
+ 261:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 262:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 263:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 264:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+ 265:../Source/spi.c **** 	  GPIO_Init(SPI2_SCK_PORT, &GPIO_InitStructure);
+ 266:../Source/spi.c **** 
+ 267:../Source/spi.c **** 	  /* Configure SD_SPI pins: MISO */
+ 268:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MISO_PIN;
+ 269:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 270:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 271:../Source/spi.c **** 	  GPIO_Init(SPI2_MISO_PORT, &GPIO_InitStructure);
+ 272:../Source/spi.c **** 
+ 273:../Source/spi.c **** 	  /* Configure SD_SPI pins: MOSI */
+ 274:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MOSI_PIN;
+ 275:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 276:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 277:../Source/spi.c **** 	  GPIO_Init(SPI2_MOSI_PORT, &GPIO_InitStructure);
+ 278:../Source/spi.c **** 
+ 279:../Source/spi.c **** 	  /* Configure SD_SPI_CS_PIN pin: SD Card CS pin */
+ 280:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_CS_PIN;
+ 281:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 282:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 283:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 284:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+ 285:../Source/spi.c **** 	  GPIO_Init(SPI2_CS_PORT, &GPIO_InitStructure);
+ 286:../Source/spi.c **** 
+ 287:../Source/spi.c **** 	  /* Connect PXx to SD_SPI_SCK */
+ 288:../Source/spi.c **** 	  GPIO_PinAFConfig(SPI2_SCK_PORT, SPI2_SCK_SOURCE, SPI2_SCK_AF);
+ 289:../Source/spi.c **** 	  /* Connect PXx to SD_SPI_MISO */
+ 290:../Source/spi.c **** 	  GPIO_PinAFConfig(SPI2_MISO_PORT, SPI2_MISO_SOURCE, SPI2_MISO_AF);
+ 291:../Source/spi.c **** 	  /* Connect PXx to SD_SPI_MOSI */
+ 292:../Source/spi.c **** 	  GPIO_PinAFConfig(SPI2_MOSI_PORT, SPI2_MOSI_SOURCE, SPI2_MOSI_AF);
+ 293:../Source/spi.c **** 
+ 294:../Source/spi.c **** 	  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+ 295:../Source/spi.c **** 	  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+ 296:../Source/spi.c **** 	  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+ 297:../Source/spi.c **** 	  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;//SPI_CPOL_Low;
+ 298:../Source/spi.c **** 	  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;//SPI_CPHA_1Edge;
+ 299:../Source/spi.c **** 	  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+ 300:../Source/spi.c **** 
+ 301:../Source/spi.c **** 	 SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+ 302:../Source/spi.c **** 	 SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+ 303:../Source/spi.c **** 	 SPI_InitStructure.SPI_CRCPolynomial = 7;
+ 304:../Source/spi.c **** 	 SPI_Init(SPI2, &SPI_InitStructure);
+ 305:../Source/spi.c **** 
+ 306:../Source/spi.c **** 	 SPI_Cmd(SPI2, ENABLE); /* SD_SPI enable */
+ 307:../Source/spi.c **** 
+ 308:../Source/spi.c **** 
+ 309:../Source/spi.c **** 	 xprintf("spi2 init done\r\n");
+ 310:../Source/spi.c **** }
+ 311:../Source/spi.c **** 
+ 312:../Source/spi.c **** static uint8_t SPI_SendByte(SPI_TypeDef *SPIx, uint8_t byte, uint16_t timeout)
+ 313:../Source/spi.c **** {
+  25              		.loc 1 313 0
+  26              		.cfi_startproc
+  27 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+  28              	.LCFI0:
+  29              		.cfi_def_cfa_offset 32
+  30              		.cfi_offset 0, -32
+  31              		.cfi_offset 1, -28
+  32              		.cfi_offset 2, -24
+  33              		.cfi_offset 4, -20
+  34              		.cfi_offset 5, -16
+  35              		.cfi_offset 6, -12
+  36              		.cfi_offset 7, -8
+  37              		.cfi_offset 14, -4
+  38              	.LVL0:
+  39              		.loc 1 313 0
+  40 0002 0191     		str	r1, [sp, #4]
+ 314:../Source/spi.c **** 	uint32_t last_time =0;
+ 315:../Source/spi.c ****   /*!< Loop while DR register in not emplty */
+ 316:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+  41              		.loc 1 316 0
+  42 0004 1F49     		ldr	r1, .L11
+  43              	.LVL1:
+ 313:../Source/spi.c **** {
+  44              		.loc 1 313 0
+  45 0006 051C     		mov	r5, r0
+  46              		.loc 1 316 0
+  47 0008 0868     		ldr	r0, [r1]
+  48              	.LVL2:
+ 313:../Source/spi.c **** {
+  49              		.loc 1 313 0
+  50 000a 171C     		mov	r7, r2
+  51              		.loc 1 316 0
+  52 000c 1318     		add	r3, r2, r0
+  53 000e 0093     		str	r3, [sp]
+  54              	.LVL3:
+ 317:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, S
+  55              		.loc 1 317 0
+  56 0010 09E0     		b	.L2
+  57              	.LVL4:
+  58              	.L5:
+ 318:../Source/spi.c **** 		if(last_time<ulMiliCount){
+  59              		.loc 1 318 0
+  60 0012 2468     		ldr	r4, [r4]
+  61 0014 009A     		ldr	r2, [sp]
+  62 0016 A242     		cmp	r2, r4
+  63 0018 05D2     		bcs	.L2
+ 319:../Source/spi.c **** 		xprintf("%s time out \r\n",__func__);
+  64              		.loc 1 319 0
+  65 001a 1B48     		ldr	r0, .L11+4
+  66 001c 1B49     		ldr	r1, .L11+8
+  67 001e FFF7FEFF 		bl	xprintf
+ 320:../Source/spi.c **** 			return 0;
+  68              		.loc 1 320 0
+  69 0022 301C     		mov	r0, r6
+  70 0024 2DE0     		b	.L3
+  71              	.L2:
+ 317:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, S
+  72              		.loc 1 317 0 discriminator 1
+  73 0026 281C     		mov	r0, r5
+  74 0028 0221     		mov	r1, #2
+  75 002a FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+  76 002e 154C     		ldr	r4, .L11
+  77 0030 061E     		sub	r6, r0, #0
+  78 0032 05D1     		bne	.L4
+ 317:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, S
+  79              		.loc 1 317 0 is_stmt 0 discriminator 2
+  80 0034 281C     		mov	r0, r5
+  81 0036 8021     		mov	r1, #128
+  82 0038 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+  83 003c 0128     		cmp	r0, #1
+  84 003e E8D0     		beq	.L5
+  85              	.L4:
+ 321:../Source/spi.c **** 		}
+ 322:../Source/spi.c **** 	}
+ 323:../Source/spi.c **** 
+ 324:../Source/spi.c ****   /*!< Send byte through the SPI1 peripheral */
+ 325:../Source/spi.c ****   SPI_SendData8(SPIx, byte);
+  86              		.loc 1 325 0 is_stmt 1
+  87 0040 281C     		mov	r0, r5
+  88 0042 0199     		ldr	r1, [sp, #4]
+  89 0044 FFF7FEFF 		bl	SPI_SendData8
+ 326:../Source/spi.c ****  // SPIx->DR=byte;
+ 327:../Source/spi.c ****   /*!< Wait to receive a byte */
+ 328:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+  90              		.loc 1 328 0
+  91 0048 2668     		ldr	r6, [r4]
+  92 004a BF19     		add	r7, r7, r6
+  93              	.LVL5:
+ 329:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, 
+  94              		.loc 1 329 0
+  95 004c 09E0     		b	.L6
+  96              	.L8:
+ 330:../Source/spi.c **** 		if(last_time<ulMiliCount){
+  97              		.loc 1 330 0
+  98 004e 0D48     		ldr	r0, .L11
+  99 0050 0368     		ldr	r3, [r0]
+ 100 0052 9F42     		cmp	r7, r3
+ 101 0054 05D2     		bcs	.L6
+ 331:../Source/spi.c **** 			xprintf("%s time out \r\n",__func__);
+ 102              		.loc 1 331 0
+ 103 0056 0C48     		ldr	r0, .L11+4
+ 104 0058 0C49     		ldr	r1, .L11+8
+ 105 005a FFF7FEFF 		bl	xprintf
+ 332:../Source/spi.c **** 			return 0;
+ 106              		.loc 1 332 0
+ 107 005e 201C     		mov	r0, r4
+ 108 0060 0FE0     		b	.L3
+ 109              	.L6:
+ 329:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, 
+ 110              		.loc 1 329 0 discriminator 1
+ 111 0062 281C     		mov	r0, r5
+ 112 0064 0121     		mov	r1, #1
+ 113 0066 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 114 006a 041E     		sub	r4, r0, #0
+ 115 006c 05D1     		bne	.L7
+ 329:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, 
+ 116              		.loc 1 329 0 is_stmt 0 discriminator 2
+ 117 006e 281C     		mov	r0, r5
+ 118 0070 8021     		mov	r1, #128
+ 119 0072 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 120 0076 0128     		cmp	r0, #1
+ 121 0078 E9D0     		beq	.L8
+ 122              	.L7:
+ 333:../Source/spi.c **** 		}
+ 334:../Source/spi.c **** 	}
+ 335:../Source/spi.c ****   //SPIx->DR;
+ 336:../Source/spi.c ****  SPI_ReceiveData8(SPIx);
+ 123              		.loc 1 336 0 is_stmt 1
+ 124 007a 281C     		mov	r0, r5
+ 125 007c FFF7FEFF 		bl	SPI_ReceiveData8
+ 337:../Source/spi.c **** 		return 1;
+ 126              		.loc 1 337 0
+ 127 0080 0120     		mov	r0, #1
+ 128              	.LVL6:
+ 129              	.L3:
+ 130              		@ sp needed for prologue
+ 131              	.LVL7:
+ 338:../Source/spi.c **** }
+ 132              		.loc 1 338 0
+ 133 0082 FEBD     		pop	{r1, r2, r3, r4, r5, r6, r7, pc}
+ 134              	.L12:
+ 135              		.align	2
+ 136              	.L11:
+ 137 0084 00000000 		.word	ulMiliCount
+ 138 0088 00000000 		.word	.LC1
+ 139 008c 00000000 		.word	.LANCHOR0
+ 140              		.cfi_endproc
+ 141              	.LFE38:
+ 143              		.section	.text.SPIx_init,"ax",%progbits
+ 144              		.align	1
+ 145              		.global	SPIx_init
+ 146              		.code	16
+ 147              		.thumb_func
+ 149              	SPIx_init:
+ 150              	.LFB33:
+  45:../Source/spi.c **** void SPIx_init(SPI_TypeDef *SPIx){
+ 151              		.loc 1 45 0
+ 152              		.cfi_startproc
+ 153 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 154              	.LCFI1:
+ 155              		.cfi_def_cfa_offset 20
+ 156              		.cfi_offset 4, -20
+ 157              		.cfi_offset 5, -16
+ 158              		.cfi_offset 6, -12
+ 159              		.cfi_offset 7, -8
+ 160              		.cfi_offset 14, -4
+ 161              	.LVL8:
+  48:../Source/spi.c **** 	if(SPIx == SPI2)
+ 162              		.loc 1 48 0
+ 163 0002 354B     		ldr	r3, .L15
+  45:../Source/spi.c **** void SPIx_init(SPI_TypeDef *SPIx){
+ 164              		.loc 1 45 0
+ 165 0004 8BB0     		sub	sp, sp, #44
+ 166              	.LCFI2:
+ 167              		.cfi_def_cfa_offset 64
+  45:../Source/spi.c **** void SPIx_init(SPI_TypeDef *SPIx){
+ 168              		.loc 1 45 0
+ 169 0006 0190     		str	r0, [sp, #4]
+  48:../Source/spi.c **** 	if(SPIx == SPI2)
+ 170              		.loc 1 48 0
+ 171 0008 9842     		cmp	r0, r3
+ 172 000a 63D1     		bne	.L13
+ 173              	.LBB4:
+ 174              	.LBB5:
+ 251:../Source/spi.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA|RCC_AHBPeriph_GPIOB|RCC_AHBPeriph_GPIOC|RCC_AHBPeriph_GP
+ 175              		.loc 1 251 0
+ 176 000c F021     		mov	r1, #240
+ 177 000e 4803     		lsl	r0, r1, #13
+ 178              	.LVL9:
+ 252:../Source/spi.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+ 179              		.loc 1 252 0
+ 180 0010 8024     		mov	r4, #128
+ 251:../Source/spi.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA|RCC_AHBPeriph_GPIOB|RCC_AHBPeriph_GPIOC|RCC_AHBPeriph_GP
+ 181              		.loc 1 251 0
+ 182 0012 0121     		mov	r1, #1
+ 260:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_SCK_PIN;
+ 183              		.loc 1 260 0
+ 184 0014 8027     		mov	r7, #128
+ 251:../Source/spi.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA|RCC_AHBPeriph_GPIOB|RCC_AHBPeriph_GPIOC|RCC_AHBPeriph_GP
+ 185              		.loc 1 251 0
+ 186 0016 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 260:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_SCK_PIN;
+ 187              		.loc 1 260 0
+ 188 001a BD01     		lsl	r5, r7, #6
+ 252:../Source/spi.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+ 189              		.loc 1 252 0
+ 190 001c E001     		lsl	r0, r4, #7
+ 191 001e 0121     		mov	r1, #1
+ 260:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_SCK_PIN;
+ 192              		.loc 1 260 0
+ 193 0020 08AC     		add	r4, sp, #32
+ 262:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 194              		.loc 1 262 0
+ 195 0022 0326     		mov	r6, #3
+ 252:../Source/spi.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
+ 196              		.loc 1 252 0
+ 197 0024 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+ 261:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 198              		.loc 1 261 0
+ 199 0028 0227     		mov	r7, #2
+ 262:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 200              		.loc 1 262 0
+ 201 002a 6671     		strb	r6, [r4, #5]
+ 260:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_SCK_PIN;
+ 202              		.loc 1 260 0
+ 203 002c 0895     		str	r5, [sp, #32]
+ 264:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+ 204              		.loc 1 264 0
+ 205 002e 0126     		mov	r6, #1
+ 263:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 206              		.loc 1 263 0
+ 207 0030 0025     		mov	r5, #0
+ 265:../Source/spi.c **** 	  GPIO_Init(SPI2_SCK_PORT, &GPIO_InitStructure);
+ 208              		.loc 1 265 0
+ 209 0032 211C     		mov	r1, r4
+ 261:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 210              		.loc 1 261 0
+ 211 0034 2771     		strb	r7, [r4, #4]
+ 263:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 212              		.loc 1 263 0
+ 213 0036 A571     		strb	r5, [r4, #6]
+ 264:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_UP;
+ 214              		.loc 1 264 0
+ 215 0038 E671     		strb	r6, [r4, #7]
+ 265:../Source/spi.c **** 	  GPIO_Init(SPI2_SCK_PORT, &GPIO_InitStructure);
+ 216              		.loc 1 265 0
+ 217 003a 2848     		ldr	r0, .L15+4
+ 218 003c FFF7FEFF 		bl	GPIO_Init
+ 268:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MISO_PIN;
+ 219              		.loc 1 268 0
+ 220 0040 8022     		mov	r2, #128
+ 221 0042 D001     		lsl	r0, r2, #7
+ 270:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 222              		.loc 1 270 0
+ 223 0044 0323     		mov	r3, #3
+ 224 0046 6371     		strb	r3, [r4, #5]
+ 271:../Source/spi.c **** 	  GPIO_Init(SPI2_MISO_PORT, &GPIO_InitStructure);
+ 225              		.loc 1 271 0
+ 226 0048 211C     		mov	r1, r4
+ 268:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MISO_PIN;
+ 227              		.loc 1 268 0
+ 228 004a 0890     		str	r0, [sp, #32]
+ 269:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 229              		.loc 1 269 0
+ 230 004c 2771     		strb	r7, [r4, #4]
+ 271:../Source/spi.c **** 	  GPIO_Init(SPI2_MISO_PORT, &GPIO_InitStructure);
+ 231              		.loc 1 271 0
+ 232 004e 2348     		ldr	r0, .L15+4
+ 233 0050 FFF7FEFF 		bl	GPIO_Init
+ 274:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MOSI_PIN;
+ 234              		.loc 1 274 0
+ 235 0054 8021     		mov	r1, #128
+ 276:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 236              		.loc 1 276 0
+ 237 0056 0320     		mov	r0, #3
+ 274:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MOSI_PIN;
+ 238              		.loc 1 274 0
+ 239 0058 0A02     		lsl	r2, r1, #8
+ 276:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 240              		.loc 1 276 0
+ 241 005a 6071     		strb	r0, [r4, #5]
+ 277:../Source/spi.c **** 	  GPIO_Init(SPI2_MOSI_PORT, &GPIO_InitStructure);
+ 242              		.loc 1 277 0
+ 243 005c 211C     		mov	r1, r4
+ 275:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 244              		.loc 1 275 0
+ 245 005e 2771     		strb	r7, [r4, #4]
+ 277:../Source/spi.c **** 	  GPIO_Init(SPI2_MOSI_PORT, &GPIO_InitStructure);
+ 246              		.loc 1 277 0
+ 247 0060 1E48     		ldr	r0, .L15+4
+ 274:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_MOSI_PIN;
+ 248              		.loc 1 274 0
+ 249 0062 0892     		str	r2, [sp, #32]
+ 277:../Source/spi.c **** 	  GPIO_Init(SPI2_MOSI_PORT, &GPIO_InitStructure);
+ 250              		.loc 1 277 0
+ 251 0064 FFF7FEFF 		bl	GPIO_Init
+ 280:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Pin = SPI2_CS_PIN;
+ 252              		.loc 1 280 0
+ 253 0068 8023     		mov	r3, #128
+ 254 006a 5901     		lsl	r1, r3, #5
+ 255 006c 0891     		str	r1, [sp, #32]
+ 281:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 256              		.loc 1 281 0
+ 257 006e 2671     		strb	r6, [r4, #4]
+ 285:../Source/spi.c **** 	  GPIO_Init(SPI2_CS_PORT, &GPIO_InitStructure);
+ 258              		.loc 1 285 0
+ 259 0070 211C     		mov	r1, r4
+ 282:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 260              		.loc 1 282 0
+ 261 0072 A571     		strb	r5, [r4, #6]
+ 283:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 262              		.loc 1 283 0
+ 263 0074 E671     		strb	r6, [r4, #7]
+ 284:../Source/spi.c **** 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
+ 264              		.loc 1 284 0
+ 265 0076 6671     		strb	r6, [r4, #5]
+ 285:../Source/spi.c **** 	  GPIO_Init(SPI2_CS_PORT, &GPIO_InitStructure);
+ 266              		.loc 1 285 0
+ 267 0078 1848     		ldr	r0, .L15+4
+ 268 007a FFF7FEFF 		bl	GPIO_Init
+ 288:../Source/spi.c **** 	  GPIO_PinAFConfig(SPI2_SCK_PORT, SPI2_SCK_SOURCE, SPI2_SCK_AF);
+ 269              		.loc 1 288 0
+ 270 007e 1748     		ldr	r0, .L15+4
+ 271 0080 0D21     		mov	r1, #13
+ 272 0082 2A1C     		mov	r2, r5
+ 273 0084 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 290:../Source/spi.c **** 	  GPIO_PinAFConfig(SPI2_MISO_PORT, SPI2_MISO_SOURCE, SPI2_MISO_AF);
+ 274              		.loc 1 290 0
+ 275 0088 1448     		ldr	r0, .L15+4
+ 276 008a 0E21     		mov	r1, #14
+ 277 008c 2A1C     		mov	r2, r5
+ 278 008e FFF7FEFF 		bl	GPIO_PinAFConfig
+ 292:../Source/spi.c **** 	  GPIO_PinAFConfig(SPI2_MOSI_PORT, SPI2_MOSI_SOURCE, SPI2_MOSI_AF);
+ 279              		.loc 1 292 0
+ 280 0092 1248     		ldr	r0, .L15+4
+ 281 0094 0F21     		mov	r1, #15
+ 282 0096 2A1C     		mov	r2, r5
+ 283 0098 FFF7FEFF 		bl	GPIO_PinAFConfig
+ 295:../Source/spi.c **** 	  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+ 284              		.loc 1 295 0
+ 285 009c 8222     		mov	r2, #130
+ 294:../Source/spi.c **** 	  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+ 286              		.loc 1 294 0
+ 287 009e 03A9     		add	r1, sp, #12
+ 295:../Source/spi.c **** 	  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+ 288              		.loc 1 295 0
+ 289 00a0 B240     		lsl	r2, r2, r6
+ 296:../Source/spi.c **** 	  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+ 290              		.loc 1 296 0
+ 291 00a2 E020     		mov	r0, #224
+ 299:../Source/spi.c **** 	  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+ 292              		.loc 1 299 0
+ 293 00a4 8024     		mov	r4, #128
+ 296:../Source/spi.c **** 	  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+ 294              		.loc 1 296 0
+ 295 00a6 C300     		lsl	r3, r0, #3
+ 295:../Source/spi.c **** 	  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+ 296              		.loc 1 295 0
+ 297 00a8 4A80     		strh	r2, [r1, #2]
+ 303:../Source/spi.c **** 	 SPI_InitStructure.SPI_CRCPolynomial = 7;
+ 298              		.loc 1 303 0
+ 299 00aa 0720     		mov	r0, #7
+ 301:../Source/spi.c **** 	 SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+ 300              		.loc 1 301 0
+ 301 00ac 1822     		mov	r2, #24
+ 299:../Source/spi.c **** 	  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+ 302              		.loc 1 299 0
+ 303 00ae BC40     		lsl	r4, r4, r7
+ 296:../Source/spi.c **** 	  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+ 304              		.loc 1 296 0
+ 305 00b0 8B80     		strh	r3, [r1, #4]
+ 301:../Source/spi.c **** 	 SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;
+ 306              		.loc 1 301 0
+ 307 00b2 8A81     		strh	r2, [r1, #12]
+ 303:../Source/spi.c **** 	 SPI_InitStructure.SPI_CRCPolynomial = 7;
+ 308              		.loc 1 303 0
+ 309 00b4 0882     		strh	r0, [r1, #16]
+ 294:../Source/spi.c **** 	  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+ 310              		.loc 1 294 0
+ 311 00b6 0D80     		strh	r5, [r1]
+ 297:../Source/spi.c **** 	  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;//SPI_CPOL_Low;
+ 312              		.loc 1 297 0
+ 313 00b8 CD80     		strh	r5, [r1, #6]
+ 298:../Source/spi.c **** 	  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;//SPI_CPHA_1Edge;
+ 314              		.loc 1 298 0
+ 315 00ba 0D81     		strh	r5, [r1, #8]
+ 299:../Source/spi.c **** 	  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+ 316              		.loc 1 299 0
+ 317 00bc 4C81     		strh	r4, [r1, #10]
+ 302:../Source/spi.c **** 	 SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+ 318              		.loc 1 302 0
+ 319 00be CD81     		strh	r5, [r1, #14]
+ 304:../Source/spi.c **** 	 SPI_Init(SPI2, &SPI_InitStructure);
+ 320              		.loc 1 304 0
+ 321 00c0 0198     		ldr	r0, [sp, #4]
+ 322 00c2 FFF7FEFF 		bl	SPI_Init
+ 306:../Source/spi.c **** 	 SPI_Cmd(SPI2, ENABLE); /* SD_SPI enable */
+ 323              		.loc 1 306 0
+ 324 00c6 0198     		ldr	r0, [sp, #4]
+ 325 00c8 311C     		mov	r1, r6
+ 326 00ca FFF7FEFF 		bl	SPI_Cmd
+ 309:../Source/spi.c **** 	 xprintf("spi2 init done\r\n");
+ 327              		.loc 1 309 0
+ 328 00ce 0448     		ldr	r0, .L15+8
+ 329 00d0 FFF7FEFF 		bl	xprintf
+ 330              	.L13:
+ 331              	.LBE5:
+ 332              	.LBE4:
+  52:../Source/spi.c **** }
+ 333              		.loc 1 52 0
+ 334 00d4 0BB0     		add	sp, sp, #44
+ 335              		@ sp needed for prologue
+ 336 00d6 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 337              	.L16:
+ 338              		.align	2
+ 339              	.L15:
+ 340 00d8 00380040 		.word	1073756160
+ 341 00dc 00040048 		.word	1207960576
+ 342 00e0 0F000000 		.word	.LC4
+ 343              		.cfi_endproc
+ 344              	.LFE33:
+ 346              		.section	.text.SPIx_ReadRegister,"ax",%progbits
+ 347              		.align	1
+ 348              		.global	SPIx_ReadRegister
+ 349              		.code	16
+ 350              		.thumb_func
+ 352              	SPIx_ReadRegister:
+ 353              	.LFB34:
+  55:../Source/spi.c **** int SPIx_ReadRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeout
+ 354              		.loc 1 55 0
+ 355              		.cfi_startproc
+ 356 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+ 357              	.LCFI3:
+ 358              		.cfi_def_cfa_offset 32
+ 359              		.cfi_offset 0, -32
+ 360              		.cfi_offset 1, -28
+ 361              		.cfi_offset 2, -24
+ 362              		.cfi_offset 4, -20
+ 363              		.cfi_offset 5, -16
+ 364              		.cfi_offset 6, -12
+ 365              		.cfi_offset 7, -8
+ 366              		.cfi_offset 14, -4
+ 367              	.LVL10:
+  55:../Source/spi.c **** int SPIx_ReadRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeout
+ 368              		.loc 1 55 0
+ 369 0002 051C     		mov	r5, r0
+ 370 0004 08A8     		add	r0, sp, #32
+ 371              	.LVL11:
+ 372 0006 171C     		mov	r7, r2
+ 373 0008 1E1C     		mov	r6, r3
+  59:../Source/spi.c **** 	if(SPIx == SPI1){
+ 374              		.loc 1 59 0
+ 375 000a 334A     		ldr	r2, .L38
+ 376              	.LVL12:
+  55:../Source/spi.c **** int SPIx_ReadRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeout
+ 377              		.loc 1 55 0
+ 378 000c 0388     		ldrh	r3, [r0]
+ 379              	.LVL13:
+  57:../Source/spi.c **** 	reg |= 0x80;
+ 380              		.loc 1 57 0
+ 381 000e 8024     		mov	r4, #128
+  55:../Source/spi.c **** int SPIx_ReadRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeout
+ 382              		.loc 1 55 0
+ 383 0010 0093     		str	r3, [sp]
+  57:../Source/spi.c **** 	reg |= 0x80;
+ 384              		.loc 1 57 0
+ 385 0012 0C43     		orr	r4, r1
+ 386              	.LVL14:
+  59:../Source/spi.c **** 	if(SPIx == SPI1){
+ 387              		.loc 1 59 0
+ 388 0014 9542     		cmp	r5, r2
+ 389 0016 01D1     		bne	.L18
+  60:../Source/spi.c **** 		SPI1_CS_LOW();
+ 390              		.loc 1 60 0
+ 391 0018 3048     		ldr	r0, .L38+4
+ 392 001a 00E0     		b	.L35
+ 393              	.L18:
+  64:../Source/spi.c **** 		SPI2_CS_LOW();
+ 394              		.loc 1 64 0
+ 395 001c 3048     		ldr	r0, .L38+8
+ 396              	.L35:
+ 397 001e 8021     		mov	r1, #128
+ 398 0020 4901     		lsl	r1, r1, #5
+ 399 0022 FFF7FEFF 		bl	GPIO_ResetBits
+  67:../Source/spi.c **** 	if(!SPI_SendByte(SPIx,reg,timeout)){
+ 400              		.loc 1 67 0
+ 401 0026 211C     		mov	r1, r4
+ 402 0028 281C     		mov	r0, r5
+ 403 002a 009A     		ldr	r2, [sp]
+ 404 002c FFF7FEFF 		bl	SPI_SendByte
+ 405 0030 041E     		sub	r4, r0, #0
+ 406              	.LVL15:
+ 407 0032 43D1     		bne	.L34
+  68:../Source/spi.c **** 		xprintf("time out \r\n");
+ 408              		.loc 1 68 0
+ 409 0034 2B48     		ldr	r0, .L38+12
+ 410 0036 FFF7FEFF 		bl	xprintf
+  69:../Source/spi.c **** 		return 0;
+ 411              		.loc 1 69 0
+ 412 003a 201C     		mov	r0, r4
+ 413 003c 4BE0     		b	.L22
+ 414              	.LVL16:
+ 415              	.L30:
+ 416              	.LBB8:
+ 417              	.LBB9:
+ 339:../Source/spi.c **** 
+ 340:../Source/spi.c **** static uint8_t SPI_readByte(SPI_TypeDef *SPIx, uint8_t*byte, uint16_t timeout){
+ 341:../Source/spi.c **** 	uint32_t last_time =0;
+ 342:../Source/spi.c ****   /*!< Loop while DR register in not emplty */
+ 343:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 418              		.loc 1 343 0
+ 419 003e 2A48     		ldr	r0, .L38+16
+ 420 0040 009A     		ldr	r2, [sp]
+ 421 0042 0368     		ldr	r3, [r0]
+ 422 0044 D418     		add	r4, r2, r3
+ 423 0046 0194     		str	r4, [sp, #4]
+ 424              	.LVL17:
+ 425 0048 03E0     		b	.L23
+ 426              	.LVL18:
+ 427              	.L26:
+ 344:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, S
+ 345:../Source/spi.c **** 		if(last_time<ulMiliCount){
+ 428              		.loc 1 345 0
+ 429 004a 2468     		ldr	r4, [r4]
+ 430 004c 0199     		ldr	r1, [sp, #4]
+ 431 004e A142     		cmp	r1, r4
+ 432 0050 18D3     		bcc	.L36
+ 433              	.L23:
+ 344:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, S
+ 434              		.loc 1 344 0
+ 435 0052 281C     		mov	r0, r5
+ 436 0054 0221     		mov	r1, #2
+ 437 0056 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 438 005a 234C     		ldr	r4, .L38+16
+ 439 005c 0028     		cmp	r0, #0
+ 440 005e 05D1     		bne	.L25
+ 441 0060 281C     		mov	r0, r5
+ 442 0062 8021     		mov	r1, #128
+ 443 0064 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 444 0068 0128     		cmp	r0, #1
+ 445 006a EED0     		beq	.L26
+ 446              	.L25:
+ 346:../Source/spi.c **** 			xprintf("%s time out \r\n",__func__);
+ 347:../Source/spi.c **** 			return 0;
+ 348:../Source/spi.c **** 		}
+ 349:../Source/spi.c **** 	}
+ 350:../Source/spi.c **** 
+ 351:../Source/spi.c ****   /*!< Send byte through the SPI1 peripheral */
+ 352:../Source/spi.c ****   SPI_SendData8(SPIx, SPI_DUMMY_BYTE);
+ 447              		.loc 1 352 0
+ 448 006c 281C     		mov	r0, r5
+ 449 006e 0021     		mov	r1, #0
+ 450 0070 FFF7FEFF 		bl	SPI_SendData8
+ 353:../Source/spi.c ****   //SPIx->DR=SPI_DUMMY_BYTE;
+ 354:../Source/spi.c ****   /*!< Wait to receive a byte */
+ 355:../Source/spi.c **** 	last_time = ulMiliCount+timeout;
+ 451              		.loc 1 355 0
+ 452 0074 2268     		ldr	r2, [r4]
+ 453 0076 009B     		ldr	r3, [sp]
+ 454 0078 9C18     		add	r4, r3, r2
+ 455              	.LVL19:
+ 456 007a 0CE0     		b	.L27
+ 457              	.L29:
+ 356:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, 
+ 357:../Source/spi.c **** 		if(last_time<ulMiliCount){
+ 458              		.loc 1 357 0
+ 459 007c 1A49     		ldr	r1, .L38+16
+ 460 007e 0868     		ldr	r0, [r1]
+ 461 0080 8442     		cmp	r4, r0
+ 462 0082 08D2     		bcs	.L27
+ 463              	.LVL20:
+ 464              	.L36:
+ 358:../Source/spi.c **** 			xprintf("%s time out \r\n",__func__);
+ 465              		.loc 1 358 0
+ 466 0084 1948     		ldr	r0, .L38+20
+ 467 0086 1A49     		ldr	r1, .L38+24
+ 468 0088 FFF7FEFF 		bl	xprintf
+ 469              	.LBE9:
+ 470              	.LBE8:
+  75:../Source/spi.c **** 			xprintf("time out \r\n");
+ 471              		.loc 1 75 0
+ 472 008c 1548     		ldr	r0, .L38+12
+ 473 008e FFF7FEFF 		bl	xprintf
+  76:../Source/spi.c **** 			return 0;
+ 474              		.loc 1 76 0
+ 475 0092 0020     		mov	r0, #0
+ 476 0094 1FE0     		b	.L22
+ 477              	.LVL21:
+ 478              	.L27:
+ 479              	.LBB12:
+ 480              	.LBB10:
+ 356:../Source/spi.c ****   while ((SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET) && (SPI_I2S_GetFlagStatus(SPIx, 
+ 481              		.loc 1 356 0
+ 482 0096 281C     		mov	r0, r5
+ 483 0098 0121     		mov	r1, #1
+ 484 009a FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 485 009e 0028     		cmp	r0, #0
+ 486 00a0 05D1     		bne	.L28
+ 487 00a2 281C     		mov	r0, r5
+ 488 00a4 8021     		mov	r1, #128
+ 489 00a6 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 490 00aa 0128     		cmp	r0, #1
+ 491 00ac E6D0     		beq	.L29
+ 492              	.L28:
+ 359:../Source/spi.c **** 			return 0;
+ 360:../Source/spi.c **** 		}
+ 361:../Source/spi.c **** 	}
+ 362:../Source/spi.c **** 
+ 363:../Source/spi.c ****   //*byte=(uint8_t)( SPIx->DR);
+ 364:../Source/spi.c ****   *byte=SPI_ReceiveData8(SPIx);
+ 493              		.loc 1 364 0
+ 494 00ae 281C     		mov	r0, r5
+ 495 00b0 FFF7FEFF 		bl	SPI_ReceiveData8
+ 496              	.LBE10:
+ 497              	.LBE12:
+  78:../Source/spi.c **** 		len--;
+ 498              		.loc 1 78 0
+ 499 00b4 013E     		sub	r6, r6, #1
+ 500              	.LVL22:
+ 501              	.LBB13:
+ 502              	.LBB11:
+ 503              		.loc 1 364 0
+ 504 00b6 3870     		strb	r0, [r7]
+ 505              	.LBE11:
+ 506              	.LBE13:
+  78:../Source/spi.c **** 		len--;
+ 507              		.loc 1 78 0
+ 508 00b8 B6B2     		uxth	r6, r6
+ 509              	.LVL23:
+  79:../Source/spi.c **** 		data++;
+ 510              		.loc 1 79 0
+ 511 00ba 0137     		add	r7, r7, #1
+ 512              	.LVL24:
+ 513              	.L34:
+  72:../Source/spi.c **** 	while(len){
+ 514              		.loc 1 72 0 discriminator 1
+ 515 00bc 002E     		cmp	r6, #0
+ 516 00be BED1     		bne	.L30
+  82:../Source/spi.c **** 	if(SPIx == SPI1)
+ 517              		.loc 1 82 0
+ 518 00c0 054E     		ldr	r6, .L38
+ 519              	.LVL25:
+ 520 00c2 B542     		cmp	r5, r6
+ 521 00c4 01D1     		bne	.L31
+  84:../Source/spi.c **** 		SPI1_CS_HIGH();
+ 522              		.loc 1 84 0
+ 523 00c6 0548     		ldr	r0, .L38+4
+ 524 00c8 00E0     		b	.L37
+ 525              	.L31:
+  88:../Source/spi.c **** 		SPI2_CS_HIGH();	
+ 526              		.loc 1 88 0
+ 527 00ca 0548     		ldr	r0, .L38+8
+ 528              	.L37:
+ 529 00cc 8025     		mov	r5, #128
+ 530              	.LVL26:
+ 531 00ce 6901     		lsl	r1, r5, #5
+ 532 00d0 FFF7FEFF 		bl	GPIO_SetBits
+  91:../Source/spi.c **** 	return 1;
+ 533              		.loc 1 91 0
+ 534 00d4 0120     		mov	r0, #1
+ 535              	.L22:
+ 536              		@ sp needed for prologue
+ 537              	.LVL27:
+  92:../Source/spi.c **** }
+ 538              		.loc 1 92 0
+ 539 00d6 FEBD     		pop	{r1, r2, r3, r4, r5, r6, r7, pc}
+ 540              	.L39:
+ 541              		.align	2
+ 542              	.L38:
+ 543 00d8 00300140 		.word	1073819648
+ 544 00dc 00080048 		.word	1207961600
+ 545 00e0 00040048 		.word	1207960576
+ 546 00e4 20000000 		.word	.LC8
+ 547 00e8 00000000 		.word	ulMiliCount
+ 548 00ec 00000000 		.word	.LC1
+ 549 00f0 00000000 		.word	.LANCHOR1
+ 550              		.cfi_endproc
+ 551              	.LFE34:
+ 553              		.section	.text.SPIx_WriteRegister,"ax",%progbits
+ 554              		.align	1
+ 555              		.global	SPIx_WriteRegister
+ 556              		.code	16
+ 557              		.thumb_func
+ 559              	SPIx_WriteRegister:
+ 560              	.LFB35:
+ 216:../Source/spi.c **** int SPIx_WriteRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeou
+ 561              		.loc 1 216 0
+ 562              		.cfi_startproc
+ 563 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+ 564              	.LCFI4:
+ 565              		.cfi_def_cfa_offset 32
+ 566              		.cfi_offset 0, -32
+ 567              		.cfi_offset 1, -28
+ 568              		.cfi_offset 2, -24
+ 569              		.cfi_offset 4, -20
+ 570              		.cfi_offset 5, -16
+ 571              		.cfi_offset 6, -12
+ 572              		.cfi_offset 7, -8
+ 573              		.cfi_offset 14, -4
+ 574              	.LVL28:
+ 216:../Source/spi.c **** int SPIx_WriteRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeou
+ 575              		.loc 1 216 0
+ 576 0002 0C1C     		mov	r4, r1
+ 577 0004 08A9     		add	r1, sp, #32
+ 578              	.LVL29:
+ 579 0006 051C     		mov	r5, r0
+ 580 0008 1E1C     		mov	r6, r3
+ 581 000a 0888     		ldrh	r0, [r1]
+ 582              	.LVL30:
+ 218:../Source/spi.c **** 	if(SPIx == SPI1)
+ 583              		.loc 1 218 0
+ 584 000c 184B     		ldr	r3, .L53
+ 585              	.LVL31:
+ 216:../Source/spi.c **** int SPIx_WriteRegister(SPI_TypeDef *SPIx, uint8_t reg, uint8_t *data, uint16_t len, uint16_t timeou
+ 586              		.loc 1 216 0
+ 587 000e 171C     		mov	r7, r2
+ 588 0010 0190     		str	r0, [sp, #4]
+ 218:../Source/spi.c **** 	if(SPIx == SPI1)
+ 589              		.loc 1 218 0
+ 590 0012 9D42     		cmp	r5, r3
+ 591 0014 01D1     		bne	.L41
+ 219:../Source/spi.c **** 		SPI1_CS_LOW();
+ 592              		.loc 1 219 0
+ 593 0016 1748     		ldr	r0, .L53+4
+ 594 0018 00E0     		b	.L50
+ 595              	.L41:
+ 221:../Source/spi.c **** 		SPI2_CS_LOW();	
+ 596              		.loc 1 221 0
+ 597 001a 1748     		ldr	r0, .L53+8
+ 598              	.L50:
+ 599 001c 8022     		mov	r2, #128
+ 600              	.LVL32:
+ 601 001e 5101     		lsl	r1, r2, #5
+ 602 0020 FFF7FEFF 		bl	GPIO_ResetBits
+ 223:../Source/spi.c **** 	if(!SPI_SendByte(SPIx,reg,timeout)){
+ 603              		.loc 1 223 0
+ 604 0024 211C     		mov	r1, r4
+ 605 0026 281C     		mov	r0, r5
+ 606 0028 019A     		ldr	r2, [sp, #4]
+ 607 002a FFF7FEFF 		bl	SPI_SendByte
+ 608 002e 041E     		sub	r4, r0, #0
+ 609 0030 0ED1     		bne	.L49
+ 610 0032 06E0     		b	.L51
+ 611              	.LVL33:
+ 612              	.L47:
+ 229:../Source/spi.c **** 		if(!SPI_SendByte(SPIx,*data, timeout)){
+ 613              		.loc 1 229 0
+ 614 0034 3978     		ldrb	r1, [r7]
+ 615 0036 281C     		mov	r0, r5
+ 616 0038 019A     		ldr	r2, [sp, #4]
+ 617 003a FFF7FEFF 		bl	SPI_SendByte
+ 618 003e 041E     		sub	r4, r0, #0
+ 619 0040 03D1     		bne	.L46
+ 620              	.LVL34:
+ 621              	.L51:
+ 230:../Source/spi.c **** 			xprintf("time out \r\n");
+ 622              		.loc 1 230 0
+ 623 0042 0E48     		ldr	r0, .L53+12
+ 624 0044 FFF7FEFF 		bl	xprintf
+ 231:../Source/spi.c **** 			return 0;
+ 625              		.loc 1 231 0
+ 626 0048 0FE0     		b	.L45
+ 627              	.LVL35:
+ 628              	.L46:
+ 233:../Source/spi.c **** 		len--;
+ 629              		.loc 1 233 0
+ 630 004a 013E     		sub	r6, r6, #1
+ 631              	.LVL36:
+ 632 004c B6B2     		uxth	r6, r6
+ 633              	.LVL37:
+ 234:../Source/spi.c **** 		data++;
+ 634              		.loc 1 234 0
+ 635 004e 0137     		add	r7, r7, #1
+ 636              	.LVL38:
+ 637              	.L49:
+ 227:../Source/spi.c **** 	while(len){
+ 638              		.loc 1 227 0 discriminator 1
+ 639 0050 002E     		cmp	r6, #0
+ 640 0052 EFD1     		bne	.L47
+ 237:../Source/spi.c **** 	if(SPIx == SPI1)
+ 641              		.loc 1 237 0
+ 642 0054 064C     		ldr	r4, .L53
+ 643 0056 A542     		cmp	r5, r4
+ 644 0058 01D1     		bne	.L48
+ 238:../Source/spi.c **** 		SPI1_CS_HIGH();
+ 645              		.loc 1 238 0
+ 646 005a 0648     		ldr	r0, .L53+4
+ 647 005c 00E0     		b	.L52
+ 648              	.L48:
+ 240:../Source/spi.c **** 		SPI2_CS_HIGH();
+ 649              		.loc 1 240 0
+ 650 005e 0648     		ldr	r0, .L53+8
+ 651              	.L52:
+ 652 0060 8025     		mov	r5, #128
+ 653              	.LVL39:
+ 654 0062 6901     		lsl	r1, r5, #5
+ 655 0064 FFF7FEFF 		bl	GPIO_SetBits
+ 242:../Source/spi.c **** 	return 1;
+ 656              		.loc 1 242 0
+ 657 0068 0124     		mov	r4, #1
+ 658              	.LVL40:
+ 659              	.L45:
+ 243:../Source/spi.c **** }
+ 660              		.loc 1 243 0
+ 661 006a 201C     		mov	r0, r4
+ 662              		@ sp needed for prologue
+ 663              	.LVL41:
+ 664 006c FEBD     		pop	{r1, r2, r3, r4, r5, r6, r7, pc}
+ 665              	.L54:
+ 666 006e C046     		.align	2
+ 667              	.L53:
+ 668 0070 00300140 		.word	1073819648
+ 669 0074 00080048 		.word	1207961600
+ 670 0078 00040048 		.word	1207960576
+ 671 007c 20000000 		.word	.LC8
+ 672              		.cfi_endproc
+ 673              	.LFE35:
+ 675              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 676              	.LC1:
+ 677 0000 25732074 		.ascii	"%s time out \015\012\000"
+ 677      696D6520 
+ 677      6F757420 
+ 677      0D0A00
+ 678              	.LC4:
+ 679 000f 73706932 		.ascii	"spi2 init done\015\012\000"
+ 679      20696E69 
+ 679      7420646F 
+ 679      6E650D0A 
+ 679      00
+ 680              	.LC8:
+ 681 0020 74696D65 		.ascii	"time out \015\012\000"
+ 681      206F7574 
+ 681      200D0A00 
+ 682              		.section	.rodata.__func__.6296,"a",%progbits
+ 683              		.set	.LANCHOR0,. + 0
+ 686              	__func__.6296:
+ 687 0000 5350495F 		.ascii	"SPI_SendByte\000"
+ 687      53656E64 
+ 687      42797465 
+ 687      00
+ 688              		.section	.rodata.__func__.6309,"a",%progbits
+ 689              		.set	.LANCHOR1,. + 0
+ 692              	__func__.6309:
+ 693 0000 5350495F 		.ascii	"SPI_readByte\000"
+ 693      72656164 
+ 693      42797465 
+ 693      00
+ 694              		.text
+ 695              	.Letext0:
+ 696              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 697              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+ 698              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 699              		.file 5 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 700              		.file 6 "../Source/global.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 spi.c
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:18     .text.SPI_SendByte:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:22     .text.SPI_SendByte:00000000 SPI_SendByte
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:137    .text.SPI_SendByte:00000084 $d
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:144    .text.SPIx_init:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:149    .text.SPIx_init:00000000 SPIx_init
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:340    .text.SPIx_init:000000d8 $d
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:347    .text.SPIx_ReadRegister:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:352    .text.SPIx_ReadRegister:00000000 SPIx_ReadRegister
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:543    .text.SPIx_ReadRegister:000000d8 $d
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:554    .text.SPIx_WriteRegister:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:559    .text.SPIx_WriteRegister:00000000 SPIx_WriteRegister
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:668    .text.SPIx_WriteRegister:00000070 $d
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:686    .rodata.__func__.6296:00000000 __func__.6296
+C:\Users\khanh\AppData\Local\Temp\ccELCxad.s:692    .rodata.__func__.6309:00000000 __func__.6309
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+xprintf
+SPI_I2S_GetFlagStatus
+SPI_SendData8
+SPI_ReceiveData8
+ulMiliCount
+RCC_AHBPeriphClockCmd
+RCC_APB1PeriphClockCmd
+GPIO_Init
+GPIO_PinAFConfig
+SPI_Init
+SPI_Cmd
+GPIO_ResetBits
+GPIO_SetBits

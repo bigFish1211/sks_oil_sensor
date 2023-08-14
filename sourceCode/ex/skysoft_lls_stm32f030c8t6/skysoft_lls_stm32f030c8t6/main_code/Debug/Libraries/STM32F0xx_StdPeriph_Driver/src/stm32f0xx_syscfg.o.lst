@@ -1,0 +1,809 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"stm32f0xx_syscfg.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.SYSCFG_DeInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	SYSCFG_DeInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	SYSCFG_DeInit:
+  24              	.LFB33:
+  25              		.file 1 "../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c"
+   1:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+   2:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   ******************************************************************************
+   3:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @file    stm32f0xx_syscfg.c
+   4:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @author  MCD Application Team
+   5:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @version V1.5.0
+   6:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @date    05-December-2014
+   7:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          functionalities of the SYSCFG peripheral:
+   9:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *           + Remapping the memory mapped at 0x00000000  
+  10:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *           + Remapping the DMA channels
+  11:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *           + Enabling I2C fast mode plus driving capability for I2C pins   
+  12:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *           + Configuring the EXTI lines connection to the GPIO port
+  13:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *           + Configuring the CFGR2 features (Connecting some internal signal
+  14:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *             to the break input of TIM1)
+  15:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *   
+  16:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *  @verbatim
+  17:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****  ===============================================================================
+  18:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****                      ##### How to use this driver #####
+  19:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****  ===============================================================================
+  20:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     [..] 
+  21:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****                The SYSCFG registers can be accessed only when the SYSCFG 
+  22:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****                interface APB clock is enabled.
+  23:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****                To enable SYSCFG APB clock use:
+  24:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****                RCC_APBPeriphClockCmd(RCC_APBPeriph_SYSCFG, ENABLE).
+  25:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *  @endverbatim
+  26:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *
+  27:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   ******************************************************************************
+  28:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @attention
+  29:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *
+  30:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  31:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *
+  32:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  33:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * You may not use this file except in compliance with the License.
+  34:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * You may obtain a copy of the License at:
+  35:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *
+  36:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  37:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *
+  38:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * Unless required by applicable law or agreed to in writing, software 
+  39:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  40:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  41:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * See the License for the specific language governing permissions and
+  42:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * limitations under the License.
+  43:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *
+  44:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   ******************************************************************************
+  45:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+  46:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  47:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Includes ------------------------------------------------------------------*/
+  48:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** #include "stm32f0xx_syscfg.h"
+  49:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  50:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /** @addtogroup STM32F0xx_StdPeriph_Driver
+  51:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @{
+  52:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+  53:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  54:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /** @defgroup SYSCFG 
+  55:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief SYSCFG driver modules
+  56:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @{
+  57:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */ 
+  58:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  59:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Private typedef -----------------------------------------------------------*/
+  60:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Private define ------------------------------------------------------------*/
+  61:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Private macro -------------------------------------------------------------*/
+  62:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Private variables ---------------------------------------------------------*/
+  63:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Private function prototypes -----------------------------------------------*/
+  64:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /* Private functions ---------------------------------------------------------*/
+  65:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  66:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /** @defgroup SYSCFG_Private_Functions
+  67:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @{
+  68:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */ 
+  69:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  70:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /** @defgroup SYSCFG_Group1 SYSCFG Initialization and Configuration functions
+  71:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****  *  @brief   SYSCFG Initialization and Configuration functions 
+  72:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****  *
+  73:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** @verbatim
+  74:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****  ===============================================================================
+  75:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****         ##### SYSCFG Initialization and Configuration functions #####
+  76:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****  ===============================================================================
+  77:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  78:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** @endverbatim
+  79:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @{
+  80:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+  81:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+  82:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+  83:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Deinitializes the SYSCFG registers to their default reset values.
+  84:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  None
+  85:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+  86:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   MEM_MODE bits are not affected by APB reset.
+  87:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   MEM_MODE bits took the value from the user option bytes.
+  88:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   CFGR2 register is not affected by APB reset.
+  89:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   CLABBB configuration bits are locked when set.
+  90:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   To unlock the configuration, perform a system reset.
+  91:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+  92:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_DeInit(void)
+  93:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+  26              		.loc 1 93 0
+  27              		.cfi_startproc
+  94:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Set SYSCFG_CFGR1 register to reset value without affecting MEM_MODE bits */
+  95:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR1 &= SYSCFG_CFGR1_MEM_MODE;
+  28              		.loc 1 95 0
+  29 0000 074B     		ldr	r3, .L2
+  30 0002 0320     		mov	r0, #3
+  31 0004 1968     		ldr	r1, [r3]
+  96:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Set EXTICRx registers to reset value */
+  97:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->EXTICR[0] = 0;
+  32              		.loc 1 97 0
+  33 0006 0022     		mov	r2, #0
+  95:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR1 &= SYSCFG_CFGR1_MEM_MODE;
+  34              		.loc 1 95 0
+  35 0008 0840     		and	r0, r1
+  36 000a 1860     		str	r0, [r3]
+  37              		.loc 1 97 0
+  38 000c 9A60     		str	r2, [r3, #8]
+  98:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->EXTICR[1] = 0;
+  39              		.loc 1 98 0
+  40 000e DA60     		str	r2, [r3, #12]
+  99:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->EXTICR[2] = 0;
+  41              		.loc 1 99 0
+  42 0010 1A61     		str	r2, [r3, #16]
+ 100:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->EXTICR[3] = 0;
+  43              		.loc 1 100 0
+  44 0012 5A61     		str	r2, [r3, #20]
+ 101:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Set CFGR2 register to reset value: clear SRAM parity error flag */
+ 102:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR2 |= (uint32_t) SYSCFG_CFGR2_SRAM_PE;
+  45              		.loc 1 102 0
+  46 0014 9969     		ldr	r1, [r3, #24]
+  47 0016 8020     		mov	r0, #128
+  48 0018 4200     		lsl	r2, r0, #1
+  49 001a 0A43     		orr	r2, r1
+  50 001c 9A61     		str	r2, [r3, #24]
+  51              		@ sp needed for prologue
+ 103:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+  52              		.loc 1 103 0
+  53 001e 7047     		bx	lr
+  54              	.L3:
+  55              		.align	2
+  56              	.L2:
+  57 0020 00000140 		.word	1073807360
+  58              		.cfi_endproc
+  59              	.LFE33:
+  61              		.section	.text.SYSCFG_MemoryRemapConfig,"ax",%progbits
+  62              		.align	1
+  63              		.global	SYSCFG_MemoryRemapConfig
+  64              		.code	16
+  65              		.thumb_func
+  67              	SYSCFG_MemoryRemapConfig:
+  68              	.LFB34:
+ 104:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 105:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 106:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Configures the memory mapping at address 0x00000000.
+ 107:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  SYSCFG_MemoryRemap: selects the memory remapping.
+ 108:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be one of the following values:
+ 109:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_MemoryRemap_Flash: Main Flash memory mapped at 0x00000000  
+ 110:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_MemoryRemap_SystemMemory: System Flash memory mapped at 0x00000000
+ 111:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_MemoryRemap_SRAM: Embedded SRAM mapped at 0x00000000
+ 112:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+ 113:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 114:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_MemoryRemapConfig(uint32_t SYSCFG_MemoryRemap)
+ 115:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+  69              		.loc 1 115 0
+  70              		.cfi_startproc
+  71              	.LVL0:
+ 116:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   uint32_t tmpctrl = 0;
+ 117:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 118:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameter */
+ 119:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_MEMORY_REMAP(SYSCFG_MemoryRemap));
+ 120:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 121:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Get CFGR1 register value */
+ 122:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmpctrl = SYSCFG->CFGR1;
+  72              		.loc 1 122 0
+  73 0000 034B     		ldr	r3, .L5
+ 123:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 124:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Clear MEM_MODE bits */
+ 125:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmpctrl &= (uint32_t) (~SYSCFG_CFGR1_MEM_MODE);
+  74              		.loc 1 125 0
+  75 0002 0321     		mov	r1, #3
+ 122:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmpctrl = SYSCFG->CFGR1;
+  76              		.loc 1 122 0
+  77 0004 1A68     		ldr	r2, [r3]
+  78              	.LVL1:
+  79              		@ sp needed for prologue
+  80              		.loc 1 125 0
+  81 0006 8A43     		bic	r2, r1
+  82              	.LVL2:
+ 126:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 127:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Set the new MEM_MODE bits value */
+ 128:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmpctrl |= (uint32_t) SYSCFG_MemoryRemap;
+  83              		.loc 1 128 0
+  84 0008 1043     		orr	r0, r2
+  85              	.LVL3:
+ 129:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 130:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Set CFGR1 register with the new memory remap configuration */
+ 131:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR1 = tmpctrl;
+  86              		.loc 1 131 0
+  87 000a 1860     		str	r0, [r3]
+ 132:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+  88              		.loc 1 132 0
+  89 000c 7047     		bx	lr
+  90              	.L6:
+  91 000e C046     		.align	2
+  92              	.L5:
+  93 0010 00000140 		.word	1073807360
+  94              		.cfi_endproc
+  95              	.LFE34:
+  97              		.section	.text.SYSCFG_DMAChannelRemapConfig,"ax",%progbits
+  98              		.align	1
+  99              		.global	SYSCFG_DMAChannelRemapConfig
+ 100              		.code	16
+ 101              		.thumb_func
+ 103              	SYSCFG_DMAChannelRemapConfig:
+ 104              	.LFB35:
+ 133:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 134:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 135:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Configure the DMA channels remapping.
+ 136:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  SYSCFG_DMARemap: selects the DMA channels remap.
+ 137:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be one of the following values:
+ 138:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM17: Remap TIM17 DMA requests from channel1 to channel2
+ 139:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_DMARemap_TIM16: Remap TIM16 DMA requests from channel3 to channel4
+ 140:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_DMARemap_USART1Rx: Remap USART1 Rx DMA requests from channel3 to channel
+ 141:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_DMARemap_USART1Tx: Remap USART1 Tx DMA requests from channel2 to channel
+ 142:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_DMARemap_ADC1: Remap ADC1 DMA requests from channel1 to channel2
+ 143:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  NewState: new state of the DMA channel remapping. 
+ 144:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         This parameter can be: ENABLE or DISABLE.
+ 145:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   When enabled, DMA channel of the selected peripheral is remapped
+ 146:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   When disabled, Default DMA channel is mapped to the selected peripheral
+ 147:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   By default TIM17 DMA requests is mapped to channel 1, 
+ 148:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         use SYSCFG_DMAChannelRemapConfig(SYSCFG_DMARemap_TIM17, Enable) to remap
+ 149:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         TIM17 DMA requests to channel 2 and use
+ 150:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         SYSCFG_DMAChannelRemapConfig(SYSCFG_DMARemap_TIM17, Disable) to map
+ 151:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         TIM17 DMA requests to channel 1 (default mapping)
+ 152:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   This function is only used for STM32F030, STM32F031, STM32F042, STM32F072 and STM32F051
+ 153:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+ 154:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 155:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_DMAChannelRemapConfig(uint32_t SYSCFG_DMARemap, FunctionalState NewState)
+ 156:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 105              		.loc 1 156 0
+ 106              		.cfi_startproc
+ 107 0000 00B5     		push	{lr}
+ 108              	.LCFI0:
+ 109              		.cfi_def_cfa_offset 4
+ 110              		.cfi_offset 14, -4
+ 111              	.LVL4:
+ 112 0002 054B     		ldr	r3, .L10
+ 157:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameters */
+ 158:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_DMA_REMAP(SYSCFG_DMARemap));
+ 159:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 160:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 161:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   if (NewState != DISABLE)
+ 162:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   {
+ 163:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     /* Remap the DMA channel */
+ 164:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     SYSCFG->CFGR1 |= (uint32_t)SYSCFG_DMARemap;
+ 113              		.loc 1 164 0
+ 114 0004 1A68     		ldr	r2, [r3]
+ 161:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   if (NewState != DISABLE)
+ 115              		.loc 1 161 0
+ 116 0006 0029     		cmp	r1, #0
+ 117 0008 02D0     		beq	.L8
+ 118              		.loc 1 164 0
+ 119 000a 1043     		orr	r0, r2
+ 120              	.LVL5:
+ 121 000c 1860     		str	r0, [r3]
+ 122 000e 01E0     		b	.L7
+ 123              	.LVL6:
+ 124              	.L8:
+ 165:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   }
+ 166:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   else
+ 167:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   {
+ 168:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     /* use the default DMA channel mapping */
+ 169:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     SYSCFG->CFGR1 &= (uint32_t)(~SYSCFG_DMARemap);
+ 125              		.loc 1 169 0
+ 126 0010 8243     		bic	r2, r0
+ 127 0012 1A60     		str	r2, [r3]
+ 128              	.LVL7:
+ 129              	.L7:
+ 130              		@ sp needed for prologue
+ 170:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   }
+ 171:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 131              		.loc 1 171 0
+ 132 0014 00BD     		pop	{pc}
+ 133              	.L11:
+ 134 0016 C046     		.align	2
+ 135              	.L10:
+ 136 0018 00000140 		.word	1073807360
+ 137              		.cfi_endproc
+ 138              	.LFE35:
+ 140              		.section	.text.SYSCFG_I2CFastModePlusConfig,"ax",%progbits
+ 141              		.align	1
+ 142              		.global	SYSCFG_I2CFastModePlusConfig
+ 143              		.code	16
+ 144              		.thumb_func
+ 146              	SYSCFG_I2CFastModePlusConfig:
+ 147              	.LFB36:
+ 172:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 173:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 174:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Configure the I2C fast mode plus driving capability.
+ 175:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  SYSCFG_I2CFastModePlus: selects the pin.
+ 176:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be one of the following values:
+ 177:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB6: Configure fast mode plus driving capability for PB6
+ 178:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB7: Configure fast mode plus driving capability for PB7
+ 179:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB8: Configure fast mode plus driving capability for PB8
+ 180:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PB9: Configure fast mode plus driving capability for PB9
+ 181:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PA9: Configure fast mode plus driving capability for PA9
+ 182:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_PA10: Configure fast mode plus driving capability for PA
+ 183:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_I2C1: Configure fast mode plus driving capability for PB
+ 184:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_I2CFastModePlus_I2C2: Configure fast mode plus driving capability for I2
+ 185:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *                
+ 186:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  NewState: new state of the DMA channel remapping. 
+ 187:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         This parameter can be:  ENABLE or DISABLE.
+ 188:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   ENABLE: Enable fast mode plus driving capability for selected I2C pin
+ 189:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   DISABLE: Disable fast mode plus driving capability for selected I2C pin
+ 190:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note  For I2C1, fast mode plus driving capability can be enabled on all selected
+ 191:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *        I2C1 pins using SYSCFG_I2CFastModePlus_I2C1 parameter or independently
+ 192:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *        on each one of the following pins PB6, PB7, PB8 and PB9.
+ 193:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note  For remaining I2C1 pins (PA14, PA15...) fast mode plus driving capability
+ 194:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *        can be enabled only by using SYSCFG_I2CFastModePlus_I2C1 parameter.
+ 195:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note  For all I2C2 pins fast mode plus driving capability can be enabled
+ 196:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *        only by using SYSCFG_I2CFastModePlus_I2C2 parameter.
+ 197:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+ 198:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 199:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_I2CFastModePlusConfig(uint32_t SYSCFG_I2CFastModePlus, FunctionalState NewState)
+ 200:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 148              		.loc 1 200 0
+ 149              		.cfi_startproc
+ 150 0000 00B5     		push	{lr}
+ 151              	.LCFI1:
+ 152              		.cfi_def_cfa_offset 4
+ 153              		.cfi_offset 14, -4
+ 154              	.LVL8:
+ 155 0002 054B     		ldr	r3, .L15
+ 201:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameters */
+ 202:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_I2C_FMP(SYSCFG_I2CFastModePlus));
+ 203:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 204:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 205:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   if (NewState != DISABLE)
+ 206:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   {
+ 207:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     /* Enable fast mode plus driving capability for selected pin */
+ 208:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     SYSCFG->CFGR1 |= (uint32_t)SYSCFG_I2CFastModePlus;
+ 156              		.loc 1 208 0
+ 157 0004 1A68     		ldr	r2, [r3]
+ 205:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   if (NewState != DISABLE)
+ 158              		.loc 1 205 0
+ 159 0006 0029     		cmp	r1, #0
+ 160 0008 02D0     		beq	.L13
+ 161              		.loc 1 208 0
+ 162 000a 1043     		orr	r0, r2
+ 163              	.LVL9:
+ 164 000c 1860     		str	r0, [r3]
+ 165 000e 01E0     		b	.L12
+ 166              	.LVL10:
+ 167              	.L13:
+ 209:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   }
+ 210:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   else
+ 211:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   {
+ 212:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     /* Disable fast mode plus driving capability for selected pin */
+ 213:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     SYSCFG->CFGR1 &= (uint32_t)(~SYSCFG_I2CFastModePlus);
+ 168              		.loc 1 213 0
+ 169 0010 8243     		bic	r2, r0
+ 170 0012 1A60     		str	r2, [r3]
+ 171              	.LVL11:
+ 172              	.L12:
+ 173              		@ sp needed for prologue
+ 214:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   }
+ 215:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 174              		.loc 1 215 0
+ 175 0014 00BD     		pop	{pc}
+ 176              	.L16:
+ 177 0016 C046     		.align	2
+ 178              	.L15:
+ 179 0018 00000140 		.word	1073807360
+ 180              		.cfi_endproc
+ 181              	.LFE36:
+ 183              		.section	.text.SYSCFG_IRDAEnvSelection,"ax",%progbits
+ 184              		.align	1
+ 185              		.global	SYSCFG_IRDAEnvSelection
+ 186              		.code	16
+ 187              		.thumb_func
+ 189              	SYSCFG_IRDAEnvSelection:
+ 190              	.LFB37:
+ 216:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 217:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /** @brief  select the modulation envelope source 
+ 218:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param SYSCFG_IRDAEnv: select the envelope source. 
+ 219:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *        This parameter can be a value 
+ 220:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_IRDA_ENV_SEL_TIM16
+ 221:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_IRDA_ENV_SEL_USART1
+ 222:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_IRDA_ENV_SEL_USART4
+ 223:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None      
+ 224:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 225:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_IRDAEnvSelection(uint32_t SYSCFG_IRDAEnv)
+ 226:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 191              		.loc 1 226 0
+ 192              		.cfi_startproc
+ 193              	.LVL12:
+ 227:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameters */
+ 228:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_IRDA_ENV(SYSCFG_IRDAEnv));
+ 229:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   
+ 230:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR1 &= ~(SYSCFG_CFGR1_IRDA_ENV_SEL);
+ 194              		.loc 1 230 0
+ 195 0000 044B     		ldr	r3, .L18
+ 196 0002 C021     		mov	r1, #192
+ 197 0004 1A68     		ldr	r2, [r3]
+ 198              		@ sp needed for prologue
+ 199 0006 8A43     		bic	r2, r1
+ 200 0008 1A60     		str	r2, [r3]
+ 231:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR1 |= (SYSCFG_IRDAEnv);
+ 201              		.loc 1 231 0
+ 202 000a 1A68     		ldr	r2, [r3]
+ 203 000c 1043     		orr	r0, r2
+ 204              	.LVL13:
+ 205 000e 1860     		str	r0, [r3]
+ 232:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 206              		.loc 1 232 0
+ 207 0010 7047     		bx	lr
+ 208              	.L19:
+ 209 0012 C046     		.align	2
+ 210              	.L18:
+ 211 0014 00000140 		.word	1073807360
+ 212              		.cfi_endproc
+ 213              	.LFE37:
+ 215              		.section	.text.SYSCFG_EXTILineConfig,"ax",%progbits
+ 216              		.align	1
+ 217              		.global	SYSCFG_EXTILineConfig
+ 218              		.code	16
+ 219              		.thumb_func
+ 221              	SYSCFG_EXTILineConfig:
+ 222              	.LFB38:
+ 233:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 234:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 235:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Selects the GPIO pin used as EXTI Line.
+ 236:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  EXTI_PortSourceGPIOx: selects the GPIO port to be used as source 
+ 237:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *                               for EXTI lines where x can be (A, B, C, D, E or F).
+ 238:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   GPIOE is available only for STM32F072.
+ 239:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   GPIOD is not available for STM32F031.    
+ 240:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  EXTI_PinSourcex: specifies the EXTI line to be configured.
+ 241:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   This parameter can be EXTI_PinSourcex where x can be:
+ 242:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         For STM32F051 and STM32F030: (0..15) for GPIOA, GPIOB, GPIOC, (2) for GPIOD and (0..1, 
+ 243:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         For STM32F072: (0..15) for GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, (0..10) for GPIOF.
+ 244:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         For STM32F031: (0..15) for GPIOA, GPIOB, (13..15) for GPIOC and (0..1, 6..7) for GPIOF.
+ 245:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+ 246:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 247:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_EXTILineConfig(uint8_t EXTI_PortSourceGPIOx, uint8_t EXTI_PinSourcex)
+ 248:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 223              		.loc 1 248 0
+ 224              		.cfi_startproc
+ 225 0000 30B5     		push	{r4, r5, lr}
+ 226              	.LCFI2:
+ 227              		.cfi_def_cfa_offset 12
+ 228              		.cfi_offset 4, -12
+ 229              		.cfi_offset 5, -8
+ 230              		.cfi_offset 14, -4
+ 231              	.LVL14:
+ 249:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   uint32_t tmp = 0x00;
+ 250:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 251:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameters */
+ 252:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_EXTI_PORT_SOURCE(EXTI_PortSourceGPIOx));
+ 253:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_EXTI_PIN_SOURCE(EXTI_PinSourcex));
+ 254:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   
+ 255:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmp = ((uint32_t)0x0F) << (0x04 * (EXTI_PinSourcex & (uint8_t)0x03));
+ 232              		.loc 1 255 0
+ 233 0002 0323     		mov	r3, #3
+ 234 0004 0B40     		and	r3, r1
+ 256:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->EXTICR[EXTI_PinSourcex >> 0x02] &= ~tmp;
+ 235              		.loc 1 256 0
+ 236 0006 8908     		lsr	r1, r1, #2
+ 237              	.LVL15:
+ 255:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmp = ((uint32_t)0x0F) << (0x04 * (EXTI_PinSourcex & (uint8_t)0x03));
+ 238              		.loc 1 255 0
+ 239 0008 9A00     		lsl	r2, r3, #2
+ 240              	.LVL16:
+ 241              		.loc 1 256 0
+ 242 000a 0231     		add	r1, r1, #2
+ 243 000c 054B     		ldr	r3, .L21
+ 244 000e 8900     		lsl	r1, r1, #2
+ 245 0010 CC58     		ldr	r4, [r1, r3]
+ 255:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   tmp = ((uint32_t)0x0F) << (0x04 * (EXTI_PinSourcex & (uint8_t)0x03));
+ 246              		.loc 1 255 0
+ 247 0012 0F25     		mov	r5, #15
+ 248 0014 9540     		lsl	r5, r5, r2
+ 249              		.loc 1 256 0
+ 250 0016 AC43     		bic	r4, r5
+ 251 0018 CC50     		str	r4, [r1, r3]
+ 257:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->EXTICR[EXTI_PinSourcex >> 0x02] |= (((uint32_t)EXTI_PortSourceGPIOx) << (0x04 * (EXTI_Pin
+ 252              		.loc 1 257 0
+ 253 001a CC58     		ldr	r4, [r1, r3]
+ 254 001c 9040     		lsl	r0, r0, r2
+ 255              	.LVL17:
+ 256 001e 2043     		orr	r0, r4
+ 257 0020 C850     		str	r0, [r1, r3]
+ 258              		@ sp needed for prologue
+ 258:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 259              		.loc 1 258 0
+ 260 0022 30BD     		pop	{r4, r5, pc}
+ 261              	.L22:
+ 262              		.align	2
+ 263              	.L21:
+ 264 0024 00000140 		.word	1073807360
+ 265              		.cfi_endproc
+ 266              	.LFE38:
+ 268              		.section	.text.SYSCFG_GetPendingIT,"ax",%progbits
+ 269              		.align	1
+ 270              		.global	SYSCFG_GetPendingIT
+ 271              		.code	16
+ 272              		.thumb_func
+ 274              	SYSCFG_GetPendingIT:
+ 275              	.LFB39:
+ 259:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 260:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 261:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  check ISR wrapper: Allow to determine interrupt source per line .
+ 262:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  IT_Source: specifies the interrupt source to check.
+ 263:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be one of the following values:
+ 264:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EWDG                       EWDG has expired 
+ 265:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_PVDOUT                     Power voltage detection Interrupt 
+ 266:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_VDDIO2                     VDDIO2 Interrupt
+ 267:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_RTC_WAKEUP                 RTC WAKEUP -> exti[20] Interrupt 
+ 268:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_RTC_TSTAMP                 RTC Time Stamp -> exti[19] interrupt 
+ 269:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_RTC_ALRA                   RTC Alarm -> exti[17] interrupt
+ 270:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_FLASH_ITF                  Flash ITF Interrupt
+ 271:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_CRS                        CRS Interrupt 
+ 272:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_CLK_CTRL                   CLK Control Interrupt 
+ 273:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI0                      External Interrupt 0 
+ 274:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI1                      External Interrupt 1 
+ 275:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI2                      External Interrupt 2 
+ 276:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI3                      External Interrupt 3 
+ 277:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI4                      External Interrupt 4 
+ 278:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI5                      External Interrupt 5 
+ 279:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI6                      External Interrupt 6 
+ 280:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI7                      External Interrupt 7 
+ 281:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI8                      External Interrupt 8 
+ 282:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI9                      External Interrupt 9 
+ 283:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI10                     External Interrupt 10 
+ 284:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI11                     External Interrupt 11 
+ 285:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI12                     External Interrupt 12 
+ 286:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI13                     External Interrupt 13 
+ 287:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI14                     External Interrupt 14 
+ 288:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_EXTI15                     External Interrupt 15 
+ 289:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TSC_EOA                    Touch control EOA Interrupt 
+ 290:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TSC_MCE                    Touch control MCE Interrupt 
+ 291:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH1                   DMA1 Channel 1 Interrupt 
+ 292:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH2                   DMA1 Channel 2 Interrupt 
+ 293:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH3                   DMA1 Channel 3 Interrupt 
+ 294:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA2_CH1                   DMA2 Channel 1 Interrupt 
+ 295:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA2_CH2                   DMA2 Channel 2 Interrupt 
+ 296:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH4                   DMA1 Channel 4 Interrupt  
+ 297:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH5                   DMA1 Channel 5 Interrupt 
+ 298:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH6                   DMA1 Channel 6 Interrupt 
+ 299:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA1_CH7                   DMA1 Channel 7 Interrupt 
+ 300:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA2_CH3                   DMA2 Channel 3 Interrupt 
+ 301:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA2_CH4                   DMA2 Channel 4 Interrupt 
+ 302:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DMA2_CH5                   DMA2 Channel 5 Interrupt 
+ 303:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_ADC                        ADC Interrupt 
+ 304:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_COMP1                      COMP1 Interrupt -> exti[21] 
+ 305:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_COMP2                      COMP2 Interrupt -> exti[21] 
+ 306:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM1_BRK                   TIM1 BRK Interrupt 
+ 307:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM1_UPD                   TIM1 UPD Interrupt 
+ 308:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM1_TRG                   TIM1 TRG Interrupt 
+ 309:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM1_CCU                   TIM1 CCU Interrupt 
+ 310:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM1_CC                    TIM1 CC Interrupt 
+ 311:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM2                       TIM2 Interrupt 
+ 312:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM3                       TIM3 Interrupt 
+ 313:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_DAC                        DAC Interrupt 
+ 314:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM6                       TIM6 Interrupt 
+ 315:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM7                       TIM7 Interrupt 
+ 316:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM14                      TIM14 Interrupt 
+ 317:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM15                      TIM15 Interrupt 
+ 318:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM16                      TIM16 Interrupt 
+ 319:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_TIM17                      TIM17 Interrupt 
+ 320:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_I2C1                       I2C1 Interrupt -> exti[23] 
+ 321:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_I2C2                       I2C2 Interrupt 
+ 322:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_SPI1                       I2C1 Interrupt -> exti[23] 
+ 323:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_SPI2                       SPI1 Interrupt 
+ 324:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART1                     USART1 GLB Interrupt -> exti[25] 
+ 325:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART2                     USART2 GLB Interrupt -> exti[26] 
+ 326:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART3                     USART3 Interrupt 
+ 327:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART4                     USART4 Interrupt 
+ 328:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART5                     USART5 Interrupt 
+ 329:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART6                     USART6 Interrupt 
+ 330:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART7                     USART7 Interrupt 
+ 331:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_USART8                     USART8 Interrupt 
+ 332:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_CAN                        CAN Interrupt 
+ 333:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg ITLINE_CEC                        CEC Interrupt 
+ 334:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval The new state of IT_LINE_SR.
+ 335:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 336:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** uint32_t  SYSCFG_GetPendingIT(uint32_t ITSourceLine)
+ 337:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 276              		.loc 1 337 0
+ 277              		.cfi_startproc
+ 278              	.LVL18:
+ 338:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****    assert_param(IS_SYSCFG_ITLINE(ITSourceLine));
+ 339:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****    return(SYSCFG->IT_LINE_SR[(ITSourceLine >> 0x18)] & (ITSourceLine & 0x00FFFFFF));
+ 279              		.loc 1 339 0
+ 280 0000 030E     		lsr	r3, r0, #24
+ 281 0002 2033     		add	r3, r3, #32
+ 282 0004 0349     		ldr	r1, .L24
+ 283 0006 9A00     		lsl	r2, r3, #2
+ 284 0008 5358     		ldr	r3, [r2, r1]
+ 285 000a 0002     		lsl	r0, r0, #8
+ 286              	.LVL19:
+ 287 000c 000A     		lsr	r0, r0, #8
+ 288 000e 1840     		and	r0, r3
+ 289              		@ sp needed for prologue
+ 340:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 290              		.loc 1 340 0
+ 291 0010 7047     		bx	lr
+ 292              	.L25:
+ 293 0012 C046     		.align	2
+ 294              	.L24:
+ 295 0014 00000140 		.word	1073807360
+ 296              		.cfi_endproc
+ 297              	.LFE39:
+ 299              		.section	.text.SYSCFG_BreakConfig,"ax",%progbits
+ 300              		.align	1
+ 301              		.global	SYSCFG_BreakConfig
+ 302              		.code	16
+ 303              		.thumb_func
+ 305              	SYSCFG_BreakConfig:
+ 306              	.LFB40:
+ 341:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 342:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 343:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Connect the selected parameter to the break input of TIM1.
+ 344:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @note   The selected configuration is locked and can be unlocked by system reset
+ 345:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  SYSCFG_Break: selects the configuration to be connected to break
+ 346:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *         input of TIM1
+ 347:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be any combination of the following values:
+ 348:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_Break_PVD: Connects the PVD event to the Break Input of TIM1,, not avail
+ 349:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_Break_SRAMParity: Connects the SRAM_PARITY error signal to the Break Inp
+ 350:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_Break_Lockup: Connects Lockup output of CortexM0 to the break input of T
+ 351:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+ 352:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 353:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_BreakConfig(uint32_t SYSCFG_Break)
+ 354:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 307              		.loc 1 354 0
+ 308              		.cfi_startproc
+ 309              	.LVL20:
+ 355:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameter */
+ 356:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_LOCK_CONFIG(SYSCFG_Break));
+ 357:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 358:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR2 |= (uint32_t) SYSCFG_Break;
+ 310              		.loc 1 358 0
+ 311 0000 024B     		ldr	r3, .L27
+ 312              		@ sp needed for prologue
+ 313 0002 9A69     		ldr	r2, [r3, #24]
+ 314 0004 1043     		orr	r0, r2
+ 315              	.LVL21:
+ 316 0006 9861     		str	r0, [r3, #24]
+ 359:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 317              		.loc 1 359 0
+ 318 0008 7047     		bx	lr
+ 319              	.L28:
+ 320 000a C046     		.align	2
+ 321              	.L27:
+ 322 000c 00000140 		.word	1073807360
+ 323              		.cfi_endproc
+ 324              	.LFE40:
+ 326              		.section	.text.SYSCFG_GetFlagStatus,"ax",%progbits
+ 327              		.align	1
+ 328              		.global	SYSCFG_GetFlagStatus
+ 329              		.code	16
+ 330              		.thumb_func
+ 332              	SYSCFG_GetFlagStatus:
+ 333              	.LFB41:
+ 360:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 361:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 362:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Checks whether the specified SYSCFG flag is set or not.
+ 363:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  SYSCFG_Flag: specifies the SYSCFG flag to check. 
+ 364:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be one of the following values:
+ 365:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_FLAG_PE: SRAM parity error flag.
+ 366:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval The new state of SYSCFG_Flag (SET or RESET).
+ 367:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 368:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** FlagStatus SYSCFG_GetFlagStatus(uint32_t SYSCFG_Flag)
+ 369:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 334              		.loc 1 369 0
+ 335              		.cfi_startproc
+ 336              	.LVL22:
+ 370:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   FlagStatus bitstatus = RESET;
+ 371:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 372:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameter */
+ 373:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_FLAG(SYSCFG_Flag));
+ 374:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 375:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the status of the specified SPI flag */
+ 376:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   if ((SYSCFG->CFGR2 & SYSCFG_CFGR2_SRAM_PE) != (uint32_t)RESET)
+ 337              		.loc 1 376 0
+ 338 0000 024B     		ldr	r3, .L30
+ 339              		@ sp needed for prologue
+ 340 0002 9969     		ldr	r1, [r3, #24]
+ 341              	.LVL23:
+ 342 0004 C805     		lsl	r0, r1, #23
+ 343              	.LVL24:
+ 377:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   {
+ 378:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     /* SYSCFG_Flag is set */
+ 379:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     bitstatus = SET;
+ 380:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   }
+ 381:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   else
+ 382:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   {
+ 383:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     /* SYSCFG_Flag is reset */
+ 384:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****     bitstatus = RESET;
+ 385:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   }
+ 386:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Return the SYSCFG_Flag status */
+ 387:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   return  bitstatus;
+ 344              		.loc 1 387 0
+ 345 0006 C00F     		lsr	r0, r0, #31
+ 388:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 346              		.loc 1 388 0
+ 347 0008 7047     		bx	lr
+ 348              	.L31:
+ 349 000a C046     		.align	2
+ 350              	.L30:
+ 351 000c 00000140 		.word	1073807360
+ 352              		.cfi_endproc
+ 353              	.LFE41:
+ 355              		.section	.text.SYSCFG_ClearFlag,"ax",%progbits
+ 356              		.align	1
+ 357              		.global	SYSCFG_ClearFlag
+ 358              		.code	16
+ 359              		.thumb_func
+ 361              	SYSCFG_ClearFlag:
+ 362              	.LFB42:
+ 389:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 390:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** /**
+ 391:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @brief  Clear the selected SYSCFG flag.
+ 392:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @param  SYSCFG_Flag: selects the flag to be cleared.
+ 393:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *          This parameter can be any combination of the following values:
+ 394:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   *            @arg SYSCFG_FLAG_PE: SRAM parity error flag.
+ 395:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   * @retval None
+ 396:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   */
+ 397:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** void SYSCFG_ClearFlag(uint32_t SYSCFG_Flag)
+ 398:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** {
+ 363              		.loc 1 398 0
+ 364              		.cfi_startproc
+ 365              	.LVL25:
+ 399:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   /* Check the parameter */
+ 400:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   assert_param(IS_SYSCFG_FLAG(SYSCFG_Flag));
+ 401:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** 
+ 402:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c ****   SYSCFG->CFGR2 |= (uint32_t) SYSCFG_Flag;
+ 366              		.loc 1 402 0
+ 367 0000 024B     		ldr	r3, .L33
+ 368              		@ sp needed for prologue
+ 369 0002 9A69     		ldr	r2, [r3, #24]
+ 370 0004 1043     		orr	r0, r2
+ 371              	.LVL26:
+ 372 0006 9861     		str	r0, [r3, #24]
+ 403:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_syscfg.c **** }
+ 373              		.loc 1 403 0
+ 374 0008 7047     		bx	lr
+ 375              	.L34:
+ 376 000a C046     		.align	2
+ 377              	.L33:
+ 378 000c 00000140 		.word	1073807360
+ 379              		.cfi_endproc
+ 380              	.LFE42:
+ 382              		.text
+ 383              	.Letext0:
+ 384              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 385              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f0xx_syscfg.c
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:18     .text.SYSCFG_DeInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:23     .text.SYSCFG_DeInit:00000000 SYSCFG_DeInit
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:57     .text.SYSCFG_DeInit:00000020 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:62     .text.SYSCFG_MemoryRemapConfig:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:67     .text.SYSCFG_MemoryRemapConfig:00000000 SYSCFG_MemoryRemapConfig
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:93     .text.SYSCFG_MemoryRemapConfig:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:98     .text.SYSCFG_DMAChannelRemapConfig:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:103    .text.SYSCFG_DMAChannelRemapConfig:00000000 SYSCFG_DMAChannelRemapConfig
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:136    .text.SYSCFG_DMAChannelRemapConfig:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:141    .text.SYSCFG_I2CFastModePlusConfig:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:146    .text.SYSCFG_I2CFastModePlusConfig:00000000 SYSCFG_I2CFastModePlusConfig
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:179    .text.SYSCFG_I2CFastModePlusConfig:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:184    .text.SYSCFG_IRDAEnvSelection:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:189    .text.SYSCFG_IRDAEnvSelection:00000000 SYSCFG_IRDAEnvSelection
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:211    .text.SYSCFG_IRDAEnvSelection:00000014 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:216    .text.SYSCFG_EXTILineConfig:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:221    .text.SYSCFG_EXTILineConfig:00000000 SYSCFG_EXTILineConfig
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:264    .text.SYSCFG_EXTILineConfig:00000024 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:269    .text.SYSCFG_GetPendingIT:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:274    .text.SYSCFG_GetPendingIT:00000000 SYSCFG_GetPendingIT
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:295    .text.SYSCFG_GetPendingIT:00000014 $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:300    .text.SYSCFG_BreakConfig:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:305    .text.SYSCFG_BreakConfig:00000000 SYSCFG_BreakConfig
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:322    .text.SYSCFG_BreakConfig:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:327    .text.SYSCFG_GetFlagStatus:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:332    .text.SYSCFG_GetFlagStatus:00000000 SYSCFG_GetFlagStatus
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:351    .text.SYSCFG_GetFlagStatus:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:356    .text.SYSCFG_ClearFlag:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:361    .text.SYSCFG_ClearFlag:00000000 SYSCFG_ClearFlag
+C:\Users\khanh\AppData\Local\Temp\cczjpObl.s:378    .text.SYSCFG_ClearFlag:0000000c $d
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

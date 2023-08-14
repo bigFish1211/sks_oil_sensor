@@ -1,0 +1,153 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"delay.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.delay_us,"ax",%progbits
+  18              		.align	1
+  19              		.global	delay_us
+  20              		.code	16
+  21              		.thumb_func
+  23              	delay_us:
+  24              	.LFB33:
+  25              		.file 1 "../Source/delay.c"
+   1:../Source/delay.c **** /*
+   2:../Source/delay.c ****  * delay.c
+   3:../Source/delay.c ****  *
+   4:../Source/delay.c ****  *  Created on: Feb 14, 2017
+   5:../Source/delay.c ****  *      Author: ThangNguyen
+   6:../Source/delay.c ****  */
+   7:../Source/delay.c **** #include <stdint.h>
+   8:../Source/delay.c **** #include "delay.h"
+   9:../Source/delay.c **** #include "global.h"
+  10:../Source/delay.c **** #include "config.h"
+  11:../Source/delay.c **** #include "stm32f0xx_conf.h"
+  12:../Source/delay.c **** 
+  13:../Source/delay.c **** void delay_us(unsigned int time_us) {
+  26              		.loc 1 13 0
+  27              		.cfi_startproc
+  28              	.LVL0:
+  29              		@ sp needed for prologue
+  14:../Source/delay.c **** 	unsigned int i;
+  15:../Source/delay.c **** 	unsigned char j;
+  16:../Source/delay.c **** 	for (i = 0; i < time_us; i++) {
+  17:../Source/delay.c **** 		for (j = 0; j < 7; j++)
+  18:../Source/delay.c **** 			;
+  19:../Source/delay.c **** 	}
+  20:../Source/delay.c **** }
+  30              		.loc 1 20 0
+  31 0000 7047     		bx	lr
+  32              		.cfi_endproc
+  33              	.LFE33:
+  35              		.section	.text.delay_ms,"ax",%progbits
+  36              		.align	1
+  37              		.global	delay_ms
+  38              		.code	16
+  39              		.thumb_func
+  41              	delay_ms:
+  42              	.LFB34:
+  21:../Source/delay.c **** void delay_ms(unsigned int time_ms) {
+  43              		.loc 1 21 0
+  44              		.cfi_startproc
+  45 0000 00B5     		push	{lr}
+  46              	.LCFI0:
+  47              		.cfi_def_cfa_offset 4
+  48              		.cfi_offset 14, -4
+  49              	.LVL1:
+  22:../Source/delay.c **** 	uint32_t next_time = ulMiliCount+ time_ms;
+  50              		.loc 1 22 0
+  51 0002 034B     		ldr	r3, .L5
+  52 0004 1A68     		ldr	r2, [r3]
+  53 0006 8018     		add	r0, r0, r2
+  54              	.LVL2:
+  55              	.L3:
+  23:../Source/delay.c **** 	while(ulMiliCount<next_time);
+  56              		.loc 1 23 0 discriminator 1
+  57 0008 1968     		ldr	r1, [r3]
+  58 000a 8142     		cmp	r1, r0
+  59 000c FCD3     		bcc	.L3
+  60              		@ sp needed for prologue
+  24:../Source/delay.c **** }
+  61              		.loc 1 24 0
+  62 000e 00BD     		pop	{pc}
+  63              	.L6:
+  64              		.align	2
+  65              	.L5:
+  66 0010 00000000 		.word	ulMiliCount
+  67              		.cfi_endproc
+  68              	.LFE34:
+  70              		.global	__aeabi_uidiv
+  71              		.section	.text.getMicros,"ax",%progbits
+  72              		.align	1
+  73              		.global	getMicros
+  74              		.code	16
+  75              		.thumb_func
+  77              	getMicros:
+  78              	.LFB35:
+  25:../Source/delay.c **** 
+  26:../Source/delay.c **** uint32_t getMicros(void) {
+  79              		.loc 1 26 0
+  80              		.cfi_startproc
+  81 0000 10B5     		push	{r4, lr}
+  82              	.LCFI1:
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 4, -8
+  85              		.cfi_offset 14, -4
+  27:../Source/delay.c **** 	uint32_t micros;
+  28:../Source/delay.c **** 	micros = ulMiliCount * 1000 + 1000 - SysTick->VAL / 72;
+  86              		.loc 1 28 0
+  87 0002 0648     		ldr	r0, .L8
+  88 0004 064A     		ldr	r2, .L8+4
+  89 0006 0368     		ldr	r3, [r0]
+  90 0008 FA21     		mov	r1, #250
+  91 000a 0133     		add	r3, r3, #1
+  92 000c 9068     		ldr	r0, [r2, #8]
+  93 000e 8C00     		lsl	r4, r1, #2
+  94 0010 4821     		mov	r1, #72
+  95 0012 5C43     		mul	r4, r3
+  96 0014 FFF7FEFF 		bl	__aeabi_uidiv
+  97              		@ sp needed for prologue
+  98 0018 201A     		sub	r0, r4, r0
+  29:../Source/delay.c **** 	// = Millis*1000+(SystemCoreClock/1000-SysTick->VAL)/72;
+  30:../Source/delay.c **** 	return micros;
+  31:../Source/delay.c **** }
+  99              		.loc 1 31 0
+ 100 001a 10BD     		pop	{r4, pc}
+ 101              	.L9:
+ 102              		.align	2
+ 103              	.L8:
+ 104 001c 00000000 		.word	ulMiliCount
+ 105 0020 10E000E0 		.word	-536813552
+ 106              		.cfi_endproc
+ 107              	.LFE35:
+ 109              		.text
+ 110              	.Letext0:
+ 111              		.file 2 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\CM
+ 112              		.file 3 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 113              		.file 4 "../Source/global.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 delay.c
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:18     .text.delay_us:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:23     .text.delay_us:00000000 delay_us
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:36     .text.delay_ms:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:41     .text.delay_ms:00000000 delay_ms
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:66     .text.delay_ms:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:72     .text.getMicros:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:77     .text.getMicros:00000000 getMicros
+C:\Users\khanh\AppData\Local\Temp\ccMeNdIT.s:104    .text.getMicros:0000001c $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+ulMiliCount
+__aeabi_uidiv

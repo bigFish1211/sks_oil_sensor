@@ -1,0 +1,1839 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"common.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	2
+  18              		.code	16
+  19              		.thumb_func
+  21              	NVIC_SystemReset:
+  22              	.LFB31:
+  23              		.file 1 "D:\\EclipseIndigo\\workspace\\rfid_demo\\Libraries\\CMSIS\\Include/core_cm0.h"
+   1:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /**************************************************************************//**
+   2:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  * @file     core_cm0.h
+   3:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  * @brief    CMSIS Cortex-M0 Core Peripheral Access Layer Header File
+   4:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  * @version  V3.20
+   5:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  * @date     25. February 2013
+   6:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  *
+   7:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  * @note
+   8:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  *
+   9:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+  10:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* Copyright (c) 2009 - 2013 ARM LIMITED
+  11:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  12:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    All rights reserved.
+  13:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    Redistribution and use in source and binary forms, with or without
+  14:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    modification, are permitted provided that the following conditions are met:
+  15:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    - Redistributions of source code must retain the above copyright
+  16:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      notice, this list of conditions and the following disclaimer.
+  17:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    - Redistributions in binary form must reproduce the above copyright
+  18:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      notice, this list of conditions and the following disclaimer in the
+  19:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      documentation and/or other materials provided with the distribution.
+  20:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  21:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      to endorse or promote products derived from this software without
+  22:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      specific prior written permission.
+  23:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    *
+  24:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  28:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    POSSIBILITY OF SUCH DAMAGE.
+  35:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    ---------------------------------------------------------------------------*/
+  36:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  37:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  38:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #if defined ( __ICCARM__ )
+  39:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  #pragma system_include  /* treat file as system include file for MISRA check */
+  40:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+  41:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  42:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #ifdef __cplusplus
+  43:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  extern "C" {
+  44:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+  45:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  46:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CORE_CM0_H_GENERIC
+  47:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __CORE_CM0_H_GENERIC
+  48:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  49:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \page CMSIS_MISRA_Exceptions  MISRA-C:2004 Compliance Exceptions
+  50:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   CMSIS violates the following MISRA-C:2004 rules:
+  51:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  52:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    \li Required Rule 8.5, object/function definition in header file.<br>
+  53:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      Function definitions in header files are used to allow 'inlining'.
+  54:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  55:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    \li Required Rule 18.4, declaration of union type or object of union type: '{...}'.<br>
+  56:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      Unions are used for effective representation of core registers.
+  57:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  58:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****    \li Advisory Rule 19.7, Function-like macro defined.<br>
+  59:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****      Function-like macros are used to allow more efficient code.
+  60:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+  61:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  62:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  63:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+  64:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  *                 CMSIS definitions
+  65:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+  66:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup Cortex_M0
+  67:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+  68:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+  69:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  70:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*  CMSIS CM0 definitions */
+  71:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION_MAIN  (0x03)                                   /*!< [31:16] CMSIS HAL m
+  72:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION_SUB   (0x20)                                   /*!< [15:0]  CMSIS HAL s
+  73:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION       ((__CM0_CMSIS_VERSION_MAIN << 16) | \
+  74:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****                                     __CM0_CMSIS_VERSION_SUB          )     /*!< CMSIS HAL version n
+  75:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  76:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __CORTEX_M                (0x00)                                   /*!< Cortex-M Core      
+  77:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  78:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  79:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #if   defined ( __CC_ARM )
+  80:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for ARM Comp
+  81:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         __inline                                   /*!< inline keyword for ARM C
+  82:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static __inline
+  83:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  84:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __ICCARM__ )
+  85:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for IAR Comp
+  86:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for IAR C
+  87:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  88:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  89:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __GNUC__ )
+  90:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for GNU Comp
+  91:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for GNU C
+  92:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  93:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  94:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __TASKING__ )
+  95:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for TASKING 
+  96:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for TASKI
+  97:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  98:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+  99:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 100:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 101:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** __FPU_USED indicates whether an FPU is used or not. This core does not support an FPU at all
+ 102:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** */
+ 103:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __FPU_USED       0
+ 104:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 105:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #if defined ( __CC_ARM )
+ 106:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __TARGET_FPU_VFP
+ 107:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 108:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 109:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 110:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __ICCARM__ )
+ 111:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __ARMVFP__
+ 112:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 113:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 114:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 115:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __GNUC__ )
+ 116:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #if defined (__VFP_FP__) && !defined(__SOFTFP__)
+ 117:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 118:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 119:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 120:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __TASKING__ )
+ 121:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __FPU_VFP__
+ 122:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+ 123:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 124:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 125:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 126:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #include <stdint.h>                      /* standard types definitions                      */
+ 127:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #include <core_cmInstr.h>                /* Core Instruction Access                         */
+ 128:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #include <core_cmFunc.h>                 /* Core Function Access                            */
+ 129:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 130:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif /* __CORE_CM0_H_GENERIC */
+ 131:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 132:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CMSIS_GENERIC
+ 133:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 134:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CORE_CM0_H_DEPENDANT
+ 135:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define __CORE_CM0_H_DEPENDANT
+ 136:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 137:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* check device defines and use defaults */
+ 138:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #if defined __CHECK_DEVICE_DEFINES
+ 139:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __CM0_REV
+ 140:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #define __CM0_REV               0x0000
+ 141:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__CM0_REV not defined in device header file; using default!"
+ 142:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 143:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 144:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __NVIC_PRIO_BITS
+ 145:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #define __NVIC_PRIO_BITS          2
+ 146:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+ 147:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 148:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 149:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __Vendor_SysTickConfig
+ 150:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #define __Vendor_SysTickConfig    0
+ 151:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+ 152:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 153:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 154:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 155:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* IO definitions (access restrictions to peripheral registers) */
+ 156:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /**
+ 157:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_glob_defs CMSIS Global Defines
+ 158:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 159:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     <strong>IO Type Qualifiers</strong> are used
+ 160:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \li to specify the access to peripheral variables.
+ 161:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \li for automatic generation of peripheral register debug information.
+ 162:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** */
+ 163:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #ifdef __cplusplus
+ 164:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define   __I     volatile             /*!< Defines 'read only' permissions                 */
+ 165:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 166:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   #define   __I     volatile const       /*!< Defines 'read only' permissions                 */
+ 167:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 168:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define     __O     volatile             /*!< Defines 'write only' permissions                */
+ 169:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
+ 170:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 171:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group Cortex_M0 */
+ 172:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 173:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 174:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 175:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+ 176:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  *                 Register Abstraction
+ 177:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   Core Register contain:
+ 178:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core Register
+ 179:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core NVIC Register
+ 180:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core SCB Register
+ 181:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core SysTick Register
+ 182:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+ 183:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \defgroup CMSIS_core_register Defines and Type Definitions
+ 184:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief Type definitions and defines for Cortex-M processor based devices.
+ 185:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** */
+ 186:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 187:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 188:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_CORE  Status and Control Registers
+ 189:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief  Core Register type definitions.
+ 190:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 191:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 192:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 193:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Application Program Status Register (APSR).
+ 194:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 195:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 196:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 197:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 198:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 199:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #if (__CORTEX_M != 0x04)
+ 200:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:27;              /*!< bit:  0..26  Reserved                           */
+ 201:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 202:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:16;              /*!< bit:  0..15  Reserved                           */
+ 203:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t GE:4;                       /*!< bit: 16..19  Greater than or Equal flags        */
+ 204:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved1:7;               /*!< bit: 20..26  Reserved                           */
+ 205:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 206:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Q:1;                        /*!< bit:     27  Saturation condition flag          */
+ 207:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t V:1;                        /*!< bit:     28  Overflow condition code flag       */
+ 208:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t C:1;                        /*!< bit:     29  Carry condition code flag          */
+ 209:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Z:1;                        /*!< bit:     30  Zero condition code flag           */
+ 210:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t N:1;                        /*!< bit:     31  Negative condition code flag       */
+ 211:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 212:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 213:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** } APSR_Type;
+ 214:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 215:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 216:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Interrupt Program Status Register (IPSR).
+ 217:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 218:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 219:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 220:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 221:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 222:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t ISR:9;                      /*!< bit:  0.. 8  Exception number                   */
+ 223:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:23;              /*!< bit:  9..31  Reserved                           */
+ 224:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 225:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 226:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** } IPSR_Type;
+ 227:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 228:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 229:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Special-Purpose Program Status Registers (xPSR).
+ 230:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 231:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 232:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 233:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 234:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 235:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t ISR:9;                      /*!< bit:  0.. 8  Exception number                   */
+ 236:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #if (__CORTEX_M != 0x04)
+ 237:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:15;              /*!< bit:  9..23  Reserved                           */
+ 238:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 239:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:7;               /*!< bit:  9..15  Reserved                           */
+ 240:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t GE:4;                       /*!< bit: 16..19  Greater than or Equal flags        */
+ 241:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved1:4;               /*!< bit: 20..23  Reserved                           */
+ 242:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 243:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t T:1;                        /*!< bit:     24  Thumb bit        (read 0)          */
+ 244:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t IT:2;                       /*!< bit: 25..26  saved IT state   (read 0)          */
+ 245:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Q:1;                        /*!< bit:     27  Saturation condition flag          */
+ 246:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t V:1;                        /*!< bit:     28  Overflow condition code flag       */
+ 247:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t C:1;                        /*!< bit:     29  Carry condition code flag          */
+ 248:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Z:1;                        /*!< bit:     30  Zero condition code flag           */
+ 249:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t N:1;                        /*!< bit:     31  Negative condition code flag       */
+ 250:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 251:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 252:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** } xPSR_Type;
+ 253:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 254:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 255:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Control Registers (CONTROL).
+ 256:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 257:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 258:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 259:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 260:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 261:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t nPRIV:1;                    /*!< bit:      0  Execution privilege in Thread mode */
+ 262:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t SPSEL:1;                    /*!< bit:      1  Stack to be used                   */
+ 263:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t FPCA:1;                     /*!< bit:      2  FP extension active flag           */
+ 264:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:29;              /*!< bit:  3..31  Reserved                           */
+ 265:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 266:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 267:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** } CONTROL_Type;
+ 268:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 269:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_CORE */
+ 270:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 271:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 272:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 273:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_NVIC  Nested Vectored Interrupt Controller (NVIC)
+ 274:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the NVIC Registers
+ 275:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 276:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 277:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 278:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the Nested Vectored Interrupt Controller (NVIC).
+ 279:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 280:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 281:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 282:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ISER[1];                 /*!< Offset: 0x000 (R/W)  Interrupt Set Enable Register   
+ 283:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED0[31];
+ 284:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICER[1];                 /*!< Offset: 0x080 (R/W)  Interrupt Clear Enable Register 
+ 285:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RSERVED1[31];
+ 286:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ISPR[1];                 /*!< Offset: 0x100 (R/W)  Interrupt Set Pending Register  
+ 287:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED2[31];
+ 288:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICPR[1];                 /*!< Offset: 0x180 (R/W)  Interrupt Clear Pending Register
+ 289:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED3[31];
+ 290:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED4[64];
+ 291:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t IP[8];                   /*!< Offset: 0x300 (R/W)  Interrupt Priority Register     
+ 292:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }  NVIC_Type;
+ 293:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 294:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_NVIC */
+ 295:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 296:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 297:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 298:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_SCB     System Control Block (SCB)
+ 299:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the System Control Block Registers
+ 300:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 301:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 302:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 303:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the System Control Block (SCB).
+ 304:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 305:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 306:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 307:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __I  uint32_t CPUID;                   /*!< Offset: 0x000 (R/ )  CPUID Base Register             
+ 308:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICSR;                    /*!< Offset: 0x004 (R/W)  Interrupt Control and State Regi
+ 309:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED0;
+ 310:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t AIRCR;                   /*!< Offset: 0x00C (R/W)  Application Interrupt and Reset 
+ 311:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SCR;                     /*!< Offset: 0x010 (R/W)  System Control Register         
+ 312:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t CCR;                     /*!< Offset: 0x014 (R/W)  Configuration Control Register  
+ 313:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED1;
+ 314:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SHP[2];                  /*!< Offset: 0x01C (R/W)  System Handlers Priority Registe
+ 315:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SHCSR;                   /*!< Offset: 0x024 (R/W)  System Handler Control and State
+ 316:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** } SCB_Type;
+ 317:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 318:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SCB CPUID Register Definitions */
+ 319:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_IMPLEMENTER_Pos          24                                             /*!< SCB 
+ 320:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_IMPLEMENTER_Msk          (0xFFUL << SCB_CPUID_IMPLEMENTER_Pos)          /*!< SCB 
+ 321:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 322:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_VARIANT_Pos              20                                             /*!< SCB 
+ 323:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_VARIANT_Msk              (0xFUL << SCB_CPUID_VARIANT_Pos)               /*!< SCB 
+ 324:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 325:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_ARCHITECTURE_Pos         16                                             /*!< SCB 
+ 326:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_ARCHITECTURE_Msk         (0xFUL << SCB_CPUID_ARCHITECTURE_Pos)          /*!< SCB 
+ 327:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 328:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_PARTNO_Pos                4                                             /*!< SCB 
+ 329:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_PARTNO_Msk               (0xFFFUL << SCB_CPUID_PARTNO_Pos)              /*!< SCB 
+ 330:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 331:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_REVISION_Pos              0                                             /*!< SCB 
+ 332:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_REVISION_Msk             (0xFUL << SCB_CPUID_REVISION_Pos)              /*!< SCB 
+ 333:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 334:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Interrupt Control State Register Definitions */
+ 335:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_NMIPENDSET_Pos            31                                             /*!< SCB 
+ 336:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_NMIPENDSET_Msk            (1UL << SCB_ICSR_NMIPENDSET_Pos)               /*!< SCB 
+ 337:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 338:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVSET_Pos             28                                             /*!< SCB 
+ 339:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVSET_Msk             (1UL << SCB_ICSR_PENDSVSET_Pos)                /*!< SCB 
+ 340:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 341:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVCLR_Pos             27                                             /*!< SCB 
+ 342:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVCLR_Msk             (1UL << SCB_ICSR_PENDSVCLR_Pos)                /*!< SCB 
+ 343:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 344:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTSET_Pos             26                                             /*!< SCB 
+ 345:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTSET_Msk             (1UL << SCB_ICSR_PENDSTSET_Pos)                /*!< SCB 
+ 346:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 347:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTCLR_Pos             25                                             /*!< SCB 
+ 348:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTCLR_Msk             (1UL << SCB_ICSR_PENDSTCLR_Pos)                /*!< SCB 
+ 349:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 350:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPREEMPT_Pos            23                                             /*!< SCB 
+ 351:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPREEMPT_Msk            (1UL << SCB_ICSR_ISRPREEMPT_Pos)               /*!< SCB 
+ 352:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 353:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPENDING_Pos            22                                             /*!< SCB 
+ 354:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPENDING_Msk            (1UL << SCB_ICSR_ISRPENDING_Pos)               /*!< SCB 
+ 355:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 356:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTPENDING_Pos           12                                             /*!< SCB 
+ 357:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTPENDING_Msk           (0x1FFUL << SCB_ICSR_VECTPENDING_Pos)          /*!< SCB 
+ 358:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 359:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTACTIVE_Pos             0                                             /*!< SCB 
+ 360:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL << SCB_ICSR_VECTACTIVE_Pos)           /*!< SCB 
+ 361:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 362:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Application Interrupt and Reset Control Register Definitions */
+ 363:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEY_Pos              16                                             /*!< SCB 
+ 364:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEY_Msk              (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)            /*!< SCB 
+ 365:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 366:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEYSTAT_Pos          16                                             /*!< SCB 
+ 367:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEYSTAT_Msk          (0xFFFFUL << SCB_AIRCR_VECTKEYSTAT_Pos)        /*!< SCB 
+ 368:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 369:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_ENDIANESS_Pos            15                                             /*!< SCB 
+ 370:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_ENDIANESS_Msk            (1UL << SCB_AIRCR_ENDIANESS_Pos)               /*!< SCB 
+ 371:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 372:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_SYSRESETREQ_Pos           2                                             /*!< SCB 
+ 373:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_SYSRESETREQ_Msk          (1UL << SCB_AIRCR_SYSRESETREQ_Pos)             /*!< SCB 
+ 374:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 375:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTCLRACTIVE_Pos         1                                             /*!< SCB 
+ 376:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTCLRACTIVE_Msk        (1UL << SCB_AIRCR_VECTCLRACTIVE_Pos)           /*!< SCB 
+ 377:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 378:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SCB System Control Register Definitions */
+ 379:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SEVONPEND_Pos               4                                             /*!< SCB 
+ 380:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SEVONPEND_Msk              (1UL << SCB_SCR_SEVONPEND_Pos)                 /*!< SCB 
+ 381:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 382:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPDEEP_Pos               2                                             /*!< SCB 
+ 383:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPDEEP_Msk              (1UL << SCB_SCR_SLEEPDEEP_Pos)                 /*!< SCB 
+ 384:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 385:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPONEXIT_Pos             1                                             /*!< SCB 
+ 386:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPONEXIT_Msk            (1UL << SCB_SCR_SLEEPONEXIT_Pos)               /*!< SCB 
+ 387:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 388:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Configuration Control Register Definitions */
+ 389:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_STKALIGN_Pos                9                                             /*!< SCB 
+ 390:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_STKALIGN_Msk               (1UL << SCB_CCR_STKALIGN_Pos)                  /*!< SCB 
+ 391:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 392:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_UNALIGN_TRP_Pos             3                                             /*!< SCB 
+ 393:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_UNALIGN_TRP_Msk            (1UL << SCB_CCR_UNALIGN_TRP_Pos)               /*!< SCB 
+ 394:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 395:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SCB System Handler Control and State Register Definitions */
+ 396:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SHCSR_SVCALLPENDED_Pos         15                                             /*!< SCB 
+ 397:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SHCSR_SVCALLPENDED_Msk         (1UL << SCB_SHCSR_SVCALLPENDED_Pos)            /*!< SCB 
+ 398:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 399:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_SCB */
+ 400:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 401:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 402:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 403:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_SysTick     System Tick Timer (SysTick)
+ 404:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the System Timer Registers.
+ 405:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 406:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 407:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 408:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the System Timer (SysTick).
+ 409:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 410:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 411:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 412:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t CTRL;                    /*!< Offset: 0x000 (R/W)  SysTick Control and Status Regis
+ 413:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t LOAD;                    /*!< Offset: 0x004 (R/W)  SysTick Reload Value Register   
+ 414:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t VAL;                     /*!< Offset: 0x008 (R/W)  SysTick Current Value Register  
+ 415:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __I  uint32_t CALIB;                   /*!< Offset: 0x00C (R/ )  SysTick Calibration Register    
+ 416:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** } SysTick_Type;
+ 417:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 418:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Control / Status Register Definitions */
+ 419:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_COUNTFLAG_Pos         16                                             /*!< SysT
+ 420:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_COUNTFLAG_Msk         (1UL << SysTick_CTRL_COUNTFLAG_Pos)            /*!< SysT
+ 421:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 422:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_CLKSOURCE_Pos          2                                             /*!< SysT
+ 423:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_CLKSOURCE_Msk         (1UL << SysTick_CTRL_CLKSOURCE_Pos)            /*!< SysT
+ 424:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 425:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_TICKINT_Pos            1                                             /*!< SysT
+ 426:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_TICKINT_Msk           (1UL << SysTick_CTRL_TICKINT_Pos)              /*!< SysT
+ 427:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 428:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_ENABLE_Pos             0                                             /*!< SysT
+ 429:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_ENABLE_Msk            (1UL << SysTick_CTRL_ENABLE_Pos)               /*!< SysT
+ 430:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 431:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Reload Register Definitions */
+ 432:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_LOAD_RELOAD_Pos             0                                             /*!< SysT
+ 433:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_LOAD_RELOAD_Msk            (0xFFFFFFUL << SysTick_LOAD_RELOAD_Pos)        /*!< SysT
+ 434:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 435:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Current Register Definitions */
+ 436:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_VAL_CURRENT_Pos             0                                             /*!< SysT
+ 437:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_VAL_CURRENT_Msk            (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)        /*!< SysT
+ 438:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 439:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Calibration Register Definitions */
+ 440:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_NOREF_Pos            31                                             /*!< SysT
+ 441:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_NOREF_Msk            (1UL << SysTick_CALIB_NOREF_Pos)               /*!< SysT
+ 442:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 443:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_SKEW_Pos             30                                             /*!< SysT
+ 444:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_SKEW_Msk             (1UL << SysTick_CALIB_SKEW_Pos)                /*!< SysT
+ 445:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 446:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_TENMS_Pos             0                                             /*!< SysT
+ 447:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_TENMS_Msk            (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)        /*!< SysT
+ 448:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 449:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_SysTick */
+ 450:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 451:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 452:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 453:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_CoreDebug       Core Debug Registers (CoreDebug)
+ 454:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Cortex-M0 Core Debug Registers (DCB registers, SHCSR, and DFSR)
+ 455:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****                 are only accessible over DAP and not via processor. Therefore
+ 456:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****                 they are not covered by the Cortex-M0 header file.
+ 457:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 458:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 459:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_CoreDebug */
+ 460:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 461:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 462:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 463:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_core_base     Core Definitions
+ 464:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Definitions for base addresses, unions, and structures.
+ 465:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 466:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 467:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 468:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* Memory mapping of Cortex-M0 Hardware */
+ 469:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCS_BASE            (0xE000E000UL)                            /*!< System Control Space Bas
+ 470:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address    
+ 471:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address       
+ 472:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Bas
+ 473:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 474:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct
+ 475:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration st
+ 476:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struc
+ 477:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 478:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 479:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*@} */
+ 480:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 481:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 482:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 483:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+ 484:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  *                Hardware Abstraction Layer
+ 485:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   Core Function Interface contains:
+ 486:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core NVIC Functions
+ 487:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core SysTick Functions
+ 488:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   - Core Register Access Functions
+ 489:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+ 490:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \defgroup CMSIS_Core_FunctionInterface Functions and Instructions Reference
+ 491:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** */
+ 492:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 493:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 494:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 495:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* ##########################   NVIC functions  #################################### */
+ 496:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 497:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_Core_NVICFunctions NVIC Functions
+ 498:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Functions that manage interrupts and exceptions via the NVIC.
+ 499:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     @{
+ 500:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 501:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 502:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* Interrupt Priorities are WORD accessible only under ARMv6M                   */
+ 503:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /* The following MACROS handle generation of the register offset and byte masks */
+ 504:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define _BIT_SHIFT(IRQn)         (  (((uint32_t)(IRQn)       )    &  0x03) * 8 )
+ 505:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define _SHP_IDX(IRQn)           ( ((((uint32_t)(IRQn) & 0x0F)-8) >>    2)     )
+ 506:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** #define _IP_IDX(IRQn)            (   ((uint32_t)(IRQn)            >>    2)     )
+ 507:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 508:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 509:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Enable External Interrupt
+ 510:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 511:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function enables a device-specific interrupt in the NVIC interrupt controller.
+ 512:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 513:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 514:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 515:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
+ 516:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 517:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ISER[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 518:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 519:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 520:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 521:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Disable External Interrupt
+ 522:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 523:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function disables a device-specific interrupt in the NVIC interrupt controller.
+ 524:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 525:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 526:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 527:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
+ 528:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 529:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ICER[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 530:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 531:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 532:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 533:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Get Pending Interrupt
+ 534:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 535:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function reads the pending register in the NVIC and returns the pending bit
+ 536:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     for the specified interrupt.
+ 537:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 538:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number.
+ 539:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 540:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \return             0  Interrupt status is not pending.
+ 541:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \return             1  Interrupt status is pending.
+ 542:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 543:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t NVIC_GetPendingIRQ(IRQn_Type IRQn)
+ 544:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 545:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   return((uint32_t) ((NVIC->ISPR[0] & (1 << ((uint32_t)(IRQn) & 0x1F)))?1:0));
+ 546:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 547:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 548:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 549:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Set Pending Interrupt
+ 550:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 551:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function sets the pending bit of an external interrupt.
+ 552:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 553:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number. Value cannot be negative.
+ 554:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 555:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SetPendingIRQ(IRQn_Type IRQn)
+ 556:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 557:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ISPR[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 558:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 559:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 560:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 561:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Clear Pending Interrupt
+ 562:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 563:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function clears the pending bit of an external interrupt.
+ 564:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 565:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 566:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 567:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
+ 568:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 569:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ICPR[0] = (1 << ((uint32_t)(IRQn) & 0x1F)); /* Clear pending interrupt */
+ 570:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 571:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 572:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 573:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Set Interrupt Priority
+ 574:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 575:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function sets the priority of an interrupt.
+ 576:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 577:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \note The priority cannot be set for every core interrupt.
+ 578:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 579:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number.
+ 580:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]  priority  Priority to set.
+ 581:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 582:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+ 583:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 584:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   if(IRQn < 0) {
+ 585:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 586:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****         (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+ 587:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   else {
+ 588:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     NVIC->IP[_IP_IDX(IRQn)] = (NVIC->IP[_IP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 589:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****         (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+ 590:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 591:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 592:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 593:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Get Interrupt Priority
+ 594:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 595:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function reads the priority of an interrupt. The interrupt
+ 596:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     number can be positive to specify an external (device specific)
+ 597:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     interrupt, or negative to specify an internal (core) interrupt.
+ 598:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 599:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 600:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]   IRQn  Interrupt number.
+ 601:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     \return             Interrupt Priority. Value is aligned automatically to the implemented
+ 602:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****                         priority bits of the microcontroller.
+ 603:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 604:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
+ 605:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+ 606:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 607:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   if(IRQn < 0) {
+ 608:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     return((uint32_t)(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) & 0xFF) >> (8 - __NVIC_PRIO_
+ 609:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   else {
+ 610:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     return((uint32_t)(((NVIC->IP[ _IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) & 0xFF) >> (8 - __NVIC_PRIO_
+ 611:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** }
+ 612:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 613:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 614:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  System Reset
+ 615:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** 
+ 616:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****     The function initiates a system reset request to reset the MCU.
+ 617:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 618:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SystemReset(void)
+ 619:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h **** {
+  24              		.loc 1 619 0
+  25              		.cfi_startproc
+  26 0000 80B5     		push	{r7, lr}
+  27              	.LCFI0:
+  28              		.cfi_def_cfa_offset 8
+  29              		.cfi_offset 7, -8
+  30              		.cfi_offset 14, -4
+  31 0002 00AF     		add	r7, sp, #0
+  32              	.LCFI1:
+  33              		.cfi_def_cfa_register 7
+  34              	.LBB6:
+  35              	.LBB7:
+  36              		.file 2 "D:\\EclipseIndigo\\workspace\\rfid_demo\\Libraries\\CMSIS\\Include/core_cmInstr.h"
+   1:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /**************************************************************************//**
+   2:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @file     core_cmInstr.h
+   3:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @brief    CMSIS Cortex-M Core Instruction Access Header File
+   4:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @version  V3.20
+   5:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @date     05. March 2013
+   6:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+   7:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * @note
+   8:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+   9:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  ******************************************************************************/
+  10:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* Copyright (c) 2009 - 2013 ARM LIMITED
+  11:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  12:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    All rights reserved.
+  13:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    Redistribution and use in source and binary forms, with or without
+  14:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    modification, are permitted provided that the following conditions are met:
+  15:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    - Redistributions of source code must retain the above copyright
+  16:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****      notice, this list of conditions and the following disclaimer.
+  17:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    - Redistributions in binary form must reproduce the above copyright
+  18:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****      notice, this list of conditions and the following disclaimer in the
+  19:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****      documentation and/or other materials provided with the distribution.
+  20:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  21:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****      to endorse or promote products derived from this software without
+  22:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****      specific prior written permission.
+  23:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    *
+  24:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  28:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    POSSIBILITY OF SUCH DAMAGE.
+  35:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****    ---------------------------------------------------------------------------*/
+  36:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  37:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  38:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __CORE_CMINSTR_H
+  39:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CORE_CMINSTR_H
+  40:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  41:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  42:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* ##########################  Core Instruction Access  ######################### */
+  43:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \defgroup CMSIS_Core_InstructionInterface CMSIS Core Instruction Interface
+  44:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   Access to dedicated instructions
+  45:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   @{
+  46:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** */
+  47:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  48:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
+  49:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* ARM armcc specific functions */
+  50:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  51:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #if (__ARMCC_VERSION < 400677)
+  52:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   #error "Please use ARM Compiler Toolchain V4.0.677 or later!"
+  53:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+  54:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  55:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  56:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  No Operation
+  57:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  58:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+  59:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  60:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __NOP                             __nop
+  61:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  62:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  63:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Interrupt
+  64:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  65:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+  66:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     until one of a number of events occurs.
+  67:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  68:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __WFI                             __wfi
+  69:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  70:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  71:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Event
+  72:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  73:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+  74:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+  75:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  76:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __WFE                             __wfe
+  77:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  78:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  79:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Send Event
+  80:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  81:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+  82:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  83:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __SEV                             __sev
+  84:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  85:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  86:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Instruction Synchronization Barrier
+  87:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  88:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Instruction Synchronization Barrier flushes the pipeline in the processor,
+  89:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     so that all instructions following the ISB are fetched from cache or
+  90:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     memory, after the instruction has been completed.
+  91:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  92:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __ISB()                           __isb(0xF)
+  93:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  94:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  95:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Synchronization Barrier
+  96:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  97:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function acts as a special kind of Data Memory Barrier.
+  98:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     It completes when all explicit memory accesses before this instruction complete.
+  99:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 100:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __DSB()                           __dsb(0xF)
+ 101:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 102:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 103:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Memory Barrier
+ 104:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 105:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function ensures the apparent order of the explicit memory operations before
+ 106:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     and after the instruction, without ensuring their completion.
+ 107:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 108:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __DMB()                           __dmb(0xF)
+ 109:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 110:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 111:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order (32 bit)
+ 112:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 113:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in integer value.
+ 114:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 115:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 116:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 117:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 118:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __REV                             __rev
+ 119:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 120:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 121:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order (16 bit)
+ 122:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 123:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in two unsigned short values.
+ 124:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 125:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 126:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 127:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 128:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __NO_EMBEDDED_ASM
+ 129:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__((section(".rev16_text"))) __STATIC_INLINE __ASM uint32_t __REV16(uint32_t value)
+ 130:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 131:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   rev16 r0, r0
+ 132:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   bx lr
+ 133:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 134:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+ 135:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 136:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order in signed short value
+ 137:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 138:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in a signed short value with sign extension to integer.
+ 139:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 140:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 141:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 142:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 143:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __NO_EMBEDDED_ASM
+ 144:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__((section(".revsh_text"))) __STATIC_INLINE __ASM int32_t __REVSH(int32_t value)
+ 145:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 146:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   revsh r0, r0
+ 147:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   bx lr
+ 148:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 149:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+ 150:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 151:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 152:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Rotate Right in unsigned value (32 bit)
+ 153:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 154:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function Rotate Right (immediate) provides the value of the contents of a register rotated
+ 155:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 156:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to rotate
+ 157:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Number of Bits to rotate
+ 158:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Rotated value
+ 159:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 160:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __ROR                             __ror
+ 161:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 162:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 163:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Breakpoint
+ 164:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 165:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function causes the processor to enter Debug state.
+ 166:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Debug tools can use this to investigate system state when the instruction at a particular addre
+ 167:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 168:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  is ignored by the processor.
+ 169:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****                    If required, a debugger can use it to store additional information about the bre
+ 170:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 171:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __BKPT(value)                       __breakpoint(value)
+ 172:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 173:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 174:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #if       (__CORTEX_M >= 0x03)
+ 175:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 176:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse bit order of value
+ 177:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 178:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the bit order of the given value.
+ 179:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 180:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 181:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 182:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 183:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __RBIT                            __rbit
+ 184:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 185:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 186:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (8 bit)
+ 187:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 188:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 8 bit value.
+ 189:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 190:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 191:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             value of type uint8_t at (*ptr)
+ 192:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 193:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXB(ptr)                     ((uint8_t ) __ldrex(ptr))
+ 194:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 195:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 196:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (16 bit)
+ 197:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 198:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 16 bit values.
+ 199:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 200:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 201:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return        value of type uint16_t at (*ptr)
+ 202:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 203:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXH(ptr)                     ((uint16_t) __ldrex(ptr))
+ 204:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 205:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 206:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (32 bit)
+ 207:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 208:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 32 bit values.
+ 209:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 210:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 211:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return        value of type uint32_t at (*ptr)
+ 212:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 213:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXW(ptr)                     ((uint32_t ) __ldrex(ptr))
+ 214:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 215:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 216:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (8 bit)
+ 217:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 218:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 8 bit values.
+ 219:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 220:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 221:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 222:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 223:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 224:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 225:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXB(value, ptr)              __strex(value, ptr)
+ 226:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 227:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 228:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (16 bit)
+ 229:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 230:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 16 bit values.
+ 231:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 232:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 233:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 234:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 235:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 236:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 237:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXH(value, ptr)              __strex(value, ptr)
+ 238:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 239:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 240:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (32 bit)
+ 241:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 242:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 32 bit values.
+ 243:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 244:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 245:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 246:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 247:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 248:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 249:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXW(value, ptr)              __strex(value, ptr)
+ 250:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 251:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 252:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Remove the exclusive lock
+ 253:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 254:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function removes the exclusive lock which is created by LDREX.
+ 255:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 256:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 257:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CLREX                           __clrex
+ 258:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 259:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 260:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Signed Saturate
+ 261:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 262:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function saturates a signed value.
+ 263:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 264:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 265:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (1..32)
+ 266:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             Saturated value
+ 267:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 268:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __SSAT                            __ssat
+ 269:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 270:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 271:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Unsigned Saturate
+ 272:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 273:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function saturates an unsigned value.
+ 274:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 275:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 276:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (0..31)
+ 277:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             Saturated value
+ 278:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 279:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __USAT                            __usat
+ 280:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 281:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 282:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Count leading zeros
+ 283:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 284:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function counts the number of leading zeros of a data value.
+ 285:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 286:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to count the leading zeros
+ 287:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             number of leading zeros in value
+ 288:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 289:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CLZ                             __clz
+ 290:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 291:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif /* (__CORTEX_M >= 0x03) */
+ 292:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 293:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 294:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 295:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
+ 296:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* IAR iccarm specific functions */
+ 297:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 298:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #include <cmsis_iar.h>
+ 299:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 300:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 301:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __TMS470__ ) /*---------------- TI CCS Compiler ------------------*/
+ 302:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* TI CCS specific functions */
+ 303:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 304:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #include <cmsis_ccs.h>
+ 305:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 306:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 307:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
+ 308:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* GNU gcc specific functions */
+ 309:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 310:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /* Define macros for porting to both thumb1 and thumb2.
+ 311:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * For thumb1, use low register (r0-r7), specified by constrant "l"
+ 312:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  * Otherwise, use general registers, specified by constrant "r" */
+ 313:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #if defined (__thumb__) && !defined (__thumb2__)
+ 314:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_OUT_REG(r) "=l" (r)
+ 315:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_USE_REG(r) "l" (r)
+ 316:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #else
+ 317:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_OUT_REG(r) "=r" (r)
+ 318:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_USE_REG(r) "r" (r)
+ 319:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+ 320:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 321:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  No Operation
+ 322:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 323:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+ 324:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 325:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __NOP(void)
+ 326:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 327:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("nop");
+ 328:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 329:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 330:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 331:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Interrupt
+ 332:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 333:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+ 334:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     until one of a number of events occurs.
+ 335:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 336:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __WFI(void)
+ 337:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 338:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 339:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 340:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 341:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 342:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Event
+ 343:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 344:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+ 345:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+ 346:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 347:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __WFE(void)
+ 348:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 349:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfe");
+ 350:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 351:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 352:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 353:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Send Event
+ 354:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 355:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+ 356:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 357:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __SEV(void)
+ 358:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 359:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("sev");
+ 360:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 361:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 362:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 363:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Instruction Synchronization Barrier
+ 364:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 365:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     Instruction Synchronization Barrier flushes the pipeline in the processor,
+ 366:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     so that all instructions following the ISB are fetched from cache or
+ 367:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     memory, after the instruction has been completed.
+ 368:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 369:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __ISB(void)
+ 370:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 371:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("isb");
+ 372:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 373:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 374:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 375:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Synchronization Barrier
+ 376:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 377:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     This function acts as a special kind of Data Memory Barrier.
+ 378:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****     It completes when all explicit memory accesses before this instruction complete.
+ 379:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 380:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __DSB(void)
+ 381:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 382:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("dsb");
+  37              		.loc 2 382 0
+  38              	@ 382 "D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include/core_cmInstr.h" 1
+  39 0004 BFF34F8F 		dsb
+  40              	@ 0 "" 2
+  41              		.code	16
+  42              	.LBE7:
+  43              	.LBE6:
+ 620:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __DSB();                                                     /* Ensure all outstanding memory acc
+ 621:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****                                                                   buffered write are completed befo
+ 622:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
+  44              		.loc 1 622 0
+  45 0008 024B     		ldr	r3, .L3
+  46 000a 034A     		ldr	r2, .L3+4
+  47 000c DA60     		str	r2, [r3, #12]
+  48              	.LBB8:
+  49              	.LBB9:
+  50              		.loc 2 382 0
+  51              	@ 382 "D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include/core_cmInstr.h" 1
+  52 000e BFF34F8F 		dsb
+  53              	@ 0 "" 2
+  54              		.code	16
+  55              	.L2:
+  56              	.LBE9:
+  57              	.LBE8:
+ 623:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****                  SCB_AIRCR_SYSRESETREQ_Msk);
+ 624:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   __DSB();                                                     /* Ensure completion of memory acces
+ 625:D:\EclipseIndigo\workspace\rfid_demo\Libraries\CMSIS\Include\core_cm0.h ****   while(1);                                                    /* wait until reset */
+  58              		.loc 1 625 0 discriminator 1
+  59 0012 FEE7     		b	.L2
+  60              	.L4:
+  61              		.align	2
+  62              	.L3:
+  63 0014 00ED00E0 		.word	-536810240
+  64 0018 0400FA05 		.word	100270084
+  65              		.cfi_endproc
+  66              	.LFE31:
+  68              		.comm	x3buffer,5560,4
+  69              		.comm	g_pointer,12,4
+  70              		.comm	g_config,92,4
+  71              		.align	2
+  72              		.global	FLASH_PagesMask
+  73              		.code	16
+  74              		.thumb_func
+  76              	FLASH_PagesMask:
+  77              	.LFB33:
+  78              		.file 3 "../scr/common.c"
+   1:../scr/common.c **** /**
+   2:../scr/common.c ****   ******************************************************************************
+   3:../scr/common.c ****   * @file    IAP/src/common.c 
+   4:../scr/common.c ****   * @author  MCD Application Team
+   5:../scr/common.c ****   * @version V3.3.0
+   6:../scr/common.c ****   * @date    10/15/2010
+   7:../scr/common.c ****   * @brief   This file provides all the common functions.
+   8:../scr/common.c ****   ******************************************************************************
+   9:../scr/common.c ****   * @copy
+  10:../scr/common.c ****   *
+  11:../scr/common.c ****   * THE PRESENT FIRMWARE WHICH IS FOR GUIDANCE ONLY AIMS AT PROVIDING CUSTOMERS
+  12:../scr/common.c ****   * WITH CODING INFORMATION REGARDING THEIR PRODUCTS IN ORDER FOR THEM TO SAVE
+  13:../scr/common.c ****   * TIME. AS A RESULT, STMICROELECTRONICS SHALL NOT BE HELD LIABLE FOR ANY
+  14:../scr/common.c ****   * DIRECT, INDIRECT OR CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING
+  15:../scr/common.c ****   * FROM THE CONTENT OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE
+  16:../scr/common.c ****   * CODING INFORMATION CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
+  17:../scr/common.c ****   *
+  18:../scr/common.c ****   * <h2><center>&copy; COPYRIGHT 2010 STMicroelectronics</center></h2>
+  19:../scr/common.c ****   */ 
+  20:../scr/common.c **** 
+  21:../scr/common.c **** /** @addtogroup IAP
+  22:../scr/common.c ****   * @{
+  23:../scr/common.c ****   */
+  24:../scr/common.c **** 
+  25:../scr/common.c **** /* Includes ------------------------------------------------------------------*/
+  26:../scr/common.c **** #include "common.h"
+  27:../scr/common.c **** #include "stm32f0xx_crc.h"
+  28:../scr/common.c **** #include "stm32f0xx_flash.h"
+  29:../scr/common.c **** #include "main.h"
+  30:../scr/common.c **** 
+  31:../scr/common.c **** /**
+  32:../scr/common.c ****   * @brief  Calculate the number of pages
+  33:../scr/common.c ****   * @param  Size: The image size
+  34:../scr/common.c ****   * @retval The number of pages
+  35:../scr/common.c ****   */
+  36:../scr/common.c **** uint32_t FLASH_PagesMask(__IO uint32_t Size)
+  37:../scr/common.c **** {
+  79              		.loc 3 37 0
+  80              		.cfi_startproc
+  81 001c 80B5     		push	{r7, lr}
+  82              	.LCFI2:
+  83              		.cfi_def_cfa_offset 8
+  84              		.cfi_offset 7, -8
+  85              		.cfi_offset 14, -4
+  86 001e 84B0     		sub	sp, sp, #16
+  87              	.LCFI3:
+  88              		.cfi_def_cfa_offset 24
+  89 0020 00AF     		add	r7, sp, #0
+  90              	.LCFI4:
+  91              		.cfi_def_cfa_register 7
+  92 0022 7860     		str	r0, [r7, #4]
+  38:../scr/common.c ****   uint32_t pagenumber = 0x0;
+  93              		.loc 3 38 0
+  94 0024 0023     		mov	r3, #0
+  95 0026 FB60     		str	r3, [r7, #12]
+  39:../scr/common.c ****   uint32_t size = Size;
+  96              		.loc 3 39 0
+  97 0028 7B68     		ldr	r3, [r7, #4]
+  98 002a BB60     		str	r3, [r7, #8]
+  40:../scr/common.c **** 
+  41:../scr/common.c ****   if ((size % PAGE_SIZE) != 0)
+  99              		.loc 3 41 0
+ 100 002c BB68     		ldr	r3, [r7, #8]
+ 101 002e 9B05     		lsl	r3, r3, #22
+ 102 0030 9B0D     		lsr	r3, r3, #22
+ 103 0032 04D0     		beq	.L6
+  42:../scr/common.c ****   {
+  43:../scr/common.c ****     pagenumber = (size / PAGE_SIZE) + 1;
+ 104              		.loc 3 43 0
+ 105 0034 BB68     		ldr	r3, [r7, #8]
+ 106 0036 9B0A     		lsr	r3, r3, #10
+ 107 0038 0133     		add	r3, r3, #1
+ 108 003a FB60     		str	r3, [r7, #12]
+ 109 003c 02E0     		b	.L7
+ 110              	.L6:
+  44:../scr/common.c ****   }
+  45:../scr/common.c ****   else
+  46:../scr/common.c ****   {
+  47:../scr/common.c ****     pagenumber = size / PAGE_SIZE;
+ 111              		.loc 3 47 0
+ 112 003e BB68     		ldr	r3, [r7, #8]
+ 113 0040 9B0A     		lsr	r3, r3, #10
+ 114 0042 FB60     		str	r3, [r7, #12]
+ 115              	.L7:
+  48:../scr/common.c ****   }
+  49:../scr/common.c ****   return pagenumber;
+ 116              		.loc 3 49 0
+ 117 0044 FB68     		ldr	r3, [r7, #12]
+  50:../scr/common.c **** 
+  51:../scr/common.c **** }
+ 118              		.loc 3 51 0
+ 119 0046 181C     		mov	r0, r3
+ 120 0048 BD46     		mov	sp, r7
+ 121 004a 04B0     		add	sp, sp, #16
+ 122              		@ sp needed
+ 123 004c 80BD     		pop	{r7, pc}
+ 124              		.cfi_endproc
+ 125              	.LFE33:
+ 127 004e C046     		.align	2
+ 128              		.global	FLASH_DisableWriteProtectionPages
+ 129              		.code	16
+ 130              		.thumb_func
+ 132              	FLASH_DisableWriteProtectionPages:
+ 133              	.LFB34:
+  52:../scr/common.c **** 
+  53:../scr/common.c **** /**
+  54:../scr/common.c ****   * @brief  Disable the write protection of desired pages
+  55:../scr/common.c ****   * @param  None
+  56:../scr/common.c ****   * @retval None
+  57:../scr/common.c ****   */
+  58:../scr/common.c **** void FLASH_DisableWriteProtectionPages(uint32_t UserMemoryMask)
+  59:../scr/common.c **** {
+ 134              		.loc 3 59 0
+ 135              		.cfi_startproc
+ 136 0050 90B5     		push	{r4, r7, lr}
+ 137              	.LCFI5:
+ 138              		.cfi_def_cfa_offset 12
+ 139              		.cfi_offset 4, -12
+ 140              		.cfi_offset 7, -8
+ 141              		.cfi_offset 14, -4
+ 142 0052 87B0     		sub	sp, sp, #28
+ 143              	.LCFI6:
+ 144              		.cfi_def_cfa_offset 40
+ 145 0054 00AF     		add	r7, sp, #0
+ 146              	.LCFI7:
+ 147              		.cfi_def_cfa_register 7
+ 148 0056 7860     		str	r0, [r7, #4]
+  60:../scr/common.c ****   uint32_t useroptionbyte = 0, WRPR = 0;
+ 149              		.loc 3 60 0
+ 150 0058 0023     		mov	r3, #0
+ 151 005a FB60     		str	r3, [r7, #12]
+ 152 005c 0023     		mov	r3, #0
+ 153 005e BB60     		str	r3, [r7, #8]
+  61:../scr/common.c ****   uint16_t var1 = OB_IWDG_SW, var2 = OB_STOP_NoRST, var3 = OB_STDBY_NoRST;
+ 154              		.loc 3 61 0
+ 155 0060 1623     		mov	r3, #22
+ 156 0062 FB18     		add	r3, r7, r3
+ 157 0064 0122     		mov	r2, #1
+ 158 0066 1A80     		strh	r2, [r3]
+ 159 0068 1423     		mov	r3, #20
+ 160 006a FB18     		add	r3, r7, r3
+ 161 006c 0222     		mov	r2, #2
+ 162 006e 1A80     		strh	r2, [r3]
+ 163 0070 1223     		mov	r3, #18
+ 164 0072 FB18     		add	r3, r7, r3
+ 165 0074 0422     		mov	r2, #4
+ 166 0076 1A80     		strh	r2, [r3]
+  62:../scr/common.c ****   FLASH_Status status = FLASH_BUSY;
+ 167              		.loc 3 62 0
+ 168 0078 1123     		mov	r3, #17
+ 169 007a FB18     		add	r3, r7, r3
+ 170 007c 0122     		mov	r2, #1
+ 171 007e 1A70     		strb	r2, [r3]
+  63:../scr/common.c **** 
+  64:../scr/common.c ****   WRPR = FLASH_GetWriteProtectionOptionByte();
+ 172              		.loc 3 64 0
+ 173 0080 FFF7FEFF 		bl	FLASH_OB_GetWRP
+ 174 0084 031C     		mov	r3, r0
+ 175 0086 BB60     		str	r3, [r7, #8]
+  65:../scr/common.c **** 
+  66:../scr/common.c ****   /* Test if user memory is write protected */
+  67:../scr/common.c ****   if ((WRPR & UserMemoryMask) != UserMemoryMask)
+ 176              		.loc 3 67 0
+ 177 0088 BB68     		ldr	r3, [r7, #8]
+ 178 008a 7A68     		ldr	r2, [r7, #4]
+ 179 008c 1A40     		and	r2, r3
+ 180 008e 7B68     		ldr	r3, [r7, #4]
+ 181 0090 9A42     		cmp	r2, r3
+ 182 0092 4ED0     		beq	.L9
+  68:../scr/common.c ****   {
+  69:../scr/common.c ****     useroptionbyte = FLASH_GetUserOptionByte();
+ 183              		.loc 3 69 0
+ 184 0094 FFF7FEFF 		bl	FLASH_OB_GetUser
+ 185 0098 031C     		mov	r3, r0
+ 186 009a FB60     		str	r3, [r7, #12]
+  70:../scr/common.c **** 
+  71:../scr/common.c ****     UserMemoryMask |= WRPR;
+ 187              		.loc 3 71 0
+ 188 009c 7A68     		ldr	r2, [r7, #4]
+ 189 009e BB68     		ldr	r3, [r7, #8]
+ 190 00a0 1343     		orr	r3, r2
+ 191 00a2 7B60     		str	r3, [r7, #4]
+  72:../scr/common.c **** 
+  73:../scr/common.c ****     status = FLASH_EraseOptionBytes();
+ 192              		.loc 3 73 0
+ 193 00a4 1123     		mov	r3, #17
+ 194 00a6 FC18     		add	r4, r7, r3
+ 195 00a8 FFF7FEFF 		bl	FLASH_OB_Erase
+ 196 00ac 031C     		mov	r3, r0
+ 197 00ae 2370     		strb	r3, [r4]
+  74:../scr/common.c **** 
+  75:../scr/common.c ****     if (UserMemoryMask != 0xFFFFFFFF)
+ 198              		.loc 3 75 0
+ 199 00b0 7B68     		ldr	r3, [r7, #4]
+ 200 00b2 0133     		add	r3, r3, #1
+ 201 00b4 08D0     		beq	.L11
+  76:../scr/common.c ****     {
+  77:../scr/common.c ****       status = FLASH_EnableWriteProtection((uint32_t)~UserMemoryMask);
+ 202              		.loc 3 77 0
+ 203 00b6 7B68     		ldr	r3, [r7, #4]
+ 204 00b8 DB43     		mvn	r3, r3
+ 205 00ba 1122     		mov	r2, #17
+ 206 00bc BC18     		add	r4, r7, r2
+ 207 00be 181C     		mov	r0, r3
+ 208 00c0 FFF7FEFF 		bl	FLASH_OB_EnableWRP
+ 209 00c4 031C     		mov	r3, r0
+ 210 00c6 2370     		strb	r3, [r4]
+ 211              	.L11:
+  78:../scr/common.c ****     }
+  79:../scr/common.c **** 
+  80:../scr/common.c ****     /* Test if user Option Bytes are programmed */
+  81:../scr/common.c ****     if ((useroptionbyte & 0x07) != 0x07)
+ 212              		.loc 3 81 0
+ 213 00c8 FB68     		ldr	r3, [r7, #12]
+ 214 00ca 0722     		mov	r2, #7
+ 215 00cc 1340     		and	r3, r2
+ 216 00ce 072B     		cmp	r3, #7
+ 217 00d0 28D0     		beq	.L12
+  82:../scr/common.c ****     { 
+  83:../scr/common.c ****       /* Restore user Option Bytes */
+  84:../scr/common.c ****       if ((useroptionbyte & 0x01) == 0x0)
+ 218              		.loc 3 84 0
+ 219 00d2 FB68     		ldr	r3, [r7, #12]
+ 220 00d4 0122     		mov	r2, #1
+ 221 00d6 1340     		and	r3, r2
+ 222 00d8 03D1     		bne	.L13
+  85:../scr/common.c ****       {
+  86:../scr/common.c ****         var1 = OB_IWDG_HW;
+ 223              		.loc 3 86 0
+ 224 00da 1623     		mov	r3, #22
+ 225 00dc FB18     		add	r3, r7, r3
+ 226 00de 0022     		mov	r2, #0
+ 227 00e0 1A80     		strh	r2, [r3]
+ 228              	.L13:
+  87:../scr/common.c ****       }
+  88:../scr/common.c ****       if ((useroptionbyte & 0x02) == 0x0)
+ 229              		.loc 3 88 0
+ 230 00e2 FB68     		ldr	r3, [r7, #12]
+ 231 00e4 0222     		mov	r2, #2
+ 232 00e6 1340     		and	r3, r2
+ 233 00e8 03D1     		bne	.L14
+  89:../scr/common.c ****       {
+  90:../scr/common.c ****         var2 = OB_STOP_RST;
+ 234              		.loc 3 90 0
+ 235 00ea 1423     		mov	r3, #20
+ 236 00ec FB18     		add	r3, r7, r3
+ 237 00ee 0022     		mov	r2, #0
+ 238 00f0 1A80     		strh	r2, [r3]
+ 239              	.L14:
+  91:../scr/common.c ****       }
+  92:../scr/common.c ****       if ((useroptionbyte & 0x04) == 0x0)
+ 240              		.loc 3 92 0
+ 241 00f2 FB68     		ldr	r3, [r7, #12]
+ 242 00f4 0422     		mov	r2, #4
+ 243 00f6 1340     		and	r3, r2
+ 244 00f8 03D1     		bne	.L15
+  93:../scr/common.c ****       {
+  94:../scr/common.c ****         var3 = OB_STDBY_RST;
+ 245              		.loc 3 94 0
+ 246 00fa 1223     		mov	r3, #18
+ 247 00fc FB18     		add	r3, r7, r3
+ 248 00fe 0022     		mov	r2, #0
+ 249 0100 1A80     		strh	r2, [r3]
+ 250              	.L15:
+  95:../scr/common.c ****       }
+  96:../scr/common.c **** 
+  97:../scr/common.c ****       FLASH_UserOptionByteConfig(var1, var2, var3);
+ 251              		.loc 3 97 0
+ 252 0102 1623     		mov	r3, #22
+ 253 0104 FB18     		add	r3, r7, r3
+ 254 0106 1B88     		ldrh	r3, [r3]
+ 255 0108 D9B2     		uxtb	r1, r3
+ 256 010a 1423     		mov	r3, #20
+ 257 010c FB18     		add	r3, r7, r3
+ 258 010e 1B88     		ldrh	r3, [r3]
+ 259 0110 DAB2     		uxtb	r2, r3
+ 260 0112 1223     		mov	r3, #18
+ 261 0114 FB18     		add	r3, r7, r3
+ 262 0116 1B88     		ldrh	r3, [r3]
+ 263 0118 DBB2     		uxtb	r3, r3
+ 264 011a 081C     		mov	r0, r1
+ 265 011c 111C     		mov	r1, r2
+ 266 011e 1A1C     		mov	r2, r3
+ 267 0120 FFF7FEFF 		bl	FLASH_OB_UserConfig
+ 268              	.L12:
+  98:../scr/common.c ****     }
+  99:../scr/common.c **** 
+ 100:../scr/common.c ****     if (status == FLASH_COMPLETE)
+ 269              		.loc 3 100 0
+ 270 0124 1123     		mov	r3, #17
+ 271 0126 FB18     		add	r3, r7, r3
+ 272 0128 1B78     		ldrb	r3, [r3]
+ 273 012a 042B     		cmp	r3, #4
+ 274 012c 01D1     		bne	.L9
+ 101:../scr/common.c ****     {
+ 102:../scr/common.c ****       //SerialPutString("Write Protection disabled...\r\n");
+ 103:../scr/common.c **** 
+ 104:../scr/common.c ****       //SerialPutString("...and a System Reset will be generated to re-load the new option bytes\r\
+ 105:../scr/common.c **** 
+ 106:../scr/common.c ****       /* Generate System Reset to load the new option byte values */
+ 107:../scr/common.c ****       NVIC_SystemReset();
+ 275              		.loc 3 107 0
+ 276 012e FFF767FF 		bl	NVIC_SystemReset
+ 277              	.L9:
+ 108:../scr/common.c ****     }
+ 109:../scr/common.c ****     else
+ 110:../scr/common.c ****     {
+ 111:../scr/common.c ****       //SerialPutString("Error: Flash write unprotection failed...\r\n");
+ 112:../scr/common.c ****     }
+ 113:../scr/common.c ****   }
+ 114:../scr/common.c ****   else
+ 115:../scr/common.c ****   {
+ 116:../scr/common.c ****     //SerialPutString("Flash memory not write protected\r\n");
+ 117:../scr/common.c ****   }
+ 118:../scr/common.c **** }
+ 278              		.loc 3 118 0
+ 279 0132 BD46     		mov	sp, r7
+ 280 0134 07B0     		add	sp, sp, #28
+ 281              		@ sp needed
+ 282 0136 90BD     		pop	{r4, r7, pc}
+ 283              		.cfi_endproc
+ 284              	.LFE34:
+ 286              		.align	2
+ 287              		.global	flash_verify_image
+ 288              		.code	16
+ 289              		.thumb_func
+ 291              	flash_verify_image:
+ 292              	.LFB35:
+ 119:../scr/common.c **** 
+ 120:../scr/common.c **** /*
+ 121:../scr/common.c ****  * flash_verify_image
+ 122:../scr/common.c ****  * return value:
+ 123:../scr/common.c ****  * 	-1: No execute image
+ 124:../scr/common.c ****  * 	-2: No secondary image, primary image checksum failed
+ 125:../scr/common.c ****  */
+ 126:../scr/common.c **** int flash_verify_image(SKS_BOOT_INFO *boot_info)
+ 127:../scr/common.c **** {
+ 293              		.loc 3 127 0
+ 294              		.cfi_startproc
+ 295 0138 80B5     		push	{r7, lr}
+ 296              	.LCFI8:
+ 297              		.cfi_def_cfa_offset 8
+ 298              		.cfi_offset 7, -8
+ 299              		.cfi_offset 14, -4
+ 300 013a 86B0     		sub	sp, sp, #24
+ 301              	.LCFI9:
+ 302              		.cfi_def_cfa_offset 32
+ 303 013c 00AF     		add	r7, sp, #0
+ 304              	.LCFI10:
+ 305              		.cfi_def_cfa_register 7
+ 306 013e 7860     		str	r0, [r7, #4]
+ 128:../scr/common.c **** 	int check_crc = 0;
+ 307              		.loc 3 128 0
+ 308 0140 0023     		mov	r3, #0
+ 309 0142 7B61     		str	r3, [r7, #20]
+ 129:../scr/common.c **** 	int copy = 0;
+ 310              		.loc 3 129 0
+ 311 0144 0023     		mov	r3, #0
+ 312 0146 3B61     		str	r3, [r7, #16]
+ 130:../scr/common.c **** 	//char str [255] = {0};
+ 131:../scr/common.c **** 	uint32_t crc_primary = 0;
+ 313              		.loc 3 131 0
+ 314 0148 0023     		mov	r3, #0
+ 315 014a FB60     		str	r3, [r7, #12]
+ 132:../scr/common.c **** 	uint32_t crc_secondary = 0;
+ 316              		.loc 3 132 0
+ 317 014c 0023     		mov	r3, #0
+ 318 014e BB60     		str	r3, [r7, #8]
+ 133:../scr/common.c **** 	flash_read_uboot_info(boot_info);
+ 319              		.loc 3 133 0
+ 320 0150 7B68     		ldr	r3, [r7, #4]
+ 321 0152 181C     		mov	r0, r3
+ 322 0154 FFF7FEFF 		bl	flash_read_uboot_info
+ 134:../scr/common.c **** 	//Calculate check sum
+ 135:../scr/common.c **** 	if ((boot_info->SecondarySize == 0xFFFFFFFF) ||(boot_info->SecondarySize == 0x0)||(boot_info->Seco
+ 323              		.loc 3 135 0
+ 324 0158 7B68     		ldr	r3, [r7, #4]
+ 325 015a DB68     		ldr	r3, [r3, #12]
+ 326 015c 0133     		add	r3, r3, #1
+ 327 015e 08D0     		beq	.L17
+ 328              		.loc 3 135 0 is_stmt 0 discriminator 1
+ 329 0160 7B68     		ldr	r3, [r7, #4]
+ 330 0162 DB68     		ldr	r3, [r3, #12]
+ 331 0164 002B     		cmp	r3, #0
+ 332 0166 04D0     		beq	.L17
+ 333              		.loc 3 135 0 discriminator 2
+ 334 0168 7B68     		ldr	r3, [r7, #4]
+ 335 016a DB68     		ldr	r3, [r3, #12]
+ 336 016c 4E4A     		ldr	r2, .L32
+ 337 016e 9342     		cmp	r3, r2
+ 338 0170 26D9     		bls	.L18
+ 339              	.L17:
+ 136:../scr/common.c **** 	{
+ 137:../scr/common.c **** 		if ((boot_info->PrimarySize == 0x0)||(boot_info->PrimarySize == 0xFFFFFFFF)||(boot_info->PrimaryS
+ 340              		.loc 3 137 0 is_stmt 1
+ 341 0172 7B68     		ldr	r3, [r7, #4]
+ 342 0174 5B68     		ldr	r3, [r3, #4]
+ 343 0176 002B     		cmp	r3, #0
+ 344 0178 08D0     		beq	.L19
+ 345              		.loc 3 137 0 is_stmt 0 discriminator 1
+ 346 017a 7B68     		ldr	r3, [r7, #4]
+ 347 017c 5B68     		ldr	r3, [r3, #4]
+ 348 017e 0133     		add	r3, r3, #1
+ 349 0180 04D0     		beq	.L19
+ 350              		.loc 3 137 0 discriminator 2
+ 351 0182 7B68     		ldr	r3, [r7, #4]
+ 352 0184 5B68     		ldr	r3, [r3, #4]
+ 353 0186 484A     		ldr	r2, .L32
+ 354 0188 9342     		cmp	r3, r2
+ 355 018a 02D9     		bls	.L20
+ 356              	.L19:
+ 138:../scr/common.c **** 			return -1;
+ 357              		.loc 3 138 0 is_stmt 1
+ 358 018c 0123     		mov	r3, #1
+ 359 018e 5B42     		neg	r3, r3
+ 360 0190 86E0     		b	.L21
+ 361              	.L20:
+ 139:../scr/common.c **** 		else
+ 140:../scr/common.c **** 		{
+ 141:../scr/common.c **** 			CRC_ResetDR();
+ 362              		.loc 3 141 0
+ 363 0192 FFF7FEFF 		bl	CRC_ResetDR
+ 142:../scr/common.c **** 			crc_primary = CRC_CalcBlockCRC((uint32_t *)BOOT_PRIMARY_ADDRESS, (boot_info->PrimarySize/4)+1);
+ 364              		.loc 3 142 0
+ 365 0196 7B68     		ldr	r3, [r7, #4]
+ 366 0198 5B68     		ldr	r3, [r3, #4]
+ 367 019a 9B08     		lsr	r3, r3, #2
+ 368 019c 0133     		add	r3, r3, #1
+ 369 019e 434A     		ldr	r2, .L32+4
+ 370 01a0 101C     		mov	r0, r2
+ 371 01a2 191C     		mov	r1, r3
+ 372 01a4 FFF7FEFF 		bl	CRC_CalcBlockCRC
+ 373 01a8 031C     		mov	r3, r0
+ 374 01aa FB60     		str	r3, [r7, #12]
+ 143:../scr/common.c **** 			if (crc_primary != boot_info->PrimaryCRC)
+ 375              		.loc 3 143 0
+ 376 01ac 7B68     		ldr	r3, [r7, #4]
+ 377 01ae 1A68     		ldr	r2, [r3]
+ 378 01b0 FB68     		ldr	r3, [r7, #12]
+ 379 01b2 9A42     		cmp	r2, r3
+ 380 01b4 02D0     		beq	.L22
+ 144:../scr/common.c **** 			{
+ 145:../scr/common.c **** 				return -2; 	//Invalid PRIMARY's  CRC
+ 381              		.loc 3 145 0
+ 382 01b6 0223     		mov	r3, #2
+ 383 01b8 5B42     		neg	r3, r3
+ 384 01ba 71E0     		b	.L21
+ 385              	.L22:
+ 146:../scr/common.c **** 			}
+ 147:../scr/common.c **** 			return 1;
+ 386              		.loc 3 147 0
+ 387 01bc 0123     		mov	r3, #1
+ 388 01be 6FE0     		b	.L21
+ 389              	.L18:
+ 148:../scr/common.c **** 		}
+ 149:../scr/common.c **** 	}
+ 150:../scr/common.c **** 	else
+ 151:../scr/common.c **** 	{
+ 152:../scr/common.c **** 		if ((boot_info->PrimarySize == 0x0)||(boot_info->PrimarySize == 0xFFFFFFFF)||(boot_info->PrimaryS
+ 390              		.loc 3 152 0
+ 391 01c0 7B68     		ldr	r3, [r7, #4]
+ 392 01c2 5B68     		ldr	r3, [r3, #4]
+ 393 01c4 002B     		cmp	r3, #0
+ 394 01c6 08D0     		beq	.L23
+ 395              		.loc 3 152 0 is_stmt 0 discriminator 1
+ 396 01c8 7B68     		ldr	r3, [r7, #4]
+ 397 01ca 5B68     		ldr	r3, [r3, #4]
+ 398 01cc 0133     		add	r3, r3, #1
+ 399 01ce 04D0     		beq	.L23
+ 400              		.loc 3 152 0 discriminator 2
+ 401 01d0 7B68     		ldr	r3, [r7, #4]
+ 402 01d2 5B68     		ldr	r3, [r3, #4]
+ 403 01d4 344A     		ldr	r2, .L32
+ 404 01d6 9342     		cmp	r3, r2
+ 405 01d8 02D9     		bls	.L24
+ 406              	.L23:
+ 153:../scr/common.c **** 		{
+ 154:../scr/common.c **** 			copy = 1;
+ 407              		.loc 3 154 0 is_stmt 1
+ 408 01da 0123     		mov	r3, #1
+ 409 01dc 3B61     		str	r3, [r7, #16]
+ 410 01de 01E0     		b	.L25
+ 411              	.L24:
+ 155:../scr/common.c **** 		}
+ 156:../scr/common.c **** 		else
+ 157:../scr/common.c **** 			check_crc = 1;
+ 412              		.loc 3 157 0
+ 413 01e0 0123     		mov	r3, #1
+ 414 01e2 7B61     		str	r3, [r7, #20]
+ 415              	.L25:
+ 158:../scr/common.c **** 		if ((boot_info->PrimaryCRC != boot_info->SecondaryCRC) || (boot_info->PrimarySize != boot_info->S
+ 416              		.loc 3 158 0
+ 417 01e4 7B68     		ldr	r3, [r7, #4]
+ 418 01e6 1A68     		ldr	r2, [r3]
+ 419 01e8 7B68     		ldr	r3, [r7, #4]
+ 420 01ea 9B68     		ldr	r3, [r3, #8]
+ 421 01ec 9A42     		cmp	r2, r3
+ 422 01ee 05D1     		bne	.L26
+ 423              		.loc 3 158 0 is_stmt 0 discriminator 1
+ 424 01f0 7B68     		ldr	r3, [r7, #4]
+ 425 01f2 5A68     		ldr	r2, [r3, #4]
+ 426 01f4 7B68     		ldr	r3, [r7, #4]
+ 427 01f6 DB68     		ldr	r3, [r3, #12]
+ 428 01f8 9A42     		cmp	r2, r3
+ 429 01fa 01D0     		beq	.L27
+ 430              	.L26:
+ 159:../scr/common.c **** 		{
+ 160:../scr/common.c **** 			copy = 1;
+ 431              		.loc 3 160 0 is_stmt 1
+ 432 01fc 0123     		mov	r3, #1
+ 433 01fe 3B61     		str	r3, [r7, #16]
+ 434              	.L27:
+ 161:../scr/common.c **** 		}
+ 162:../scr/common.c **** 		if (copy == 1)
+ 435              		.loc 3 162 0
+ 436 0200 3B69     		ldr	r3, [r7, #16]
+ 437 0202 012B     		cmp	r3, #1
+ 438 0204 32D1     		bne	.L28
+ 163:../scr/common.c **** 		{
+ 164:../scr/common.c **** 			//Verify Secondary CRC image
+ 165:../scr/common.c **** 			CRC_ResetDR();
+ 439              		.loc 3 165 0
+ 440 0206 FFF7FEFF 		bl	CRC_ResetDR
+ 166:../scr/common.c **** 			crc_secondary = CRC_CalcBlockCRC((uint32_t *)BOOT_SECONDARY_ADDRESS, (boot_info->SecondarySize/4
+ 441              		.loc 3 166 0
+ 442 020a 7B68     		ldr	r3, [r7, #4]
+ 443 020c DB68     		ldr	r3, [r3, #12]
+ 444 020e 9B08     		lsr	r3, r3, #2
+ 445 0210 0133     		add	r3, r3, #1
+ 446 0212 274A     		ldr	r2, .L32+8
+ 447 0214 101C     		mov	r0, r2
+ 448 0216 191C     		mov	r1, r3
+ 449 0218 FFF7FEFF 		bl	CRC_CalcBlockCRC
+ 450 021c 031C     		mov	r3, r0
+ 451 021e BB60     		str	r3, [r7, #8]
+ 167:../scr/common.c **** 			if (crc_secondary == boot_info->SecondaryCRC)
+ 452              		.loc 3 167 0
+ 453 0220 7B68     		ldr	r3, [r7, #4]
+ 454 0222 9A68     		ldr	r2, [r3, #8]
+ 455 0224 BB68     		ldr	r3, [r7, #8]
+ 456 0226 9A42     		cmp	r2, r3
+ 457 0228 20D1     		bne	.L28
+ 168:../scr/common.c **** 			{
+ 169:../scr/common.c **** 				if (((*(__IO uint32_t*)(BOOT_SECONDARY_ADDRESS)) & 0x2FFE0000 ) == 0x20000000)
+ 458              		.loc 3 169 0
+ 459 022a 214B     		ldr	r3, .L32+8
+ 460 022c 1B68     		ldr	r3, [r3]
+ 461 022e 214A     		ldr	r2, .L32+12
+ 462 0230 1A40     		and	r2, r3
+ 463 0232 8023     		mov	r3, #128
+ 464 0234 9B05     		lsl	r3, r3, #22
+ 465 0236 9A42     		cmp	r2, r3
+ 466 0238 0AD1     		bne	.L29
+ 170:../scr/common.c **** 				//if(1)
+ 171:../scr/common.c **** 				{
+ 172:../scr/common.c **** 				//PrintBootInfo();
+ 173:../scr/common.c **** 				flash_copy_image(boot_info);
+ 467              		.loc 3 173 0
+ 468 023a 7B68     		ldr	r3, [r7, #4]
+ 469 023c 181C     		mov	r0, r3
+ 470 023e FFF7FEFF 		bl	flash_copy_image
+ 174:../scr/common.c **** 				flash_write_uboot_info(boot_info);
+ 471              		.loc 3 174 0
+ 472 0242 7B68     		ldr	r3, [r7, #4]
+ 473 0244 181C     		mov	r0, r3
+ 474 0246 FFF7FEFF 		bl	flash_write_uboot_info
+ 175:../scr/common.c **** 				check_crc = 1;
+ 475              		.loc 3 175 0
+ 476 024a 0123     		mov	r3, #1
+ 477 024c 7B61     		str	r3, [r7, #20]
+ 478 024e 0DE0     		b	.L28
+ 479              	.L29:
+ 176:../scr/common.c **** 				//PrintBootInfo();
+ 177:../scr/common.c **** 				}
+ 178:../scr/common.c **** 				else
+ 179:../scr/common.c **** 				{
+ 180:../scr/common.c **** 					boot_info->SecondarySize =boot_info->PrimarySize;
+ 480              		.loc 3 180 0
+ 481 0250 7B68     		ldr	r3, [r7, #4]
+ 482 0252 5A68     		ldr	r2, [r3, #4]
+ 483 0254 7B68     		ldr	r3, [r7, #4]
+ 484 0256 DA60     		str	r2, [r3, #12]
+ 181:../scr/common.c **** 					boot_info->SecondaryCRC =boot_info->PrimaryCRC;
+ 485              		.loc 3 181 0
+ 486 0258 7B68     		ldr	r3, [r7, #4]
+ 487 025a 1A68     		ldr	r2, [r3]
+ 488 025c 7B68     		ldr	r3, [r7, #4]
+ 489 025e 9A60     		str	r2, [r3, #8]
+ 182:../scr/common.c **** 					flash_write_uboot_info(boot_info);
+ 490              		.loc 3 182 0
+ 491 0260 7B68     		ldr	r3, [r7, #4]
+ 492 0262 181C     		mov	r0, r3
+ 493 0264 FFF7FEFF 		bl	flash_write_uboot_info
+ 183:../scr/common.c **** 					check_crc = 1;
+ 494              		.loc 3 183 0
+ 495 0268 0123     		mov	r3, #1
+ 496 026a 7B61     		str	r3, [r7, #20]
+ 497              	.L28:
+ 184:../scr/common.c **** 				}
+ 185:../scr/common.c **** 			}
+ 186:../scr/common.c **** 		}
+ 187:../scr/common.c **** 		if (check_crc)
+ 498              		.loc 3 187 0
+ 499 026c 7B69     		ldr	r3, [r7, #20]
+ 500 026e 002B     		cmp	r3, #0
+ 501 0270 13D0     		beq	.L30
+ 188:../scr/common.c **** 		{
+ 189:../scr/common.c **** 			CRC_ResetDR();
+ 502              		.loc 3 189 0
+ 503 0272 FFF7FEFF 		bl	CRC_ResetDR
+ 190:../scr/common.c **** 			crc_primary = CRC_CalcBlockCRC((uint32_t *)BOOT_PRIMARY_ADDRESS, (uint32_t)(boot_info->PrimarySi
+ 504              		.loc 3 190 0
+ 505 0276 7B68     		ldr	r3, [r7, #4]
+ 506 0278 5B68     		ldr	r3, [r3, #4]
+ 507 027a 9B08     		lsr	r3, r3, #2
+ 508 027c 0133     		add	r3, r3, #1
+ 509 027e 0B4A     		ldr	r2, .L32+4
+ 510 0280 101C     		mov	r0, r2
+ 511 0282 191C     		mov	r1, r3
+ 512 0284 FFF7FEFF 		bl	CRC_CalcBlockCRC
+ 513 0288 031C     		mov	r3, r0
+ 514 028a FB60     		str	r3, [r7, #12]
+ 191:../scr/common.c **** 			if (crc_primary != boot_info->PrimaryCRC)
+ 515              		.loc 3 191 0
+ 516 028c 7B68     		ldr	r3, [r7, #4]
+ 517 028e 1A68     		ldr	r2, [r3]
+ 518 0290 FB68     		ldr	r3, [r7, #12]
+ 519 0292 9A42     		cmp	r2, r3
+ 520 0294 03D0     		beq	.L31
+ 192:../scr/common.c **** 			{
+ 193:../scr/common.c **** 				return 0; 	//Invalid PRIMARY's  CRC
+ 521              		.loc 3 193 0
+ 522 0296 0023     		mov	r3, #0
+ 523 0298 02E0     		b	.L21
+ 524              	.L30:
+ 194:../scr/common.c **** 			}
+ 195:../scr/common.c **** 		}
+ 196:../scr/common.c **** 		else return 0;
+ 525              		.loc 3 196 0
+ 526 029a 0023     		mov	r3, #0
+ 527 029c 00E0     		b	.L21
+ 528              	.L31:
+ 197:../scr/common.c **** 	}
+ 198:../scr/common.c **** 	//SerialPutString("VERIFY DATA SUCCESS\r\n");
+ 199:../scr/common.c **** 	return 1;
+ 529              		.loc 3 199 0
+ 530 029e 0123     		mov	r3, #1
+ 531              	.L21:
+ 200:../scr/common.c **** }
+ 532              		.loc 3 200 0
+ 533 02a0 181C     		mov	r0, r3
+ 534 02a2 BD46     		mov	sp, r7
+ 535 02a4 06B0     		add	sp, sp, #24
+ 536              		@ sp needed
+ 537 02a6 80BD     		pop	{r7, pc}
+ 538              	.L33:
+ 539              		.align	2
+ 540              	.L32:
+ 541 02a8 FF630000 		.word	25599
+ 542 02ac 00280008 		.word	134227968
+ 543 02b0 008C0008 		.word	134253568
+ 544 02b4 0000FE2F 		.word	805175296
+ 545              		.cfi_endproc
+ 546              	.LFE35:
+ 548              	.Letext0:
+ 549              		.file 4 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\mach
+ 550              		.file 5 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\sys\
+ 551              		.file 6 "D:\\EclipseIndigo\\workspace\\rfid_demo\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32
+ 552              		.file 7 "../scr/DataUtil.h"
+ 553              		.file 8 "../scr/common.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 common.c
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:17     .text:00000000 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:21     .text:00000000 NVIC_SystemReset
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:63     .text:00000014 $d
+                            *COM*:000015b8 x3buffer
+                            *COM*:0000000c g_pointer
+                            *COM*:0000005c g_config
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:71     .text:0000001c $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:76     .text:0000001c FLASH_PagesMask
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:132    .text:00000050 FLASH_DisableWriteProtectionPages
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:291    .text:00000138 flash_verify_image
+C:\Users\ADMINI~1\AppData\Local\Temp\ccVdSJaI.s:541    .text:000002a8 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.38f3ce5416ddc4c94340ac14f0421ae0
+                           .group:00000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:00000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:00000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:00000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4._default_types.h.6.35ee9e747940367bf2a634907d1c2382
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.cdefs.h.47.3052445825803de6c3a3b68ec8193866
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:00000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:00000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:00000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:00000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.68.ff6d7571d3ad75c55f15e26dbaa81e35
+                           .group:00000000 wm4.string.h.8.c4b8571ce60dff2817f43fec8b86aecd
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.stm32f0xx.h.54.4683aa1e9aded801990d6fc5c3cd79d1
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:00000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.490.3021eb906afe162bf2c4c3f84017f2b7
+                           .group:00000000 wm4.stm32f0xx_adc.h.85.55aeb589c2c2703602e5f964c35b0c48
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.3e9f83248098cae82aee4fdd1dde590d
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.b7995c183c4864b04eda399c410c0e53
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.time.h.8.2930fe070f4a8096b07db9159698c8e3
+                           .group:00000000 wm4.time.h.2.4581ce0ffb6627cfc02162c94bf846c9
+                           .group:00000000 wm4.time.h.24.3660bbb2d0a4c7457ff52ba3ada4c166
+                           .group:00000000 wm4.timespec.h.41.d855182eb0e690443ab8651bcedca6e1
+                           .group:00000000 wm4.time.h.217.2f437ac2cf06537c84703833b0977905
+                           .group:00000000 wm4.DataUtil.h.6.7244789e324a04765de5b008e99af49c
+                           .group:00000000 wm4.common.h.36.396870489cb68de4c1415185500a1a4d
+                           .group:00000000 wm4.ymodem.h.24.613d258bf183758042d94dca54a83ab9
+
+UNDEFINED SYMBOLS
+FLASH_OB_GetWRP
+FLASH_OB_GetUser
+FLASH_OB_Erase
+FLASH_OB_EnableWRP
+FLASH_OB_UserConfig
+flash_read_uboot_info
+CRC_ResetDR
+CRC_CalcBlockCRC
+flash_copy_image
+flash_write_uboot_info

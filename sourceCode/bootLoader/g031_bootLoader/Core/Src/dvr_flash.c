@@ -8,6 +8,7 @@
 #include "stdio.h"
 #include "dvr_flash.h"
 #include "common.h"
+#include "stm32g031xx.h"
 
 #define FLASH_PAGE_SIZE				0x800
 void FLASH_Lock(void) {
@@ -140,13 +141,12 @@ FLASH_Status FLASH_WaitForLastBankOperation(uint32_t Timeout) {
 
 FLASH_Status FLASH_ErasePage(uint32_t Page_Address) {
 	FLASH_Status status = FLASH_COMPLETE;
-	while ((FLASH->SR & FLASH_SR_BSY1))
-		;
+	uint32_t pageNum = Page_Address/800;
+	while ((FLASH->SR & FLASH_SR_BSY1));
 	FLASH->CR |= FLASH_CR_PER; //Page Erase Set
-	FLASH->CR |= (FLASH_CR_PNB & (Page_Address << 3));
+	FLASH->CR |= (FLASH_CR_PNB & (pageNum << 3));
 	FLASH->CR |= FLASH_CR_STRT; //Start Page Erase
-	while ((FLASH->SR & FLASH_SR_BSY1))
-		;
+	while ((FLASH->SR & FLASH_SR_BSY1));
 	FLASH->CR &= ~FLASH_SR_BSY1;
 	FLASH->CR &= ~FLASH_CR_PER; //Page Erase Clear
 	return status;

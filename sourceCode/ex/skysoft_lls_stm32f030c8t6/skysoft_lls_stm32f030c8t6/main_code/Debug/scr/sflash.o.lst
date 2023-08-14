@@ -1,0 +1,2123 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"sflash.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.align	2
+  18              		.global	sFLASH_LowLevel_DeInit
+  19              		.code	16
+  20              		.thumb_func
+  22              	sFLASH_LowLevel_DeInit:
+  23              	.LFB33:
+  24              		.file 1 "../scr/sflash.c"
+   1:../scr/sflash.c **** #include "sflash.h"
+   2:../scr/sflash.c **** /**
+   3:../scr/sflash.c ****  * @brief  DeInitializes the peripherals used by the SPI FLASH driver.
+   4:../scr/sflash.c ****  * @param  None
+   5:../scr/sflash.c ****  * @retval None
+   6:../scr/sflash.c ****  */
+   7:../scr/sflash.c **** void sFLASH_LowLevel_DeInit(void) {
+  25              		.loc 1 7 0
+  26              		.cfi_startproc
+  27 0000 80B5     		push	{r7, lr}
+  28              	.LCFI0:
+  29              		.cfi_def_cfa_offset 8
+  30              		.cfi_offset 7, -8
+  31              		.cfi_offset 14, -4
+  32 0002 82B0     		sub	sp, sp, #8
+  33              	.LCFI1:
+  34              		.cfi_def_cfa_offset 16
+  35 0004 00AF     		add	r7, sp, #0
+  36              	.LCFI2:
+  37              		.cfi_def_cfa_register 7
+   8:../scr/sflash.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+   9:../scr/sflash.c **** 
+  10:../scr/sflash.c **** 	/*!< Disable the sFLASH_SPI  */
+  11:../scr/sflash.c **** 	SPI_Cmd(sFLASH_SPI, DISABLE);
+  38              		.loc 1 11 0
+  39 0006 1E4B     		ldr	r3, .L2
+  40 0008 181C     		mov	r0, r3
+  41 000a 0021     		mov	r1, #0
+  42 000c FFF7FEFF 		bl	SPI_Cmd
+  12:../scr/sflash.c **** 
+  13:../scr/sflash.c **** 	/*!< DeInitializes the sFLASH_SPI */
+  14:../scr/sflash.c **** 	SPI_I2S_DeInit(sFLASH_SPI);
+  43              		.loc 1 14 0
+  44 0010 1B4B     		ldr	r3, .L2
+  45 0012 181C     		mov	r0, r3
+  46 0014 FFF7FEFF 		bl	SPI_I2S_DeInit
+  15:../scr/sflash.c **** 
+  16:../scr/sflash.c **** 	/*!< sFLASH_SPI Periph clock disable */
+  17:../scr/sflash.c **** 	//RCC_APB2PeriphClockCmd(sFLASH_SPI_CLK, DISABLE);
+  18:../scr/sflash.c **** 	RCC_APB1PeriphClockCmd(sFLASH_SPI_CLK, DISABLE);
+  47              		.loc 1 18 0
+  48 0018 8023     		mov	r3, #128
+  49 001a DB01     		lsl	r3, r3, #7
+  50 001c 181C     		mov	r0, r3
+  51 001e 0021     		mov	r1, #0
+  52 0020 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+  19:../scr/sflash.c **** 
+  20:../scr/sflash.c **** 	/*!< Configure sFLASH_SPI pins: SCK */
+  21:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_SPI_SCK_PIN;
+  53              		.loc 1 21 0
+  54 0024 3B1C     		mov	r3, r7
+  55 0026 8022     		mov	r2, #128
+  56 0028 D200     		lsl	r2, r2, #3
+  57 002a 1A60     		str	r2, [r3]
+  22:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  58              		.loc 1 22 0
+  59 002c 3B1C     		mov	r3, r7
+  60 002e 0022     		mov	r2, #0
+  61 0030 1A71     		strb	r2, [r3, #4]
+  23:../scr/sflash.c **** 	GPIO_Init(sFLASH_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
+  62              		.loc 1 23 0
+  63 0032 144A     		ldr	r2, .L2+4
+  64 0034 3B1C     		mov	r3, r7
+  65 0036 101C     		mov	r0, r2
+  66 0038 191C     		mov	r1, r3
+  67 003a FFF7FEFF 		bl	GPIO_Init
+  24:../scr/sflash.c **** 
+  25:../scr/sflash.c **** 	/*!< Configure sFLASH_SPI pins: MISO */
+  26:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_SPI_MISO_PIN;
+  68              		.loc 1 26 0
+  69 003e 3B1C     		mov	r3, r7
+  70 0040 8022     		mov	r2, #128
+  71 0042 D201     		lsl	r2, r2, #7
+  72 0044 1A60     		str	r2, [r3]
+  27:../scr/sflash.c **** 	GPIO_Init(sFLASH_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
+  73              		.loc 1 27 0
+  74 0046 0F4A     		ldr	r2, .L2+4
+  75 0048 3B1C     		mov	r3, r7
+  76 004a 101C     		mov	r0, r2
+  77 004c 191C     		mov	r1, r3
+  78 004e FFF7FEFF 		bl	GPIO_Init
+  28:../scr/sflash.c **** 
+  29:../scr/sflash.c **** 	/*!< Configure sFLASH_SPI pins: MOSI */
+  30:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_SPI_MOSI_PIN;
+  79              		.loc 1 30 0
+  80 0052 3B1C     		mov	r3, r7
+  81 0054 8022     		mov	r2, #128
+  82 0056 1202     		lsl	r2, r2, #8
+  83 0058 1A60     		str	r2, [r3]
+  31:../scr/sflash.c **** 	GPIO_Init(sFLASH_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
+  84              		.loc 1 31 0
+  85 005a 0A4A     		ldr	r2, .L2+4
+  86 005c 3B1C     		mov	r3, r7
+  87 005e 101C     		mov	r0, r2
+  88 0060 191C     		mov	r1, r3
+  89 0062 FFF7FEFF 		bl	GPIO_Init
+  32:../scr/sflash.c **** 
+  33:../scr/sflash.c **** 	/*!< Configure sFLASH_CS_PIN pin: sFLASH Card CS pin */
+  34:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_CS_PIN;
+  90              		.loc 1 34 0
+  91 0066 3B1C     		mov	r3, r7
+  92 0068 8022     		mov	r2, #128
+  93 006a 9200     		lsl	r2, r2, #2
+  94 006c 1A60     		str	r2, [r3]
+  35:../scr/sflash.c **** 	GPIO_Init(sFLASH_CS_GPIO_PORT, &GPIO_InitStructure);
+  95              		.loc 1 35 0
+  96 006e 054A     		ldr	r2, .L2+4
+  97 0070 3B1C     		mov	r3, r7
+  98 0072 101C     		mov	r0, r2
+  99 0074 191C     		mov	r1, r3
+ 100 0076 FFF7FEFF 		bl	GPIO_Init
+  36:../scr/sflash.c **** 
+  37:../scr/sflash.c **** }
+ 101              		.loc 1 37 0
+ 102 007a BD46     		mov	sp, r7
+ 103 007c 02B0     		add	sp, sp, #8
+ 104              		@ sp needed
+ 105 007e 80BD     		pop	{r7, pc}
+ 106              	.L3:
+ 107              		.align	2
+ 108              	.L2:
+ 109 0080 00380040 		.word	1073756160
+ 110 0084 00040048 		.word	1207960576
+ 111              		.cfi_endproc
+ 112              	.LFE33:
+ 114              		.align	2
+ 115              		.global	sFLASH_LowLevel_Init
+ 116              		.code	16
+ 117              		.thumb_func
+ 119              	sFLASH_LowLevel_Init:
+ 120              	.LFB34:
+  38:../scr/sflash.c **** 
+  39:../scr/sflash.c **** /**
+  40:../scr/sflash.c ****  * @brief  Initializes the peripherals used by the SPI FLASH driver.
+  41:../scr/sflash.c ****  * @param  None
+  42:../scr/sflash.c ****  * @retval None
+  43:../scr/sflash.c ****  */
+  44:../scr/sflash.c **** void sFLASH_LowLevel_Init(void) {
+ 121              		.loc 1 44 0
+ 122              		.cfi_startproc
+ 123 0088 80B5     		push	{r7, lr}
+ 124              	.LCFI3:
+ 125              		.cfi_def_cfa_offset 8
+ 126              		.cfi_offset 7, -8
+ 127              		.cfi_offset 14, -4
+ 128 008a 82B0     		sub	sp, sp, #8
+ 129              	.LCFI4:
+ 130              		.cfi_def_cfa_offset 16
+ 131 008c 00AF     		add	r7, sp, #0
+ 132              	.LCFI5:
+ 133              		.cfi_def_cfa_register 7
+  45:../scr/sflash.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  46:../scr/sflash.c **** 
+  47:../scr/sflash.c **** 	/*!< sFLASH_SPI_CS_GPIO, sFLASH_SPI_MOSI_GPIO, sFLASH_SPI_MISO_GPIO
+  48:../scr/sflash.c **** 	 and sFLASH_SPI_SCK_GPIO Periph clock enable */
+  49:../scr/sflash.c **** 	RCC_APB2PeriphClockCmd(
+ 134              		.loc 1 49 0
+ 135 008e 8023     		mov	r3, #128
+ 136 0090 DB02     		lsl	r3, r3, #11
+ 137 0092 181C     		mov	r0, r3
+ 138 0094 0121     		mov	r1, #1
+ 139 0096 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  50:../scr/sflash.c **** 			sFLASH_CS_GPIO_CLK | sFLASH_SPI_MOSI_GPIO_CLK
+  51:../scr/sflash.c **** 					| sFLASH_SPI_MISO_GPIO_CLK | sFLASH_SPI_SCK_GPIO_CLK,
+  52:../scr/sflash.c **** 			ENABLE);
+  53:../scr/sflash.c **** 
+  54:../scr/sflash.c **** 	/*!< sFLASH_SPI Periph clock enable */
+  55:../scr/sflash.c **** 	//RCC_APB2PeriphClockCmd(sFLASH_SPI_CLK, ENABLE);
+  56:../scr/sflash.c **** 	RCC_APB1PeriphClockCmd(sFLASH_SPI_CLK, ENABLE);
+ 140              		.loc 1 56 0
+ 141 009a 8023     		mov	r3, #128
+ 142 009c DB01     		lsl	r3, r3, #7
+ 143 009e 181C     		mov	r0, r3
+ 144 00a0 0121     		mov	r1, #1
+ 145 00a2 FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+  57:../scr/sflash.c **** 
+  58:../scr/sflash.c **** 	/*!< Configure sFLASH_SPI pins: SCK */
+  59:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_SPI_SCK_PIN;
+ 146              		.loc 1 59 0
+ 147 00a6 3B1C     		mov	r3, r7
+ 148 00a8 8022     		mov	r2, #128
+ 149 00aa D200     		lsl	r2, r2, #3
+ 150 00ac 1A60     		str	r2, [r3]
+  60:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 151              		.loc 1 60 0
+ 152 00ae 3B1C     		mov	r3, r7
+ 153 00b0 0322     		mov	r2, #3
+ 154 00b2 5A71     		strb	r2, [r3, #5]
+  61:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 155              		.loc 1 61 0
+ 156 00b4 3B1C     		mov	r3, r7
+ 157 00b6 0222     		mov	r2, #2
+ 158 00b8 1A71     		strb	r2, [r3, #4]
+  62:../scr/sflash.c **** 	GPIO_Init(sFLASH_SPI_SCK_GPIO_PORT, &GPIO_InitStructure);
+ 159              		.loc 1 62 0
+ 160 00ba 224A     		ldr	r2, .L5
+ 161 00bc 3B1C     		mov	r3, r7
+ 162 00be 101C     		mov	r0, r2
+ 163 00c0 191C     		mov	r1, r3
+ 164 00c2 FFF7FEFF 		bl	GPIO_Init
+  63:../scr/sflash.c **** 
+  64:../scr/sflash.c **** 	/*!< Configure sFLASH_SPI pins: MOSI */
+  65:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_SPI_MOSI_PIN;
+ 165              		.loc 1 65 0
+ 166 00c6 3B1C     		mov	r3, r7
+ 167 00c8 8022     		mov	r2, #128
+ 168 00ca 1202     		lsl	r2, r2, #8
+ 169 00cc 1A60     		str	r2, [r3]
+  66:../scr/sflash.c **** 	GPIO_Init(sFLASH_SPI_MOSI_GPIO_PORT, &GPIO_InitStructure);
+ 170              		.loc 1 66 0
+ 171 00ce 1D4A     		ldr	r2, .L5
+ 172 00d0 3B1C     		mov	r3, r7
+ 173 00d2 101C     		mov	r0, r2
+ 174 00d4 191C     		mov	r1, r3
+ 175 00d6 FFF7FEFF 		bl	GPIO_Init
+  67:../scr/sflash.c **** 
+  68:../scr/sflash.c **** 	/*!< Configure sFLASH_SPI pins: MISO */
+  69:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_SPI_MISO_PIN;
+ 176              		.loc 1 69 0
+ 177 00da 3B1C     		mov	r3, r7
+ 178 00dc 8022     		mov	r2, #128
+ 179 00de D201     		lsl	r2, r2, #7
+ 180 00e0 1A60     		str	r2, [r3]
+  70:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+ 181              		.loc 1 70 0
+ 182 00e2 3B1C     		mov	r3, r7
+ 183 00e4 0022     		mov	r2, #0
+ 184 00e6 1A71     		strb	r2, [r3, #4]
+  71:../scr/sflash.c **** 	GPIO_Init(sFLASH_SPI_MISO_GPIO_PORT, &GPIO_InitStructure);
+ 185              		.loc 1 71 0
+ 186 00e8 164A     		ldr	r2, .L5
+ 187 00ea 3B1C     		mov	r3, r7
+ 188 00ec 101C     		mov	r0, r2
+ 189 00ee 191C     		mov	r1, r3
+ 190 00f0 FFF7FEFF 		bl	GPIO_Init
+  72:../scr/sflash.c **** 
+  73:../scr/sflash.c **** 	/*!< Configure sFLASH_CS_PIN pin: sFLASH Card CS pin */
+  74:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = sFLASH_CS_PIN;
+ 191              		.loc 1 74 0
+ 192 00f4 3B1C     		mov	r3, r7
+ 193 00f6 8022     		mov	r2, #128
+ 194 00f8 9200     		lsl	r2, r2, #2
+ 195 00fa 1A60     		str	r2, [r3]
+  75:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 196              		.loc 1 75 0
+ 197 00fc 3B1C     		mov	r3, r7
+ 198 00fe 0122     		mov	r2, #1
+ 199 0100 1A71     		strb	r2, [r3, #4]
+  76:../scr/sflash.c **** 	GPIO_Init(sFLASH_CS_GPIO_PORT, &GPIO_InitStructure);
+ 200              		.loc 1 76 0
+ 201 0102 104A     		ldr	r2, .L5
+ 202 0104 3B1C     		mov	r3, r7
+ 203 0106 101C     		mov	r0, r2
+ 204 0108 191C     		mov	r1, r3
+ 205 010a FFF7FEFF 		bl	GPIO_Init
+  77:../scr/sflash.c **** 
+  78:../scr/sflash.c **** 	/*!< Configure A1_A8_PIN pin: sFLASH Card CS pin */
+  79:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 206              		.loc 1 79 0
+ 207 010e 3B1C     		mov	r3, r7
+ 208 0110 0222     		mov	r2, #2
+ 209 0112 1A71     		strb	r2, [r3, #4]
+  80:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = 1;
+ 210              		.loc 1 80 0
+ 211 0114 3B1C     		mov	r3, r7
+ 212 0116 0122     		mov	r2, #1
+ 213 0118 1A60     		str	r2, [r3]
+  81:../scr/sflash.c **** 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+ 214              		.loc 1 81 0
+ 215 011a 9023     		mov	r3, #144
+ 216 011c DA05     		lsl	r2, r3, #23
+ 217 011e 3B1C     		mov	r3, r7
+ 218 0120 101C     		mov	r0, r2
+ 219 0122 191C     		mov	r1, r3
+ 220 0124 FFF7FEFF 		bl	GPIO_Init
+  82:../scr/sflash.c **** 	GPIO_InitStructure.GPIO_Pin = 8;
+ 221              		.loc 1 82 0
+ 222 0128 3B1C     		mov	r3, r7
+ 223 012a 0822     		mov	r2, #8
+ 224 012c 1A60     		str	r2, [r3]
+  83:../scr/sflash.c **** 	GPIO_Init(GPIOA, &GPIO_InitStructure);
+ 225              		.loc 1 83 0
+ 226 012e 9023     		mov	r3, #144
+ 227 0130 DA05     		lsl	r2, r3, #23
+ 228 0132 3B1C     		mov	r3, r7
+ 229 0134 101C     		mov	r0, r2
+ 230 0136 191C     		mov	r1, r3
+ 231 0138 FFF7FEFF 		bl	GPIO_Init
+  84:../scr/sflash.c **** }
+ 232              		.loc 1 84 0
+ 233 013c BD46     		mov	sp, r7
+ 234 013e 02B0     		add	sp, sp, #8
+ 235              		@ sp needed
+ 236 0140 80BD     		pop	{r7, pc}
+ 237              	.L6:
+ 238 0142 C046     		.align	2
+ 239              	.L5:
+ 240 0144 00040048 		.word	1207960576
+ 241              		.cfi_endproc
+ 242              	.LFE34:
+ 244              		.align	2
+ 245              		.global	sFLASH_DeInit
+ 246              		.code	16
+ 247              		.thumb_func
+ 249              	sFLASH_DeInit:
+ 250              	.LFB35:
+  85:../scr/sflash.c **** 
+  86:../scr/sflash.c **** /** @addtogroup Utilities
+  87:../scr/sflash.c ****  * @{
+  88:../scr/sflash.c ****  */
+  89:../scr/sflash.c **** 
+  90:../scr/sflash.c **** /** @addtogroup STM32_EVAL
+  91:../scr/sflash.c ****  * @{
+  92:../scr/sflash.c ****  */
+  93:../scr/sflash.c **** 
+  94:../scr/sflash.c **** /** @addtogroup Common
+  95:../scr/sflash.c ****  * @{
+  96:../scr/sflash.c ****  */
+  97:../scr/sflash.c **** 
+  98:../scr/sflash.c **** /** @addtogroup STM32_EVAL_SPI_FLASH
+  99:../scr/sflash.c ****  * @brief      This file includes the M25Pxxx SPI FLASH driver of STM32-EVAL boards.
+ 100:../scr/sflash.c ****  * @{
+ 101:../scr/sflash.c ****  */
+ 102:../scr/sflash.c **** 
+ 103:../scr/sflash.c **** /** @defgroup STM32_EVAL_SPI_FLASH_Private_Types
+ 104:../scr/sflash.c ****  * @{
+ 105:../scr/sflash.c ****  */
+ 106:../scr/sflash.c **** /**
+ 107:../scr/sflash.c ****  * @}
+ 108:../scr/sflash.c ****  */
+ 109:../scr/sflash.c **** 
+ 110:../scr/sflash.c **** /** @defgroup STM32_EVAL_SPI_FLASH_Private_Defines
+ 111:../scr/sflash.c ****  * @{
+ 112:../scr/sflash.c ****  */
+ 113:../scr/sflash.c **** /**
+ 114:../scr/sflash.c ****  * @}
+ 115:../scr/sflash.c ****  */
+ 116:../scr/sflash.c **** 
+ 117:../scr/sflash.c **** /** @defgroup STM32_EVAL_SPI_FLASH_Private_Macros
+ 118:../scr/sflash.c ****  * @{
+ 119:../scr/sflash.c ****  */
+ 120:../scr/sflash.c **** /**
+ 121:../scr/sflash.c ****  * @}
+ 122:../scr/sflash.c ****  */
+ 123:../scr/sflash.c **** 
+ 124:../scr/sflash.c **** /** @defgroup STM32_EVAL_SPI_FLASH_Private_Variables
+ 125:../scr/sflash.c ****  * @{
+ 126:../scr/sflash.c ****  */
+ 127:../scr/sflash.c **** /**
+ 128:../scr/sflash.c ****  * @}
+ 129:../scr/sflash.c ****  */
+ 130:../scr/sflash.c **** 
+ 131:../scr/sflash.c **** /** @defgroup STM32_EVAL_SPI_FLASH_Private_Function_Prototypes
+ 132:../scr/sflash.c ****  * @{
+ 133:../scr/sflash.c ****  */
+ 134:../scr/sflash.c **** /**
+ 135:../scr/sflash.c ****  * @}
+ 136:../scr/sflash.c ****  */
+ 137:../scr/sflash.c **** 
+ 138:../scr/sflash.c **** /** @defgroup STM32_EVAL_SPI_FLASH_Private_Functions
+ 139:../scr/sflash.c ****  * @{
+ 140:../scr/sflash.c ****  */
+ 141:../scr/sflash.c **** 
+ 142:../scr/sflash.c **** /**
+ 143:../scr/sflash.c ****  * @brief  DeInitializes the peripherals used by the SPI FLASH driver.
+ 144:../scr/sflash.c ****  * @param  None
+ 145:../scr/sflash.c ****  * @retval None
+ 146:../scr/sflash.c ****  */
+ 147:../scr/sflash.c **** void sFLASH_DeInit(void) {
+ 251              		.loc 1 147 0
+ 252              		.cfi_startproc
+ 253 0148 80B5     		push	{r7, lr}
+ 254              	.LCFI6:
+ 255              		.cfi_def_cfa_offset 8
+ 256              		.cfi_offset 7, -8
+ 257              		.cfi_offset 14, -4
+ 258 014a 00AF     		add	r7, sp, #0
+ 259              	.LCFI7:
+ 260              		.cfi_def_cfa_register 7
+ 148:../scr/sflash.c **** 	sFLASH_LowLevel_DeInit();
+ 261              		.loc 1 148 0
+ 262 014c FFF7FEFF 		bl	sFLASH_LowLevel_DeInit
+ 149:../scr/sflash.c **** }
+ 263              		.loc 1 149 0
+ 264 0150 BD46     		mov	sp, r7
+ 265              		@ sp needed
+ 266 0152 80BD     		pop	{r7, pc}
+ 267              		.cfi_endproc
+ 268              	.LFE35:
+ 270              		.align	2
+ 271              		.global	sFLASH_Init
+ 272              		.code	16
+ 273              		.thumb_func
+ 275              	sFLASH_Init:
+ 276              	.LFB36:
+ 150:../scr/sflash.c **** 
+ 151:../scr/sflash.c **** /**
+ 152:../scr/sflash.c ****  * @brief  Initializes the peripherals used by the SPI FLASH driver.
+ 153:../scr/sflash.c ****  * @param  None
+ 154:../scr/sflash.c ****  * @retval None
+ 155:../scr/sflash.c ****  */
+ 156:../scr/sflash.c **** void sFLASH_Init(void) {
+ 277              		.loc 1 156 0
+ 278              		.cfi_startproc
+ 279 0154 80B5     		push	{r7, lr}
+ 280              	.LCFI8:
+ 281              		.cfi_def_cfa_offset 8
+ 282              		.cfi_offset 7, -8
+ 283              		.cfi_offset 14, -4
+ 284 0156 86B0     		sub	sp, sp, #24
+ 285              	.LCFI9:
+ 286              		.cfi_def_cfa_offset 32
+ 287 0158 00AF     		add	r7, sp, #0
+ 288              	.LCFI10:
+ 289              		.cfi_def_cfa_register 7
+ 157:../scr/sflash.c **** 	SPI_InitTypeDef SPI_InitStructure;
+ 158:../scr/sflash.c **** 
+ 159:../scr/sflash.c **** 	sFLASH_LowLevel_Init();
+ 290              		.loc 1 159 0
+ 291 015a FFF7FEFF 		bl	sFLASH_LowLevel_Init
+ 160:../scr/sflash.c **** 
+ 161:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 292              		.loc 1 161 0
+ 293 015e 1C4A     		ldr	r2, .L9
+ 294 0160 8023     		mov	r3, #128
+ 295 0162 9B00     		lsl	r3, r3, #2
+ 296 0164 101C     		mov	r0, r2
+ 297 0166 191C     		mov	r1, r3
+ 298 0168 FFF7FEFF 		bl	GPIO_SetBits
+ 299 016c 9023     		mov	r3, #144
+ 300 016e DB05     		lsl	r3, r3, #23
+ 301 0170 181C     		mov	r0, r3
+ 302 0172 0121     		mov	r1, #1
+ 303 0174 FFF7FEFF 		bl	GPIO_ResetBits
+ 162:../scr/sflash.c **** 
+ 163:../scr/sflash.c **** 	/*!< SPI configuration */
+ 164:../scr/sflash.c **** 	SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
+ 304              		.loc 1 164 0
+ 305 0178 3B1D     		add	r3, r7, #4
+ 306 017a 0022     		mov	r2, #0
+ 307 017c 1A80     		strh	r2, [r3]
+ 165:../scr/sflash.c **** 	SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+ 308              		.loc 1 165 0
+ 309 017e 3B1D     		add	r3, r7, #4
+ 310 0180 8222     		mov	r2, #130
+ 311 0182 5200     		lsl	r2, r2, #1
+ 312 0184 5A80     		strh	r2, [r3, #2]
+ 166:../scr/sflash.c **** 	SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
+ 313              		.loc 1 166 0
+ 314 0186 3B1D     		add	r3, r7, #4
+ 315 0188 E022     		mov	r2, #224
+ 316 018a D200     		lsl	r2, r2, #3
+ 317 018c 9A80     		strh	r2, [r3, #4]
+ 167:../scr/sflash.c **** 	SPI_InitStructure.SPI_CPOL = SPI_CPOL_High;
+ 318              		.loc 1 167 0
+ 319 018e 3B1D     		add	r3, r7, #4
+ 320 0190 0222     		mov	r2, #2
+ 321 0192 DA80     		strh	r2, [r3, #6]
+ 168:../scr/sflash.c **** 	SPI_InitStructure.SPI_CPHA = SPI_CPHA_2Edge;
+ 322              		.loc 1 168 0
+ 323 0194 3B1D     		add	r3, r7, #4
+ 324 0196 0122     		mov	r2, #1
+ 325 0198 1A81     		strh	r2, [r3, #8]
+ 169:../scr/sflash.c **** 	SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
+ 326              		.loc 1 169 0
+ 327 019a 3B1D     		add	r3, r7, #4
+ 328 019c 8022     		mov	r2, #128
+ 329 019e 9200     		lsl	r2, r2, #2
+ 330 01a0 5A81     		strh	r2, [r3, #10]
+ 170:../scr/sflash.c **** //#if defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
+ 171:../scr/sflash.c **** 	SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+ 331              		.loc 1 171 0
+ 332 01a2 3B1D     		add	r3, r7, #4
+ 333 01a4 0022     		mov	r2, #0
+ 334 01a6 9A81     		strh	r2, [r3, #12]
+ 172:../scr/sflash.c **** //#else
+ 173:../scr/sflash.c **** 	// SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_4;
+ 174:../scr/sflash.c **** //#endif
+ 175:../scr/sflash.c **** 
+ 176:../scr/sflash.c **** 	SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
+ 335              		.loc 1 176 0
+ 336 01a8 3B1D     		add	r3, r7, #4
+ 337 01aa 0022     		mov	r2, #0
+ 338 01ac DA81     		strh	r2, [r3, #14]
+ 177:../scr/sflash.c **** 	SPI_InitStructure.SPI_CRCPolynomial = 7;
+ 339              		.loc 1 177 0
+ 340 01ae 3B1D     		add	r3, r7, #4
+ 341 01b0 0722     		mov	r2, #7
+ 342 01b2 1A82     		strh	r2, [r3, #16]
+ 178:../scr/sflash.c **** 	SPI_Init(sFLASH_SPI, &SPI_InitStructure);
+ 343              		.loc 1 178 0
+ 344 01b4 074A     		ldr	r2, .L9+4
+ 345 01b6 3B1D     		add	r3, r7, #4
+ 346 01b8 101C     		mov	r0, r2
+ 347 01ba 191C     		mov	r1, r3
+ 348 01bc FFF7FEFF 		bl	SPI_Init
+ 179:../scr/sflash.c **** 
+ 180:../scr/sflash.c **** 	/*!< Enable the sFLASH_SPI  */
+ 181:../scr/sflash.c **** 	SPI_Cmd(sFLASH_SPI, ENABLE);
+ 349              		.loc 1 181 0
+ 350 01c0 044B     		ldr	r3, .L9+4
+ 351 01c2 181C     		mov	r0, r3
+ 352 01c4 0121     		mov	r1, #1
+ 353 01c6 FFF7FEFF 		bl	SPI_Cmd
+ 182:../scr/sflash.c **** }
+ 354              		.loc 1 182 0
+ 355 01ca BD46     		mov	sp, r7
+ 356 01cc 06B0     		add	sp, sp, #24
+ 357              		@ sp needed
+ 358 01ce 80BD     		pop	{r7, pc}
+ 359              	.L10:
+ 360              		.align	2
+ 361              	.L9:
+ 362 01d0 00040048 		.word	1207960576
+ 363 01d4 00380040 		.word	1073756160
+ 364              		.cfi_endproc
+ 365              	.LFE36:
+ 367              		.align	2
+ 368              		.global	sFLASH_EraseSector
+ 369              		.code	16
+ 370              		.thumb_func
+ 372              	sFLASH_EraseSector:
+ 373              	.LFB37:
+ 183:../scr/sflash.c **** 
+ 184:../scr/sflash.c **** /**
+ 185:../scr/sflash.c ****  * @brief  Erases the specified FLASH sector.
+ 186:../scr/sflash.c ****  * @param  SectorAddr: address of the sector to erase.
+ 187:../scr/sflash.c ****  * @retval None
+ 188:../scr/sflash.c ****  */
+ 189:../scr/sflash.c **** void sFLASH_EraseSector(uint32_t SectorAddr) {
+ 374              		.loc 1 189 0
+ 375              		.cfi_startproc
+ 376 01d8 80B5     		push	{r7, lr}
+ 377              	.LCFI11:
+ 378              		.cfi_def_cfa_offset 8
+ 379              		.cfi_offset 7, -8
+ 380              		.cfi_offset 14, -4
+ 381 01da 82B0     		sub	sp, sp, #8
+ 382              	.LCFI12:
+ 383              		.cfi_def_cfa_offset 16
+ 384 01dc 00AF     		add	r7, sp, #0
+ 385              	.LCFI13:
+ 386              		.cfi_def_cfa_register 7
+ 387 01de 7860     		str	r0, [r7, #4]
+ 190:../scr/sflash.c **** 	/*!< Send write enable instruction */
+ 191:../scr/sflash.c **** 	sFLASH_WriteEnable();
+ 388              		.loc 1 191 0
+ 389 01e0 FFF7FEFF 		bl	sFLASH_WriteEnable
+ 192:../scr/sflash.c **** 
+ 193:../scr/sflash.c **** 	/*!< Sector Erase */
+ 194:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */sFLASH_CS_LOW();
+ 390              		.loc 1 194 0
+ 391 01e4 174A     		ldr	r2, .L12
+ 392 01e6 8023     		mov	r3, #128
+ 393 01e8 9B00     		lsl	r3, r3, #2
+ 394 01ea 101C     		mov	r0, r2
+ 395 01ec 191C     		mov	r1, r3
+ 396 01ee FFF7FEFF 		bl	GPIO_ResetBits
+ 397 01f2 9023     		mov	r3, #144
+ 398 01f4 DB05     		lsl	r3, r3, #23
+ 399 01f6 181C     		mov	r0, r3
+ 400 01f8 0121     		mov	r1, #1
+ 401 01fa FFF7FEFF 		bl	GPIO_SetBits
+ 195:../scr/sflash.c **** 	/*!< Send Sector Erase instruction */
+ 196:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_SE);
+ 402              		.loc 1 196 0
+ 403 01fe D820     		mov	r0, #216
+ 404 0200 FFF7FEFF 		bl	sFLASH_SendByte
+ 197:../scr/sflash.c **** 	/*!< Send SectorAddr high nibble address byte */
+ 198:../scr/sflash.c **** 	//sFLASH_SendByte((SectorAddr & 0xFF0000) >> 16);
+ 199:../scr/sflash.c **** 	/*!< Send SectorAddr medium nibble address byte */
+ 200:../scr/sflash.c **** 	sFLASH_SendByte((SectorAddr & 0xFF00) >> 8);
+ 405              		.loc 1 200 0
+ 406 0204 7A68     		ldr	r2, [r7, #4]
+ 407 0206 FF23     		mov	r3, #255
+ 408 0208 1B02     		lsl	r3, r3, #8
+ 409 020a 1340     		and	r3, r2
+ 410 020c 1B0A     		lsr	r3, r3, #8
+ 411 020e DBB2     		uxtb	r3, r3
+ 412 0210 181C     		mov	r0, r3
+ 413 0212 FFF7FEFF 		bl	sFLASH_SendByte
+ 201:../scr/sflash.c **** 	/*!< Send SectorAddr low nibble address byte */
+ 202:../scr/sflash.c **** 	sFLASH_SendByte(SectorAddr & 0xFF);
+ 414              		.loc 1 202 0
+ 415 0216 7B68     		ldr	r3, [r7, #4]
+ 416 0218 DBB2     		uxtb	r3, r3
+ 417 021a 181C     		mov	r0, r3
+ 418 021c FFF7FEFF 		bl	sFLASH_SendByte
+ 203:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 419              		.loc 1 203 0
+ 420 0220 084A     		ldr	r2, .L12
+ 421 0222 8023     		mov	r3, #128
+ 422 0224 9B00     		lsl	r3, r3, #2
+ 423 0226 101C     		mov	r0, r2
+ 424 0228 191C     		mov	r1, r3
+ 425 022a FFF7FEFF 		bl	GPIO_SetBits
+ 426 022e 9023     		mov	r3, #144
+ 427 0230 DB05     		lsl	r3, r3, #23
+ 428 0232 181C     		mov	r0, r3
+ 429 0234 0121     		mov	r1, #1
+ 430 0236 FFF7FEFF 		bl	GPIO_ResetBits
+ 204:../scr/sflash.c **** 
+ 205:../scr/sflash.c **** 	/*!< Wait the end of Flash writing */
+ 206:../scr/sflash.c **** 	sFLASH_WaitForWriteEnd();
+ 431              		.loc 1 206 0
+ 432 023a FFF7FEFF 		bl	sFLASH_WaitForWriteEnd
+ 207:../scr/sflash.c **** }
+ 433              		.loc 1 207 0
+ 434 023e BD46     		mov	sp, r7
+ 435 0240 02B0     		add	sp, sp, #8
+ 436              		@ sp needed
+ 437 0242 80BD     		pop	{r7, pc}
+ 438              	.L13:
+ 439              		.align	2
+ 440              	.L12:
+ 441 0244 00040048 		.word	1207960576
+ 442              		.cfi_endproc
+ 443              	.LFE37:
+ 445              		.align	2
+ 446              		.global	sFLASH_EraseBulk
+ 447              		.code	16
+ 448              		.thumb_func
+ 450              	sFLASH_EraseBulk:
+ 451              	.LFB38:
+ 208:../scr/sflash.c **** 
+ 209:../scr/sflash.c **** /**
+ 210:../scr/sflash.c ****  * @brief  Erases the entire FLASH.
+ 211:../scr/sflash.c ****  * @param  None
+ 212:../scr/sflash.c ****  * @retval None
+ 213:../scr/sflash.c ****  */
+ 214:../scr/sflash.c **** void sFLASH_EraseBulk(void) {
+ 452              		.loc 1 214 0
+ 453              		.cfi_startproc
+ 454 0248 80B5     		push	{r7, lr}
+ 455              	.LCFI14:
+ 456              		.cfi_def_cfa_offset 8
+ 457              		.cfi_offset 7, -8
+ 458              		.cfi_offset 14, -4
+ 459 024a 00AF     		add	r7, sp, #0
+ 460              	.LCFI15:
+ 461              		.cfi_def_cfa_register 7
+ 215:../scr/sflash.c **** 	/*!< Send write enable instruction */
+ 216:../scr/sflash.c **** 	sFLASH_WriteEnable();
+ 462              		.loc 1 216 0
+ 463 024c FFF7FEFF 		bl	sFLASH_WriteEnable
+ 217:../scr/sflash.c **** 
+ 218:../scr/sflash.c **** 	/*!< Bulk Erase */
+ 219:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */sFLASH_CS_LOW();
+ 464              		.loc 1 219 0
+ 465 0250 104A     		ldr	r2, .L15
+ 466 0252 8023     		mov	r3, #128
+ 467 0254 9B00     		lsl	r3, r3, #2
+ 468 0256 101C     		mov	r0, r2
+ 469 0258 191C     		mov	r1, r3
+ 470 025a FFF7FEFF 		bl	GPIO_ResetBits
+ 471 025e 9023     		mov	r3, #144
+ 472 0260 DB05     		lsl	r3, r3, #23
+ 473 0262 181C     		mov	r0, r3
+ 474 0264 0121     		mov	r1, #1
+ 475 0266 FFF7FEFF 		bl	GPIO_SetBits
+ 220:../scr/sflash.c **** 	/*!< Send Bulk Erase instruction  */
+ 221:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_BE);
+ 476              		.loc 1 221 0
+ 477 026a C720     		mov	r0, #199
+ 478 026c FFF7FEFF 		bl	sFLASH_SendByte
+ 222:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 479              		.loc 1 222 0
+ 480 0270 084A     		ldr	r2, .L15
+ 481 0272 8023     		mov	r3, #128
+ 482 0274 9B00     		lsl	r3, r3, #2
+ 483 0276 101C     		mov	r0, r2
+ 484 0278 191C     		mov	r1, r3
+ 485 027a FFF7FEFF 		bl	GPIO_SetBits
+ 486 027e 9023     		mov	r3, #144
+ 487 0280 DB05     		lsl	r3, r3, #23
+ 488 0282 181C     		mov	r0, r3
+ 489 0284 0121     		mov	r1, #1
+ 490 0286 FFF7FEFF 		bl	GPIO_ResetBits
+ 223:../scr/sflash.c **** 
+ 224:../scr/sflash.c **** 	/*!< Wait the end of Flash writing */
+ 225:../scr/sflash.c **** 	sFLASH_WaitForWriteEnd();
+ 491              		.loc 1 225 0
+ 492 028a FFF7FEFF 		bl	sFLASH_WaitForWriteEnd
+ 226:../scr/sflash.c **** }
+ 493              		.loc 1 226 0
+ 494 028e BD46     		mov	sp, r7
+ 495              		@ sp needed
+ 496 0290 80BD     		pop	{r7, pc}
+ 497              	.L16:
+ 498 0292 C046     		.align	2
+ 499              	.L15:
+ 500 0294 00040048 		.word	1207960576
+ 501              		.cfi_endproc
+ 502              	.LFE38:
+ 504              		.align	2
+ 505              		.global	sFLASH_WritePage
+ 506              		.code	16
+ 507              		.thumb_func
+ 509              	sFLASH_WritePage:
+ 510              	.LFB39:
+ 227:../scr/sflash.c **** 
+ 228:../scr/sflash.c **** /**
+ 229:../scr/sflash.c ****  * @brief  Writes more than one byte to the FLASH with a single WRITE cycle
+ 230:../scr/sflash.c ****  *         (Page WRITE sequence).
+ 231:../scr/sflash.c ****  * @note   The number of byte can't exceed the FLASH page size.
+ 232:../scr/sflash.c ****  * @param  pBuffer: pointer to the buffer  containing the data to be written
+ 233:../scr/sflash.c ****  *         to the FLASH.
+ 234:../scr/sflash.c ****  * @param  WriteAddr: FLASH's internal address to write to.
+ 235:../scr/sflash.c ****  * @param  NumByteToWrite: number of bytes to write to the FLASH, must be equal
+ 236:../scr/sflash.c ****  *         or less than "sFLASH_PAGESIZE" value.
+ 237:../scr/sflash.c ****  * @retval None
+ 238:../scr/sflash.c ****  */
+ 239:../scr/sflash.c **** void sFLASH_WritePage(uint8_t* pBuffer, uint32_t WriteAddr,
+ 240:../scr/sflash.c **** 		uint16_t NumByteToWrite) {
+ 511              		.loc 1 240 0
+ 512              		.cfi_startproc
+ 513 0298 80B5     		push	{r7, lr}
+ 514              	.LCFI16:
+ 515              		.cfi_def_cfa_offset 8
+ 516              		.cfi_offset 7, -8
+ 517              		.cfi_offset 14, -4
+ 518 029a 84B0     		sub	sp, sp, #16
+ 519              	.LCFI17:
+ 520              		.cfi_def_cfa_offset 24
+ 521 029c 00AF     		add	r7, sp, #0
+ 522              	.LCFI18:
+ 523              		.cfi_def_cfa_register 7
+ 524 029e F860     		str	r0, [r7, #12]
+ 525 02a0 B960     		str	r1, [r7, #8]
+ 526 02a2 BB1D     		add	r3, r7, #6
+ 527 02a4 1A80     		strh	r2, [r3]
+ 241:../scr/sflash.c **** 	/*!< Enable the write access to the FLASH */
+ 242:../scr/sflash.c **** 	sFLASH_WriteEnable();
+ 528              		.loc 1 242 0
+ 529 02a6 FFF7FEFF 		bl	sFLASH_WriteEnable
+ 243:../scr/sflash.c **** 
+ 244:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */sFLASH_CS_LOW();
+ 530              		.loc 1 244 0
+ 531 02aa 204A     		ldr	r2, .L20
+ 532 02ac 8023     		mov	r3, #128
+ 533 02ae 9B00     		lsl	r3, r3, #2
+ 534 02b0 101C     		mov	r0, r2
+ 535 02b2 191C     		mov	r1, r3
+ 536 02b4 FFF7FEFF 		bl	GPIO_ResetBits
+ 537 02b8 9023     		mov	r3, #144
+ 538 02ba DB05     		lsl	r3, r3, #23
+ 539 02bc 181C     		mov	r0, r3
+ 540 02be 0121     		mov	r1, #1
+ 541 02c0 FFF7FEFF 		bl	GPIO_SetBits
+ 245:../scr/sflash.c **** 	/*!< Send "Write to Memory " instruction */
+ 246:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_WRITE);
+ 542              		.loc 1 246 0
+ 543 02c4 0220     		mov	r0, #2
+ 544 02c6 FFF7FEFF 		bl	sFLASH_SendByte
+ 247:../scr/sflash.c **** 	/*!< Send WriteAddr high nibble address byte to write to */
+ 248:../scr/sflash.c **** 	//sFLASH_SendByte((WriteAddr & 0xFF0000) >> 16);
+ 249:../scr/sflash.c **** 	/*!< Send WriteAddr medium nibble address byte to write to */
+ 250:../scr/sflash.c **** 	sFLASH_SendByte((WriteAddr & 0xFF00) >> 8);
+ 545              		.loc 1 250 0
+ 546 02ca BA68     		ldr	r2, [r7, #8]
+ 547 02cc FF23     		mov	r3, #255
+ 548 02ce 1B02     		lsl	r3, r3, #8
+ 549 02d0 1340     		and	r3, r2
+ 550 02d2 1B0A     		lsr	r3, r3, #8
+ 551 02d4 DBB2     		uxtb	r3, r3
+ 552 02d6 181C     		mov	r0, r3
+ 553 02d8 FFF7FEFF 		bl	sFLASH_SendByte
+ 251:../scr/sflash.c **** 	/*!< Send WriteAddr low nibble address byte to write to */
+ 252:../scr/sflash.c **** 	sFLASH_SendByte(WriteAddr & 0xFF);
+ 554              		.loc 1 252 0
+ 555 02dc BB68     		ldr	r3, [r7, #8]
+ 556 02de DBB2     		uxtb	r3, r3
+ 557 02e0 181C     		mov	r0, r3
+ 558 02e2 FFF7FEFF 		bl	sFLASH_SendByte
+ 253:../scr/sflash.c **** 
+ 254:../scr/sflash.c **** 	/*!< while there is data to be written on the FLASH */
+ 255:../scr/sflash.c **** 	while (NumByteToWrite--) {
+ 559              		.loc 1 255 0
+ 560 02e6 07E0     		b	.L18
+ 561              	.L19:
+ 256:../scr/sflash.c **** 		/*!< Send the current byte */
+ 257:../scr/sflash.c **** 		sFLASH_SendByte(*pBuffer);
+ 562              		.loc 1 257 0
+ 563 02e8 FB68     		ldr	r3, [r7, #12]
+ 564 02ea 1B78     		ldrb	r3, [r3]
+ 565 02ec 181C     		mov	r0, r3
+ 566 02ee FFF7FEFF 		bl	sFLASH_SendByte
+ 258:../scr/sflash.c **** 		/*!< Point on the next byte to be written */
+ 259:../scr/sflash.c **** 		pBuffer++;
+ 567              		.loc 1 259 0
+ 568 02f2 FB68     		ldr	r3, [r7, #12]
+ 569 02f4 0133     		add	r3, r3, #1
+ 570 02f6 FB60     		str	r3, [r7, #12]
+ 571              	.L18:
+ 255:../scr/sflash.c **** 		/*!< Send the current byte */
+ 572              		.loc 1 255 0
+ 573 02f8 BB1D     		add	r3, r7, #6
+ 574 02fa 1B88     		ldrh	r3, [r3]
+ 575 02fc BA1D     		add	r2, r7, #6
+ 576 02fe 591E     		sub	r1, r3, #1
+ 577 0300 1180     		strh	r1, [r2]
+ 578 0302 002B     		cmp	r3, #0
+ 579 0304 F0D1     		bne	.L19
+ 260:../scr/sflash.c **** 	}
+ 261:../scr/sflash.c **** 
+ 262:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 580              		.loc 1 262 0
+ 581 0306 094A     		ldr	r2, .L20
+ 582 0308 8023     		mov	r3, #128
+ 583 030a 9B00     		lsl	r3, r3, #2
+ 584 030c 101C     		mov	r0, r2
+ 585 030e 191C     		mov	r1, r3
+ 586 0310 FFF7FEFF 		bl	GPIO_SetBits
+ 587 0314 9023     		mov	r3, #144
+ 588 0316 DB05     		lsl	r3, r3, #23
+ 589 0318 181C     		mov	r0, r3
+ 590 031a 0121     		mov	r1, #1
+ 591 031c FFF7FEFF 		bl	GPIO_ResetBits
+ 263:../scr/sflash.c **** 
+ 264:../scr/sflash.c **** 	/*!< Wait the end of Flash writing */
+ 265:../scr/sflash.c **** 	sFLASH_WaitForWriteEnd();
+ 592              		.loc 1 265 0
+ 593 0320 FFF7FEFF 		bl	sFLASH_WaitForWriteEnd
+ 266:../scr/sflash.c **** }
+ 594              		.loc 1 266 0
+ 595 0324 BD46     		mov	sp, r7
+ 596 0326 04B0     		add	sp, sp, #16
+ 597              		@ sp needed
+ 598 0328 80BD     		pop	{r7, pc}
+ 599              	.L21:
+ 600 032a C046     		.align	2
+ 601              	.L20:
+ 602 032c 00040048 		.word	1207960576
+ 603              		.cfi_endproc
+ 604              	.LFE39:
+ 606              		.align	2
+ 607              		.global	sFLASH_WriteBuffer
+ 608              		.code	16
+ 609              		.thumb_func
+ 611              	sFLASH_WriteBuffer:
+ 612              	.LFB40:
+ 267:../scr/sflash.c **** 
+ 268:../scr/sflash.c **** /**
+ 269:../scr/sflash.c ****  * @brief  Writes block of data to the FLASH. In this function, the number of
+ 270:../scr/sflash.c ****  *         WRITE cycles are reduced, using Page WRITE sequence.
+ 271:../scr/sflash.c ****  * @param  pBuffer: pointer to the buffer  containing the data to be written
+ 272:../scr/sflash.c ****  *         to the FLASH.
+ 273:../scr/sflash.c ****  * @param  WriteAddr: FLASH's internal address to write to.
+ 274:../scr/sflash.c ****  * @param  NumByteToWrite: number of bytes to write to the FLASH.
+ 275:../scr/sflash.c ****  * @retval None
+ 276:../scr/sflash.c ****  */
+ 277:../scr/sflash.c **** void sFLASH_WriteBuffer(uint8_t* pBuffer, uint32_t WriteAddr,
+ 278:../scr/sflash.c **** 		uint16_t NumByteToWrite) {
+ 613              		.loc 1 278 0
+ 614              		.cfi_startproc
+ 615 0330 80B5     		push	{r7, lr}
+ 616              	.LCFI19:
+ 617              		.cfi_def_cfa_offset 8
+ 618              		.cfi_offset 7, -8
+ 619              		.cfi_offset 14, -4
+ 620 0332 86B0     		sub	sp, sp, #24
+ 621              	.LCFI20:
+ 622              		.cfi_def_cfa_offset 32
+ 623 0334 00AF     		add	r7, sp, #0
+ 624              	.LCFI21:
+ 625              		.cfi_def_cfa_register 7
+ 626 0336 F860     		str	r0, [r7, #12]
+ 627 0338 B960     		str	r1, [r7, #8]
+ 628 033a BB1D     		add	r3, r7, #6
+ 629 033c 1A80     		strh	r2, [r3]
+ 279:../scr/sflash.c **** 	uint8_t NumOfPage = 0, NumOfSingle = 0, Addr = 0, count = 0, temp = 0;
+ 630              		.loc 1 279 0
+ 631 033e 1723     		mov	r3, #23
+ 632 0340 FB18     		add	r3, r7, r3
+ 633 0342 0022     		mov	r2, #0
+ 634 0344 1A70     		strb	r2, [r3]
+ 635 0346 1623     		mov	r3, #22
+ 636 0348 FB18     		add	r3, r7, r3
+ 637 034a 0022     		mov	r2, #0
+ 638 034c 1A70     		strb	r2, [r3]
+ 639 034e 1523     		mov	r3, #21
+ 640 0350 FB18     		add	r3, r7, r3
+ 641 0352 0022     		mov	r2, #0
+ 642 0354 1A70     		strb	r2, [r3]
+ 643 0356 1423     		mov	r3, #20
+ 644 0358 FB18     		add	r3, r7, r3
+ 645 035a 0022     		mov	r2, #0
+ 646 035c 1A70     		strb	r2, [r3]
+ 647 035e 1323     		mov	r3, #19
+ 648 0360 FB18     		add	r3, r7, r3
+ 649 0362 0022     		mov	r2, #0
+ 650 0364 1A70     		strb	r2, [r3]
+ 280:../scr/sflash.c **** 
+ 281:../scr/sflash.c **** 	Addr = WriteAddr % sFLASH_SPI_PAGESIZE;
+ 651              		.loc 1 281 0
+ 652 0366 BB68     		ldr	r3, [r7, #8]
+ 653 0368 DAB2     		uxtb	r2, r3
+ 654 036a 1523     		mov	r3, #21
+ 655 036c FB18     		add	r3, r7, r3
+ 656 036e 3F21     		mov	r1, #63
+ 657 0370 0A40     		and	r2, r1
+ 658 0372 1A70     		strb	r2, [r3]
+ 282:../scr/sflash.c **** 	count = sFLASH_SPI_PAGESIZE - Addr;
+ 659              		.loc 1 282 0
+ 660 0374 1423     		mov	r3, #20
+ 661 0376 FB18     		add	r3, r7, r3
+ 662 0378 1522     		mov	r2, #21
+ 663 037a BA18     		add	r2, r7, r2
+ 664 037c 1278     		ldrb	r2, [r2]
+ 665 037e 4021     		mov	r1, #64
+ 666 0380 8A1A     		sub	r2, r1, r2
+ 667 0382 1A70     		strb	r2, [r3]
+ 283:../scr/sflash.c **** 	NumOfPage = NumByteToWrite / sFLASH_SPI_PAGESIZE;
+ 668              		.loc 1 283 0
+ 669 0384 BB1D     		add	r3, r7, #6
+ 670 0386 1B88     		ldrh	r3, [r3]
+ 671 0388 9B09     		lsr	r3, r3, #6
+ 672 038a 9AB2     		uxth	r2, r3
+ 673 038c 1723     		mov	r3, #23
+ 674 038e FB18     		add	r3, r7, r3
+ 675 0390 1A70     		strb	r2, [r3]
+ 284:../scr/sflash.c **** 	NumOfSingle = NumByteToWrite % sFLASH_SPI_PAGESIZE;
+ 676              		.loc 1 284 0
+ 677 0392 BB1D     		add	r3, r7, #6
+ 678 0394 1B88     		ldrh	r3, [r3]
+ 679 0396 DAB2     		uxtb	r2, r3
+ 680 0398 1623     		mov	r3, #22
+ 681 039a FB18     		add	r3, r7, r3
+ 682 039c 3F21     		mov	r1, #63
+ 683 039e 0A40     		and	r2, r1
+ 684 03a0 1A70     		strb	r2, [r3]
+ 285:../scr/sflash.c **** 
+ 286:../scr/sflash.c **** 	if (Addr == 0) /*!< WriteAddr is sFLASH_PAGESIZE aligned  */
+ 685              		.loc 1 286 0
+ 686 03a2 1523     		mov	r3, #21
+ 687 03a4 FB18     		add	r3, r7, r3
+ 688 03a6 1B78     		ldrb	r3, [r3]
+ 689 03a8 002B     		cmp	r3, #0
+ 690 03aa 31D1     		bne	.L23
+ 287:../scr/sflash.c **** 	{
+ 288:../scr/sflash.c **** 		if (NumOfPage == 0) /*!< NumByteToWrite < sFLASH_PAGESIZE */
+ 691              		.loc 1 288 0
+ 692 03ac 1723     		mov	r3, #23
+ 693 03ae FB18     		add	r3, r7, r3
+ 694 03b0 1B78     		ldrb	r3, [r3]
+ 695 03b2 002B     		cmp	r3, #0
+ 696 03b4 09D1     		bne	.L24
+ 289:../scr/sflash.c **** 		{
+ 290:../scr/sflash.c **** 			sFLASH_WritePage(pBuffer, WriteAddr, NumByteToWrite);
+ 697              		.loc 1 290 0
+ 698 03b6 F968     		ldr	r1, [r7, #12]
+ 699 03b8 BA68     		ldr	r2, [r7, #8]
+ 700 03ba BB1D     		add	r3, r7, #6
+ 701 03bc 1B88     		ldrh	r3, [r3]
+ 702 03be 081C     		mov	r0, r1
+ 703 03c0 111C     		mov	r1, r2
+ 704 03c2 1A1C     		mov	r2, r3
+ 705 03c4 FFF7FEFF 		bl	sFLASH_WritePage
+ 706 03c8 BCE0     		b	.L22
+ 707              	.L24:
+ 291:../scr/sflash.c **** 		} else /*!< NumByteToWrite > sFLASH_PAGESIZE */
+ 292:../scr/sflash.c **** 		{
+ 293:../scr/sflash.c **** 			while (NumOfPage--) {
+ 708              		.loc 1 293 0
+ 709 03ca 0CE0     		b	.L26
+ 710              	.L27:
+ 294:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, sFLASH_SPI_PAGESIZE);
+ 711              		.loc 1 294 0
+ 712 03cc FA68     		ldr	r2, [r7, #12]
+ 713 03ce BB68     		ldr	r3, [r7, #8]
+ 714 03d0 101C     		mov	r0, r2
+ 715 03d2 191C     		mov	r1, r3
+ 716 03d4 4022     		mov	r2, #64
+ 717 03d6 FFF7FEFF 		bl	sFLASH_WritePage
+ 295:../scr/sflash.c **** 				WriteAddr += sFLASH_SPI_PAGESIZE;
+ 718              		.loc 1 295 0
+ 719 03da BB68     		ldr	r3, [r7, #8]
+ 720 03dc 4033     		add	r3, r3, #64
+ 721 03de BB60     		str	r3, [r7, #8]
+ 296:../scr/sflash.c **** 				pBuffer += sFLASH_SPI_PAGESIZE;
+ 722              		.loc 1 296 0
+ 723 03e0 FB68     		ldr	r3, [r7, #12]
+ 724 03e2 4033     		add	r3, r3, #64
+ 725 03e4 FB60     		str	r3, [r7, #12]
+ 726              	.L26:
+ 293:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, sFLASH_SPI_PAGESIZE);
+ 727              		.loc 1 293 0
+ 728 03e6 1723     		mov	r3, #23
+ 729 03e8 FB18     		add	r3, r7, r3
+ 730 03ea 1B78     		ldrb	r3, [r3]
+ 731 03ec 1722     		mov	r2, #23
+ 732 03ee BA18     		add	r2, r7, r2
+ 733 03f0 591E     		sub	r1, r3, #1
+ 734 03f2 1170     		strb	r1, [r2]
+ 735 03f4 002B     		cmp	r3, #0
+ 736 03f6 E9D1     		bne	.L27
+ 297:../scr/sflash.c **** 			}
+ 298:../scr/sflash.c **** 
+ 299:../scr/sflash.c **** 			sFLASH_WritePage(pBuffer, WriteAddr, NumOfSingle);
+ 737              		.loc 1 299 0
+ 738 03f8 1623     		mov	r3, #22
+ 739 03fa FB18     		add	r3, r7, r3
+ 740 03fc 1B78     		ldrb	r3, [r3]
+ 741 03fe 9BB2     		uxth	r3, r3
+ 742 0400 F968     		ldr	r1, [r7, #12]
+ 743 0402 BA68     		ldr	r2, [r7, #8]
+ 744 0404 081C     		mov	r0, r1
+ 745 0406 111C     		mov	r1, r2
+ 746 0408 1A1C     		mov	r2, r3
+ 747 040a FFF7FEFF 		bl	sFLASH_WritePage
+ 748 040e 99E0     		b	.L22
+ 749              	.L23:
+ 300:../scr/sflash.c **** 		}
+ 301:../scr/sflash.c **** 	} else /*!< WriteAddr is not sFLASH_PAGESIZE aligned  */
+ 302:../scr/sflash.c **** 	{
+ 303:../scr/sflash.c **** 		if (NumOfPage == 0) /*!< NumByteToWrite < sFLASH_PAGESIZE */
+ 750              		.loc 1 303 0
+ 751 0410 1723     		mov	r3, #23
+ 752 0412 FB18     		add	r3, r7, r3
+ 753 0414 1B78     		ldrb	r3, [r3]
+ 754 0416 002B     		cmp	r3, #0
+ 755 0418 3ED1     		bne	.L29
+ 304:../scr/sflash.c **** 		{
+ 305:../scr/sflash.c **** 			if (NumOfSingle > count) /*!< (NumByteToWrite + WriteAddr) > sFLASH_PAGESIZE */
+ 756              		.loc 1 305 0
+ 757 041a 1623     		mov	r3, #22
+ 758 041c FA18     		add	r2, r7, r3
+ 759 041e 1423     		mov	r3, #20
+ 760 0420 FB18     		add	r3, r7, r3
+ 761 0422 1278     		ldrb	r2, [r2]
+ 762 0424 1B78     		ldrb	r3, [r3]
+ 763 0426 9A42     		cmp	r2, r3
+ 764 0428 2CD9     		bls	.L30
+ 306:../scr/sflash.c **** 			{
+ 307:../scr/sflash.c **** 				temp = NumOfSingle - count;
+ 765              		.loc 1 307 0
+ 766 042a 1323     		mov	r3, #19
+ 767 042c FB18     		add	r3, r7, r3
+ 768 042e 1622     		mov	r2, #22
+ 769 0430 B918     		add	r1, r7, r2
+ 770 0432 1422     		mov	r2, #20
+ 771 0434 BA18     		add	r2, r7, r2
+ 772 0436 0978     		ldrb	r1, [r1]
+ 773 0438 1278     		ldrb	r2, [r2]
+ 774 043a 8A1A     		sub	r2, r1, r2
+ 775 043c 1A70     		strb	r2, [r3]
+ 308:../scr/sflash.c **** 
+ 309:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, count);
+ 776              		.loc 1 309 0
+ 777 043e 1423     		mov	r3, #20
+ 778 0440 FB18     		add	r3, r7, r3
+ 779 0442 1B78     		ldrb	r3, [r3]
+ 780 0444 9BB2     		uxth	r3, r3
+ 781 0446 F968     		ldr	r1, [r7, #12]
+ 782 0448 BA68     		ldr	r2, [r7, #8]
+ 783 044a 081C     		mov	r0, r1
+ 784 044c 111C     		mov	r1, r2
+ 785 044e 1A1C     		mov	r2, r3
+ 786 0450 FFF7FEFF 		bl	sFLASH_WritePage
+ 310:../scr/sflash.c **** 				WriteAddr += count;
+ 787              		.loc 1 310 0
+ 788 0454 1423     		mov	r3, #20
+ 789 0456 FB18     		add	r3, r7, r3
+ 790 0458 1B78     		ldrb	r3, [r3]
+ 791 045a BA68     		ldr	r2, [r7, #8]
+ 792 045c D318     		add	r3, r2, r3
+ 793 045e BB60     		str	r3, [r7, #8]
+ 311:../scr/sflash.c **** 				pBuffer += count;
+ 794              		.loc 1 311 0
+ 795 0460 1423     		mov	r3, #20
+ 796 0462 FB18     		add	r3, r7, r3
+ 797 0464 1B78     		ldrb	r3, [r3]
+ 798 0466 FA68     		ldr	r2, [r7, #12]
+ 799 0468 D318     		add	r3, r2, r3
+ 800 046a FB60     		str	r3, [r7, #12]
+ 312:../scr/sflash.c **** 
+ 313:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, temp);
+ 801              		.loc 1 313 0
+ 802 046c 1323     		mov	r3, #19
+ 803 046e FB18     		add	r3, r7, r3
+ 804 0470 1B78     		ldrb	r3, [r3]
+ 805 0472 9BB2     		uxth	r3, r3
+ 806 0474 F968     		ldr	r1, [r7, #12]
+ 807 0476 BA68     		ldr	r2, [r7, #8]
+ 808 0478 081C     		mov	r0, r1
+ 809 047a 111C     		mov	r1, r2
+ 810 047c 1A1C     		mov	r2, r3
+ 811 047e FFF7FEFF 		bl	sFLASH_WritePage
+ 812 0482 5FE0     		b	.L22
+ 813              	.L30:
+ 314:../scr/sflash.c **** 			} else {
+ 315:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, NumByteToWrite);
+ 814              		.loc 1 315 0
+ 815 0484 F968     		ldr	r1, [r7, #12]
+ 816 0486 BA68     		ldr	r2, [r7, #8]
+ 817 0488 BB1D     		add	r3, r7, #6
+ 818 048a 1B88     		ldrh	r3, [r3]
+ 819 048c 081C     		mov	r0, r1
+ 820 048e 111C     		mov	r1, r2
+ 821 0490 1A1C     		mov	r2, r3
+ 822 0492 FFF7FEFF 		bl	sFLASH_WritePage
+ 823 0496 55E0     		b	.L22
+ 824              	.L29:
+ 316:../scr/sflash.c **** 			}
+ 317:../scr/sflash.c **** 		} else /*!< NumByteToWrite > sFLASH_PAGESIZE */
+ 318:../scr/sflash.c **** 		{
+ 319:../scr/sflash.c **** 			NumByteToWrite -= count;
+ 825              		.loc 1 319 0
+ 826 0498 1423     		mov	r3, #20
+ 827 049a FB18     		add	r3, r7, r3
+ 828 049c 1B78     		ldrb	r3, [r3]
+ 829 049e 9AB2     		uxth	r2, r3
+ 830 04a0 BB1D     		add	r3, r7, #6
+ 831 04a2 B91D     		add	r1, r7, #6
+ 832 04a4 0988     		ldrh	r1, [r1]
+ 833 04a6 8A1A     		sub	r2, r1, r2
+ 834 04a8 1A80     		strh	r2, [r3]
+ 320:../scr/sflash.c **** 			NumOfPage = NumByteToWrite / sFLASH_SPI_PAGESIZE;
+ 835              		.loc 1 320 0
+ 836 04aa BB1D     		add	r3, r7, #6
+ 837 04ac 1B88     		ldrh	r3, [r3]
+ 838 04ae 9B09     		lsr	r3, r3, #6
+ 839 04b0 9AB2     		uxth	r2, r3
+ 840 04b2 1723     		mov	r3, #23
+ 841 04b4 FB18     		add	r3, r7, r3
+ 842 04b6 1A70     		strb	r2, [r3]
+ 321:../scr/sflash.c **** 			NumOfSingle = NumByteToWrite % sFLASH_SPI_PAGESIZE;
+ 843              		.loc 1 321 0
+ 844 04b8 BB1D     		add	r3, r7, #6
+ 845 04ba 1B88     		ldrh	r3, [r3]
+ 846 04bc DAB2     		uxtb	r2, r3
+ 847 04be 1623     		mov	r3, #22
+ 848 04c0 FB18     		add	r3, r7, r3
+ 849 04c2 3F21     		mov	r1, #63
+ 850 04c4 0A40     		and	r2, r1
+ 851 04c6 1A70     		strb	r2, [r3]
+ 322:../scr/sflash.c **** 
+ 323:../scr/sflash.c **** 			sFLASH_WritePage(pBuffer, WriteAddr, count);
+ 852              		.loc 1 323 0
+ 853 04c8 1423     		mov	r3, #20
+ 854 04ca FB18     		add	r3, r7, r3
+ 855 04cc 1B78     		ldrb	r3, [r3]
+ 856 04ce 9BB2     		uxth	r3, r3
+ 857 04d0 F968     		ldr	r1, [r7, #12]
+ 858 04d2 BA68     		ldr	r2, [r7, #8]
+ 859 04d4 081C     		mov	r0, r1
+ 860 04d6 111C     		mov	r1, r2
+ 861 04d8 1A1C     		mov	r2, r3
+ 862 04da FFF7FEFF 		bl	sFLASH_WritePage
+ 324:../scr/sflash.c **** 			WriteAddr += count;
+ 863              		.loc 1 324 0
+ 864 04de 1423     		mov	r3, #20
+ 865 04e0 FB18     		add	r3, r7, r3
+ 866 04e2 1B78     		ldrb	r3, [r3]
+ 867 04e4 BA68     		ldr	r2, [r7, #8]
+ 868 04e6 D318     		add	r3, r2, r3
+ 869 04e8 BB60     		str	r3, [r7, #8]
+ 325:../scr/sflash.c **** 			pBuffer += count;
+ 870              		.loc 1 325 0
+ 871 04ea 1423     		mov	r3, #20
+ 872 04ec FB18     		add	r3, r7, r3
+ 873 04ee 1B78     		ldrb	r3, [r3]
+ 874 04f0 FA68     		ldr	r2, [r7, #12]
+ 875 04f2 D318     		add	r3, r2, r3
+ 876 04f4 FB60     		str	r3, [r7, #12]
+ 326:../scr/sflash.c **** 
+ 327:../scr/sflash.c **** 			while (NumOfPage--) {
+ 877              		.loc 1 327 0
+ 878 04f6 0CE0     		b	.L32
+ 879              	.L33:
+ 328:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, sFLASH_SPI_PAGESIZE);
+ 880              		.loc 1 328 0
+ 881 04f8 FA68     		ldr	r2, [r7, #12]
+ 882 04fa BB68     		ldr	r3, [r7, #8]
+ 883 04fc 101C     		mov	r0, r2
+ 884 04fe 191C     		mov	r1, r3
+ 885 0500 4022     		mov	r2, #64
+ 886 0502 FFF7FEFF 		bl	sFLASH_WritePage
+ 329:../scr/sflash.c **** 				WriteAddr += sFLASH_SPI_PAGESIZE;
+ 887              		.loc 1 329 0
+ 888 0506 BB68     		ldr	r3, [r7, #8]
+ 889 0508 4033     		add	r3, r3, #64
+ 890 050a BB60     		str	r3, [r7, #8]
+ 330:../scr/sflash.c **** 				pBuffer += sFLASH_SPI_PAGESIZE;
+ 891              		.loc 1 330 0
+ 892 050c FB68     		ldr	r3, [r7, #12]
+ 893 050e 4033     		add	r3, r3, #64
+ 894 0510 FB60     		str	r3, [r7, #12]
+ 895              	.L32:
+ 327:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, sFLASH_SPI_PAGESIZE);
+ 896              		.loc 1 327 0
+ 897 0512 1723     		mov	r3, #23
+ 898 0514 FB18     		add	r3, r7, r3
+ 899 0516 1B78     		ldrb	r3, [r3]
+ 900 0518 1722     		mov	r2, #23
+ 901 051a BA18     		add	r2, r7, r2
+ 902 051c 591E     		sub	r1, r3, #1
+ 903 051e 1170     		strb	r1, [r2]
+ 904 0520 002B     		cmp	r3, #0
+ 905 0522 E9D1     		bne	.L33
+ 331:../scr/sflash.c **** 			}
+ 332:../scr/sflash.c **** 
+ 333:../scr/sflash.c **** 			if (NumOfSingle != 0) {
+ 906              		.loc 1 333 0
+ 907 0524 1623     		mov	r3, #22
+ 908 0526 FB18     		add	r3, r7, r3
+ 909 0528 1B78     		ldrb	r3, [r3]
+ 910 052a 002B     		cmp	r3, #0
+ 911 052c 0AD0     		beq	.L22
+ 334:../scr/sflash.c **** 				sFLASH_WritePage(pBuffer, WriteAddr, NumOfSingle);
+ 912              		.loc 1 334 0
+ 913 052e 1623     		mov	r3, #22
+ 914 0530 FB18     		add	r3, r7, r3
+ 915 0532 1B78     		ldrb	r3, [r3]
+ 916 0534 9BB2     		uxth	r3, r3
+ 917 0536 F968     		ldr	r1, [r7, #12]
+ 918 0538 BA68     		ldr	r2, [r7, #8]
+ 919 053a 081C     		mov	r0, r1
+ 920 053c 111C     		mov	r1, r2
+ 921 053e 1A1C     		mov	r2, r3
+ 922 0540 FFF7FEFF 		bl	sFLASH_WritePage
+ 923              	.L22:
+ 335:../scr/sflash.c **** 			}
+ 336:../scr/sflash.c **** 		}
+ 337:../scr/sflash.c **** 	}
+ 338:../scr/sflash.c **** }
+ 924              		.loc 1 338 0
+ 925 0544 BD46     		mov	sp, r7
+ 926 0546 06B0     		add	sp, sp, #24
+ 927              		@ sp needed
+ 928 0548 80BD     		pop	{r7, pc}
+ 929              		.cfi_endproc
+ 930              	.LFE40:
+ 932 054a C046     		.align	2
+ 933              		.global	sFLASH_ReadBuffer
+ 934              		.code	16
+ 935              		.thumb_func
+ 937              	sFLASH_ReadBuffer:
+ 938              	.LFB41:
+ 339:../scr/sflash.c **** 
+ 340:../scr/sflash.c **** /**
+ 341:../scr/sflash.c ****  * @brief  Reads a block of data from the FLASH.
+ 342:../scr/sflash.c ****  * @param  pBuffer: pointer to the buffer that receives the data read from the FLASH.
+ 343:../scr/sflash.c ****  * @param  ReadAddr: FLASH's internal address to read from.
+ 344:../scr/sflash.c ****  * @param  NumByteToRead: number of bytes to read from the FLASH.
+ 345:../scr/sflash.c ****  * @retval None
+ 346:../scr/sflash.c ****  */
+ 347:../scr/sflash.c **** void sFLASH_ReadBuffer(uint8_t* pBuffer, uint32_t ReadAddr,
+ 348:../scr/sflash.c **** 		uint16_t NumByteToRead) {
+ 939              		.loc 1 348 0
+ 940              		.cfi_startproc
+ 941 054c 80B5     		push	{r7, lr}
+ 942              	.LCFI22:
+ 943              		.cfi_def_cfa_offset 8
+ 944              		.cfi_offset 7, -8
+ 945              		.cfi_offset 14, -4
+ 946 054e 84B0     		sub	sp, sp, #16
+ 947              	.LCFI23:
+ 948              		.cfi_def_cfa_offset 24
+ 949 0550 00AF     		add	r7, sp, #0
+ 950              	.LCFI24:
+ 951              		.cfi_def_cfa_register 7
+ 952 0552 F860     		str	r0, [r7, #12]
+ 953 0554 B960     		str	r1, [r7, #8]
+ 954 0556 BB1D     		add	r3, r7, #6
+ 955 0558 1A80     		strh	r2, [r3]
+ 349:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */
+ 350:../scr/sflash.c **** 	sFLASH_CS_LOW();
+ 956              		.loc 1 350 0
+ 957 055a 204A     		ldr	r2, .L37
+ 958 055c 8023     		mov	r3, #128
+ 959 055e 9B00     		lsl	r3, r3, #2
+ 960 0560 101C     		mov	r0, r2
+ 961 0562 191C     		mov	r1, r3
+ 962 0564 FFF7FEFF 		bl	GPIO_ResetBits
+ 963 0568 9023     		mov	r3, #144
+ 964 056a DB05     		lsl	r3, r3, #23
+ 965 056c 181C     		mov	r0, r3
+ 966 056e 0121     		mov	r1, #1
+ 967 0570 FFF7FEFF 		bl	GPIO_SetBits
+ 351:../scr/sflash.c **** 
+ 352:../scr/sflash.c **** 	/*!< Send "Read from Memory " instruction */
+ 353:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_READ);
+ 968              		.loc 1 353 0
+ 969 0574 0320     		mov	r0, #3
+ 970 0576 FFF7FEFF 		bl	sFLASH_SendByte
+ 354:../scr/sflash.c **** 
+ 355:../scr/sflash.c **** 	/*!< Send ReadAddr high nibble address byte to read from */
+ 356:../scr/sflash.c **** 	//sFLASH_SendByte((ReadAddr & 0xFF0000) >> 16);
+ 357:../scr/sflash.c **** 	/*!< Send ReadAddr medium nibble address byte to read from */
+ 358:../scr/sflash.c **** 	sFLASH_SendByte((ReadAddr & 0xFF00) >> 8);
+ 971              		.loc 1 358 0
+ 972 057a BA68     		ldr	r2, [r7, #8]
+ 973 057c FF23     		mov	r3, #255
+ 974 057e 1B02     		lsl	r3, r3, #8
+ 975 0580 1340     		and	r3, r2
+ 976 0582 1B0A     		lsr	r3, r3, #8
+ 977 0584 DBB2     		uxtb	r3, r3
+ 978 0586 181C     		mov	r0, r3
+ 979 0588 FFF7FEFF 		bl	sFLASH_SendByte
+ 359:../scr/sflash.c **** 	/*!< Send ReadAddr low nibble address byte to read from */
+ 360:../scr/sflash.c **** 	sFLASH_SendByte(ReadAddr & 0xFF);
+ 980              		.loc 1 360 0
+ 981 058c BB68     		ldr	r3, [r7, #8]
+ 982 058e DBB2     		uxtb	r3, r3
+ 983 0590 181C     		mov	r0, r3
+ 984 0592 FFF7FEFF 		bl	sFLASH_SendByte
+ 361:../scr/sflash.c **** 
+ 362:../scr/sflash.c **** 	while (NumByteToRead--) /*!< while there is data to be read */
+ 985              		.loc 1 362 0
+ 986 0596 09E0     		b	.L35
+ 987              	.L36:
+ 363:../scr/sflash.c **** 	{
+ 364:../scr/sflash.c **** 		/*!< Read a byte from the FLASH */
+ 365:../scr/sflash.c **** 		*pBuffer = sFLASH_SendByte(sFLASH_DUMMY_BYTE);
+ 988              		.loc 1 365 0
+ 989 0598 A520     		mov	r0, #165
+ 990 059a FFF7FEFF 		bl	sFLASH_SendByte
+ 991 059e 031C     		mov	r3, r0
+ 992 05a0 1A1C     		mov	r2, r3
+ 993 05a2 FB68     		ldr	r3, [r7, #12]
+ 994 05a4 1A70     		strb	r2, [r3]
+ 366:../scr/sflash.c **** 		/*!< Point to the next location where the byte read will be saved */
+ 367:../scr/sflash.c **** 		pBuffer++;
+ 995              		.loc 1 367 0
+ 996 05a6 FB68     		ldr	r3, [r7, #12]
+ 997 05a8 0133     		add	r3, r3, #1
+ 998 05aa FB60     		str	r3, [r7, #12]
+ 999              	.L35:
+ 362:../scr/sflash.c **** 	{
+ 1000              		.loc 1 362 0
+ 1001 05ac BB1D     		add	r3, r7, #6
+ 1002 05ae 1B88     		ldrh	r3, [r3]
+ 1003 05b0 BA1D     		add	r2, r7, #6
+ 1004 05b2 591E     		sub	r1, r3, #1
+ 1005 05b4 1180     		strh	r1, [r2]
+ 1006 05b6 002B     		cmp	r3, #0
+ 1007 05b8 EED1     		bne	.L36
+ 368:../scr/sflash.c **** 	}
+ 369:../scr/sflash.c **** 
+ 370:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 1008              		.loc 1 370 0
+ 1009 05ba 084A     		ldr	r2, .L37
+ 1010 05bc 8023     		mov	r3, #128
+ 1011 05be 9B00     		lsl	r3, r3, #2
+ 1012 05c0 101C     		mov	r0, r2
+ 1013 05c2 191C     		mov	r1, r3
+ 1014 05c4 FFF7FEFF 		bl	GPIO_SetBits
+ 1015 05c8 9023     		mov	r3, #144
+ 1016 05ca DB05     		lsl	r3, r3, #23
+ 1017 05cc 181C     		mov	r0, r3
+ 1018 05ce 0121     		mov	r1, #1
+ 1019 05d0 FFF7FEFF 		bl	GPIO_ResetBits
+ 371:../scr/sflash.c **** }
+ 1020              		.loc 1 371 0
+ 1021 05d4 BD46     		mov	sp, r7
+ 1022 05d6 04B0     		add	sp, sp, #16
+ 1023              		@ sp needed
+ 1024 05d8 80BD     		pop	{r7, pc}
+ 1025              	.L38:
+ 1026 05da C046     		.align	2
+ 1027              	.L37:
+ 1028 05dc 00040048 		.word	1207960576
+ 1029              		.cfi_endproc
+ 1030              	.LFE41:
+ 1032              		.align	2
+ 1033              		.global	sFLASH_ReadID
+ 1034              		.code	16
+ 1035              		.thumb_func
+ 1037              	sFLASH_ReadID:
+ 1038              	.LFB42:
+ 372:../scr/sflash.c **** 
+ 373:../scr/sflash.c **** /**
+ 374:../scr/sflash.c ****  * @brief  Reads FLASH identification.
+ 375:../scr/sflash.c ****  * @param  None
+ 376:../scr/sflash.c ****  * @retval FLASH identification
+ 377:../scr/sflash.c ****  */
+ 378:../scr/sflash.c **** uint32_t sFLASH_ReadID(void) {
+ 1039              		.loc 1 378 0
+ 1040              		.cfi_startproc
+ 1041 05e0 80B5     		push	{r7, lr}
+ 1042              	.LCFI25:
+ 1043              		.cfi_def_cfa_offset 8
+ 1044              		.cfi_offset 7, -8
+ 1045              		.cfi_offset 14, -4
+ 1046 05e2 84B0     		sub	sp, sp, #16
+ 1047              	.LCFI26:
+ 1048              		.cfi_def_cfa_offset 24
+ 1049 05e4 00AF     		add	r7, sp, #0
+ 1050              	.LCFI27:
+ 1051              		.cfi_def_cfa_register 7
+ 379:../scr/sflash.c **** 	uint32_t Temp = 0, Temp0 = 0, Temp1 = 0, Temp2 = 0;
+ 1052              		.loc 1 379 0
+ 1053 05e6 0023     		mov	r3, #0
+ 1054 05e8 FB60     		str	r3, [r7, #12]
+ 1055 05ea 0023     		mov	r3, #0
+ 1056 05ec BB60     		str	r3, [r7, #8]
+ 1057 05ee 0023     		mov	r3, #0
+ 1058 05f0 7B60     		str	r3, [r7, #4]
+ 1059 05f2 0023     		mov	r3, #0
+ 1060 05f4 3B60     		str	r3, [r7]
+ 380:../scr/sflash.c **** 
+ 381:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */sFLASH_CS_LOW();
+ 1061              		.loc 1 381 0
+ 1062 05f6 1C4A     		ldr	r2, .L41
+ 1063 05f8 8023     		mov	r3, #128
+ 1064 05fa 9B00     		lsl	r3, r3, #2
+ 1065 05fc 101C     		mov	r0, r2
+ 1066 05fe 191C     		mov	r1, r3
+ 1067 0600 FFF7FEFF 		bl	GPIO_ResetBits
+ 1068 0604 9023     		mov	r3, #144
+ 1069 0606 DB05     		lsl	r3, r3, #23
+ 1070 0608 181C     		mov	r0, r3
+ 1071 060a 0121     		mov	r1, #1
+ 1072 060c FFF7FEFF 		bl	GPIO_SetBits
+ 382:../scr/sflash.c **** 
+ 383:../scr/sflash.c **** 	/*!< Send "RDID " instruction */
+ 384:../scr/sflash.c **** 	sFLASH_SendByte(0x9F);
+ 1073              		.loc 1 384 0
+ 1074 0610 9F20     		mov	r0, #159
+ 1075 0612 FFF7FEFF 		bl	sFLASH_SendByte
+ 385:../scr/sflash.c **** 
+ 386:../scr/sflash.c **** 	/*!< Read a byte from the FLASH */
+ 387:../scr/sflash.c **** 	Temp0 = sFLASH_SendByte(sFLASH_DUMMY_BYTE);
+ 1076              		.loc 1 387 0
+ 1077 0616 A520     		mov	r0, #165
+ 1078 0618 FFF7FEFF 		bl	sFLASH_SendByte
+ 1079 061c 031C     		mov	r3, r0
+ 1080 061e BB60     		str	r3, [r7, #8]
+ 388:../scr/sflash.c **** 
+ 389:../scr/sflash.c **** 	/*!< Read a byte from the FLASH */
+ 390:../scr/sflash.c **** 	Temp1 = sFLASH_SendByte(sFLASH_DUMMY_BYTE);
+ 1081              		.loc 1 390 0
+ 1082 0620 A520     		mov	r0, #165
+ 1083 0622 FFF7FEFF 		bl	sFLASH_SendByte
+ 1084 0626 031C     		mov	r3, r0
+ 1085 0628 7B60     		str	r3, [r7, #4]
+ 391:../scr/sflash.c **** 
+ 392:../scr/sflash.c **** 	/*!< Read a byte from the FLASH */
+ 393:../scr/sflash.c **** 	Temp2 = sFLASH_SendByte(sFLASH_DUMMY_BYTE);
+ 1086              		.loc 1 393 0
+ 1087 062a A520     		mov	r0, #165
+ 1088 062c FFF7FEFF 		bl	sFLASH_SendByte
+ 1089 0630 031C     		mov	r3, r0
+ 1090 0632 3B60     		str	r3, [r7]
+ 394:../scr/sflash.c **** 
+ 395:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 1091              		.loc 1 395 0
+ 1092 0634 0C4A     		ldr	r2, .L41
+ 1093 0636 8023     		mov	r3, #128
+ 1094 0638 9B00     		lsl	r3, r3, #2
+ 1095 063a 101C     		mov	r0, r2
+ 1096 063c 191C     		mov	r1, r3
+ 1097 063e FFF7FEFF 		bl	GPIO_SetBits
+ 1098 0642 9023     		mov	r3, #144
+ 1099 0644 DB05     		lsl	r3, r3, #23
+ 1100 0646 181C     		mov	r0, r3
+ 1101 0648 0121     		mov	r1, #1
+ 1102 064a FFF7FEFF 		bl	GPIO_ResetBits
+ 396:../scr/sflash.c **** 
+ 397:../scr/sflash.c **** 	Temp = (Temp0 << 16) | (Temp1 << 8) | Temp2;
+ 1103              		.loc 1 397 0
+ 1104 064e BB68     		ldr	r3, [r7, #8]
+ 1105 0650 1A04     		lsl	r2, r3, #16
+ 1106 0652 7B68     		ldr	r3, [r7, #4]
+ 1107 0654 1B02     		lsl	r3, r3, #8
+ 1108 0656 1A43     		orr	r2, r3
+ 1109 0658 3B68     		ldr	r3, [r7]
+ 1110 065a 1343     		orr	r3, r2
+ 1111 065c FB60     		str	r3, [r7, #12]
+ 398:../scr/sflash.c **** 
+ 399:../scr/sflash.c **** 	return Temp;
+ 1112              		.loc 1 399 0
+ 1113 065e FB68     		ldr	r3, [r7, #12]
+ 400:../scr/sflash.c **** }
+ 1114              		.loc 1 400 0
+ 1115 0660 181C     		mov	r0, r3
+ 1116 0662 BD46     		mov	sp, r7
+ 1117 0664 04B0     		add	sp, sp, #16
+ 1118              		@ sp needed
+ 1119 0666 80BD     		pop	{r7, pc}
+ 1120              	.L42:
+ 1121              		.align	2
+ 1122              	.L41:
+ 1123 0668 00040048 		.word	1207960576
+ 1124              		.cfi_endproc
+ 1125              	.LFE42:
+ 1127              		.align	2
+ 1128              		.global	sFLASH_StartReadSequence
+ 1129              		.code	16
+ 1130              		.thumb_func
+ 1132              	sFLASH_StartReadSequence:
+ 1133              	.LFB43:
+ 401:../scr/sflash.c **** 
+ 402:../scr/sflash.c **** /**
+ 403:../scr/sflash.c ****  * @brief  Initiates a read data byte (READ) sequence from the Flash.
+ 404:../scr/sflash.c ****  *   This is done by driving the /CS line low to select the device, then the READ
+ 405:../scr/sflash.c ****  *   instruction is transmitted followed by 3 bytes address. This function exit
+ 406:../scr/sflash.c ****  *   and keep the /CS line low, so the Flash still being selected. With this
+ 407:../scr/sflash.c ****  *   technique the whole content of the Flash is read with a single READ instruction.
+ 408:../scr/sflash.c ****  * @param  ReadAddr: FLASH's internal address to read from.
+ 409:../scr/sflash.c ****  * @retval None
+ 410:../scr/sflash.c ****  */
+ 411:../scr/sflash.c **** void sFLASH_StartReadSequence(uint32_t ReadAddr) {
+ 1134              		.loc 1 411 0
+ 1135              		.cfi_startproc
+ 1136 066c 80B5     		push	{r7, lr}
+ 1137              	.LCFI28:
+ 1138              		.cfi_def_cfa_offset 8
+ 1139              		.cfi_offset 7, -8
+ 1140              		.cfi_offset 14, -4
+ 1141 066e 82B0     		sub	sp, sp, #8
+ 1142              	.LCFI29:
+ 1143              		.cfi_def_cfa_offset 16
+ 1144 0670 00AF     		add	r7, sp, #0
+ 1145              	.LCFI30:
+ 1146              		.cfi_def_cfa_register 7
+ 1147 0672 7860     		str	r0, [r7, #4]
+ 412:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */
+ 413:../scr/sflash.c **** 	sFLASH_CS_LOW();
+ 1148              		.loc 1 413 0
+ 1149 0674 104A     		ldr	r2, .L44
+ 1150 0676 8023     		mov	r3, #128
+ 1151 0678 9B00     		lsl	r3, r3, #2
+ 1152 067a 101C     		mov	r0, r2
+ 1153 067c 191C     		mov	r1, r3
+ 1154 067e FFF7FEFF 		bl	GPIO_ResetBits
+ 1155 0682 9023     		mov	r3, #144
+ 1156 0684 DB05     		lsl	r3, r3, #23
+ 1157 0686 181C     		mov	r0, r3
+ 1158 0688 0121     		mov	r1, #1
+ 1159 068a FFF7FEFF 		bl	GPIO_SetBits
+ 414:../scr/sflash.c **** 
+ 415:../scr/sflash.c **** 	/*!< Send "Read from Memory " instruction */
+ 416:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_READ);
+ 1160              		.loc 1 416 0
+ 1161 068e 0320     		mov	r0, #3
+ 1162 0690 FFF7FEFF 		bl	sFLASH_SendByte
+ 417:../scr/sflash.c **** 
+ 418:../scr/sflash.c **** 	/*!< Send the 24-bit address of the address to read from -------------------*/
+ 419:../scr/sflash.c **** 	/*!< Send ReadAddr high nibble address byte */
+ 420:../scr/sflash.c **** 	//sFLASH_SendByte((ReadAddr & 0xFF0000) >> 16);
+ 421:../scr/sflash.c **** 	/*!< Send ReadAddr medium nibble address byte */
+ 422:../scr/sflash.c **** 	sFLASH_SendByte((ReadAddr & 0xFF00) >> 8);
+ 1163              		.loc 1 422 0
+ 1164 0694 7A68     		ldr	r2, [r7, #4]
+ 1165 0696 FF23     		mov	r3, #255
+ 1166 0698 1B02     		lsl	r3, r3, #8
+ 1167 069a 1340     		and	r3, r2
+ 1168 069c 1B0A     		lsr	r3, r3, #8
+ 1169 069e DBB2     		uxtb	r3, r3
+ 1170 06a0 181C     		mov	r0, r3
+ 1171 06a2 FFF7FEFF 		bl	sFLASH_SendByte
+ 423:../scr/sflash.c **** 	/*!< Send ReadAddr low nibble address byte */
+ 424:../scr/sflash.c **** 	sFLASH_SendByte(ReadAddr & 0xFF);
+ 1172              		.loc 1 424 0
+ 1173 06a6 7B68     		ldr	r3, [r7, #4]
+ 1174 06a8 DBB2     		uxtb	r3, r3
+ 1175 06aa 181C     		mov	r0, r3
+ 1176 06ac FFF7FEFF 		bl	sFLASH_SendByte
+ 425:../scr/sflash.c **** }
+ 1177              		.loc 1 425 0
+ 1178 06b0 BD46     		mov	sp, r7
+ 1179 06b2 02B0     		add	sp, sp, #8
+ 1180              		@ sp needed
+ 1181 06b4 80BD     		pop	{r7, pc}
+ 1182              	.L45:
+ 1183 06b6 C046     		.align	2
+ 1184              	.L44:
+ 1185 06b8 00040048 		.word	1207960576
+ 1186              		.cfi_endproc
+ 1187              	.LFE43:
+ 1189              		.align	2
+ 1190              		.global	sFLASH_ReadByte
+ 1191              		.code	16
+ 1192              		.thumb_func
+ 1194              	sFLASH_ReadByte:
+ 1195              	.LFB44:
+ 426:../scr/sflash.c **** 
+ 427:../scr/sflash.c **** /**
+ 428:../scr/sflash.c ****  * @brief  Reads a byte from the SPI Flash.
+ 429:../scr/sflash.c ****  * @note   This function must be used only if the Start_Read_Sequence function
+ 430:../scr/sflash.c ****  *         has been previously called.
+ 431:../scr/sflash.c ****  * @param  None
+ 432:../scr/sflash.c ****  * @retval Byte Read from the SPI Flash.
+ 433:../scr/sflash.c ****  */
+ 434:../scr/sflash.c **** uint8_t sFLASH_ReadByte(void) {
+ 1196              		.loc 1 434 0
+ 1197              		.cfi_startproc
+ 1198 06bc 80B5     		push	{r7, lr}
+ 1199              	.LCFI31:
+ 1200              		.cfi_def_cfa_offset 8
+ 1201              		.cfi_offset 7, -8
+ 1202              		.cfi_offset 14, -4
+ 1203 06be 00AF     		add	r7, sp, #0
+ 1204              	.LCFI32:
+ 1205              		.cfi_def_cfa_register 7
+ 435:../scr/sflash.c **** 	return (sFLASH_SendByte(sFLASH_DUMMY_BYTE));
+ 1206              		.loc 1 435 0
+ 1207 06c0 A520     		mov	r0, #165
+ 1208 06c2 FFF7FEFF 		bl	sFLASH_SendByte
+ 1209 06c6 031C     		mov	r3, r0
+ 436:../scr/sflash.c **** }
+ 1210              		.loc 1 436 0
+ 1211 06c8 181C     		mov	r0, r3
+ 1212 06ca BD46     		mov	sp, r7
+ 1213              		@ sp needed
+ 1214 06cc 80BD     		pop	{r7, pc}
+ 1215              		.cfi_endproc
+ 1216              	.LFE44:
+ 1218 06ce C046     		.align	2
+ 1219              		.global	sFLASH_SendByte
+ 1220              		.code	16
+ 1221              		.thumb_func
+ 1223              	sFLASH_SendByte:
+ 1224              	.LFB45:
+ 437:../scr/sflash.c **** 
+ 438:../scr/sflash.c **** /**
+ 439:../scr/sflash.c ****  * @brief  Sends a byte through the SPI interface and return the byte received
+ 440:../scr/sflash.c ****  *         from the SPI bus.
+ 441:../scr/sflash.c ****  * @param  byte: byte to send.
+ 442:../scr/sflash.c ****  * @retval The value of the received byte.
+ 443:../scr/sflash.c ****  */
+ 444:../scr/sflash.c **** extern volatile uint32_t ulTickCount;
+ 445:../scr/sflash.c **** uint8_t sFLASH_SendByte(uint8_t byte) {
+ 1225              		.loc 1 445 0
+ 1226              		.cfi_startproc
+ 1227 06d0 80B5     		push	{r7, lr}
+ 1228              	.LCFI33:
+ 1229              		.cfi_def_cfa_offset 8
+ 1230              		.cfi_offset 7, -8
+ 1231              		.cfi_offset 14, -4
+ 1232 06d2 84B0     		sub	sp, sp, #16
+ 1233              	.LCFI34:
+ 1234              		.cfi_def_cfa_offset 24
+ 1235 06d4 00AF     		add	r7, sp, #0
+ 1236              	.LCFI35:
+ 1237              		.cfi_def_cfa_register 7
+ 1238 06d6 021C     		mov	r2, r0
+ 1239 06d8 FB1D     		add	r3, r7, #7
+ 1240 06da 1A70     		strb	r2, [r3]
+ 446:../scr/sflash.c **** 	unsigned long lastTick = ulTickCount;
+ 1241              		.loc 1 446 0
+ 1242 06dc 194B     		ldr	r3, .L54
+ 1243 06de 1B68     		ldr	r3, [r3]
+ 1244 06e0 FB60     		str	r3, [r7, #12]
+ 447:../scr/sflash.c **** 	/*!< Loop while DR register in not emplty */
+ 448:../scr/sflash.c **** 	while ((SPI_I2S_GetFlagStatus(sFLASH_SPI, SPI_I2S_FLAG_TXE) == RESET)
+ 1245              		.loc 1 448 0
+ 1246 06e2 C046     		mov	r8, r8
+ 1247              	.L50:
+ 1248 06e4 184B     		ldr	r3, .L54+4
+ 1249 06e6 181C     		mov	r0, r3
+ 1250 06e8 0221     		mov	r1, #2
+ 1251 06ea FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 1252 06ee 031E     		sub	r3, r0, #0
+ 1253 06f0 05D1     		bne	.L49
+ 449:../scr/sflash.c **** 			&& ((ulTickCount - lastTick) <= 2))
+ 1254              		.loc 1 449 0
+ 1255 06f2 144B     		ldr	r3, .L54
+ 1256 06f4 1A68     		ldr	r2, [r3]
+ 1257 06f6 FB68     		ldr	r3, [r7, #12]
+ 1258 06f8 D31A     		sub	r3, r2, r3
+ 1259 06fa 022B     		cmp	r3, #2
+ 1260 06fc F2D9     		bls	.L50
+ 1261              	.L49:
+ 450:../scr/sflash.c **** 		;
+ 451:../scr/sflash.c **** 
+ 452:../scr/sflash.c **** 	/*!< Send byte through the SPI1 peripheral */
+ 453:../scr/sflash.c **** 	SPI_I2S_SendData(sFLASH_SPI, byte);
+ 1262              		.loc 1 453 0
+ 1263 06fe FB1D     		add	r3, r7, #7
+ 1264 0700 1B78     		ldrb	r3, [r3]
+ 1265 0702 114A     		ldr	r2, .L54+4
+ 1266 0704 101C     		mov	r0, r2
+ 1267 0706 191C     		mov	r1, r3
+ 1268 0708 FFF7FEFF 		bl	SPI_I2S_SendData
+ 454:../scr/sflash.c **** 
+ 455:../scr/sflash.c **** 	lastTick = ulTickCount;
+ 1269              		.loc 1 455 0
+ 1270 070c 0D4B     		ldr	r3, .L54
+ 1271 070e 1B68     		ldr	r3, [r3]
+ 1272 0710 FB60     		str	r3, [r7, #12]
+ 456:../scr/sflash.c **** 	/*!< Wait to receive a byte */
+ 457:../scr/sflash.c **** 	while ((SPI_I2S_GetFlagStatus(sFLASH_SPI, SPI_I2S_FLAG_RXNE) == RESET)
+ 1273              		.loc 1 457 0
+ 1274 0712 C046     		mov	r8, r8
+ 1275              	.L52:
+ 1276 0714 0C4B     		ldr	r3, .L54+4
+ 1277 0716 181C     		mov	r0, r3
+ 1278 0718 0121     		mov	r1, #1
+ 1279 071a FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 1280 071e 031E     		sub	r3, r0, #0
+ 1281 0720 05D1     		bne	.L51
+ 458:../scr/sflash.c **** 			&& ((ulTickCount - lastTick) <= 2))
+ 1282              		.loc 1 458 0
+ 1283 0722 084B     		ldr	r3, .L54
+ 1284 0724 1A68     		ldr	r2, [r3]
+ 1285 0726 FB68     		ldr	r3, [r7, #12]
+ 1286 0728 D31A     		sub	r3, r2, r3
+ 1287 072a 022B     		cmp	r3, #2
+ 1288 072c F2D9     		bls	.L52
+ 1289              	.L51:
+ 459:../scr/sflash.c **** 		;
+ 460:../scr/sflash.c **** 
+ 461:../scr/sflash.c **** 	/*!< Return the byte read from the SPI bus */
+ 462:../scr/sflash.c **** 	return SPI_I2S_ReceiveData(sFLASH_SPI);
+ 1290              		.loc 1 462 0
+ 1291 072e 064B     		ldr	r3, .L54+4
+ 1292 0730 181C     		mov	r0, r3
+ 1293 0732 FFF7FEFF 		bl	SPI_I2S_ReceiveData
+ 1294 0736 031C     		mov	r3, r0
+ 1295 0738 DBB2     		uxtb	r3, r3
+ 463:../scr/sflash.c **** }
+ 1296              		.loc 1 463 0
+ 1297 073a 181C     		mov	r0, r3
+ 1298 073c BD46     		mov	sp, r7
+ 1299 073e 04B0     		add	sp, sp, #16
+ 1300              		@ sp needed
+ 1301 0740 80BD     		pop	{r7, pc}
+ 1302              	.L55:
+ 1303 0742 C046     		.align	2
+ 1304              	.L54:
+ 1305 0744 00000000 		.word	ulTickCount
+ 1306 0748 00380040 		.word	1073756160
+ 1307              		.cfi_endproc
+ 1308              	.LFE45:
+ 1310              		.align	2
+ 1311              		.global	sFLASH_SendHalfWord
+ 1312              		.code	16
+ 1313              		.thumb_func
+ 1315              	sFLASH_SendHalfWord:
+ 1316              	.LFB46:
+ 464:../scr/sflash.c **** 
+ 465:../scr/sflash.c **** /**
+ 466:../scr/sflash.c ****  * @brief  Sends a Half Word through the SPI interface and return the Half Word
+ 467:../scr/sflash.c ****  *         received from the SPI bus.
+ 468:../scr/sflash.c ****  * @param  HalfWord: Half Word to send.
+ 469:../scr/sflash.c ****  * @retval The value of the received Half Word.
+ 470:../scr/sflash.c ****  */
+ 471:../scr/sflash.c **** uint16_t sFLASH_SendHalfWord(uint16_t HalfWord) {
+ 1317              		.loc 1 471 0
+ 1318              		.cfi_startproc
+ 1319 074c 80B5     		push	{r7, lr}
+ 1320              	.LCFI36:
+ 1321              		.cfi_def_cfa_offset 8
+ 1322              		.cfi_offset 7, -8
+ 1323              		.cfi_offset 14, -4
+ 1324 074e 82B0     		sub	sp, sp, #8
+ 1325              	.LCFI37:
+ 1326              		.cfi_def_cfa_offset 16
+ 1327 0750 00AF     		add	r7, sp, #0
+ 1328              	.LCFI38:
+ 1329              		.cfi_def_cfa_register 7
+ 1330 0752 021C     		mov	r2, r0
+ 1331 0754 BB1D     		add	r3, r7, #6
+ 1332 0756 1A80     		strh	r2, [r3]
+ 472:../scr/sflash.c **** 	/*!< Loop while DR register in not emplty */
+ 473:../scr/sflash.c **** 	while (SPI_I2S_GetFlagStatus(sFLASH_SPI, SPI_I2S_FLAG_TXE) == RESET)
+ 1333              		.loc 1 473 0
+ 1334 0758 C046     		mov	r8, r8
+ 1335              	.L57:
+ 1336              		.loc 1 473 0 is_stmt 0 discriminator 1
+ 1337 075a 104B     		ldr	r3, .L60
+ 1338 075c 181C     		mov	r0, r3
+ 1339 075e 0221     		mov	r1, #2
+ 1340 0760 FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 1341 0764 031E     		sub	r3, r0, #0
+ 1342 0766 F8D0     		beq	.L57
+ 474:../scr/sflash.c **** 		;
+ 475:../scr/sflash.c **** 
+ 476:../scr/sflash.c **** 	/*!< Send Half Word through the sFLASH peripheral */
+ 477:../scr/sflash.c **** 	SPI_I2S_SendData(sFLASH_SPI, HalfWord);
+ 1343              		.loc 1 477 0 is_stmt 1
+ 1344 0768 BB1D     		add	r3, r7, #6
+ 1345 076a 1B88     		ldrh	r3, [r3]
+ 1346 076c 0B4A     		ldr	r2, .L60
+ 1347 076e 101C     		mov	r0, r2
+ 1348 0770 191C     		mov	r1, r3
+ 1349 0772 FFF7FEFF 		bl	SPI_I2S_SendData
+ 478:../scr/sflash.c **** 
+ 479:../scr/sflash.c **** 	/*!< Wait to receive a Half Word */
+ 480:../scr/sflash.c **** 	while (SPI_I2S_GetFlagStatus(sFLASH_SPI, SPI_I2S_FLAG_RXNE) == RESET)
+ 1350              		.loc 1 480 0
+ 1351 0776 C046     		mov	r8, r8
+ 1352              	.L58:
+ 1353              		.loc 1 480 0 is_stmt 0 discriminator 1
+ 1354 0778 084B     		ldr	r3, .L60
+ 1355 077a 181C     		mov	r0, r3
+ 1356 077c 0121     		mov	r1, #1
+ 1357 077e FFF7FEFF 		bl	SPI_I2S_GetFlagStatus
+ 1358 0782 031E     		sub	r3, r0, #0
+ 1359 0784 F8D0     		beq	.L58
+ 481:../scr/sflash.c **** 		;
+ 482:../scr/sflash.c **** 
+ 483:../scr/sflash.c **** 	/*!< Return the Half Word read from the SPI bus */
+ 484:../scr/sflash.c **** 	return SPI_I2S_ReceiveData(sFLASH_SPI);
+ 1360              		.loc 1 484 0 is_stmt 1
+ 1361 0786 054B     		ldr	r3, .L60
+ 1362 0788 181C     		mov	r0, r3
+ 1363 078a FFF7FEFF 		bl	SPI_I2S_ReceiveData
+ 1364 078e 031C     		mov	r3, r0
+ 1365 0790 9BB2     		uxth	r3, r3
+ 485:../scr/sflash.c **** }
+ 1366              		.loc 1 485 0
+ 1367 0792 181C     		mov	r0, r3
+ 1368 0794 BD46     		mov	sp, r7
+ 1369 0796 02B0     		add	sp, sp, #8
+ 1370              		@ sp needed
+ 1371 0798 80BD     		pop	{r7, pc}
+ 1372              	.L61:
+ 1373 079a C046     		.align	2
+ 1374              	.L60:
+ 1375 079c 00380040 		.word	1073756160
+ 1376              		.cfi_endproc
+ 1377              	.LFE46:
+ 1379              		.align	2
+ 1380              		.global	sFLASH_WriteEnable
+ 1381              		.code	16
+ 1382              		.thumb_func
+ 1384              	sFLASH_WriteEnable:
+ 1385              	.LFB47:
+ 486:../scr/sflash.c **** 
+ 487:../scr/sflash.c **** /**
+ 488:../scr/sflash.c ****  * @brief  Enables the write access to the FLASH.
+ 489:../scr/sflash.c ****  * @param  None
+ 490:../scr/sflash.c ****  * @retval None
+ 491:../scr/sflash.c ****  */
+ 492:../scr/sflash.c **** void sFLASH_WriteEnable(void) {
+ 1386              		.loc 1 492 0
+ 1387              		.cfi_startproc
+ 1388 07a0 80B5     		push	{r7, lr}
+ 1389              	.LCFI39:
+ 1390              		.cfi_def_cfa_offset 8
+ 1391              		.cfi_offset 7, -8
+ 1392              		.cfi_offset 14, -4
+ 1393 07a2 00AF     		add	r7, sp, #0
+ 1394              	.LCFI40:
+ 1395              		.cfi_def_cfa_register 7
+ 493:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */
+ 494:../scr/sflash.c **** 	sFLASH_CS_LOW();
+ 1396              		.loc 1 494 0
+ 1397 07a4 0F4A     		ldr	r2, .L63
+ 1398 07a6 8023     		mov	r3, #128
+ 1399 07a8 9B00     		lsl	r3, r3, #2
+ 1400 07aa 101C     		mov	r0, r2
+ 1401 07ac 191C     		mov	r1, r3
+ 1402 07ae FFF7FEFF 		bl	GPIO_ResetBits
+ 1403 07b2 9023     		mov	r3, #144
+ 1404 07b4 DB05     		lsl	r3, r3, #23
+ 1405 07b6 181C     		mov	r0, r3
+ 1406 07b8 0121     		mov	r1, #1
+ 1407 07ba FFF7FEFF 		bl	GPIO_SetBits
+ 495:../scr/sflash.c **** 
+ 496:../scr/sflash.c **** 	/*!< Send "Write Enable" instruction */
+ 497:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_WREN);
+ 1408              		.loc 1 497 0
+ 1409 07be 0620     		mov	r0, #6
+ 1410 07c0 FFF7FEFF 		bl	sFLASH_SendByte
+ 498:../scr/sflash.c **** 
+ 499:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 1411              		.loc 1 499 0
+ 1412 07c4 074A     		ldr	r2, .L63
+ 1413 07c6 8023     		mov	r3, #128
+ 1414 07c8 9B00     		lsl	r3, r3, #2
+ 1415 07ca 101C     		mov	r0, r2
+ 1416 07cc 191C     		mov	r1, r3
+ 1417 07ce FFF7FEFF 		bl	GPIO_SetBits
+ 1418 07d2 9023     		mov	r3, #144
+ 1419 07d4 DB05     		lsl	r3, r3, #23
+ 1420 07d6 181C     		mov	r0, r3
+ 1421 07d8 0121     		mov	r1, #1
+ 1422 07da FFF7FEFF 		bl	GPIO_ResetBits
+ 500:../scr/sflash.c **** }
+ 1423              		.loc 1 500 0
+ 1424 07de BD46     		mov	sp, r7
+ 1425              		@ sp needed
+ 1426 07e0 80BD     		pop	{r7, pc}
+ 1427              	.L64:
+ 1428 07e2 C046     		.align	2
+ 1429              	.L63:
+ 1430 07e4 00040048 		.word	1207960576
+ 1431              		.cfi_endproc
+ 1432              	.LFE47:
+ 1434              		.align	2
+ 1435              		.global	sFLASH_WaitForWriteEnd
+ 1436              		.code	16
+ 1437              		.thumb_func
+ 1439              	sFLASH_WaitForWriteEnd:
+ 1440              	.LFB48:
+ 501:../scr/sflash.c **** 
+ 502:../scr/sflash.c **** /**
+ 503:../scr/sflash.c ****  * @brief  Polls the status of the Write In Progress (WIP) flag in the FLASH's
+ 504:../scr/sflash.c ****  *         status register and loop until write opertaion has completed.
+ 505:../scr/sflash.c ****  * @param  None
+ 506:../scr/sflash.c ****  * @retval None
+ 507:../scr/sflash.c ****  */
+ 508:../scr/sflash.c **** void sFLASH_WaitForWriteEnd(void) {
+ 1441              		.loc 1 508 0
+ 1442              		.cfi_startproc
+ 1443 07e8 90B5     		push	{r4, r7, lr}
+ 1444              	.LCFI41:
+ 1445              		.cfi_def_cfa_offset 12
+ 1446              		.cfi_offset 4, -12
+ 1447              		.cfi_offset 7, -8
+ 1448              		.cfi_offset 14, -4
+ 1449 07ea 83B0     		sub	sp, sp, #12
+ 1450              	.LCFI42:
+ 1451              		.cfi_def_cfa_offset 24
+ 1452 07ec 00AF     		add	r7, sp, #0
+ 1453              	.LCFI43:
+ 1454              		.cfi_def_cfa_register 7
+ 509:../scr/sflash.c **** 	uint8_t flashstatus = 0;
+ 1455              		.loc 1 509 0
+ 1456 07ee FB1D     		add	r3, r7, #7
+ 1457 07f0 0022     		mov	r2, #0
+ 1458 07f2 1A70     		strb	r2, [r3]
+ 510:../scr/sflash.c **** 
+ 511:../scr/sflash.c **** 	/*!< Select the FLASH: Chip Select low */sFLASH_CS_LOW();
+ 1459              		.loc 1 511 0
+ 1460 07f4 194A     		ldr	r2, .L68
+ 1461 07f6 8023     		mov	r3, #128
+ 1462 07f8 9B00     		lsl	r3, r3, #2
+ 1463 07fa 101C     		mov	r0, r2
+ 1464 07fc 191C     		mov	r1, r3
+ 1465 07fe FFF7FEFF 		bl	GPIO_ResetBits
+ 1466 0802 9023     		mov	r3, #144
+ 1467 0804 DB05     		lsl	r3, r3, #23
+ 1468 0806 181C     		mov	r0, r3
+ 1469 0808 0121     		mov	r1, #1
+ 1470 080a FFF7FEFF 		bl	GPIO_SetBits
+ 512:../scr/sflash.c **** 
+ 513:../scr/sflash.c **** 	/*!< Send "Read Status Register" instruction */
+ 514:../scr/sflash.c **** 	sFLASH_SendByte(sFLASH_CMD_RDSR);
+ 1471              		.loc 1 514 0
+ 1472 080e 0520     		mov	r0, #5
+ 1473 0810 FFF7FEFF 		bl	sFLASH_SendByte
+ 515:../scr/sflash.c **** 
+ 516:../scr/sflash.c **** 	unsigned long lastTick = ulTickCount;
+ 1474              		.loc 1 516 0
+ 1475 0814 124B     		ldr	r3, .L68+4
+ 1476 0816 1B68     		ldr	r3, [r3]
+ 1477 0818 3B60     		str	r3, [r7]
+ 1478              	.L67:
+ 517:../scr/sflash.c **** 	/*!< Loop as long as the memory is busy with a write cycle */
+ 518:../scr/sflash.c **** 	do {
+ 519:../scr/sflash.c **** 		/*!< Send a dummy byte to generate the clock needed by the FLASH
+ 520:../scr/sflash.c **** 		 and put the value of the status register in FLASH_Status variable */
+ 521:../scr/sflash.c **** 		flashstatus = sFLASH_SendByte(sFLASH_DUMMY_BYTE);
+ 1479              		.loc 1 521 0 discriminator 2
+ 1480 081a FC1D     		add	r4, r7, #7
+ 1481 081c A520     		mov	r0, #165
+ 1482 081e FFF7FEFF 		bl	sFLASH_SendByte
+ 1483 0822 031C     		mov	r3, r0
+ 1484 0824 2370     		strb	r3, [r4]
+ 522:../scr/sflash.c **** 
+ 523:../scr/sflash.c **** 	} while (((flashstatus & sFLASH_WIP_FLAG) == SET)
+ 1485              		.loc 1 523 0 discriminator 2
+ 1486 0826 FB1D     		add	r3, r7, #7
+ 1487 0828 1B78     		ldrb	r3, [r3]
+ 1488 082a 0122     		mov	r2, #1
+ 1489 082c 1340     		and	r3, r2
+ 524:../scr/sflash.c **** 			&& ((ulTickCount - lastTick) <= 2)); /* Write in progress */
+ 1490              		.loc 1 524 0 discriminator 2
+ 1491 082e 05D0     		beq	.L66
+ 1492              		.loc 1 524 0 is_stmt 0 discriminator 1
+ 1493 0830 0B4B     		ldr	r3, .L68+4
+ 1494 0832 1A68     		ldr	r2, [r3]
+ 1495 0834 3B68     		ldr	r3, [r7]
+ 1496 0836 D31A     		sub	r3, r2, r3
+ 1497 0838 022B     		cmp	r3, #2
+ 1498 083a EED9     		bls	.L67
+ 1499              	.L66:
+ 525:../scr/sflash.c **** 
+ 526:../scr/sflash.c **** 	/*!< Deselect the FLASH: Chip Select high */sFLASH_CS_HIGH();
+ 1500              		.loc 1 526 0 is_stmt 1
+ 1501 083c 074A     		ldr	r2, .L68
+ 1502 083e 8023     		mov	r3, #128
+ 1503 0840 9B00     		lsl	r3, r3, #2
+ 1504 0842 101C     		mov	r0, r2
+ 1505 0844 191C     		mov	r1, r3
+ 1506 0846 FFF7FEFF 		bl	GPIO_SetBits
+ 1507 084a 9023     		mov	r3, #144
+ 1508 084c DB05     		lsl	r3, r3, #23
+ 1509 084e 181C     		mov	r0, r3
+ 1510 0850 0121     		mov	r1, #1
+ 1511 0852 FFF7FEFF 		bl	GPIO_ResetBits
+ 527:../scr/sflash.c **** }
+ 1512              		.loc 1 527 0
+ 1513 0856 BD46     		mov	sp, r7
+ 1514 0858 03B0     		add	sp, sp, #12
+ 1515              		@ sp needed
+ 1516 085a 90BD     		pop	{r4, r7, pc}
+ 1517              	.L69:
+ 1518              		.align	2
+ 1519              	.L68:
+ 1520 085c 00040048 		.word	1207960576
+ 1521 0860 00000000 		.word	ulTickCount
+ 1522              		.cfi_endproc
+ 1523              	.LFE48:
+ 1525              	.Letext0:
+ 1526              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\mach
+ 1527              		.file 3 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\sys\
+ 1528              		.file 4 "../scr/stm32f0xx.h"
+ 1529              		.file 5 "D:\\EclipseIndigo\\workspace\\rfid_demo\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32
+ 1530              		.file 6 "D:\\EclipseIndigo\\workspace\\rfid_demo\\Libraries\\STM32F0xx_StdPeriph_Driver\\inc/stm32
+DEFINED SYMBOLS
+                            *ABS*:00000000 sflash.c
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:17     .text:00000000 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:22     .text:00000000 sFLASH_LowLevel_DeInit
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:109    .text:00000080 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:114    .text:00000088 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:119    .text:00000088 sFLASH_LowLevel_Init
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:240    .text:00000144 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:244    .text:00000148 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:249    .text:00000148 sFLASH_DeInit
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:275    .text:00000154 sFLASH_Init
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:362    .text:000001d0 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:367    .text:000001d8 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:372    .text:000001d8 sFLASH_EraseSector
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1384   .text:000007a0 sFLASH_WriteEnable
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1223   .text:000006d0 sFLASH_SendByte
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1439   .text:000007e8 sFLASH_WaitForWriteEnd
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:441    .text:00000244 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:445    .text:00000248 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:450    .text:00000248 sFLASH_EraseBulk
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:500    .text:00000294 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:504    .text:00000298 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:509    .text:00000298 sFLASH_WritePage
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:602    .text:0000032c $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:606    .text:00000330 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:611    .text:00000330 sFLASH_WriteBuffer
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:937    .text:0000054c sFLASH_ReadBuffer
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1028   .text:000005dc $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1032   .text:000005e0 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1037   .text:000005e0 sFLASH_ReadID
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1123   .text:00000668 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1127   .text:0000066c $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1132   .text:0000066c sFLASH_StartReadSequence
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1185   .text:000006b8 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1189   .text:000006bc $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1194   .text:000006bc sFLASH_ReadByte
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1305   .text:00000744 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1310   .text:0000074c $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1315   .text:0000074c sFLASH_SendHalfWord
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1375   .text:0000079c $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1379   .text:000007a0 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1430   .text:000007e4 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1434   .text:000007e8 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccOOtO1o.s:1520   .text:0000085c $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.38f3ce5416ddc4c94340ac14f0421ae0
+                           .group:00000000 wm4.stm32f0xx.h.54.4683aa1e9aded801990d6fc5c3cd79d1
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:00000000 wm4._default_types.h.15.933e8edd27a65e0b69af4a865eb623d2
+                           .group:00000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:00000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:00000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.490.3021eb906afe162bf2c4c3f84017f2b7
+                           .group:00000000 wm4.stm32f0xx_adc.h.85.55aeb589c2c2703602e5f964c35b0c48
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.3e9f83248098cae82aee4fdd1dde590d
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.b7995c183c4864b04eda399c410c0e53
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.sflash.h.4.74bac0333e456f5a37ba0592b07d60d4
+
+UNDEFINED SYMBOLS
+SPI_Cmd
+SPI_I2S_DeInit
+RCC_APB1PeriphClockCmd
+GPIO_Init
+RCC_APB2PeriphClockCmd
+GPIO_SetBits
+GPIO_ResetBits
+SPI_Init
+SPI_I2S_GetFlagStatus
+SPI_I2S_SendData
+SPI_I2S_ReceiveData
+ulTickCount

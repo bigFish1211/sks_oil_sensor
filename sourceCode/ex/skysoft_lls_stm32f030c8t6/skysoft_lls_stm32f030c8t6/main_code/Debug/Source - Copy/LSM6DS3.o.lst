@@ -1,0 +1,2264 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"LSM6DS3.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.LSM6DS3_ReadRegister,"ax",%progbits
+  18              		.align	1
+  19              		.code	16
+  20              		.thumb_func
+  22              	LSM6DS3_ReadRegister:
+  23              	.LFB58:
+  24              		.file 1 "../Source - Copy/LSM6DS3.c"
+   1:../Source - Copy/LSM6DS3.c **** #include "LSM6DS3.h"
+   2:../Source - Copy/LSM6DS3.c **** #include "spi.h"
+   3:../Source - Copy/LSM6DS3.c **** #include "delay.h"
+   4:../Source - Copy/LSM6DS3.c **** #include "xprintf.h"
+   5:../Source - Copy/LSM6DS3.c **** 
+   6:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_Verify_XL_Settings(uint8_t XL_Rate, uint8_t XL_Range, uint8_t XL_Filt
+   7:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_Verify_GS_Settings(uint8_t GS_Rate, uint8_t GS_Range);
+   8:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_WriteAndVerify(uint8_t reg, uint8_t* data, uint16_t size);
+   9:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_ReadRegister(uint8_t reg, uint8_t* data, uint16_t size);
+  10:../Source - Copy/LSM6DS3.c **** /* static LSM6DS3_Result LSM6DS3_WriteRegister(uint16_t reg, uint8_t* data,uint16_t size); */
+  11:../Source - Copy/LSM6DS3.c **** 
+  12:../Source - Copy/LSM6DS3.c **** static LSM6DS3_configuration LSM6DS3_parameters;
+  13:../Source - Copy/LSM6DS3.c **** static LSM6DS3_IMU_measurements LSM6DS3_data;
+  14:../Source - Copy/LSM6DS3.c **** 
+  15:../Source - Copy/LSM6DS3.c **** /*
+  16:../Source - Copy/LSM6DS3.c ****  * @brief  Initialize the library
+  17:../Source - Copy/LSM6DS3.c ****  * @param  SA0: Define the SA0 level, its related to the IMU's I2C address
+  18:../Source - Copy/LSM6DS3.c ****  * 			        - LSM6DS3_SA0_LOW_LEVEL  address -> (0x6A << 1)
+  19:../Source - Copy/LSM6DS3.c ****  * 			        - LSM6DS3_SA0_HIGH_LEVEL address -> (0x6B << 1)
+  20:../Source - Copy/LSM6DS3.c ****  * 		   timeout: Set the timeout for the I2C peripheral
+  21:../Source - Copy/LSM6DS3.c ****  * 		   i2c_channel: Define the selected I2C channel for the IMU
+  22:../Source - Copy/LSM6DS3.c ****  * @retval None
+  23:../Source - Copy/LSM6DS3.c **** */
+  24:../Source - Copy/LSM6DS3.c **** void LSM6DS3_Initialize(SPI_TypeDef* spi_channel, uint16_t timeout) {
+  25:../Source - Copy/LSM6DS3.c **** 	
+  26:../Source - Copy/LSM6DS3.c **** 	SPIx_init(spi_channel);
+  27:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.timeout	   = timeout;
+  28:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.spi_channel = spi_channel;
+  29:../Source - Copy/LSM6DS3.c **** }
+  30:../Source - Copy/LSM6DS3.c **** 
+  31:../Source - Copy/LSM6DS3.c **** /*
+  32:../Source - Copy/LSM6DS3.c ****  * @brief  Detect the IMU
+  33:../Source - Copy/LSM6DS3.c ****  * @param  None
+  34:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+  35:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+  36:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+  37:../Source - Copy/LSM6DS3.c **** */
+  38:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_Detect(uint8_t efforts) {
+  39:../Source - Copy/LSM6DS3.c **** 	uint8_t byte;
+  40:../Source - Copy/LSM6DS3.c **** 
+  41:../Source - Copy/LSM6DS3.c **** 	while(efforts > 0) {
+  42:../Source - Copy/LSM6DS3.c **** 		if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_WHO_AM_I_REG, &byte, sizeof(byte)) == LSM6DS3_OK) {
+  43:../Source - Copy/LSM6DS3.c **** 			if(byte == LSM6DS3N_WHO_I_AM_RESPONSE ||
+  44:../Source - Copy/LSM6DS3.c **** 					byte == LSM6DS3_WHO_I_AM_RESPONSE ||
+  45:../Source - Copy/LSM6DS3.c **** 					byte == LSM6DS3TRC_WHO_I_AM_RESPONSE) {
+  46:../Source - Copy/LSM6DS3.c **** 
+  47:../Source - Copy/LSM6DS3.c **** 				return LSM6DS3_OK;
+  48:../Source - Copy/LSM6DS3.c **** 			}
+  49:../Source - Copy/LSM6DS3.c **** 		}
+  50:../Source - Copy/LSM6DS3.c **** 		delay_ms(2);
+  51:../Source - Copy/LSM6DS3.c **** 		efforts--;
+  52:../Source - Copy/LSM6DS3.c **** 	}
+  53:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+  54:../Source - Copy/LSM6DS3.c **** }
+  55:../Source - Copy/LSM6DS3.c **** 
+  56:../Source - Copy/LSM6DS3.c **** /*
+  57:../Source - Copy/LSM6DS3.c ****  * @brief  Start the accelerometer with desired settings
+  58:../Source - Copy/LSM6DS3.c ****  * @param  XL_Rate: Output data rate
+  59:../Source - Copy/LSM6DS3.c ****  * 					- XL_12_5Hz
+  60:../Source - Copy/LSM6DS3.c ****  *				    - XL_26Hz
+  61:../Source - Copy/LSM6DS3.c ****  *					- XL_52Hz
+  62:../Source - Copy/LSM6DS3.c ****  *					- XL_104Hz
+  63:../Source - Copy/LSM6DS3.c ****  *					- XL_208Hz
+  64:../Source - Copy/LSM6DS3.c ****  *					- XL_416Hz
+  65:../Source - Copy/LSM6DS3.c ****  *					- XL_833Hz
+  66:../Source - Copy/LSM6DS3.c ****  *					- XL_1666Hz
+  67:../Source - Copy/LSM6DS3.c ****  *					- XL_3330Hz
+  68:../Source - Copy/LSM6DS3.c ****  *					- XL_6660Hz
+  69:../Source - Copy/LSM6DS3.c ****  *		   XL_Scale: Scale selection
+  70:../Source - Copy/LSM6DS3.c ****  *		   			- XL_RANGE_2G
+  71:../Source - Copy/LSM6DS3.c ****  *		   			- XL_RANGE_16G
+  72:../Source - Copy/LSM6DS3.c ****  *		   			- XL_RANGE_4G
+  73:../Source - Copy/LSM6DS3.c ****  *		   			- XL_RANGE_8G
+  74:../Source - Copy/LSM6DS3.c ****  *         XL_Filter: Anti-aliasing filter bandwidth
+  75:../Source - Copy/LSM6DS3.c ****  *					- XL_FILTER_400Hz
+  76:../Source - Copy/LSM6DS3.c ****  * 					- XL_FILTER_200Hz
+  77:../Source - Copy/LSM6DS3.c ****  * 					- XL_FILTER_100Hz
+  78:../Source - Copy/LSM6DS3.c ****  * 					- XL_FILTER_50Hz
+  79:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+  80:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+  81:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+  82:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL_PARAMETERS  = 2,  Failed due to wrong parameters
+  83:../Source - Copy/LSM6DS3.c **** */
+  84:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_XL_Start(uint8_t XL_Rate, uint8_t XL_Scale, uint8_t XL_Filter) {
+  85:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = (XL_Rate << 4) | ((XL_Scale << 2) & 0x0F) | (XL_Filter & 0x03);
+  86:../Source - Copy/LSM6DS3.c **** 
+  87:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_Verify_XL_Settings(XL_Rate, XL_Scale, XL_Filter) !=  LSM6DS3_OK){
+  88:../Source - Copy/LSM6DS3.c **** 
+  89:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+  90:../Source - Copy/LSM6DS3.c **** 		//xprintf("%s-%d\r\n",__func__,__LINE__);
+  91:../Source - Copy/LSM6DS3.c **** 	}
+  92:../Source - Copy/LSM6DS3.c **** 
+  93:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL1_XL, &byte, sizeof(byte)) !=  LSM6DS3_OK){
+  94:../Source - Copy/LSM6DS3.c **** 
+  95:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL;
+  96:../Source - Copy/LSM6DS3.c **** 		//xprintf("%s-%d\r\n",__func__,__LINE__);
+  97:../Source - Copy/LSM6DS3.c **** 	}
+  98:../Source - Copy/LSM6DS3.c **** 
+  99:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_OK;
+ 100:../Source - Copy/LSM6DS3.c **** }
+ 101:../Source - Copy/LSM6DS3.c **** 
+ 102:../Source - Copy/LSM6DS3.c **** /*
+ 103:../Source - Copy/LSM6DS3.c ****  * @brief  Disable the accelerometer
+ 104:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 105:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 106:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 107:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 108:../Source - Copy/LSM6DS3.c **** */
+ 109:../Source - Copy/LSM6DS3.c **** uint8_t LSM6DS3_XL_Stop(void) {
+ 110:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = XL_POWER_DOWN;
+ 111:../Source - Copy/LSM6DS3.c **** 
+ 112:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL1_XL, &byte, sizeof(byte)) ==  LSM6DS3_OK)
+ 113:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 114:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 115:../Source - Copy/LSM6DS3.c **** }
+ 116:../Source - Copy/LSM6DS3.c **** 
+ 117:../Source - Copy/LSM6DS3.c **** /*
+ 118:../Source - Copy/LSM6DS3.c ****  * @brief  Check the Accelerometer settings
+ 119:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 120:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 121:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 122:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL_PARAMETERS  = 2,  Failed due to wrong parameters
+ 123:../Source - Copy/LSM6DS3.c **** */
+ 124:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_Verify_XL_Settings(uint8_t XL_Rate, uint8_t XL_Range, uint8_t XL_Filt
+ 125:../Source - Copy/LSM6DS3.c **** 	if((XL_Rate < XL_12_5Hz) || (XL_Rate > XL_6660Hz))
+ 126:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 127:../Source - Copy/LSM6DS3.c **** 	else if((XL_Range < XL_RANGE_2G) || (XL_Range > XL_RANGE_8G))
+ 128:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 129:../Source - Copy/LSM6DS3.c **** 	else if((XL_Filter < XL_FILTER_400Hz) || (XL_Filter > XL_FILTER_50Hz))
+ 130:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 131:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.XL_range = XL_Range;
+ 132:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_OK;
+ 133:../Source - Copy/LSM6DS3.c **** }
+ 134:../Source - Copy/LSM6DS3.c **** 
+ 135:../Source - Copy/LSM6DS3.c **** /*
+ 136:../Source - Copy/LSM6DS3.c ****  * @brief  Refresh the Accelerometer data
+ 137:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 138:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 139:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 140:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 141:../Source - Copy/LSM6DS3.c **** */
+ 142:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_XL_GetMeasurements(void) {
+ 143:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[6] = {0};
+ 144:../Source - Copy/LSM6DS3.c **** 
+ 145:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_XL, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 146:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_x = (int16_t) (bytes[1]<<8 | bytes[0]);
+ 147:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_y = (int16_t) (bytes[3]<<8 | bytes[2]);
+ 148:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_z = (int16_t) (bytes[5]<<8 | bytes[4]);
+ 149:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 150:../Source - Copy/LSM6DS3.c **** 	}
+ 151:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 152:../Source - Copy/LSM6DS3.c **** }
+ 153:../Source - Copy/LSM6DS3.c **** 
+ 154:../Source - Copy/LSM6DS3.c **** 
+ 155:../Source - Copy/LSM6DS3.c **** /*
+ 156:../Source - Copy/LSM6DS3.c ****  * @brief  Start the gyroscope with desired settings
+ 157:../Source - Copy/LSM6DS3.c ****  * @param  GS_Rate: Output data rate
+ 158:../Source - Copy/LSM6DS3.c ****  * 					- GS_12_5Hz
+ 159:../Source - Copy/LSM6DS3.c ****  * 					- GS_26Hz
+ 160:../Source - Copy/LSM6DS3.c ****  * 					- GS_52Hz
+ 161:../Source - Copy/LSM6DS3.c ****  * 					- GS_104Hz
+ 162:../Source - Copy/LSM6DS3.c ****  * 					- GS_208Hz
+ 163:../Source - Copy/LSM6DS3.c ****  * 					- GS_416Hz
+ 164:../Source - Copy/LSM6DS3.c ****  * 					- GS_833Hz
+ 165:../Source - Copy/LSM6DS3.c ****  * 					- GS_1666Hz
+ 166:../Source - Copy/LSM6DS3.c ****  *		   GS_Range: Scale selection
+ 167:../Source - Copy/LSM6DS3.c ****  *		   			- GS_RANGE_125dps
+ 168:../Source - Copy/LSM6DS3.c ****  *		   			- GS_RANGE_250dps
+ 169:../Source - Copy/LSM6DS3.c ****  *		   			- GS_RANGE_500dps
+ 170:../Source - Copy/LSM6DS3.c ****  *		   			- GS_RANGE_1000dps
+ 171:../Source - Copy/LSM6DS3.c ****  *		   			- GS_RANGE_2000dps
+ 172:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 173:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 174:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 175:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL_PARAMETERS  = 2,  Failed due to wrong parameters
+ 176:../Source - Copy/LSM6DS3.c **** */
+ 177:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_GS_Start(uint8_t GS_Rate, uint8_t GS_Range) {
+ 178:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = (GS_Rate << 4) | ((GS_Range << 1) & 0x0F);
+ 179:../Source - Copy/LSM6DS3.c **** 
+ 180:../Source - Copy/LSM6DS3.c **** 	byte &= 0xFE; /* Always secure the LSB is 0 */
+ 181:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_Verify_GS_Settings(GS_Rate, GS_Range) !=  LSM6DS3_OK){
+ 182:../Source - Copy/LSM6DS3.c **** 
+ 183:../Source - Copy/LSM6DS3.c **** 		xprintf("%s-%d\r\n",__func__,__LINE__);
+ 184:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 185:../Source - Copy/LSM6DS3.c **** 
+ 186:../Source - Copy/LSM6DS3.c **** 	}
+ 187:../Source - Copy/LSM6DS3.c **** 
+ 188:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL2_G, &byte, sizeof(byte)) !=  LSM6DS3_OK){
+ 189:../Source - Copy/LSM6DS3.c **** 		xprintf("%s-%d\r\n",__func__,__LINE__);
+ 190:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL;
+ 191:../Source - Copy/LSM6DS3.c **** 	}
+ 192:../Source - Copy/LSM6DS3.c **** 
+ 193:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_OK;
+ 194:../Source - Copy/LSM6DS3.c **** }
+ 195:../Source - Copy/LSM6DS3.c **** 
+ 196:../Source - Copy/LSM6DS3.c **** /*
+ 197:../Source - Copy/LSM6DS3.c ****  * @brief  Disable the gyroscope
+ 198:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 199:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 200:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 201:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 202:../Source - Copy/LSM6DS3.c **** */
+ 203:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_GS_Stop(void) {
+ 204:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = GS_POWER_DOWN;
+ 205:../Source - Copy/LSM6DS3.c **** 
+ 206:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL2_G, &byte, sizeof(byte)) ==  LSM6DS3_OK)
+ 207:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 208:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 209:../Source - Copy/LSM6DS3.c **** }
+ 210:../Source - Copy/LSM6DS3.c **** 
+ 211:../Source - Copy/LSM6DS3.c **** /*
+ 212:../Source - Copy/LSM6DS3.c ****  * @brief  Check the Gyroscope settings
+ 213:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 214:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 215:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 216:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL_PARAMETERS  = 2,  Failed due to wrong parameters
+ 217:../Source - Copy/LSM6DS3.c **** */
+ 218:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_Verify_GS_Settings(uint8_t GS_Rate, uint8_t GS_Range) {
+ 219:../Source - Copy/LSM6DS3.c **** 	if((GS_Rate < GS_12_5Hz) || (GS_Rate > GS_1666Hz))
+ 220:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 221:../Source - Copy/LSM6DS3.c **** 	else if((GS_Range < GS_RANGE_250dps) || (GS_Range > GS_RANGE_2000dps) || (GS_Range == 3) || (GS_Ra
+ 222:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 223:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.GS_range = GS_Range;
+ 224:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_OK;
+ 225:../Source - Copy/LSM6DS3.c **** }
+ 226:../Source - Copy/LSM6DS3.c **** 
+ 227:../Source - Copy/LSM6DS3.c **** /*
+ 228:../Source - Copy/LSM6DS3.c ****  * @brief  Refresh the Gyroscope data
+ 229:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 230:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 231:../Source - Copy/LSM6DS3.c **** * 					- LSM6DS3_OK    		   = 0,  Success
+ 232:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 233:../Source - Copy/LSM6DS3.c **** */
+ 234:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_GS_GetMeasurements(void) {
+ 235:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[6] = {0};
+ 236:../Source - Copy/LSM6DS3.c **** 
+ 237:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_GS, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 238:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_x = (int16_t) (bytes[1]<<8 | bytes[0]);
+ 239:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_y = (int16_t) (bytes[3]<<8 | bytes[2]);
+ 240:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_z = (int16_t) (bytes[5]<<8 | bytes[4]);
+ 241:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 242:../Source - Copy/LSM6DS3.c **** 	}
+ 243:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 244:../Source - Copy/LSM6DS3.c **** }
+ 245:../Source - Copy/LSM6DS3.c **** 
+ 246:../Source - Copy/LSM6DS3.c **** /*
+ 247:../Source - Copy/LSM6DS3.c ****  * @brief  Refresh the IMU values
+ 248:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 249:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 250:../Source - Copy/LSM6DS3.c **** * 					- LSM6DS3_OK    		   = 0,  Success
+ 251:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 252:../Source - Copy/LSM6DS3.c **** */
+ 253:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_IMU_GetMeasurements(void) {
+ 254:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[14] = {0};
+ 255:../Source - Copy/LSM6DS3.c **** 
+ 256:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUT_TEMP_L, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 257:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.Temperature = (int16_t) (bytes[1]<<8  | bytes[0]);
+ 258:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_x 		 = (int16_t) (bytes[3]<<8  | bytes[2]);
+ 259:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_y 		 = (int16_t) (bytes[5]<<8  | bytes[4]);
+ 260:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_z 		 = (int16_t) (bytes[7]<<8  | bytes[6]);
+ 261:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_x 		 = (int16_t) (bytes[9]<<8  | bytes[8]);
+ 262:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_y 		 = (int16_t) (bytes[11]<<8 | bytes[10]);
+ 263:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_z 		 = (int16_t) (bytes[13]<<8 | bytes[12]);
+ 264:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 265:../Source - Copy/LSM6DS3.c **** 	}
+ 266:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 267:../Source - Copy/LSM6DS3.c **** }
+ 268:../Source - Copy/LSM6DS3.c **** 
+ 269:../Source - Copy/LSM6DS3.c **** /*
+ 270:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of X axe (Accelerometer)
+ 271:../Source - Copy/LSM6DS3.c ****  * @param  none
+ 272:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of X axe
+ 273:../Source - Copy/LSM6DS3.c **** */
+ 274:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetXL_X_Int16(void) {
+ 275:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.XL_x;
+ 276:../Source - Copy/LSM6DS3.c **** }
+ 277:../Source - Copy/LSM6DS3.c **** 
+ 278:../Source - Copy/LSM6DS3.c **** /*
+ 279:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of Y axe (Accelerometer)
+ 280:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 281:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of Y axe
+ 282:../Source - Copy/LSM6DS3.c **** */
+ 283:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetXL_Y_Int16(void) {
+ 284:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.XL_y;
+ 285:../Source - Copy/LSM6DS3.c **** }
+ 286:../Source - Copy/LSM6DS3.c **** 
+ 287:../Source - Copy/LSM6DS3.c **** /*
+ 288:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of Z axe (Accelerometer)
+ 289:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 290:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of Z axe
+ 291:../Source - Copy/LSM6DS3.c **** */
+ 292:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetXL_Z_Int16(void) {
+ 293:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.XL_z;
+ 294:../Source - Copy/LSM6DS3.c **** }
+ 295:../Source - Copy/LSM6DS3.c **** 
+ 296:../Source - Copy/LSM6DS3.c **** /*
+ 297:../Source - Copy/LSM6DS3.c ****  * @brief  Get the value of X axe (Accelerometer)
+ 298:../Source - Copy/LSM6DS3.c ****  * @param  units: Select the units to be returned
+ 299:../Source - Copy/LSM6DS3.c ****  * 					- 0:  Selected units are g
+ 300:../Source - Copy/LSM6DS3.c ****  * 					- 1:  Selected units are mg
+ 301:../Source - Copy/LSM6DS3.c ****  * 					- >1: Invalid. Will return zero
+ 302:../Source - Copy/LSM6DS3.c ****  * @retval float: Value of X axe on g or mg
+ 303:../Source - Copy/LSM6DS3.c **** */
+ 304:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetXL_X_Float(uint8_t units) {
+ 305:../Source - Copy/LSM6DS3.c **** 	float mg_lsb = 0;
+ 306:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.XL_range)
+ 307:../Source - Copy/LSM6DS3.c **** 	{
+ 308:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_2G:
+ 309:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.061f;
+ 310:../Source - Copy/LSM6DS3.c **** 			break;
+ 311:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_4G:
+ 312:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.122f;
+ 313:../Source - Copy/LSM6DS3.c **** 			break;
+ 314:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_8G:
+ 315:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.244f;
+ 316:../Source - Copy/LSM6DS3.c **** 			break;
+ 317:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_16G:
+ 318:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.488f;
+ 319:../Source - Copy/LSM6DS3.c **** 			break;
+ 320:../Source - Copy/LSM6DS3.c **** 		default:
+ 321:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.000f; /* Should never comes here */
+ 322:../Source - Copy/LSM6DS3.c **** 			break;
+ 323:../Source - Copy/LSM6DS3.c **** 	}
+ 324:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 325:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_x * mg_lsb / 1000.0f);
+ 326:../Source - Copy/LSM6DS3.c **** 	else
+ 327:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_x * mg_lsb);
+ 328:../Source - Copy/LSM6DS3.c **** }
+ 329:../Source - Copy/LSM6DS3.c **** 
+ 330:../Source - Copy/LSM6DS3.c **** /*
+ 331:../Source - Copy/LSM6DS3.c ****  * @brief  Get the value of Y axe (Accelerometer)
+ 332:../Source - Copy/LSM6DS3.c ****  * @param  units: Select the units to be returned
+ 333:../Source - Copy/LSM6DS3.c ****  * 					- 0:  Selected units are g
+ 334:../Source - Copy/LSM6DS3.c ****  * 					- 1:  Selected units are mg
+ 335:../Source - Copy/LSM6DS3.c ****  * 					- >1: Invalid. Will return zero
+ 336:../Source - Copy/LSM6DS3.c ****  * @retval float: Value of Y axe on g or mg
+ 337:../Source - Copy/LSM6DS3.c **** */
+ 338:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetXL_Y_Float(uint8_t units) {
+ 339:../Source - Copy/LSM6DS3.c **** 	float mg_lsb = 0;
+ 340:../Source - Copy/LSM6DS3.c **** 
+ 341:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.XL_range)
+ 342:../Source - Copy/LSM6DS3.c **** 	{
+ 343:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_2G:
+ 344:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.061f;
+ 345:../Source - Copy/LSM6DS3.c **** 			break;
+ 346:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_4G:
+ 347:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.122f;
+ 348:../Source - Copy/LSM6DS3.c **** 			break;
+ 349:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_8G:
+ 350:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.244f;
+ 351:../Source - Copy/LSM6DS3.c **** 			break;
+ 352:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_16G:
+ 353:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.488f;
+ 354:../Source - Copy/LSM6DS3.c **** 			break;
+ 355:../Source - Copy/LSM6DS3.c **** 		default:
+ 356:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.000f; /* Should never comes here */
+ 357:../Source - Copy/LSM6DS3.c **** 			break;
+ 358:../Source - Copy/LSM6DS3.c **** 	}
+ 359:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 360:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_y * mg_lsb / 1000.0f);
+ 361:../Source - Copy/LSM6DS3.c **** 	else
+ 362:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_y * mg_lsb);
+ 363:../Source - Copy/LSM6DS3.c **** }
+ 364:../Source - Copy/LSM6DS3.c **** 
+ 365:../Source - Copy/LSM6DS3.c **** /*
+ 366:../Source - Copy/LSM6DS3.c ****  * @brief  Get the value of Z axe (Accelerometer)
+ 367:../Source - Copy/LSM6DS3.c ****  * @param  units: Select the units to be returned
+ 368:../Source - Copy/LSM6DS3.c ****  * 					- 0:  Selected units are g
+ 369:../Source - Copy/LSM6DS3.c ****  * 					- 1:  Selected units are mg
+ 370:../Source - Copy/LSM6DS3.c ****  * 					- >1: Invalid. Will return zero
+ 371:../Source - Copy/LSM6DS3.c ****  * @retval float: Value of Z axe on g or mg
+ 372:../Source - Copy/LSM6DS3.c **** */
+ 373:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetXL_Z_Float(uint8_t units) {
+ 374:../Source - Copy/LSM6DS3.c **** 	float mg_lsb = 0;
+ 375:../Source - Copy/LSM6DS3.c **** 
+ 376:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.XL_range)
+ 377:../Source - Copy/LSM6DS3.c **** 	{
+ 378:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_2G:
+ 379:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.061f;
+ 380:../Source - Copy/LSM6DS3.c **** 			break;
+ 381:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_4G:
+ 382:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.122f;
+ 383:../Source - Copy/LSM6DS3.c **** 			break;
+ 384:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_8G:
+ 385:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.244f;
+ 386:../Source - Copy/LSM6DS3.c **** 			break;
+ 387:../Source - Copy/LSM6DS3.c **** 		case XL_RANGE_16G:
+ 388:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.488f;
+ 389:../Source - Copy/LSM6DS3.c **** 			break;
+ 390:../Source - Copy/LSM6DS3.c **** 		default:
+ 391:../Source - Copy/LSM6DS3.c **** 			mg_lsb = 0.000f; /* Should never comes here */
+ 392:../Source - Copy/LSM6DS3.c **** 			break;
+ 393:../Source - Copy/LSM6DS3.c **** 	}
+ 394:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 395:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_z * mg_lsb / 1000.0f);
+ 396:../Source - Copy/LSM6DS3.c **** 	else
+ 397:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_z * mg_lsb);
+ 398:../Source - Copy/LSM6DS3.c **** }
+ 399:../Source - Copy/LSM6DS3.c **** 
+ 400:../Source - Copy/LSM6DS3.c **** /*
+ 401:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of X axe (Gyroscope)
+ 402:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 403:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of X axe
+ 404:../Source - Copy/LSM6DS3.c **** */
+ 405:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetGS_X_Int16(void) {
+ 406:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.GS_x;
+ 407:../Source - Copy/LSM6DS3.c **** }
+ 408:../Source - Copy/LSM6DS3.c **** 
+ 409:../Source - Copy/LSM6DS3.c **** /*
+ 410:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of Y axe (Gyroscope)
+ 411:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 412:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of Y axe
+ 413:../Source - Copy/LSM6DS3.c **** */
+ 414:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetGS_Y_Int16(void) {
+ 415:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.GS_y;
+ 416:../Source - Copy/LSM6DS3.c **** }
+ 417:../Source - Copy/LSM6DS3.c **** 
+ 418:../Source - Copy/LSM6DS3.c **** /*
+ 419:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of Z axe (Gyroscope)
+ 420:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 421:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of Z axe
+ 422:../Source - Copy/LSM6DS3.c **** */
+ 423:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetGS_Z_Int16(void) {
+ 424:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.GS_z;
+ 425:../Source - Copy/LSM6DS3.c **** }
+ 426:../Source - Copy/LSM6DS3.c **** 
+ 427:../Source - Copy/LSM6DS3.c **** /*
+ 428:../Source - Copy/LSM6DS3.c ****  * @brief  Get the raw data of temperature
+ 429:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 430:../Source - Copy/LSM6DS3.c ****  * @retval int16_t: Raw data of temperature
+ 431:../Source - Copy/LSM6DS3.c **** */
+ 432:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_Temperature_Int16(void) {
+ 433:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.Temperature;
+ 434:../Source - Copy/LSM6DS3.c **** }
+ 435:../Source - Copy/LSM6DS3.c **** 
+ 436:../Source - Copy/LSM6DS3.c **** /*
+ 437:../Source - Copy/LSM6DS3.c ****  * @brief  Get the temperature
+ 438:../Source - Copy/LSM6DS3.c ****  * @param  None
+ 439:../Source - Copy/LSM6DS3.c ****  * @retval float: Temperature in C (Celsius)
+ 440:../Source - Copy/LSM6DS3.c **** */
+ 441:../Source - Copy/LSM6DS3.c **** float LSM6DS3_Temperature_Celsius(void) {
+ 442:../Source - Copy/LSM6DS3.c **** 	return ((float)LSM6DS3_data.Temperature / 16.0f + 25.0f);
+ 443:../Source - Copy/LSM6DS3.c **** }
+ 444:../Source - Copy/LSM6DS3.c **** 
+ 445:../Source - Copy/LSM6DS3.c **** /*
+ 446:../Source - Copy/LSM6DS3.c ****  * @brief  Get the value of X axe (Gyroscope)
+ 447:../Source - Copy/LSM6DS3.c ****  * @param  units: Select the units to be returned
+ 448:../Source - Copy/LSM6DS3.c ****  * 					- 0: Selected units are dps
+ 449:../Source - Copy/LSM6DS3.c ****  * 					- 1: Selected units are mdps
+ 450:../Source - Copy/LSM6DS3.c ****  * 					- >1: Invalid. Will return zero
+ 451:../Source - Copy/LSM6DS3.c ****  * @retval float: Value of X axe on dps or mdps
+ 452:../Source - Copy/LSM6DS3.c **** */
+ 453:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetGS_X_Float(uint8_t units) {
+ 454:../Source - Copy/LSM6DS3.c **** 	float mdps_lsb = 0;
+ 455:../Source - Copy/LSM6DS3.c **** 
+ 456:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.GS_range)
+ 457:../Source - Copy/LSM6DS3.c **** 	{
+ 458:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_125dps:
+ 459:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 4.375f;
+ 460:../Source - Copy/LSM6DS3.c **** 			break;
+ 461:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_250dps:
+ 462:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 8.75f;
+ 463:../Source - Copy/LSM6DS3.c **** 			break;
+ 464:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_500dps:
+ 465:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 17.50f;
+ 466:../Source - Copy/LSM6DS3.c **** 			break;
+ 467:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_1000dps:
+ 468:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 35.0f;
+ 469:../Source - Copy/LSM6DS3.c **** 			break;
+ 470:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_2000dps:
+ 471:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 70.f;
+ 472:../Source - Copy/LSM6DS3.c **** 			break;
+ 473:../Source - Copy/LSM6DS3.c **** 		default:
+ 474:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 0.000f; /* Should never comes here */
+ 475:../Source - Copy/LSM6DS3.c **** 			break;
+ 476:../Source - Copy/LSM6DS3.c **** 	}
+ 477:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 478:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_x * mdps_lsb / 1000.0f);
+ 479:../Source - Copy/LSM6DS3.c **** 	else
+ 480:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_x * mdps_lsb);
+ 481:../Source - Copy/LSM6DS3.c **** }
+ 482:../Source - Copy/LSM6DS3.c **** 
+ 483:../Source - Copy/LSM6DS3.c **** /*
+ 484:../Source - Copy/LSM6DS3.c ****  * @brief  Get the value of Y axe (Gyroscope)
+ 485:../Source - Copy/LSM6DS3.c ****  * @param  units: Select the units to be returned
+ 486:../Source - Copy/LSM6DS3.c ****  * 					- 0: Selected units are dps
+ 487:../Source - Copy/LSM6DS3.c ****  * 					- 1: Selected units are mdps
+ 488:../Source - Copy/LSM6DS3.c ****  * 					- >1: Invalid. Will return zero
+ 489:../Source - Copy/LSM6DS3.c ****  * @retval float: Value of Y axe on dps or mdps
+ 490:../Source - Copy/LSM6DS3.c **** */
+ 491:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetGS_Y_Float(uint8_t units) {
+ 492:../Source - Copy/LSM6DS3.c **** 	float mdps_lsb = 0;
+ 493:../Source - Copy/LSM6DS3.c **** 
+ 494:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.GS_range)
+ 495:../Source - Copy/LSM6DS3.c **** 	{
+ 496:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_125dps:
+ 497:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 4.375f;
+ 498:../Source - Copy/LSM6DS3.c **** 			break;
+ 499:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_250dps:
+ 500:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 8.75f;
+ 501:../Source - Copy/LSM6DS3.c **** 			break;
+ 502:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_500dps:
+ 503:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 17.50f;
+ 504:../Source - Copy/LSM6DS3.c **** 			break;
+ 505:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_1000dps:
+ 506:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 35.0f;
+ 507:../Source - Copy/LSM6DS3.c **** 			break;
+ 508:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_2000dps:
+ 509:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 70.f;
+ 510:../Source - Copy/LSM6DS3.c **** 			break;
+ 511:../Source - Copy/LSM6DS3.c **** 		default:
+ 512:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 0.000f; /* Should never comes here */
+ 513:../Source - Copy/LSM6DS3.c **** 			break;
+ 514:../Source - Copy/LSM6DS3.c **** 	}
+ 515:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 516:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_y * mdps_lsb / 1000.0f);
+ 517:../Source - Copy/LSM6DS3.c **** 	else
+ 518:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_y * mdps_lsb);
+ 519:../Source - Copy/LSM6DS3.c **** }
+ 520:../Source - Copy/LSM6DS3.c **** 
+ 521:../Source - Copy/LSM6DS3.c **** /*
+ 522:../Source - Copy/LSM6DS3.c ****  * @brief  Get the value of Z axe (Gyroscope)
+ 523:../Source - Copy/LSM6DS3.c ****  * @param  units: Select the units to be returned
+ 524:../Source - Copy/LSM6DS3.c ****  * 					- 0: Selected units are dps
+ 525:../Source - Copy/LSM6DS3.c ****  * 					- 1: Selected units are mdps
+ 526:../Source - Copy/LSM6DS3.c ****  * 					- >1: Invalid. Will return zero
+ 527:../Source - Copy/LSM6DS3.c ****  * @retval float: Value of Z axe on dps or mdps
+ 528:../Source - Copy/LSM6DS3.c **** */
+ 529:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetGS_Z_Float(uint8_t units) {
+ 530:../Source - Copy/LSM6DS3.c **** 	float mdps_lsb = 0;
+ 531:../Source - Copy/LSM6DS3.c **** 
+ 532:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.GS_range)
+ 533:../Source - Copy/LSM6DS3.c **** 	{
+ 534:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_125dps:
+ 535:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 4.375f;
+ 536:../Source - Copy/LSM6DS3.c **** 			break;
+ 537:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_250dps:
+ 538:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 8.75f;
+ 539:../Source - Copy/LSM6DS3.c **** 			break;
+ 540:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_500dps:
+ 541:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 17.50f;
+ 542:../Source - Copy/LSM6DS3.c **** 			break;
+ 543:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_1000dps:
+ 544:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 35.0f;
+ 545:../Source - Copy/LSM6DS3.c **** 			break;
+ 546:../Source - Copy/LSM6DS3.c **** 		case GS_RANGE_2000dps:
+ 547:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 70.f;
+ 548:../Source - Copy/LSM6DS3.c **** 			break;
+ 549:../Source - Copy/LSM6DS3.c **** 		default:
+ 550:../Source - Copy/LSM6DS3.c **** 			mdps_lsb = 0.000f; /* Should never comes here */
+ 551:../Source - Copy/LSM6DS3.c **** 			break;
+ 552:../Source - Copy/LSM6DS3.c **** 	}
+ 553:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 554:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_z * mdps_lsb / 1000.0f);
+ 555:../Source - Copy/LSM6DS3.c **** 	else
+ 556:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_z * mdps_lsb);
+ 557:../Source - Copy/LSM6DS3.c **** }
+ 558:../Source - Copy/LSM6DS3.c **** 
+ 559:../Source - Copy/LSM6DS3.c **** /*
+ 560:../Source - Copy/LSM6DS3.c ****  * @brief  Write a value to a register and verify
+ 561:../Source - Copy/LSM6DS3.c ****  * @param  reg:  The slave's register address
+ 562:../Source - Copy/LSM6DS3.c ****  * 		   data: Pointer to parse the read data
+ 563:../Source - Copy/LSM6DS3.c ****  * 		   size: Size of data to be written
+ 564:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 565:../Source - Copy/LSM6DS3.c **** * 					- LSM6DS3_OK    		   = 0,  Success
+ 566:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 567:../Source - Copy/LSM6DS3.c **** */
+ 568:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_ReadRegister(uint8_t reg, uint8_t* data, uint16_t size) {
+  25              		.loc 1 568 0
+  26              		.cfi_startproc
+  27 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+  28              	.LCFI0:
+  29              		.cfi_def_cfa_offset 24
+  30              		.cfi_offset 0, -24
+  31              		.cfi_offset 1, -20
+  32              		.cfi_offset 2, -16
+  33              		.cfi_offset 4, -12
+  34              		.cfi_offset 5, -8
+  35              		.cfi_offset 14, -4
+  36              	.LVL0:
+  37              		.loc 1 568 0
+  38 0002 131C     		mov	r3, r2
+ 569:../Source - Copy/LSM6DS3.c **** 	if(!SPIx_ReadRegister(LSM6DS3_parameters.spi_channel,reg,data,size,LSM6DS3_parameters.timeout))
+  39              		.loc 1 569 0
+  40 0004 064A     		ldr	r2, .L2
+  41              	.LVL1:
+ 568:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_ReadRegister(uint8_t reg, uint8_t* data, uint16_t size) {
+  42              		.loc 1 568 0
+  43 0006 0C1C     		mov	r4, r1
+  44              		.loc 1 569 0
+  45 0008 9188     		ldrh	r1, [r2, #4]
+  46              	.LVL2:
+ 568:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_ReadRegister(uint8_t reg, uint8_t* data, uint16_t size) {
+  47              		.loc 1 568 0
+  48 000a 051C     		mov	r5, r0
+  49              		.loc 1 569 0
+  50 000c 0091     		str	r1, [sp]
+  51 000e 9068     		ldr	r0, [r2, #8]
+  52              	.LVL3:
+  53 0010 291C     		mov	r1, r5
+  54 0012 221C     		mov	r2, r4
+  55 0014 FFF7FEFF 		bl	SPIx_ReadRegister
+  56              		@ sp needed for prologue
+  57 0018 4342     		neg	r3, r0
+  58 001a 5841     		adc	r0, r0, r3
+  59              	.LVL4:
+ 570:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL;
+ 571:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_OK;
+ 572:../Source - Copy/LSM6DS3.c **** }
+  60              		.loc 1 572 0
+  61 001c 3EBD     		pop	{r1, r2, r3, r4, r5, pc}
+  62              	.L3:
+  63 001e C046     		.align	2
+  64              	.L2:
+  65 0020 00000000 		.word	.LANCHOR0
+  66              		.cfi_endproc
+  67              	.LFE58:
+  69              		.section	.text.LSM6DS3_WriteAndVerify.constprop.0,"ax",%progbits
+  70              		.align	1
+  71              		.code	16
+  72              		.thumb_func
+  74              	LSM6DS3_WriteAndVerify.constprop.0:
+  75              	.LFB60:
+ 573:../Source - Copy/LSM6DS3.c **** 
+ 574:../Source - Copy/LSM6DS3.c **** /*
+ 575:../Source - Copy/LSM6DS3.c ****  * @brief  Write a value to a register and verify
+ 576:../Source - Copy/LSM6DS3.c ****  * @param  reg:  The slave's register address
+ 577:../Source - Copy/LSM6DS3.c ****  * 		   data: Pointer to the data to be written
+ 578:../Source - Copy/LSM6DS3.c ****  * 		   size: Size of data to be written
+ 579:../Source - Copy/LSM6DS3.c ****  * @retval enum LSM6DS3_Result:
+ 580:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_OK    		   = 0,  Success
+ 581:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL  		   = 1,  Failed due to HAL
+ 582:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL_PARAMETERS  = 2,  Failed due to wrong parameters
+ 583:../Source - Copy/LSM6DS3.c ****  * 					- LSM6DS3_FAIL_COMPARE 	   = 3,  Failed due to wrong write/read compare
+ 584:../Source - Copy/LSM6DS3.c **** */
+ 585:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_WriteAndVerify(uint8_t reg, uint8_t* data, uint16_t size) {
+  76              		.loc 1 585 0
+  77              		.cfi_startproc
+  78 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  79              	.LCFI1:
+  80              		.cfi_def_cfa_offset 20
+  81              		.cfi_offset 4, -20
+  82              		.cfi_offset 5, -16
+  83              		.cfi_offset 6, -12
+  84              		.cfi_offset 7, -8
+  85              		.cfi_offset 14, -4
+  86              	.LVL5:
+  87 0002 8DB0     		sub	sp, sp, #52
+  88              	.LCFI2:
+  89              		.cfi_def_cfa_offset 72
+ 586:../Source - Copy/LSM6DS3.c **** 	uint8_t compare[32] = {0xFF};
+  90              		.loc 1 586 0
+  91 0004 04AD     		add	r5, sp, #16
+ 585:../Source - Copy/LSM6DS3.c **** static LSM6DS3_Result LSM6DS3_WriteAndVerify(uint8_t reg, uint8_t* data, uint16_t size) {
+  92              		.loc 1 585 0
+  93 0006 071C     		mov	r7, r0
+  94 0008 0391     		str	r1, [sp, #12]
+  95              		.loc 1 586 0
+  96 000a 2022     		mov	r2, #32
+  97 000c 0021     		mov	r1, #0
+  98              	.LVL6:
+  99 000e 281C     		mov	r0, r5
+ 100              	.LVL7:
+ 101 0010 FFF7FEFF 		bl	memset
+ 587:../Source - Copy/LSM6DS3.c **** 
+ 588:../Source - Copy/LSM6DS3.c **** 	if(size > sizeof(compare))
+ 589:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 590:../Source - Copy/LSM6DS3.c **** 
+ 591:../Source - Copy/LSM6DS3.c **** 	if(!SPIx_WriteRegister(LSM6DS3_parameters.spi_channel,reg,data,size,LSM6DS3_parameters.timeout))
+ 102              		.loc 1 591 0
+ 103 0014 124C     		ldr	r4, .L9
+ 586:../Source - Copy/LSM6DS3.c **** 	uint8_t compare[32] = {0xFF};
+ 104              		.loc 1 586 0
+ 105 0016 FF20     		mov	r0, #255
+ 106 0018 2870     		strb	r0, [r5]
+ 107              		.loc 1 591 0
+ 108 001a A388     		ldrh	r3, [r4, #4]
+ 109 001c 391C     		mov	r1, r7
+ 110 001e 0093     		str	r3, [sp]
+ 111 0020 A068     		ldr	r0, [r4, #8]
+ 112 0022 039A     		ldr	r2, [sp, #12]
+ 113 0024 0123     		mov	r3, #1
+ 114 0026 FFF7FEFF 		bl	SPIx_WriteRegister
+ 592:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL;
+ 115              		.loc 1 592 0
+ 116 002a 0126     		mov	r6, #1
+ 591:../Source - Copy/LSM6DS3.c **** 	if(!SPIx_WriteRegister(LSM6DS3_parameters.spi_channel,reg,data,size,LSM6DS3_parameters.timeout))
+ 117              		.loc 1 591 0
+ 118 002c 0028     		cmp	r0, #0
+ 119 002e 13D0     		beq	.L5
+ 593:../Source - Copy/LSM6DS3.c **** 
+ 594:../Source - Copy/LSM6DS3.c **** 
+ 595:../Source - Copy/LSM6DS3.c **** 	if(!SPIx_ReadRegister(LSM6DS3_parameters.spi_channel,reg,compare,size,LSM6DS3_parameters.timeout))
+ 120              		.loc 1 595 0
+ 121 0030 A188     		ldrh	r1, [r4, #4]
+ 122 0032 2A1C     		mov	r2, r5
+ 123 0034 0091     		str	r1, [sp]
+ 124 0036 A068     		ldr	r0, [r4, #8]
+ 125 0038 391C     		mov	r1, r7
+ 126 003a 331C     		mov	r3, r6
+ 127 003c FFF7FEFF 		bl	SPIx_ReadRegister
+ 128 0040 0028     		cmp	r0, #0
+ 129 0042 09D0     		beq	.L5
+ 130              	.LVL8:
+ 131              	.LBB3:
+ 596:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL;
+ 597:../Source - Copy/LSM6DS3.c **** 
+ 598:../Source - Copy/LSM6DS3.c **** 	for(uint8_t i=0; i < size; i++) {
+ 599:../Source - Copy/LSM6DS3.c **** 		if(compare[i] != data[i]){
+ 132              		.loc 1 599 0
+ 133 0044 2A78     		ldrb	r2, [r5]
+ 134 0046 039D     		ldr	r5, [sp, #12]
+ 600:../Source - Copy/LSM6DS3.c **** 			xprintf("not equal\r\n");
+ 601:../Source - Copy/LSM6DS3.c **** 			return LSM6DS3_FAIL_COMPARE;
+ 602:../Source - Copy/LSM6DS3.c **** 		}
+ 603:../Source - Copy/LSM6DS3.c **** 	}
+ 604:../Source - Copy/LSM6DS3.c **** 
+ 605:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_OK;
+ 135              		.loc 1 605 0
+ 136 0048 0026     		mov	r6, #0
+ 599:../Source - Copy/LSM6DS3.c **** 		if(compare[i] != data[i]){
+ 137              		.loc 1 599 0
+ 138 004a 2C78     		ldrb	r4, [r5]
+ 139 004c A242     		cmp	r2, r4
+ 140 004e 03D0     		beq	.L5
+ 600:../Source - Copy/LSM6DS3.c **** 			xprintf("not equal\r\n");
+ 141              		.loc 1 600 0
+ 142 0050 0448     		ldr	r0, .L9+4
+ 143 0052 FFF7FEFF 		bl	xprintf
+ 601:../Source - Copy/LSM6DS3.c **** 			return LSM6DS3_FAIL_COMPARE;
+ 144              		.loc 1 601 0
+ 145 0056 0326     		mov	r6, #3
+ 146              	.LVL9:
+ 147              	.L5:
+ 148              	.LBE3:
+ 606:../Source - Copy/LSM6DS3.c **** }
+ 149              		.loc 1 606 0
+ 150 0058 301C     		mov	r0, r6
+ 151 005a 0DB0     		add	sp, sp, #52
+ 152              		@ sp needed for prologue
+ 153 005c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 154              	.L10:
+ 155 005e C046     		.align	2
+ 156              	.L9:
+ 157 0060 00000000 		.word	.LANCHOR0
+ 158 0064 00000000 		.word	.LC2
+ 159              		.cfi_endproc
+ 160              	.LFE60:
+ 162              		.section	.text.LSM6DS3_Initialize,"ax",%progbits
+ 163              		.align	1
+ 164              		.global	LSM6DS3_Initialize
+ 165              		.code	16
+ 166              		.thumb_func
+ 168              	LSM6DS3_Initialize:
+ 169              	.LFB33:
+  24:../Source - Copy/LSM6DS3.c **** void LSM6DS3_Initialize(SPI_TypeDef* spi_channel, uint16_t timeout) {
+ 170              		.loc 1 24 0
+ 171              		.cfi_startproc
+ 172 0000 38B5     		push	{r3, r4, r5, lr}
+ 173              	.LCFI3:
+ 174              		.cfi_def_cfa_offset 16
+ 175              		.cfi_offset 3, -16
+ 176              		.cfi_offset 4, -12
+ 177              		.cfi_offset 5, -8
+ 178              		.cfi_offset 14, -4
+ 179              	.LVL10:
+  24:../Source - Copy/LSM6DS3.c **** void LSM6DS3_Initialize(SPI_TypeDef* spi_channel, uint16_t timeout) {
+ 180              		.loc 1 24 0
+ 181 0002 0D1C     		mov	r5, r1
+ 182 0004 041C     		mov	r4, r0
+  26:../Source - Copy/LSM6DS3.c **** 	SPIx_init(spi_channel);
+ 183              		.loc 1 26 0
+ 184 0006 FFF7FEFF 		bl	SPIx_init
+ 185              	.LVL11:
+  27:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.timeout	   = timeout;
+ 186              		.loc 1 27 0
+ 187 000a 024B     		ldr	r3, .L12
+ 188              		@ sp needed for prologue
+ 189 000c 9D80     		strh	r5, [r3, #4]
+  28:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.spi_channel = spi_channel;
+ 190              		.loc 1 28 0
+ 191 000e 9C60     		str	r4, [r3, #8]
+ 192              	.LVL12:
+  29:../Source - Copy/LSM6DS3.c **** }
+ 193              		.loc 1 29 0
+ 194 0010 38BD     		pop	{r3, r4, r5, pc}
+ 195              	.L13:
+ 196 0012 C046     		.align	2
+ 197              	.L12:
+ 198 0014 00000000 		.word	.LANCHOR0
+ 199              		.cfi_endproc
+ 200              	.LFE33:
+ 202              		.section	.text.LSM6DS3_Detect,"ax",%progbits
+ 203              		.align	1
+ 204              		.global	LSM6DS3_Detect
+ 205              		.code	16
+ 206              		.thumb_func
+ 208              	LSM6DS3_Detect:
+ 209              	.LFB34:
+  38:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_Detect(uint8_t efforts) {
+ 210              		.loc 1 38 0
+ 211              		.cfi_startproc
+ 212 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 213              	.LCFI4:
+ 214              		.cfi_def_cfa_offset 24
+ 215              		.cfi_offset 0, -24
+ 216              		.cfi_offset 1, -20
+ 217              		.cfi_offset 2, -16
+ 218              		.cfi_offset 4, -12
+ 219              		.cfi_offset 5, -8
+ 220              		.cfi_offset 14, -4
+ 221              	.LVL13:
+  38:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_Detect(uint8_t efforts) {
+ 222              		.loc 1 38 0
+ 223 0002 051C     		mov	r5, r0
+  41:../Source - Copy/LSM6DS3.c **** 	while(efforts > 0) {
+ 224              		.loc 1 41 0
+ 225 0004 18E0     		b	.L15
+ 226              	.LVL14:
+ 227              	.L18:
+  42:../Source - Copy/LSM6DS3.c **** 		if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_WHO_AM_I_REG, &byte, sizeof(byte)) == LSM6DS3_OK) {
+ 228              		.loc 1 42 0
+ 229 0006 6C46     		mov	r4, sp
+ 230 0008 0734     		add	r4, r4, #7
+ 231 000a 0F20     		mov	r0, #15
+ 232 000c 211C     		mov	r1, r4
+ 233 000e 0122     		mov	r2, #1
+ 234 0010 FFF7FEFF 		bl	LSM6DS3_ReadRegister
+ 235 0014 0028     		cmp	r0, #0
+ 236 0016 0AD1     		bne	.L16
+  43:../Source - Copy/LSM6DS3.c **** 			if(byte == LSM6DS3N_WHO_I_AM_RESPONSE ||
+ 237              		.loc 1 43 0
+ 238 0018 2378     		ldrb	r3, [r4]
+ 239 001a 692B     		cmp	r3, #105
+ 240 001c 10D0     		beq	.L19
+ 241 001e 181C     		mov	r0, r3
+ 242 0020 6C38     		sub	r0, r0, #108
+ 243 0022 4242     		neg	r2, r0
+ 244 0024 5041     		adc	r0, r0, r2
+ 245 0026 0028     		cmp	r0, #0
+ 246 0028 0AD1     		bne	.L19
+  44:../Source - Copy/LSM6DS3.c **** 					byte == LSM6DS3_WHO_I_AM_RESPONSE ||
+ 247              		.loc 1 44 0
+ 248 002a 6A2B     		cmp	r3, #106
+ 249 002c 09D0     		beq	.L17
+ 250              	.L16:
+  50:../Source - Copy/LSM6DS3.c **** 		delay_ms(2);
+ 251              		.loc 1 50 0
+ 252 002e 0220     		mov	r0, #2
+ 253 0030 FFF7FEFF 		bl	delay_ms
+  51:../Source - Copy/LSM6DS3.c **** 		efforts--;
+ 254              		.loc 1 51 0
+ 255 0034 013D     		sub	r5, r5, #1
+ 256              	.LVL15:
+ 257 0036 EDB2     		uxtb	r5, r5
+ 258              	.LVL16:
+ 259              	.L15:
+  41:../Source - Copy/LSM6DS3.c **** 	while(efforts > 0) {
+ 260              		.loc 1 41 0 discriminator 1
+ 261 0038 002D     		cmp	r5, #0
+ 262 003a E4D1     		bne	.L18
+  53:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 263              		.loc 1 53 0
+ 264 003c 0120     		mov	r0, #1
+ 265 003e 00E0     		b	.L17
+ 266              	.L19:
+  47:../Source - Copy/LSM6DS3.c **** 				return LSM6DS3_OK;
+ 267              		.loc 1 47 0
+ 268 0040 0020     		mov	r0, #0
+ 269              	.L17:
+ 270              		@ sp needed for prologue
+ 271              	.LVL17:
+  54:../Source - Copy/LSM6DS3.c **** }
+ 272              		.loc 1 54 0
+ 273 0042 3EBD     		pop	{r1, r2, r3, r4, r5, pc}
+ 274              		.cfi_endproc
+ 275              	.LFE34:
+ 277              		.section	.text.LSM6DS3_XL_Start,"ax",%progbits
+ 278              		.align	1
+ 279              		.global	LSM6DS3_XL_Start
+ 280              		.code	16
+ 281              		.thumb_func
+ 283              	LSM6DS3_XL_Start:
+ 284              	.LFB35:
+  84:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_XL_Start(uint8_t XL_Rate, uint8_t XL_Scale, uint8_t XL_Filter) {
+ 285              		.loc 1 84 0
+ 286              		.cfi_startproc
+ 287 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 288              	.LCFI5:
+ 289              		.cfi_def_cfa_offset 24
+ 290              		.cfi_offset 0, -24
+ 291              		.cfi_offset 1, -20
+ 292              		.cfi_offset 4, -16
+ 293              		.cfi_offset 5, -12
+ 294              		.cfi_offset 6, -8
+ 295              		.cfi_offset 14, -4
+ 296              	.LVL18:
+  85:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = (XL_Rate << 4) | ((XL_Scale << 2) & 0x0F) | (XL_Filter & 0x03);
+ 297              		.loc 1 85 0
+ 298 0002 0324     		mov	r4, #3
+ 299 0004 0501     		lsl	r5, r0, #4
+  84:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_XL_Start(uint8_t XL_Rate, uint8_t XL_Scale, uint8_t XL_Filter) {
+ 300              		.loc 1 84 0
+ 301 0006 0B1C     		mov	r3, r1
+  85:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = (XL_Rate << 4) | ((XL_Scale << 2) & 0x0F) | (XL_Filter & 0x03);
+ 302              		.loc 1 85 0
+ 303 0008 1440     		and	r4, r2
+ 304 000a 2C43     		orr	r4, r5
+ 305 000c 9E00     		lsl	r6, r3, #2
+ 306 000e 0F25     		mov	r5, #15
+ 307 0010 6946     		mov	r1, sp
+ 308              	.LVL19:
+ 309 0012 3540     		and	r5, r6
+ 310 0014 2C43     		orr	r4, r5
+ 311 0016 0731     		add	r1, r1, #7
+ 312 0018 0C70     		strb	r4, [r1]
+ 313              	.LVL20:
+ 314              	.LBB6:
+ 315              	.LBB7:
+ 125:../Source - Copy/LSM6DS3.c **** 	if((XL_Rate < XL_12_5Hz) || (XL_Rate > XL_6660Hz))
+ 316              		.loc 1 125 0
+ 317 001a 441E     		sub	r4, r0, #1
+  89:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 318              		.loc 1 89 0
+ 319 001c 0220     		mov	r0, #2
+ 320              	.LVL21:
+ 125:../Source - Copy/LSM6DS3.c **** 	if((XL_Rate < XL_12_5Hz) || (XL_Rate > XL_6660Hz))
+ 321              		.loc 1 125 0
+ 322 001e 092C     		cmp	r4, #9
+ 323 0020 0AD8     		bhi	.L22
+ 127:../Source - Copy/LSM6DS3.c **** 	else if((XL_Range < XL_RANGE_2G) || (XL_Range > XL_RANGE_8G))
+ 324              		.loc 1 127 0
+ 325 0022 032B     		cmp	r3, #3
+ 326 0024 08D8     		bhi	.L22
+ 129:../Source - Copy/LSM6DS3.c **** 	else if((XL_Filter < XL_FILTER_400Hz) || (XL_Filter > XL_FILTER_50Hz))
+ 327              		.loc 1 129 0
+ 328 0026 032A     		cmp	r2, #3
+ 329 0028 06D8     		bhi	.L22
+ 131:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.XL_range = XL_Range;
+ 330              		.loc 1 131 0
+ 331 002a 044A     		ldr	r2, .L26
+ 332              	.LVL22:
+ 333              	.LBE7:
+ 334              	.LBE6:
+  93:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL1_XL, &byte, sizeof(byte)) !=  LSM6DS3_OK){
+ 335              		.loc 1 93 0
+ 336 002c 1020     		mov	r0, #16
+ 337              	.LBB9:
+ 338              	.LBB8:
+ 131:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.XL_range = XL_Range;
+ 339              		.loc 1 131 0
+ 340 002e 1370     		strb	r3, [r2]
+ 341              	.LBE8:
+ 342              	.LBE9:
+  93:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL1_XL, &byte, sizeof(byte)) !=  LSM6DS3_OK){
+ 343              		.loc 1 93 0
+ 344 0030 FFF7FEFF 		bl	LSM6DS3_WriteAndVerify.constprop.0
+ 345              	.LVL23:
+  89:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 346              		.loc 1 89 0
+ 347 0034 431E     		sub	r3, r0, #1
+ 348 0036 9841     		sbc	r0, r0, r3
+ 349              	.L22:
+ 350              		@ sp needed for prologue
+ 351              	.LVL24:
+ 100:../Source - Copy/LSM6DS3.c **** }
+ 352              		.loc 1 100 0
+ 353 0038 76BD     		pop	{r1, r2, r4, r5, r6, pc}
+ 354              	.L27:
+ 355 003a C046     		.align	2
+ 356              	.L26:
+ 357 003c 00000000 		.word	.LANCHOR0
+ 358              		.cfi_endproc
+ 359              	.LFE35:
+ 361              		.section	.text.LSM6DS3_XL_Stop,"ax",%progbits
+ 362              		.align	1
+ 363              		.global	LSM6DS3_XL_Stop
+ 364              		.code	16
+ 365              		.thumb_func
+ 367              	LSM6DS3_XL_Stop:
+ 368              	.LFB36:
+ 109:../Source - Copy/LSM6DS3.c **** uint8_t LSM6DS3_XL_Stop(void) {
+ 369              		.loc 1 109 0
+ 370              		.cfi_startproc
+ 371 0000 07B5     		push	{r0, r1, r2, lr}
+ 372              	.LCFI6:
+ 373              		.cfi_def_cfa_offset 16
+ 374              		.cfi_offset 0, -16
+ 375              		.cfi_offset 1, -12
+ 376              		.cfi_offset 2, -8
+ 377              		.cfi_offset 14, -4
+ 110:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = XL_POWER_DOWN;
+ 378              		.loc 1 110 0
+ 379 0002 6946     		mov	r1, sp
+ 380 0004 0023     		mov	r3, #0
+ 381 0006 0731     		add	r1, r1, #7
+ 382 0008 0B70     		strb	r3, [r1]
+ 383              	.LVL25:
+ 112:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL1_XL, &byte, sizeof(byte)) ==  LSM6DS3_OK)
+ 384              		.loc 1 112 0
+ 385 000a 1020     		mov	r0, #16
+ 386 000c FFF7FEFF 		bl	LSM6DS3_WriteAndVerify.constprop.0
+ 387              		@ sp needed for prologue
+ 388 0010 431E     		sub	r3, r0, #1
+ 389 0012 9841     		sbc	r0, r0, r3
+ 115:../Source - Copy/LSM6DS3.c **** }
+ 390              		.loc 1 115 0
+ 391 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 392              		.cfi_endproc
+ 393              	.LFE36:
+ 395              		.section	.text.LSM6DS3_XL_GetMeasurements,"ax",%progbits
+ 396              		.align	1
+ 397              		.global	LSM6DS3_XL_GetMeasurements
+ 398              		.code	16
+ 399              		.thumb_func
+ 401              	LSM6DS3_XL_GetMeasurements:
+ 402              	.LFB38:
+ 142:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_XL_GetMeasurements(void) {
+ 403              		.loc 1 142 0
+ 404              		.cfi_startproc
+ 405 0000 13B5     		push	{r0, r1, r4, lr}
+ 406              	.LCFI7:
+ 407              		.cfi_def_cfa_offset 16
+ 408              		.cfi_offset 0, -16
+ 409              		.cfi_offset 1, -12
+ 410              		.cfi_offset 4, -8
+ 411              		.cfi_offset 14, -4
+ 143:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[6] = {0};
+ 412              		.loc 1 143 0
+ 413 0002 0023     		mov	r3, #0
+ 414 0004 6946     		mov	r1, sp
+ 415 0006 8B80     		strh	r3, [r1, #4]
+ 145:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_XL, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 416              		.loc 1 145 0
+ 417 0008 2820     		mov	r0, #40
+ 418 000a 0622     		mov	r2, #6
+ 143:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[6] = {0};
+ 419              		.loc 1 143 0
+ 420 000c 0093     		str	r3, [sp]
+ 145:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_XL, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 421              		.loc 1 145 0
+ 422 000e FFF7FEFF 		bl	LSM6DS3_ReadRegister
+ 151:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 423              		.loc 1 151 0
+ 424 0012 0123     		mov	r3, #1
+ 145:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_XL, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 425              		.loc 1 145 0
+ 426 0014 0028     		cmp	r0, #0
+ 427 0016 11D1     		bne	.L30
+ 146:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_x = (int16_t) (bytes[1]<<8 | bytes[0]);
+ 428              		.loc 1 146 0
+ 429 0018 6C46     		mov	r4, sp
+ 430 001a 6278     		ldrb	r2, [r4, #1]
+ 431 001c 2178     		ldrb	r1, [r4]
+ 432 001e 084B     		ldr	r3, .L32
+ 433 0020 1202     		lsl	r2, r2, #8
+ 434 0022 0A43     		orr	r2, r1
+ 435 0024 1A80     		strh	r2, [r3]
+ 147:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_y = (int16_t) (bytes[3]<<8 | bytes[2]);
+ 436              		.loc 1 147 0
+ 437 0026 E278     		ldrb	r2, [r4, #3]
+ 438 0028 A178     		ldrb	r1, [r4, #2]
+ 439 002a 1202     		lsl	r2, r2, #8
+ 440 002c 0A43     		orr	r2, r1
+ 441 002e 5A80     		strh	r2, [r3, #2]
+ 148:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_z = (int16_t) (bytes[5]<<8 | bytes[4]);
+ 442              		.loc 1 148 0
+ 443 0030 6279     		ldrb	r2, [r4, #5]
+ 444 0032 2179     		ldrb	r1, [r4, #4]
+ 445 0034 1202     		lsl	r2, r2, #8
+ 446 0036 0A43     		orr	r2, r1
+ 447 0038 9A80     		strh	r2, [r3, #4]
+ 149:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 448              		.loc 1 149 0
+ 449 003a 031C     		mov	r3, r0
+ 450              	.L30:
+ 152:../Source - Copy/LSM6DS3.c **** }
+ 451              		.loc 1 152 0
+ 452 003c 181C     		mov	r0, r3
+ 453              		@ sp needed for prologue
+ 454 003e 16BD     		pop	{r1, r2, r4, pc}
+ 455              	.L33:
+ 456              		.align	2
+ 457              	.L32:
+ 458 0040 00000000 		.word	.LANCHOR1
+ 459              		.cfi_endproc
+ 460              	.LFE38:
+ 462              		.section	.text.LSM6DS3_GS_Start,"ax",%progbits
+ 463              		.align	1
+ 464              		.global	LSM6DS3_GS_Start
+ 465              		.code	16
+ 466              		.thumb_func
+ 468              	LSM6DS3_GS_Start:
+ 469              	.LFB39:
+ 177:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_GS_Start(uint8_t GS_Rate, uint8_t GS_Range) {
+ 470              		.loc 1 177 0
+ 471              		.cfi_startproc
+ 472 0000 13B5     		push	{r0, r1, r4, lr}
+ 473              	.LCFI8:
+ 474              		.cfi_def_cfa_offset 16
+ 475              		.cfi_offset 0, -16
+ 476              		.cfi_offset 1, -12
+ 477              		.cfi_offset 4, -8
+ 478              		.cfi_offset 14, -4
+ 479              	.LVL26:
+ 178:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = (GS_Rate << 4) | ((GS_Range << 1) & 0x0F);
+ 480              		.loc 1 178 0
+ 481 0002 4C00     		lsl	r4, r1, #1
+ 482 0004 0F22     		mov	r2, #15
+ 483 0006 2240     		and	r2, r4
+ 484 0008 0401     		lsl	r4, r0, #4
+ 180:../Source - Copy/LSM6DS3.c **** 	byte &= 0xFE; /* Always secure the LSB is 0 */
+ 485              		.loc 1 180 0
+ 486 000a 6B46     		mov	r3, sp
+ 487 000c 2243     		orr	r2, r4
+ 488              	.LBB12:
+ 489              	.LBB13:
+ 219:../Source - Copy/LSM6DS3.c **** 	if((GS_Rate < GS_12_5Hz) || (GS_Rate > GS_1666Hz))
+ 490              		.loc 1 219 0
+ 491 000e 0138     		sub	r0, r0, #1
+ 492              	.LVL27:
+ 493              	.LBE13:
+ 494              	.LBE12:
+ 180:../Source - Copy/LSM6DS3.c **** 	byte &= 0xFE; /* Always secure the LSB is 0 */
+ 495              		.loc 1 180 0
+ 496 0010 DA71     		strb	r2, [r3, #7]
+ 497              	.LVL28:
+ 498 0012 0733     		add	r3, r3, #7
+ 499              	.LVL29:
+ 500              	.LBB15:
+ 501              	.LBB14:
+ 219:../Source - Copy/LSM6DS3.c **** 	if((GS_Rate < GS_12_5Hz) || (GS_Rate > GS_1666Hz))
+ 502              		.loc 1 219 0
+ 503 0014 0728     		cmp	r0, #7
+ 504 0016 0ED8     		bhi	.L35
+ 221:../Source - Copy/LSM6DS3.c **** 	else if((GS_Range < GS_RANGE_250dps) || (GS_Range > GS_RANGE_2000dps) || (GS_Range == 3) || (GS_Ra
+ 505              		.loc 1 221 0
+ 506 0018 0329     		cmp	r1, #3
+ 507 001a 0CD0     		beq	.L35
+ 508 001c 0629     		cmp	r1, #6
+ 509 001e 0AD8     		bhi	.L35
+ 510 0020 0529     		cmp	r1, #5
+ 511 0022 08D0     		beq	.L35
+ 223:../Source - Copy/LSM6DS3.c **** 	LSM6DS3_parameters.GS_range = GS_Range;
+ 512              		.loc 1 223 0
+ 513 0024 0B48     		ldr	r0, .L38
+ 514 0026 4170     		strb	r1, [r0, #1]
+ 515              	.LBE14:
+ 516              	.LBE15:
+ 188:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL2_G, &byte, sizeof(byte)) !=  LSM6DS3_OK){
+ 517              		.loc 1 188 0
+ 518 0028 1120     		mov	r0, #17
+ 519 002a 191C     		mov	r1, r3
+ 520              	.LVL30:
+ 521 002c FFF7FEFF 		bl	LSM6DS3_WriteAndVerify.constprop.0
+ 522              	.LVL31:
+ 523 0030 0028     		cmp	r0, #0
+ 524 0032 0DD0     		beq	.L37
+ 525 0034 06E0     		b	.L36
+ 526              	.LVL32:
+ 527              	.L35:
+ 183:../Source - Copy/LSM6DS3.c **** 		xprintf("%s-%d\r\n",__func__,__LINE__);
+ 528              		.loc 1 183 0
+ 529 0036 0848     		ldr	r0, .L38+4
+ 530 0038 0849     		ldr	r1, .L38+8
+ 531              	.LVL33:
+ 532 003a B722     		mov	r2, #183
+ 533 003c FFF7FEFF 		bl	xprintf
+ 184:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL_PARAMETERS;
+ 534              		.loc 1 184 0
+ 535 0040 0220     		mov	r0, #2
+ 536 0042 05E0     		b	.L37
+ 537              	.L36:
+ 189:../Source - Copy/LSM6DS3.c **** 		xprintf("%s-%d\r\n",__func__,__LINE__);
+ 538              		.loc 1 189 0
+ 539 0044 0448     		ldr	r0, .L38+4
+ 540 0046 0549     		ldr	r1, .L38+8
+ 541 0048 BD22     		mov	r2, #189
+ 542 004a FFF7FEFF 		bl	xprintf
+ 190:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_FAIL;
+ 543              		.loc 1 190 0
+ 544 004e 0120     		mov	r0, #1
+ 545              	.L37:
+ 546              		@ sp needed for prologue
+ 194:../Source - Copy/LSM6DS3.c **** }
+ 547              		.loc 1 194 0
+ 548 0050 16BD     		pop	{r1, r2, r4, pc}
+ 549              	.L39:
+ 550 0052 C046     		.align	2
+ 551              	.L38:
+ 552 0054 00000000 		.word	.LANCHOR0
+ 553 0058 0C000000 		.word	.LC8
+ 554 005c 00000000 		.word	.LANCHOR2
+ 555              		.cfi_endproc
+ 556              	.LFE39:
+ 558              		.section	.text.LSM6DS3_GS_Stop,"ax",%progbits
+ 559              		.align	1
+ 560              		.global	LSM6DS3_GS_Stop
+ 561              		.code	16
+ 562              		.thumb_func
+ 564              	LSM6DS3_GS_Stop:
+ 565              	.LFB40:
+ 203:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_GS_Stop(void) {
+ 566              		.loc 1 203 0
+ 567              		.cfi_startproc
+ 568 0000 07B5     		push	{r0, r1, r2, lr}
+ 569              	.LCFI9:
+ 570              		.cfi_def_cfa_offset 16
+ 571              		.cfi_offset 0, -16
+ 572              		.cfi_offset 1, -12
+ 573              		.cfi_offset 2, -8
+ 574              		.cfi_offset 14, -4
+ 204:../Source - Copy/LSM6DS3.c **** 	uint8_t byte = GS_POWER_DOWN;
+ 575              		.loc 1 204 0
+ 576 0002 6946     		mov	r1, sp
+ 577 0004 0023     		mov	r3, #0
+ 578 0006 0731     		add	r1, r1, #7
+ 579 0008 0B70     		strb	r3, [r1]
+ 580              	.LVL34:
+ 206:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_WriteAndVerify(LSM6DS3_XL_GS_CTRL2_G, &byte, sizeof(byte)) ==  LSM6DS3_OK)
+ 581              		.loc 1 206 0
+ 582 000a 1120     		mov	r0, #17
+ 583 000c FFF7FEFF 		bl	LSM6DS3_WriteAndVerify.constprop.0
+ 584              		@ sp needed for prologue
+ 585 0010 431E     		sub	r3, r0, #1
+ 586 0012 9841     		sbc	r0, r0, r3
+ 209:../Source - Copy/LSM6DS3.c **** }
+ 587              		.loc 1 209 0
+ 588 0014 0EBD     		pop	{r1, r2, r3, pc}
+ 589              		.cfi_endproc
+ 590              	.LFE40:
+ 592              		.section	.text.LSM6DS3_GS_GetMeasurements,"ax",%progbits
+ 593              		.align	1
+ 594              		.global	LSM6DS3_GS_GetMeasurements
+ 595              		.code	16
+ 596              		.thumb_func
+ 598              	LSM6DS3_GS_GetMeasurements:
+ 599              	.LFB42:
+ 234:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_GS_GetMeasurements(void) {
+ 600              		.loc 1 234 0
+ 601              		.cfi_startproc
+ 602 0000 13B5     		push	{r0, r1, r4, lr}
+ 603              	.LCFI10:
+ 604              		.cfi_def_cfa_offset 16
+ 605              		.cfi_offset 0, -16
+ 606              		.cfi_offset 1, -12
+ 607              		.cfi_offset 4, -8
+ 608              		.cfi_offset 14, -4
+ 235:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[6] = {0};
+ 609              		.loc 1 235 0
+ 610 0002 0023     		mov	r3, #0
+ 611 0004 6946     		mov	r1, sp
+ 612 0006 8B80     		strh	r3, [r1, #4]
+ 237:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_GS, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 613              		.loc 1 237 0
+ 614 0008 2220     		mov	r0, #34
+ 615 000a 0622     		mov	r2, #6
+ 235:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[6] = {0};
+ 616              		.loc 1 235 0
+ 617 000c 0093     		str	r3, [sp]
+ 237:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_GS, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 618              		.loc 1 237 0
+ 619 000e FFF7FEFF 		bl	LSM6DS3_ReadRegister
+ 243:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 620              		.loc 1 243 0
+ 621 0012 0123     		mov	r3, #1
+ 237:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUTX_L_GS, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 622              		.loc 1 237 0
+ 623 0014 0028     		cmp	r0, #0
+ 624 0016 11D1     		bne	.L42
+ 238:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_x = (int16_t) (bytes[1]<<8 | bytes[0]);
+ 625              		.loc 1 238 0
+ 626 0018 6C46     		mov	r4, sp
+ 627 001a 6278     		ldrb	r2, [r4, #1]
+ 628 001c 2178     		ldrb	r1, [r4]
+ 629 001e 084B     		ldr	r3, .L44
+ 630 0020 1202     		lsl	r2, r2, #8
+ 631 0022 0A43     		orr	r2, r1
+ 632 0024 DA80     		strh	r2, [r3, #6]
+ 239:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_y = (int16_t) (bytes[3]<<8 | bytes[2]);
+ 633              		.loc 1 239 0
+ 634 0026 E278     		ldrb	r2, [r4, #3]
+ 635 0028 A178     		ldrb	r1, [r4, #2]
+ 636 002a 1202     		lsl	r2, r2, #8
+ 637 002c 0A43     		orr	r2, r1
+ 638 002e 1A81     		strh	r2, [r3, #8]
+ 240:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_z = (int16_t) (bytes[5]<<8 | bytes[4]);
+ 639              		.loc 1 240 0
+ 640 0030 6279     		ldrb	r2, [r4, #5]
+ 641 0032 2179     		ldrb	r1, [r4, #4]
+ 642 0034 1202     		lsl	r2, r2, #8
+ 643 0036 0A43     		orr	r2, r1
+ 644 0038 5A81     		strh	r2, [r3, #10]
+ 241:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 645              		.loc 1 241 0
+ 646 003a 031C     		mov	r3, r0
+ 647              	.L42:
+ 244:../Source - Copy/LSM6DS3.c **** }
+ 648              		.loc 1 244 0
+ 649 003c 181C     		mov	r0, r3
+ 650              		@ sp needed for prologue
+ 651 003e 16BD     		pop	{r1, r2, r4, pc}
+ 652              	.L45:
+ 653              		.align	2
+ 654              	.L44:
+ 655 0040 00000000 		.word	.LANCHOR1
+ 656              		.cfi_endproc
+ 657              	.LFE42:
+ 659              		.section	.text.LSM6DS3_IMU_GetMeasurements,"ax",%progbits
+ 660              		.align	1
+ 661              		.global	LSM6DS3_IMU_GetMeasurements
+ 662              		.code	16
+ 663              		.thumb_func
+ 665              	LSM6DS3_IMU_GetMeasurements:
+ 666              	.LFB43:
+ 253:../Source - Copy/LSM6DS3.c **** LSM6DS3_Result LSM6DS3_IMU_GetMeasurements(void) {
+ 667              		.loc 1 253 0
+ 668              		.cfi_startproc
+ 669 0000 1FB5     		push	{r0, r1, r2, r3, r4, lr}
+ 670              	.LCFI11:
+ 671              		.cfi_def_cfa_offset 24
+ 672              		.cfi_offset 0, -24
+ 673              		.cfi_offset 1, -20
+ 674              		.cfi_offset 2, -16
+ 675              		.cfi_offset 3, -12
+ 676              		.cfi_offset 4, -8
+ 677              		.cfi_offset 14, -4
+ 254:../Source - Copy/LSM6DS3.c **** 	uint8_t bytes[14] = {0};
+ 678              		.loc 1 254 0
+ 679 0002 0021     		mov	r1, #0
+ 680 0004 0E22     		mov	r2, #14
+ 681 0006 6846     		mov	r0, sp
+ 682 0008 FFF7FEFF 		bl	memset
+ 256:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUT_TEMP_L, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 683              		.loc 1 256 0
+ 684 000c 2020     		mov	r0, #32
+ 685 000e 6946     		mov	r1, sp
+ 686 0010 0E22     		mov	r2, #14
+ 687 0012 FFF7FEFF 		bl	LSM6DS3_ReadRegister
+ 266:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_FAIL;
+ 688              		.loc 1 266 0
+ 689 0016 0123     		mov	r3, #1
+ 256:../Source - Copy/LSM6DS3.c **** 	if(LSM6DS3_ReadRegister(LSM6DS3_XL_GS_OUT_TEMP_L, bytes, sizeof(bytes)) == LSM6DS3_OK) {
+ 690              		.loc 1 256 0
+ 691 0018 0028     		cmp	r0, #0
+ 692 001a 26D1     		bne	.L47
+ 257:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.Temperature = (int16_t) (bytes[1]<<8  | bytes[0]);
+ 693              		.loc 1 257 0
+ 694 001c 6946     		mov	r1, sp
+ 695 001e 4A78     		ldrb	r2, [r1, #1]
+ 696 0020 0978     		ldrb	r1, [r1]
+ 697 0022 134B     		ldr	r3, .L49
+ 698 0024 1402     		lsl	r4, r2, #8
+ 699 0026 0C43     		orr	r4, r1
+ 700 0028 9C81     		strh	r4, [r3, #12]
+ 258:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_x 		 = (int16_t) (bytes[3]<<8  | bytes[2]);
+ 701              		.loc 1 258 0
+ 702 002a 6C46     		mov	r4, sp
+ 703 002c E278     		ldrb	r2, [r4, #3]
+ 704 002e A178     		ldrb	r1, [r4, #2]
+ 705 0030 1202     		lsl	r2, r2, #8
+ 706 0032 0A43     		orr	r2, r1
+ 707 0034 DA80     		strh	r2, [r3, #6]
+ 259:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_y 		 = (int16_t) (bytes[5]<<8  | bytes[4]);
+ 708              		.loc 1 259 0
+ 709 0036 6279     		ldrb	r2, [r4, #5]
+ 710 0038 2179     		ldrb	r1, [r4, #4]
+ 711 003a 1202     		lsl	r2, r2, #8
+ 712 003c 0A43     		orr	r2, r1
+ 713 003e 1A81     		strh	r2, [r3, #8]
+ 260:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.GS_z 		 = (int16_t) (bytes[7]<<8  | bytes[6]);
+ 714              		.loc 1 260 0
+ 715 0040 E279     		ldrb	r2, [r4, #7]
+ 716 0042 A179     		ldrb	r1, [r4, #6]
+ 717 0044 1202     		lsl	r2, r2, #8
+ 718 0046 0A43     		orr	r2, r1
+ 719 0048 5A81     		strh	r2, [r3, #10]
+ 261:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_x 		 = (int16_t) (bytes[9]<<8  | bytes[8]);
+ 720              		.loc 1 261 0
+ 721 004a 627A     		ldrb	r2, [r4, #9]
+ 722 004c 217A     		ldrb	r1, [r4, #8]
+ 723 004e 1202     		lsl	r2, r2, #8
+ 724 0050 0A43     		orr	r2, r1
+ 725 0052 1A80     		strh	r2, [r3]
+ 262:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_y 		 = (int16_t) (bytes[11]<<8 | bytes[10]);
+ 726              		.loc 1 262 0
+ 727 0054 E27A     		ldrb	r2, [r4, #11]
+ 728 0056 A17A     		ldrb	r1, [r4, #10]
+ 729 0058 1202     		lsl	r2, r2, #8
+ 730 005a 0A43     		orr	r2, r1
+ 731 005c 5A80     		strh	r2, [r3, #2]
+ 263:../Source - Copy/LSM6DS3.c **** 		LSM6DS3_data.XL_z 		 = (int16_t) (bytes[13]<<8 | bytes[12]);
+ 732              		.loc 1 263 0
+ 733 005e 627B     		ldrb	r2, [r4, #13]
+ 734 0060 217B     		ldrb	r1, [r4, #12]
+ 735 0062 1202     		lsl	r2, r2, #8
+ 736 0064 0A43     		orr	r2, r1
+ 737 0066 9A80     		strh	r2, [r3, #4]
+ 264:../Source - Copy/LSM6DS3.c **** 		return LSM6DS3_OK;
+ 738              		.loc 1 264 0
+ 739 0068 031C     		mov	r3, r0
+ 740              	.L47:
+ 267:../Source - Copy/LSM6DS3.c **** }
+ 741              		.loc 1 267 0
+ 742 006a 181C     		mov	r0, r3
+ 743 006c 04B0     		add	sp, sp, #16
+ 744              		@ sp needed for prologue
+ 745 006e 10BD     		pop	{r4, pc}
+ 746              	.L50:
+ 747              		.align	2
+ 748              	.L49:
+ 749 0070 00000000 		.word	.LANCHOR1
+ 750              		.cfi_endproc
+ 751              	.LFE43:
+ 753              		.section	.text.LSM6DS3_GetXL_X_Int16,"ax",%progbits
+ 754              		.align	1
+ 755              		.global	LSM6DS3_GetXL_X_Int16
+ 756              		.code	16
+ 757              		.thumb_func
+ 759              	LSM6DS3_GetXL_X_Int16:
+ 760              	.LFB44:
+ 274:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetXL_X_Int16(void) {
+ 761              		.loc 1 274 0
+ 762              		.cfi_startproc
+ 275:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.XL_x;
+ 763              		.loc 1 275 0
+ 764 0000 014B     		ldr	r3, .L52
+ 765              		@ sp needed for prologue
+ 766 0002 0022     		mov	r2, #0
+ 767 0004 985E     		ldrsh	r0, [r3, r2]
+ 276:../Source - Copy/LSM6DS3.c **** }
+ 768              		.loc 1 276 0
+ 769 0006 7047     		bx	lr
+ 770              	.L53:
+ 771              		.align	2
+ 772              	.L52:
+ 773 0008 00000000 		.word	.LANCHOR1
+ 774              		.cfi_endproc
+ 775              	.LFE44:
+ 777              		.section	.text.LSM6DS3_GetXL_Y_Int16,"ax",%progbits
+ 778              		.align	1
+ 779              		.global	LSM6DS3_GetXL_Y_Int16
+ 780              		.code	16
+ 781              		.thumb_func
+ 783              	LSM6DS3_GetXL_Y_Int16:
+ 784              	.LFB45:
+ 283:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetXL_Y_Int16(void) {
+ 785              		.loc 1 283 0
+ 786              		.cfi_startproc
+ 284:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.XL_y;
+ 787              		.loc 1 284 0
+ 788 0000 014B     		ldr	r3, .L55
+ 789              		@ sp needed for prologue
+ 790 0002 0222     		mov	r2, #2
+ 791 0004 985E     		ldrsh	r0, [r3, r2]
+ 285:../Source - Copy/LSM6DS3.c **** }
+ 792              		.loc 1 285 0
+ 793 0006 7047     		bx	lr
+ 794              	.L56:
+ 795              		.align	2
+ 796              	.L55:
+ 797 0008 00000000 		.word	.LANCHOR1
+ 798              		.cfi_endproc
+ 799              	.LFE45:
+ 801              		.section	.text.LSM6DS3_GetXL_Z_Int16,"ax",%progbits
+ 802              		.align	1
+ 803              		.global	LSM6DS3_GetXL_Z_Int16
+ 804              		.code	16
+ 805              		.thumb_func
+ 807              	LSM6DS3_GetXL_Z_Int16:
+ 808              	.LFB46:
+ 292:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetXL_Z_Int16(void) {
+ 809              		.loc 1 292 0
+ 810              		.cfi_startproc
+ 293:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.XL_z;
+ 811              		.loc 1 293 0
+ 812 0000 014B     		ldr	r3, .L58
+ 813              		@ sp needed for prologue
+ 814 0002 0422     		mov	r2, #4
+ 815 0004 985E     		ldrsh	r0, [r3, r2]
+ 294:../Source - Copy/LSM6DS3.c **** }
+ 816              		.loc 1 294 0
+ 817 0006 7047     		bx	lr
+ 818              	.L59:
+ 819              		.align	2
+ 820              	.L58:
+ 821 0008 00000000 		.word	.LANCHOR1
+ 822              		.cfi_endproc
+ 823              	.LFE46:
+ 825              		.global	__aeabi_i2f
+ 826              		.global	__aeabi_fmul
+ 827              		.global	__aeabi_fdiv
+ 828              		.section	.text.LSM6DS3_GetXL_X_Float,"ax",%progbits
+ 829              		.align	1
+ 830              		.global	LSM6DS3_GetXL_X_Float
+ 831              		.code	16
+ 832              		.thumb_func
+ 834              	LSM6DS3_GetXL_X_Float:
+ 835              	.LFB47:
+ 304:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetXL_X_Float(uint8_t units) {
+ 836              		.loc 1 304 0
+ 837              		.cfi_startproc
+ 838 0000 10B5     		push	{r4, lr}
+ 839              	.LCFI12:
+ 840              		.cfi_def_cfa_offset 8
+ 841              		.cfi_offset 4, -8
+ 842              		.cfi_offset 14, -4
+ 843              	.LVL35:
+ 306:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.XL_range)
+ 844              		.loc 1 306 0
+ 845 0002 0F4B     		ldr	r3, .L65
+ 846 0004 0024     		mov	r4, #0
+ 847 0006 1B78     		ldrb	r3, [r3]
+ 848 0008 032B     		cmp	r3, #3
+ 849 000a 02D8     		bhi	.L61
+ 850 000c 0D4A     		ldr	r2, .L65+4
+ 851 000e 9900     		lsl	r1, r3, #2
+ 852 0010 8C58     		ldr	r4, [r1, r2]
+ 853              	.L61:
+ 854              	.LVL36:
+ 855 0012 0D4B     		ldr	r3, .L65+8
+ 324:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 856              		.loc 1 324 0
+ 857 0014 0028     		cmp	r0, #0
+ 858 0016 0AD1     		bne	.L62
+ 325:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_x * mg_lsb / 1000.0f);
+ 859              		.loc 1 325 0
+ 860 0018 0022     		mov	r2, #0
+ 861 001a 985E     		ldrsh	r0, [r3, r2]
+ 862              	.LVL37:
+ 863 001c FFF7FEFF 		bl	__aeabi_i2f
+ 864 0020 211C     		add	r1, r4, #0
+ 865 0022 FFF7FEFF 		bl	__aeabi_fmul
+ 866 0026 0949     		ldr	r1, .L65+12
+ 867 0028 FFF7FEFF 		bl	__aeabi_fdiv
+ 868 002c 06E0     		b	.L63
+ 869              	.LVL38:
+ 870              	.L62:
+ 327:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_x * mg_lsb);
+ 871              		.loc 1 327 0
+ 872 002e 0022     		mov	r2, #0
+ 873 0030 985E     		ldrsh	r0, [r3, r2]
+ 874              	.LVL39:
+ 875 0032 FFF7FEFF 		bl	__aeabi_i2f
+ 876 0036 211C     		add	r1, r4, #0
+ 877 0038 FFF7FEFF 		bl	__aeabi_fmul
+ 878              	.L63:
+ 879              		@ sp needed for prologue
+ 880              	.LVL40:
+ 328:../Source - Copy/LSM6DS3.c **** }
+ 881              		.loc 1 328 0
+ 882 003c 10BD     		pop	{r4, pc}
+ 883              	.L66:
+ 884 003e C046     		.align	2
+ 885              	.L65:
+ 886 0040 00000000 		.word	.LANCHOR0
+ 887 0044 00000000 		.word	.LANCHOR3
+ 888 0048 00000000 		.word	.LANCHOR1
+ 889 004c 00007A44 		.word	1148846080
+ 890              		.cfi_endproc
+ 891              	.LFE47:
+ 893              		.section	.text.LSM6DS3_GetXL_Y_Float,"ax",%progbits
+ 894              		.align	1
+ 895              		.global	LSM6DS3_GetXL_Y_Float
+ 896              		.code	16
+ 897              		.thumb_func
+ 899              	LSM6DS3_GetXL_Y_Float:
+ 900              	.LFB48:
+ 338:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetXL_Y_Float(uint8_t units) {
+ 901              		.loc 1 338 0
+ 902              		.cfi_startproc
+ 903 0000 10B5     		push	{r4, lr}
+ 904              	.LCFI13:
+ 905              		.cfi_def_cfa_offset 8
+ 906              		.cfi_offset 4, -8
+ 907              		.cfi_offset 14, -4
+ 908              	.LVL41:
+ 341:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.XL_range)
+ 909              		.loc 1 341 0
+ 910 0002 0F4B     		ldr	r3, .L72
+ 911 0004 0024     		mov	r4, #0
+ 912 0006 1B78     		ldrb	r3, [r3]
+ 913 0008 032B     		cmp	r3, #3
+ 914 000a 02D8     		bhi	.L68
+ 915 000c 0D4A     		ldr	r2, .L72+4
+ 916 000e 9900     		lsl	r1, r3, #2
+ 917 0010 8C58     		ldr	r4, [r1, r2]
+ 918              	.L68:
+ 919              	.LVL42:
+ 920 0012 0D4B     		ldr	r3, .L72+8
+ 359:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 921              		.loc 1 359 0
+ 922 0014 0028     		cmp	r0, #0
+ 923 0016 0AD1     		bne	.L69
+ 360:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_y * mg_lsb / 1000.0f);
+ 924              		.loc 1 360 0
+ 925 0018 0222     		mov	r2, #2
+ 926 001a 985E     		ldrsh	r0, [r3, r2]
+ 927              	.LVL43:
+ 928 001c FFF7FEFF 		bl	__aeabi_i2f
+ 929 0020 211C     		add	r1, r4, #0
+ 930 0022 FFF7FEFF 		bl	__aeabi_fmul
+ 931 0026 0949     		ldr	r1, .L72+12
+ 932 0028 FFF7FEFF 		bl	__aeabi_fdiv
+ 933 002c 06E0     		b	.L70
+ 934              	.LVL44:
+ 935              	.L69:
+ 362:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_y * mg_lsb);
+ 936              		.loc 1 362 0
+ 937 002e 0222     		mov	r2, #2
+ 938 0030 985E     		ldrsh	r0, [r3, r2]
+ 939              	.LVL45:
+ 940 0032 FFF7FEFF 		bl	__aeabi_i2f
+ 941 0036 211C     		add	r1, r4, #0
+ 942 0038 FFF7FEFF 		bl	__aeabi_fmul
+ 943              	.L70:
+ 944              		@ sp needed for prologue
+ 945              	.LVL46:
+ 363:../Source - Copy/LSM6DS3.c **** }
+ 946              		.loc 1 363 0
+ 947 003c 10BD     		pop	{r4, pc}
+ 948              	.L73:
+ 949 003e C046     		.align	2
+ 950              	.L72:
+ 951 0040 00000000 		.word	.LANCHOR0
+ 952 0044 00000000 		.word	.LANCHOR4
+ 953 0048 00000000 		.word	.LANCHOR1
+ 954 004c 00007A44 		.word	1148846080
+ 955              		.cfi_endproc
+ 956              	.LFE48:
+ 958              		.section	.text.LSM6DS3_GetXL_Z_Float,"ax",%progbits
+ 959              		.align	1
+ 960              		.global	LSM6DS3_GetXL_Z_Float
+ 961              		.code	16
+ 962              		.thumb_func
+ 964              	LSM6DS3_GetXL_Z_Float:
+ 965              	.LFB49:
+ 373:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetXL_Z_Float(uint8_t units) {
+ 966              		.loc 1 373 0
+ 967              		.cfi_startproc
+ 968 0000 10B5     		push	{r4, lr}
+ 969              	.LCFI14:
+ 970              		.cfi_def_cfa_offset 8
+ 971              		.cfi_offset 4, -8
+ 972              		.cfi_offset 14, -4
+ 973              	.LVL47:
+ 376:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.XL_range)
+ 974              		.loc 1 376 0
+ 975 0002 0F4B     		ldr	r3, .L79
+ 976 0004 0024     		mov	r4, #0
+ 977 0006 1B78     		ldrb	r3, [r3]
+ 978 0008 032B     		cmp	r3, #3
+ 979 000a 02D8     		bhi	.L75
+ 980 000c 0D4A     		ldr	r2, .L79+4
+ 981 000e 9900     		lsl	r1, r3, #2
+ 982 0010 8C58     		ldr	r4, [r1, r2]
+ 983              	.L75:
+ 984              	.LVL48:
+ 985 0012 0D4B     		ldr	r3, .L79+8
+ 394:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 986              		.loc 1 394 0
+ 987 0014 0028     		cmp	r0, #0
+ 988 0016 0AD1     		bne	.L76
+ 395:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_z * mg_lsb / 1000.0f);
+ 989              		.loc 1 395 0
+ 990 0018 0422     		mov	r2, #4
+ 991 001a 985E     		ldrsh	r0, [r3, r2]
+ 992              	.LVL49:
+ 993 001c FFF7FEFF 		bl	__aeabi_i2f
+ 994 0020 211C     		add	r1, r4, #0
+ 995 0022 FFF7FEFF 		bl	__aeabi_fmul
+ 996 0026 0949     		ldr	r1, .L79+12
+ 997 0028 FFF7FEFF 		bl	__aeabi_fdiv
+ 998 002c 06E0     		b	.L77
+ 999              	.LVL50:
+ 1000              	.L76:
+ 397:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.XL_z * mg_lsb);
+ 1001              		.loc 1 397 0
+ 1002 002e 0422     		mov	r2, #4
+ 1003 0030 985E     		ldrsh	r0, [r3, r2]
+ 1004              	.LVL51:
+ 1005 0032 FFF7FEFF 		bl	__aeabi_i2f
+ 1006 0036 211C     		add	r1, r4, #0
+ 1007 0038 FFF7FEFF 		bl	__aeabi_fmul
+ 1008              	.L77:
+ 1009              		@ sp needed for prologue
+ 1010              	.LVL52:
+ 398:../Source - Copy/LSM6DS3.c **** }
+ 1011              		.loc 1 398 0
+ 1012 003c 10BD     		pop	{r4, pc}
+ 1013              	.L80:
+ 1014 003e C046     		.align	2
+ 1015              	.L79:
+ 1016 0040 00000000 		.word	.LANCHOR0
+ 1017 0044 00000000 		.word	.LANCHOR5
+ 1018 0048 00000000 		.word	.LANCHOR1
+ 1019 004c 00007A44 		.word	1148846080
+ 1020              		.cfi_endproc
+ 1021              	.LFE49:
+ 1023              		.section	.text.LSM6DS3_GetGS_X_Int16,"ax",%progbits
+ 1024              		.align	1
+ 1025              		.global	LSM6DS3_GetGS_X_Int16
+ 1026              		.code	16
+ 1027              		.thumb_func
+ 1029              	LSM6DS3_GetGS_X_Int16:
+ 1030              	.LFB50:
+ 405:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetGS_X_Int16(void) {
+ 1031              		.loc 1 405 0
+ 1032              		.cfi_startproc
+ 406:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.GS_x;
+ 1033              		.loc 1 406 0
+ 1034 0000 014B     		ldr	r3, .L82
+ 1035              		@ sp needed for prologue
+ 1036 0002 0622     		mov	r2, #6
+ 1037 0004 985E     		ldrsh	r0, [r3, r2]
+ 407:../Source - Copy/LSM6DS3.c **** }
+ 1038              		.loc 1 407 0
+ 1039 0006 7047     		bx	lr
+ 1040              	.L83:
+ 1041              		.align	2
+ 1042              	.L82:
+ 1043 0008 00000000 		.word	.LANCHOR1
+ 1044              		.cfi_endproc
+ 1045              	.LFE50:
+ 1047              		.section	.text.LSM6DS3_GetGS_Y_Int16,"ax",%progbits
+ 1048              		.align	1
+ 1049              		.global	LSM6DS3_GetGS_Y_Int16
+ 1050              		.code	16
+ 1051              		.thumb_func
+ 1053              	LSM6DS3_GetGS_Y_Int16:
+ 1054              	.LFB51:
+ 414:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetGS_Y_Int16(void) {
+ 1055              		.loc 1 414 0
+ 1056              		.cfi_startproc
+ 415:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.GS_y;
+ 1057              		.loc 1 415 0
+ 1058 0000 014B     		ldr	r3, .L85
+ 1059              		@ sp needed for prologue
+ 1060 0002 0822     		mov	r2, #8
+ 1061 0004 985E     		ldrsh	r0, [r3, r2]
+ 416:../Source - Copy/LSM6DS3.c **** }
+ 1062              		.loc 1 416 0
+ 1063 0006 7047     		bx	lr
+ 1064              	.L86:
+ 1065              		.align	2
+ 1066              	.L85:
+ 1067 0008 00000000 		.word	.LANCHOR1
+ 1068              		.cfi_endproc
+ 1069              	.LFE51:
+ 1071              		.section	.text.LSM6DS3_GetGS_Z_Int16,"ax",%progbits
+ 1072              		.align	1
+ 1073              		.global	LSM6DS3_GetGS_Z_Int16
+ 1074              		.code	16
+ 1075              		.thumb_func
+ 1077              	LSM6DS3_GetGS_Z_Int16:
+ 1078              	.LFB52:
+ 423:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_GetGS_Z_Int16(void) {
+ 1079              		.loc 1 423 0
+ 1080              		.cfi_startproc
+ 424:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.GS_z;
+ 1081              		.loc 1 424 0
+ 1082 0000 014B     		ldr	r3, .L88
+ 1083              		@ sp needed for prologue
+ 1084 0002 0A22     		mov	r2, #10
+ 1085 0004 985E     		ldrsh	r0, [r3, r2]
+ 425:../Source - Copy/LSM6DS3.c **** }
+ 1086              		.loc 1 425 0
+ 1087 0006 7047     		bx	lr
+ 1088              	.L89:
+ 1089              		.align	2
+ 1090              	.L88:
+ 1091 0008 00000000 		.word	.LANCHOR1
+ 1092              		.cfi_endproc
+ 1093              	.LFE52:
+ 1095              		.section	.text.LSM6DS3_Temperature_Int16,"ax",%progbits
+ 1096              		.align	1
+ 1097              		.global	LSM6DS3_Temperature_Int16
+ 1098              		.code	16
+ 1099              		.thumb_func
+ 1101              	LSM6DS3_Temperature_Int16:
+ 1102              	.LFB53:
+ 432:../Source - Copy/LSM6DS3.c **** int16_t LSM6DS3_Temperature_Int16(void) {
+ 1103              		.loc 1 432 0
+ 1104              		.cfi_startproc
+ 433:../Source - Copy/LSM6DS3.c **** 	return LSM6DS3_data.Temperature;
+ 1105              		.loc 1 433 0
+ 1106 0000 014B     		ldr	r3, .L91
+ 1107              		@ sp needed for prologue
+ 1108 0002 0C22     		mov	r2, #12
+ 1109 0004 985E     		ldrsh	r0, [r3, r2]
+ 434:../Source - Copy/LSM6DS3.c **** }
+ 1110              		.loc 1 434 0
+ 1111 0006 7047     		bx	lr
+ 1112              	.L92:
+ 1113              		.align	2
+ 1114              	.L91:
+ 1115 0008 00000000 		.word	.LANCHOR1
+ 1116              		.cfi_endproc
+ 1117              	.LFE53:
+ 1119              		.global	__aeabi_fadd
+ 1120              		.section	.text.LSM6DS3_Temperature_Celsius,"ax",%progbits
+ 1121              		.align	1
+ 1122              		.global	LSM6DS3_Temperature_Celsius
+ 1123              		.code	16
+ 1124              		.thumb_func
+ 1126              	LSM6DS3_Temperature_Celsius:
+ 1127              	.LFB54:
+ 441:../Source - Copy/LSM6DS3.c **** float LSM6DS3_Temperature_Celsius(void) {
+ 1128              		.loc 1 441 0
+ 1129              		.cfi_startproc
+ 1130 0000 08B5     		push	{r3, lr}
+ 1131              	.LCFI15:
+ 1132              		.cfi_def_cfa_offset 8
+ 1133              		.cfi_offset 3, -8
+ 1134              		.cfi_offset 14, -4
+ 442:../Source - Copy/LSM6DS3.c **** 	return ((float)LSM6DS3_data.Temperature / 16.0f + 25.0f);
+ 1135              		.loc 1 442 0
+ 1136 0002 064B     		ldr	r3, .L94
+ 1137              		@ sp needed for prologue
+ 1138 0004 0C22     		mov	r2, #12
+ 1139 0006 985E     		ldrsh	r0, [r3, r2]
+ 1140 0008 FFF7FEFF 		bl	__aeabi_i2f
+ 1141 000c F621     		mov	r1, #246
+ 1142 000e 8905     		lsl	r1, r1, #22
+ 1143 0010 FFF7FEFF 		bl	__aeabi_fmul
+ 1144 0014 0249     		ldr	r1, .L94+4
+ 1145 0016 FFF7FEFF 		bl	__aeabi_fadd
+ 443:../Source - Copy/LSM6DS3.c **** }
+ 1146              		.loc 1 443 0
+ 1147 001a 08BD     		pop	{r3, pc}
+ 1148              	.L95:
+ 1149              		.align	2
+ 1150              	.L94:
+ 1151 001c 00000000 		.word	.LANCHOR1
+ 1152 0020 0000C841 		.word	1103626240
+ 1153              		.cfi_endproc
+ 1154              	.LFE54:
+ 1156              		.section	.text.LSM6DS3_GetGS_X_Float,"ax",%progbits
+ 1157              		.align	1
+ 1158              		.global	LSM6DS3_GetGS_X_Float
+ 1159              		.code	16
+ 1160              		.thumb_func
+ 1162              	LSM6DS3_GetGS_X_Float:
+ 1163              	.LFB55:
+ 453:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetGS_X_Float(uint8_t units) {
+ 1164              		.loc 1 453 0
+ 1165              		.cfi_startproc
+ 1166 0000 10B5     		push	{r4, lr}
+ 1167              	.LCFI16:
+ 1168              		.cfi_def_cfa_offset 8
+ 1169              		.cfi_offset 4, -8
+ 1170              		.cfi_offset 14, -4
+ 1171              	.LVL53:
+ 456:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.GS_range)
+ 1172              		.loc 1 456 0
+ 1173 0002 0F4B     		ldr	r3, .L101
+ 1174 0004 0024     		mov	r4, #0
+ 1175 0006 5B78     		ldrb	r3, [r3, #1]
+ 1176 0008 062B     		cmp	r3, #6
+ 1177 000a 02D8     		bhi	.L97
+ 1178 000c 0D4A     		ldr	r2, .L101+4
+ 1179 000e 9900     		lsl	r1, r3, #2
+ 1180 0010 8C58     		ldr	r4, [r1, r2]
+ 1181              	.L97:
+ 1182              	.LVL54:
+ 1183 0012 0D4B     		ldr	r3, .L101+8
+ 477:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 1184              		.loc 1 477 0
+ 1185 0014 0028     		cmp	r0, #0
+ 1186 0016 0AD1     		bne	.L98
+ 478:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_x * mdps_lsb / 1000.0f);
+ 1187              		.loc 1 478 0
+ 1188 0018 0622     		mov	r2, #6
+ 1189 001a 985E     		ldrsh	r0, [r3, r2]
+ 1190              	.LVL55:
+ 1191 001c FFF7FEFF 		bl	__aeabi_i2f
+ 1192 0020 211C     		add	r1, r4, #0
+ 1193 0022 FFF7FEFF 		bl	__aeabi_fmul
+ 1194 0026 0949     		ldr	r1, .L101+12
+ 1195 0028 FFF7FEFF 		bl	__aeabi_fdiv
+ 1196 002c 06E0     		b	.L99
+ 1197              	.LVL56:
+ 1198              	.L98:
+ 480:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_x * mdps_lsb);
+ 1199              		.loc 1 480 0
+ 1200 002e 0622     		mov	r2, #6
+ 1201 0030 985E     		ldrsh	r0, [r3, r2]
+ 1202              	.LVL57:
+ 1203 0032 FFF7FEFF 		bl	__aeabi_i2f
+ 1204 0036 211C     		add	r1, r4, #0
+ 1205 0038 FFF7FEFF 		bl	__aeabi_fmul
+ 1206              	.L99:
+ 1207              		@ sp needed for prologue
+ 1208              	.LVL58:
+ 481:../Source - Copy/LSM6DS3.c **** }
+ 1209              		.loc 1 481 0
+ 1210 003c 10BD     		pop	{r4, pc}
+ 1211              	.L102:
+ 1212 003e C046     		.align	2
+ 1213              	.L101:
+ 1214 0040 00000000 		.word	.LANCHOR0
+ 1215 0044 00000000 		.word	.LANCHOR6
+ 1216 0048 00000000 		.word	.LANCHOR1
+ 1217 004c 00007A44 		.word	1148846080
+ 1218              		.cfi_endproc
+ 1219              	.LFE55:
+ 1221              		.section	.text.LSM6DS3_GetGS_Y_Float,"ax",%progbits
+ 1222              		.align	1
+ 1223              		.global	LSM6DS3_GetGS_Y_Float
+ 1224              		.code	16
+ 1225              		.thumb_func
+ 1227              	LSM6DS3_GetGS_Y_Float:
+ 1228              	.LFB56:
+ 491:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetGS_Y_Float(uint8_t units) {
+ 1229              		.loc 1 491 0
+ 1230              		.cfi_startproc
+ 1231 0000 10B5     		push	{r4, lr}
+ 1232              	.LCFI17:
+ 1233              		.cfi_def_cfa_offset 8
+ 1234              		.cfi_offset 4, -8
+ 1235              		.cfi_offset 14, -4
+ 1236              	.LVL59:
+ 494:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.GS_range)
+ 1237              		.loc 1 494 0
+ 1238 0002 0F4B     		ldr	r3, .L108
+ 1239 0004 0024     		mov	r4, #0
+ 1240 0006 5B78     		ldrb	r3, [r3, #1]
+ 1241 0008 062B     		cmp	r3, #6
+ 1242 000a 02D8     		bhi	.L104
+ 1243 000c 0D4A     		ldr	r2, .L108+4
+ 1244 000e 9900     		lsl	r1, r3, #2
+ 1245 0010 8C58     		ldr	r4, [r1, r2]
+ 1246              	.L104:
+ 1247              	.LVL60:
+ 1248 0012 0D4B     		ldr	r3, .L108+8
+ 515:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 1249              		.loc 1 515 0
+ 1250 0014 0028     		cmp	r0, #0
+ 1251 0016 0AD1     		bne	.L105
+ 516:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_y * mdps_lsb / 1000.0f);
+ 1252              		.loc 1 516 0
+ 1253 0018 0822     		mov	r2, #8
+ 1254 001a 985E     		ldrsh	r0, [r3, r2]
+ 1255              	.LVL61:
+ 1256 001c FFF7FEFF 		bl	__aeabi_i2f
+ 1257 0020 211C     		add	r1, r4, #0
+ 1258 0022 FFF7FEFF 		bl	__aeabi_fmul
+ 1259 0026 0949     		ldr	r1, .L108+12
+ 1260 0028 FFF7FEFF 		bl	__aeabi_fdiv
+ 1261 002c 06E0     		b	.L106
+ 1262              	.LVL62:
+ 1263              	.L105:
+ 518:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_y * mdps_lsb);
+ 1264              		.loc 1 518 0
+ 1265 002e 0822     		mov	r2, #8
+ 1266 0030 985E     		ldrsh	r0, [r3, r2]
+ 1267              	.LVL63:
+ 1268 0032 FFF7FEFF 		bl	__aeabi_i2f
+ 1269 0036 211C     		add	r1, r4, #0
+ 1270 0038 FFF7FEFF 		bl	__aeabi_fmul
+ 1271              	.L106:
+ 1272              		@ sp needed for prologue
+ 1273              	.LVL64:
+ 519:../Source - Copy/LSM6DS3.c **** }
+ 1274              		.loc 1 519 0
+ 1275 003c 10BD     		pop	{r4, pc}
+ 1276              	.L109:
+ 1277 003e C046     		.align	2
+ 1278              	.L108:
+ 1279 0040 00000000 		.word	.LANCHOR0
+ 1280 0044 00000000 		.word	.LANCHOR7
+ 1281 0048 00000000 		.word	.LANCHOR1
+ 1282 004c 00007A44 		.word	1148846080
+ 1283              		.cfi_endproc
+ 1284              	.LFE56:
+ 1286              		.section	.text.LSM6DS3_GetGS_Z_Float,"ax",%progbits
+ 1287              		.align	1
+ 1288              		.global	LSM6DS3_GetGS_Z_Float
+ 1289              		.code	16
+ 1290              		.thumb_func
+ 1292              	LSM6DS3_GetGS_Z_Float:
+ 1293              	.LFB57:
+ 529:../Source - Copy/LSM6DS3.c **** float LSM6DS3_GetGS_Z_Float(uint8_t units) {
+ 1294              		.loc 1 529 0
+ 1295              		.cfi_startproc
+ 1296 0000 10B5     		push	{r4, lr}
+ 1297              	.LCFI18:
+ 1298              		.cfi_def_cfa_offset 8
+ 1299              		.cfi_offset 4, -8
+ 1300              		.cfi_offset 14, -4
+ 1301              	.LVL65:
+ 532:../Source - Copy/LSM6DS3.c **** 	switch(LSM6DS3_parameters.GS_range)
+ 1302              		.loc 1 532 0
+ 1303 0002 0F4B     		ldr	r3, .L115
+ 1304 0004 0024     		mov	r4, #0
+ 1305 0006 5B78     		ldrb	r3, [r3, #1]
+ 1306 0008 062B     		cmp	r3, #6
+ 1307 000a 02D8     		bhi	.L111
+ 1308 000c 0D4A     		ldr	r2, .L115+4
+ 1309 000e 9900     		lsl	r1, r3, #2
+ 1310 0010 8C58     		ldr	r4, [r1, r2]
+ 1311              	.L111:
+ 1312              	.LVL66:
+ 1313 0012 0D4B     		ldr	r3, .L115+8
+ 553:../Source - Copy/LSM6DS3.c **** 	if(units == LSM6DS3_UNITS_G)
+ 1314              		.loc 1 553 0
+ 1315 0014 0028     		cmp	r0, #0
+ 1316 0016 0AD1     		bne	.L112
+ 554:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_z * mdps_lsb / 1000.0f);
+ 1317              		.loc 1 554 0
+ 1318 0018 0A22     		mov	r2, #10
+ 1319 001a 985E     		ldrsh	r0, [r3, r2]
+ 1320              	.LVL67:
+ 1321 001c FFF7FEFF 		bl	__aeabi_i2f
+ 1322 0020 211C     		add	r1, r4, #0
+ 1323 0022 FFF7FEFF 		bl	__aeabi_fmul
+ 1324 0026 0949     		ldr	r1, .L115+12
+ 1325 0028 FFF7FEFF 		bl	__aeabi_fdiv
+ 1326 002c 06E0     		b	.L113
+ 1327              	.LVL68:
+ 1328              	.L112:
+ 556:../Source - Copy/LSM6DS3.c **** 		return (LSM6DS3_data.GS_z * mdps_lsb);
+ 1329              		.loc 1 556 0
+ 1330 002e 0A22     		mov	r2, #10
+ 1331 0030 985E     		ldrsh	r0, [r3, r2]
+ 1332              	.LVL69:
+ 1333 0032 FFF7FEFF 		bl	__aeabi_i2f
+ 1334 0036 211C     		add	r1, r4, #0
+ 1335 0038 FFF7FEFF 		bl	__aeabi_fmul
+ 1336              	.L113:
+ 1337              		@ sp needed for prologue
+ 1338              	.LVL70:
+ 557:../Source - Copy/LSM6DS3.c **** }
+ 1339              		.loc 1 557 0
+ 1340 003c 10BD     		pop	{r4, pc}
+ 1341              	.L116:
+ 1342 003e C046     		.align	2
+ 1343              	.L115:
+ 1344 0040 00000000 		.word	.LANCHOR0
+ 1345 0044 00000000 		.word	.LANCHOR8
+ 1346 0048 00000000 		.word	.LANCHOR1
+ 1347 004c 00007A44 		.word	1148846080
+ 1348              		.cfi_endproc
+ 1349              	.LFE57:
+ 1351              		.section	.rodata.CSWTCH.8,"a",%progbits
+ 1352              		.align	2
+ 1353              		.set	.LANCHOR3,. + 0
+ 1356              	CSWTCH.8:
+ 1357 0000 23DB793D 		.word	1031396131
+ 1358 0004 23DBF93E 		.word	1056561955
+ 1359 0008 23DBF93D 		.word	1039784739
+ 1360 000c 23DB793E 		.word	1048173347
+ 1361              		.section	.bss.LSM6DS3_parameters,"aw",%nobits
+ 1362              		.align	2
+ 1363              		.set	.LANCHOR0,. + 0
+ 1366              	LSM6DS3_parameters:
+ 1367 0000 00000000 		.space	12
+ 1367      00000000 
+ 1367      00000000 
+ 1368              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 1369              	.LC2:
+ 1370 0000 6E6F7420 		.ascii	"not equal\015\012\000"
+ 1370      65717561 
+ 1370      6C0D0A00 
+ 1371              	.LC8:
+ 1372 000c 25732D25 		.ascii	"%s-%d\015\012\000"
+ 1372      640D0A00 
+ 1373              		.section	.rodata.CSWTCH.10,"a",%progbits
+ 1374              		.align	2
+ 1375              		.set	.LANCHOR4,. + 0
+ 1378              	CSWTCH.10:
+ 1379 0000 23DB793D 		.word	1031396131
+ 1380 0004 23DBF93E 		.word	1056561955
+ 1381 0008 23DBF93D 		.word	1039784739
+ 1382 000c 23DB793E 		.word	1048173347
+ 1383              		.section	.bss.LSM6DS3_data,"aw",%nobits
+ 1384              		.align	1
+ 1385              		.set	.LANCHOR1,. + 0
+ 1388              	LSM6DS3_data:
+ 1389 0000 00000000 		.space	14
+ 1389      00000000 
+ 1389      00000000 
+ 1389      0000
+ 1390              		.section	.rodata.CSWTCH.12,"a",%progbits
+ 1391              		.align	2
+ 1392              		.set	.LANCHOR5,. + 0
+ 1395              	CSWTCH.12:
+ 1396 0000 23DB793D 		.word	1031396131
+ 1397 0004 23DBF93E 		.word	1056561955
+ 1398 0008 23DBF93D 		.word	1039784739
+ 1399 000c 23DB793E 		.word	1048173347
+ 1400              		.section	.rodata.CSWTCH.14,"a",%progbits
+ 1401              		.align	2
+ 1402              		.set	.LANCHOR6,. + 0
+ 1405              	CSWTCH.14:
+ 1406 0000 00000C41 		.word	1091305472
+ 1407 0004 00008C40 		.word	1082916864
+ 1408 0008 00008C41 		.word	1099694080
+ 1409 000c 00000000 		.word	0
+ 1410 0010 00000C42 		.word	1108082688
+ 1411 0014 00000000 		.word	0
+ 1412 0018 00008C42 		.word	1116471296
+ 1413              		.section	.rodata.CSWTCH.16,"a",%progbits
+ 1414              		.align	2
+ 1415              		.set	.LANCHOR7,. + 0
+ 1418              	CSWTCH.16:
+ 1419 0000 00000C41 		.word	1091305472
+ 1420 0004 00008C40 		.word	1082916864
+ 1421 0008 00008C41 		.word	1099694080
+ 1422 000c 00000000 		.word	0
+ 1423 0010 00000C42 		.word	1108082688
+ 1424 0014 00000000 		.word	0
+ 1425 0018 00008C42 		.word	1116471296
+ 1426              		.section	.rodata.CSWTCH.18,"a",%progbits
+ 1427              		.align	2
+ 1428              		.set	.LANCHOR8,. + 0
+ 1431              	CSWTCH.18:
+ 1432 0000 00000C41 		.word	1091305472
+ 1433 0004 00008C40 		.word	1082916864
+ 1434 0008 00008C41 		.word	1099694080
+ 1435 000c 00000000 		.word	0
+ 1436 0010 00000C42 		.word	1108082688
+ 1437 0014 00000000 		.word	0
+ 1438 0018 00008C42 		.word	1116471296
+ 1439              		.section	.rodata.__func__.6367,"a",%progbits
+ 1440              		.set	.LANCHOR2,. + 0
+ 1443              	__func__.6367:
+ 1444 0000 4C534D36 		.ascii	"LSM6DS3_GS_Start\000"
+ 1444      4453335F 
+ 1444      47535F53 
+ 1444      74617274 
+ 1444      00
+ 1445              		.text
+ 1446              	.Letext0:
+ 1447              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1448              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+ 1449              		.file 4 "../Source - Copy/LSM6DS3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 LSM6DS3.c
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:18     .text.LSM6DS3_ReadRegister:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:22     .text.LSM6DS3_ReadRegister:00000000 LSM6DS3_ReadRegister
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:65     .text.LSM6DS3_ReadRegister:00000020 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:70     .text.LSM6DS3_WriteAndVerify.constprop.0:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:74     .text.LSM6DS3_WriteAndVerify.constprop.0:00000000 LSM6DS3_WriteAndVerify.constprop.0
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:157    .text.LSM6DS3_WriteAndVerify.constprop.0:00000060 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:163    .text.LSM6DS3_Initialize:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:168    .text.LSM6DS3_Initialize:00000000 LSM6DS3_Initialize
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:198    .text.LSM6DS3_Initialize:00000014 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:203    .text.LSM6DS3_Detect:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:208    .text.LSM6DS3_Detect:00000000 LSM6DS3_Detect
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:278    .text.LSM6DS3_XL_Start:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:283    .text.LSM6DS3_XL_Start:00000000 LSM6DS3_XL_Start
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:357    .text.LSM6DS3_XL_Start:0000003c $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:362    .text.LSM6DS3_XL_Stop:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:367    .text.LSM6DS3_XL_Stop:00000000 LSM6DS3_XL_Stop
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:396    .text.LSM6DS3_XL_GetMeasurements:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:401    .text.LSM6DS3_XL_GetMeasurements:00000000 LSM6DS3_XL_GetMeasurements
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:458    .text.LSM6DS3_XL_GetMeasurements:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:463    .text.LSM6DS3_GS_Start:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:468    .text.LSM6DS3_GS_Start:00000000 LSM6DS3_GS_Start
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:552    .text.LSM6DS3_GS_Start:00000054 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:559    .text.LSM6DS3_GS_Stop:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:564    .text.LSM6DS3_GS_Stop:00000000 LSM6DS3_GS_Stop
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:593    .text.LSM6DS3_GS_GetMeasurements:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:598    .text.LSM6DS3_GS_GetMeasurements:00000000 LSM6DS3_GS_GetMeasurements
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:655    .text.LSM6DS3_GS_GetMeasurements:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:660    .text.LSM6DS3_IMU_GetMeasurements:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:665    .text.LSM6DS3_IMU_GetMeasurements:00000000 LSM6DS3_IMU_GetMeasurements
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:749    .text.LSM6DS3_IMU_GetMeasurements:00000070 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:754    .text.LSM6DS3_GetXL_X_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:759    .text.LSM6DS3_GetXL_X_Int16:00000000 LSM6DS3_GetXL_X_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:773    .text.LSM6DS3_GetXL_X_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:778    .text.LSM6DS3_GetXL_Y_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:783    .text.LSM6DS3_GetXL_Y_Int16:00000000 LSM6DS3_GetXL_Y_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:797    .text.LSM6DS3_GetXL_Y_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:802    .text.LSM6DS3_GetXL_Z_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:807    .text.LSM6DS3_GetXL_Z_Int16:00000000 LSM6DS3_GetXL_Z_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:821    .text.LSM6DS3_GetXL_Z_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:829    .text.LSM6DS3_GetXL_X_Float:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:834    .text.LSM6DS3_GetXL_X_Float:00000000 LSM6DS3_GetXL_X_Float
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:886    .text.LSM6DS3_GetXL_X_Float:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:894    .text.LSM6DS3_GetXL_Y_Float:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:899    .text.LSM6DS3_GetXL_Y_Float:00000000 LSM6DS3_GetXL_Y_Float
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:951    .text.LSM6DS3_GetXL_Y_Float:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:959    .text.LSM6DS3_GetXL_Z_Float:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:964    .text.LSM6DS3_GetXL_Z_Float:00000000 LSM6DS3_GetXL_Z_Float
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1016   .text.LSM6DS3_GetXL_Z_Float:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1024   .text.LSM6DS3_GetGS_X_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1029   .text.LSM6DS3_GetGS_X_Int16:00000000 LSM6DS3_GetGS_X_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1043   .text.LSM6DS3_GetGS_X_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1048   .text.LSM6DS3_GetGS_Y_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1053   .text.LSM6DS3_GetGS_Y_Int16:00000000 LSM6DS3_GetGS_Y_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1067   .text.LSM6DS3_GetGS_Y_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1072   .text.LSM6DS3_GetGS_Z_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1077   .text.LSM6DS3_GetGS_Z_Int16:00000000 LSM6DS3_GetGS_Z_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1091   .text.LSM6DS3_GetGS_Z_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1096   .text.LSM6DS3_Temperature_Int16:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1101   .text.LSM6DS3_Temperature_Int16:00000000 LSM6DS3_Temperature_Int16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1115   .text.LSM6DS3_Temperature_Int16:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1121   .text.LSM6DS3_Temperature_Celsius:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1126   .text.LSM6DS3_Temperature_Celsius:00000000 LSM6DS3_Temperature_Celsius
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1151   .text.LSM6DS3_Temperature_Celsius:0000001c $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1157   .text.LSM6DS3_GetGS_X_Float:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1162   .text.LSM6DS3_GetGS_X_Float:00000000 LSM6DS3_GetGS_X_Float
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1214   .text.LSM6DS3_GetGS_X_Float:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1222   .text.LSM6DS3_GetGS_Y_Float:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1227   .text.LSM6DS3_GetGS_Y_Float:00000000 LSM6DS3_GetGS_Y_Float
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1279   .text.LSM6DS3_GetGS_Y_Float:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1287   .text.LSM6DS3_GetGS_Z_Float:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1292   .text.LSM6DS3_GetGS_Z_Float:00000000 LSM6DS3_GetGS_Z_Float
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1344   .text.LSM6DS3_GetGS_Z_Float:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1352   .rodata.CSWTCH.8:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1356   .rodata.CSWTCH.8:00000000 CSWTCH.8
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1362   .bss.LSM6DS3_parameters:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1366   .bss.LSM6DS3_parameters:00000000 LSM6DS3_parameters
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1374   .rodata.CSWTCH.10:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1378   .rodata.CSWTCH.10:00000000 CSWTCH.10
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1384   .bss.LSM6DS3_data:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1388   .bss.LSM6DS3_data:00000000 LSM6DS3_data
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1391   .rodata.CSWTCH.12:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1395   .rodata.CSWTCH.12:00000000 CSWTCH.12
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1401   .rodata.CSWTCH.14:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1405   .rodata.CSWTCH.14:00000000 CSWTCH.14
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1414   .rodata.CSWTCH.16:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1418   .rodata.CSWTCH.16:00000000 CSWTCH.16
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1427   .rodata.CSWTCH.18:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1431   .rodata.CSWTCH.18:00000000 CSWTCH.18
+C:\Users\khanh\AppData\Local\Temp\cctiTojB.s:1443   .rodata.__func__.6367:00000000 __func__.6367
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+SPIx_ReadRegister
+memset
+SPIx_WriteRegister
+xprintf
+SPIx_init
+delay_ms
+__aeabi_i2f
+__aeabi_fmul
+__aeabi_fdiv
+__aeabi_fadd

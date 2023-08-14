@@ -19,7 +19,7 @@ static int setUp(void);
 
 extern void mainTask(void);
 int main(void) {
-d	setUp();
+	setUp();
 	mainTask();
 	while (1) {
 		if ((uint32_t) (ulMiliCount - lastSendData) >= 1000) {

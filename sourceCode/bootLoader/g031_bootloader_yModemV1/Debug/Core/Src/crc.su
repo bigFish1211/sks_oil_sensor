@@ -1,0 +1,2 @@
+../Core/Src/crc.c:12:10:CRC_CalcBlockCRC	24	static
+../Core/Src/crc.c:23:6:CRC_ResetDR	8	static

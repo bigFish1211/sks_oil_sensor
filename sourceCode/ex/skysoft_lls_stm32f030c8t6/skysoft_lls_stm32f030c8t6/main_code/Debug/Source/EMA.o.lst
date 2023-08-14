@@ -1,0 +1,364 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"EMA.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_ui2d
+  18              		.global	__aeabi_dmul
+  19              		.global	__aeabi_dadd
+  20              		.global	__aeabi_ddiv
+  21              		.section	.text.calcMA,"ax",%progbits
+  22              		.align	1
+  23              		.global	calcMA
+  24              		.code	16
+  25              		.thumb_func
+  27              	calcMA:
+  28              	.LFB0:
+  29              		.file 1 "../Source/EMA.c"
+   1:../Source/EMA.c **** /*
+   2:../Source/EMA.c ****  * EMA.c
+   3:../Source/EMA.c ****  *
+   4:../Source/EMA.c ****  *  Created on: Aug 31, 2022
+   5:../Source/EMA.c ****  *      Author: icepe
+   6:../Source/EMA.c ****  */
+   7:../Source/EMA.c **** 
+   8:../Source/EMA.c **** #include "EMA.h"
+   9:../Source/EMA.c **** #include "define.h"
+  10:../Source/EMA.c **** 
+  11:../Source/EMA.c **** EMA_t SensorEMA5  = {
+  12:../Source/EMA.c **** 			.timePreiod = 5,
+  13:../Source/EMA.c **** 			.size 		= 0,
+  14:../Source/EMA.c **** 			.lastEMA 	= 0
+  15:../Source/EMA.c **** };
+  16:../Source/EMA.c **** 
+  17:../Source/EMA.c **** EMA_t SensorEMA10  = {
+  18:../Source/EMA.c **** 			.timePreiod = 5,
+  19:../Source/EMA.c **** 			.size 		= 0,
+  20:../Source/EMA.c **** 			.lastEMA 	= 0
+  21:../Source/EMA.c **** };
+  22:../Source/EMA.c **** 
+  23:../Source/EMA.c **** EMA_t SensorEMA15  = {
+  24:../Source/EMA.c **** 			.timePreiod = 15,
+  25:../Source/EMA.c **** 			.size 		= 0,
+  26:../Source/EMA.c **** 			.lastEMA 	= 0
+  27:../Source/EMA.c **** };
+  28:../Source/EMA.c **** 
+  29:../Source/EMA.c **** EMA_t SensorEMA30  = {
+  30:../Source/EMA.c **** 			.timePreiod = 30,
+  31:../Source/EMA.c **** 			.size 		= 0,
+  32:../Source/EMA.c **** 			.lastEMA 	= 0
+  33:../Source/EMA.c **** };
+  34:../Source/EMA.c **** 
+  35:../Source/EMA.c **** EMA_t SensorEMA50  = {
+  36:../Source/EMA.c **** 			.timePreiod = 50,
+  37:../Source/EMA.c **** 			.size 		= 0,
+  38:../Source/EMA.c **** 			.lastEMA 	= 0
+  39:../Source/EMA.c **** };
+  40:../Source/EMA.c **** 
+  41:../Source/EMA.c **** double calcMA(double previousAverage, unsigned int previousNumDays,
+  42:../Source/EMA.c **** 		double newStock) {
+  30              		.loc 1 42 0
+  31              		.cfi_startproc
+  32 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 24
+  35              		.cfi_offset 3, -24
+  36              		.cfi_offset 4, -20
+  37              		.cfi_offset 5, -16
+  38              		.cfi_offset 6, -12
+  39              		.cfi_offset 7, -8
+  40              		.cfi_offset 14, -4
+  41              	.LVL0:
+  42              		.loc 1 42 0
+  43 0002 041C     		mov	r4, r0
+  43:../Source/EMA.c **** 
+  44:../Source/EMA.c **** 	double result = 0;
+  45:../Source/EMA.c **** 	result = previousNumDays * previousAverage + newStock;
+  44              		.loc 1 45 0
+  45 0004 101C     		mov	r0, r2
+  46              	.LVL1:
+  42:../Source/EMA.c **** 		double newStock) {
+  47              		.loc 1 42 0
+  48 0006 0D1C     		mov	r5, r1
+  49              		.loc 1 45 0
+  50 0008 FFF7FEFF 		bl	__aeabi_ui2d
+  51              	.LVL2:
+  52 000c 221C     		mov	r2, r4
+  53 000e 2B1C     		mov	r3, r5
+  54 0010 061C     		mov	r6, r0
+  55 0012 0F1C     		mov	r7, r1
+  56              	.LVL3:
+  57 0014 FFF7FEFF 		bl	__aeabi_dmul
+  58 0018 069A     		ldr	r2, [sp, #24]
+  59 001a 079B     		ldr	r3, [sp, #28]
+  60 001c FFF7FEFF 		bl	__aeabi_dadd
+  46:../Source/EMA.c **** 	return result / (previousNumDays + 1.0);
+  61              		.loc 1 46 0
+  62 0020 084B     		ldr	r3, .L2+4
+  63 0022 074A     		ldr	r2, .L2
+  45:../Source/EMA.c **** 	result = previousNumDays * previousAverage + newStock;
+  64              		.loc 1 45 0
+  65 0024 0D1C     		mov	r5, r1
+  66 0026 041C     		mov	r4, r0
+  67              	.LVL4:
+  68              		.loc 1 46 0
+  69 0028 391C     		mov	r1, r7
+  70 002a 301C     		mov	r0, r6
+  71 002c FFF7FEFF 		bl	__aeabi_dadd
+  72 0030 021C     		mov	r2, r0
+  73 0032 0B1C     		mov	r3, r1
+  74 0034 201C     		mov	r0, r4
+  75 0036 291C     		mov	r1, r5
+  76 0038 FFF7FEFF 		bl	__aeabi_ddiv
+  77              		@ sp needed for prologue
+  47:../Source/EMA.c **** 
+  48:../Source/EMA.c **** }
+  78              		.loc 1 48 0
+  79 003c F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+  80              	.L3:
+  81 003e C046     		.align	3
+  82              	.L2:
+  83 0040 00000000 		.word	0
+  84 0044 0000F03F 		.word	1072693248
+  85              		.cfi_endproc
+  86              	.LFE0:
+  88              		.global	__aeabi_dsub
+  89              		.global	__aeabi_i2d
+  90              		.section	.text.calcEMA,"ax",%progbits
+  91              		.align	1
+  92              		.global	calcEMA
+  93              		.code	16
+  94              		.thumb_func
+  96              	calcEMA:
+  97              	.LFB1:
+  49:../Source/EMA.c **** 
+  50:../Source/EMA.c **** double calcEMA(double previousAverage, int timePeriod, double newStock) {
+  98              		.loc 1 50 0
+  99              		.cfi_startproc
+ 100 0000 D3B5     		push	{r0, r1, r4, r6, r7, lr}
+ 101              	.LCFI1:
+ 102              		.cfi_def_cfa_offset 24
+ 103              		.cfi_offset 0, -24
+ 104              		.cfi_offset 1, -20
+ 105              		.cfi_offset 4, -16
+ 106              		.cfi_offset 6, -12
+ 107              		.cfi_offset 7, -8
+ 108              		.cfi_offset 14, -4
+ 109              	.LVL5:
+ 110              		.loc 1 50 0
+ 111 0002 061C     		mov	r6, r0
+ 112 0004 0F1C     		mov	r7, r1
+  51:../Source/EMA.c **** 	double result = 0, mult = 0;
+  52:../Source/EMA.c **** 	mult = 2.0 / (timePeriod + 1.0);
+  53:../Source/EMA.c **** 	result = (newStock - previousAverage) * mult + previousAverage;
+ 113              		.loc 1 53 0
+ 114 0006 3B1C     		mov	r3, r7
+  50:../Source/EMA.c **** double calcEMA(double previousAverage, int timePeriod, double newStock) {
+ 115              		.loc 1 50 0
+ 116 0008 141C     		mov	r4, r2
+ 117              	.LVL6:
+ 118              		.loc 1 53 0
+ 119 000a 0698     		ldr	r0, [sp, #24]
+ 120 000c 0799     		ldr	r1, [sp, #28]
+ 121              	.LVL7:
+ 122 000e 321C     		mov	r2, r6
+ 123              	.LVL8:
+ 124 0010 FFF7FEFF 		bl	__aeabi_dsub
+ 125 0014 0090     		str	r0, [sp]
+ 126 0016 0191     		str	r1, [sp, #4]
+  52:../Source/EMA.c **** 	mult = 2.0 / (timePeriod + 1.0);
+ 127              		.loc 1 52 0
+ 128 0018 201C     		mov	r0, r4
+ 129 001a FFF7FEFF 		bl	__aeabi_i2d
+ 130 001e 0B4B     		ldr	r3, .L5+4
+ 131 0020 094A     		ldr	r2, .L5
+ 132 0022 FFF7FEFF 		bl	__aeabi_dadd
+ 133 0026 021C     		mov	r2, r0
+ 134 0028 0B1C     		mov	r3, r1
+ 135 002a 0948     		ldr	r0, .L5+8
+ 136 002c 0949     		ldr	r1, .L5+12
+ 137 002e FFF7FEFF 		bl	__aeabi_ddiv
+ 138 0032 021C     		mov	r2, r0
+ 139 0034 0B1C     		mov	r3, r1
+ 140              		.loc 1 53 0
+ 141 0036 0098     		ldr	r0, [sp]
+ 142 0038 0199     		ldr	r1, [sp, #4]
+ 143 003a FFF7FEFF 		bl	__aeabi_dmul
+ 144 003e 321C     		mov	r2, r6
+ 145 0040 3B1C     		mov	r3, r7
+ 146 0042 FFF7FEFF 		bl	__aeabi_dadd
+ 147              		@ sp needed for prologue
+ 148              	.LVL9:
+  54:../Source/EMA.c **** 	return result;
+  55:../Source/EMA.c **** 
+  56:../Source/EMA.c **** }
+ 149              		.loc 1 56 0
+ 150 0046 DCBD     		pop	{r2, r3, r4, r6, r7, pc}
+ 151              	.L6:
+ 152              		.align	3
+ 153              	.L5:
+ 154 0048 00000000 		.word	0
+ 155 004c 0000F03F 		.word	1072693248
+ 156 0050 00000000 		.word	0
+ 157 0054 00000040 		.word	1073741824
+ 158              		.cfi_endproc
+ 159              	.LFE1:
+ 161              		.section	.text.addStock,"ax",%progbits
+ 162              		.align	1
+ 163              		.global	addStock
+ 164              		.code	16
+ 165              		.thumb_func
+ 167              	addStock:
+ 168              	.LFB2:
+  57:../Source/EMA.c **** 
+  58:../Source/EMA.c **** void addStock(double newStock, EMA_t*EMA){
+ 169              		.loc 1 58 0
+ 170              		.cfi_startproc
+ 171 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+ 172              	.LCFI2:
+ 173              		.cfi_def_cfa_offset 24
+ 174              		.cfi_offset 0, -24
+ 175              		.cfi_offset 1, -20
+ 176              		.cfi_offset 2, -16
+ 177              		.cfi_offset 4, -12
+ 178              		.cfi_offset 5, -8
+ 179              		.cfi_offset 14, -4
+ 180              	.LVL10:
+ 181              		.loc 1 58 0
+ 182 0002 141C     		mov	r4, r2
+  59:../Source/EMA.c **** 	EMA->size++;
+ 183              		.loc 1 59 0
+ 184 0004 5268     		ldr	r2, [r2, #4]
+ 185              	.LVL11:
+  60:../Source/EMA.c **** 	if(EMA->size < EMA->timePreiod){
+ 186              		.loc 1 60 0
+ 187 0006 2388     		ldrh	r3, [r4]
+  59:../Source/EMA.c **** 	EMA->size++;
+ 188              		.loc 1 59 0
+ 189 0008 551C     		add	r5, r2, #1
+  61:../Source/EMA.c **** 		EMA->lastEMA = calcMA(EMA->lastEMA, EMA->size -1 , newStock);
+ 190              		.loc 1 61 0
+ 191 000a 0090     		str	r0, [sp]
+ 192 000c 0191     		str	r1, [sp, #4]
+ 193 000e A068     		ldr	r0, [r4, #8]
+ 194 0010 E168     		ldr	r1, [r4, #12]
+ 195              	.LVL12:
+  59:../Source/EMA.c **** 	EMA->size++;
+ 196              		.loc 1 59 0
+ 197 0012 6560     		str	r5, [r4, #4]
+  60:../Source/EMA.c **** 	if(EMA->size < EMA->timePreiod){
+ 198              		.loc 1 60 0
+ 199 0014 9D42     		cmp	r5, r3
+ 200 0016 02D2     		bcs	.L8
+ 201              		.loc 1 61 0
+ 202 0018 FFF7FEFF 		bl	calcMA
+ 203              	.LVL13:
+ 204 001c 02E0     		b	.L10
+ 205              	.LVL14:
+ 206              	.L8:
+  62:../Source/EMA.c **** 	} else{
+  63:../Source/EMA.c **** 		EMA->lastEMA = calcEMA(EMA->lastEMA, EMA->timePreiod, newStock);
+ 207              		.loc 1 63 0
+ 208 001e 1A1C     		mov	r2, r3
+ 209 0020 FFF7FEFF 		bl	calcEMA
+ 210              	.LVL15:
+ 211              	.L10:
+ 212 0024 A060     		str	r0, [r4, #8]
+ 213 0026 E160     		str	r1, [r4, #12]
+ 214              		@ sp needed for prologue
+ 215              	.LVL16:
+  64:../Source/EMA.c **** 	}
+  65:../Source/EMA.c **** }
+ 216              		.loc 1 65 0
+ 217 0028 37BD     		pop	{r0, r1, r2, r4, r5, pc}
+ 218              		.cfi_endproc
+ 219              	.LFE2:
+ 221              		.global	SensorEMA50
+ 222              		.global	SensorEMA30
+ 223              		.global	SensorEMA15
+ 224              		.global	SensorEMA10
+ 225              		.global	SensorEMA5
+ 226              		.section	.data.SensorEMA10,"aw",%progbits
+ 227              		.align	3
+ 230              	SensorEMA10:
+ 231 0000 0500     		.short	5
+ 232 0002 0000     		.space	2
+ 233 0004 00000000 		.word	0
+ 234 0008 00000000 		.word	0
+ 235 000c 00000000 		.word	0
+ 236              		.section	.data.SensorEMA15,"aw",%progbits
+ 237              		.align	3
+ 240              	SensorEMA15:
+ 241 0000 0F00     		.short	15
+ 242 0002 0000     		.space	2
+ 243 0004 00000000 		.word	0
+ 244 0008 00000000 		.word	0
+ 245 000c 00000000 		.word	0
+ 246              		.section	.data.SensorEMA50,"aw",%progbits
+ 247              		.align	3
+ 250              	SensorEMA50:
+ 251 0000 3200     		.short	50
+ 252 0002 0000     		.space	2
+ 253 0004 00000000 		.word	0
+ 254 0008 00000000 		.word	0
+ 255 000c 00000000 		.word	0
+ 256              		.section	.data.SensorEMA30,"aw",%progbits
+ 257              		.align	3
+ 260              	SensorEMA30:
+ 261 0000 1E00     		.short	30
+ 262 0002 0000     		.space	2
+ 263 0004 00000000 		.word	0
+ 264 0008 00000000 		.word	0
+ 265 000c 00000000 		.word	0
+ 266              		.section	.data.SensorEMA5,"aw",%progbits
+ 267              		.align	3
+ 270              	SensorEMA5:
+ 271 0000 0500     		.short	5
+ 272 0002 0000     		.space	2
+ 273 0004 00000000 		.word	0
+ 274 0008 00000000 		.word	0
+ 275 000c 00000000 		.word	0
+ 276              		.text
+ 277              	.Letext0:
+ 278              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 279              		.file 3 "../Source/EMA.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 EMA.c
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:22     .text.calcMA:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:27     .text.calcMA:00000000 calcMA
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:83     .text.calcMA:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:91     .text.calcEMA:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:96     .text.calcEMA:00000000 calcEMA
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:154    .text.calcEMA:00000048 $d
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:162    .text.addStock:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:167    .text.addStock:00000000 addStock
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:250    .data.SensorEMA50:00000000 SensorEMA50
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:260    .data.SensorEMA30:00000000 SensorEMA30
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:240    .data.SensorEMA15:00000000 SensorEMA15
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:230    .data.SensorEMA10:00000000 SensorEMA10
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:270    .data.SensorEMA5:00000000 SensorEMA5
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:227    .data.SensorEMA10:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:237    .data.SensorEMA15:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:247    .data.SensorEMA50:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:257    .data.SensorEMA30:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc2V6iRL.s:267    .data.SensorEMA5:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_ui2d
+__aeabi_dmul
+__aeabi_dadd
+__aeabi_ddiv
+__aeabi_dsub
+__aeabi_i2d

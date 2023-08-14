@@ -1,0 +1,1209 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"main.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_uidiv
+  18              		.section	.text.startup.main,"ax",%progbits
+  19              		.align	1
+  20              		.global	main
+  21              		.code	16
+  22              		.thumb_func
+  24              	main:
+  25              	.LFB33:
+  26              		.file 1 "../scr/main.c"
+   1:../scr/main.c **** /**
+   2:../scr/main.c ****  ******************************************************************************
+   3:../scr/main.c ****  * @file    Project/STM32F0xx_StdPeriph_Templates/main.c
+   4:../scr/main.c ****  * @author  MCD Application Team
+   5:../scr/main.c ****  * @version V1.5.0
+   6:../scr/main.c ****  * @date    05-December-2014
+   7:../scr/main.c ****  * @brief   Main program body
+   8:../scr/main.c ****  ******************************************************************************
+   9:../scr/main.c ****  * @attention
+  10:../scr/main.c ****  *
+  11:../scr/main.c ****  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  12:../scr/main.c ****  *
+  13:../scr/main.c ****  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  14:../scr/main.c ****  * You may not use this file except in compliance with the License.
+  15:../scr/main.c ****  * You may obtain a copy of the License at:
+  16:../scr/main.c ****  *
+  17:../scr/main.c ****  *        http://www.st.com/software_license_agreement_liberty_v2
+  18:../scr/main.c ****  *
+  19:../scr/main.c ****  * Unless required by applicable law or agreed to in writing, software
+  20:../scr/main.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  21:../scr/main.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  22:../scr/main.c ****  * See the License for the specific language governing permissions and
+  23:../scr/main.c ****  * limitations under the License.
+  24:../scr/main.c ****  *
+  25:../scr/main.c ****  ******************************************************************************
+  26:../scr/main.c ****  */
+  27:../scr/main.c **** /* Includes ------------------------------------------------------------------*/
+  28:../scr/main.c **** #include <string.h>
+  29:../scr/main.c **** 
+  30:../scr/main.c **** #include "stm32f0xx_conf.h"
+  31:../scr/main.c **** //#include "alarm.h"
+  32:../scr/main.c **** #include "xprintf.h"
+  33:../scr/main.c **** #include "uart.h"
+  34:../scr/main.c **** #include "KalmanFilter.h"
+  35:../scr/main.c **** #include "command.h"
+  36:../scr/main.c **** #include "LSM6DS3.h"
+  37:../scr/main.c **** #include "delay.h"
+  38:../scr/main.c **** #include "global.h"
+  39:../scr/main.c **** #include "config.h"
+  40:../scr/main.c **** #include "spi.h"
+  41:../scr/main.c **** #include "timer.h"
+  42:../scr/main.c **** /** @addtogroup STM32F0xx_StdPeriph_Templates
+  43:../scr/main.c ****  * @{
+  44:../scr/main.c ****  */
+  45:../scr/main.c **** /* Private typedef -----------------------------------------------------------*/
+  46:../scr/main.c **** /* Private define ------------------------------------------------------------*/
+  47:../scr/main.c **** #define APPLICATION_ADDRESS     (uint32_t)0x08002800
+  48:../scr/main.c **** #define PC_BAUDRATE				19200
+  49:../scr/main.c **** //#define USING_BOOTLOADER		1
+  50:../scr/main.c **** /* Private macro -------------------------------------------------------------*/
+  51:../scr/main.c **** /* Private variables ---------------------------------------------------------*/
+  52:../scr/main.c **** #ifdef USING_BOOTLOADER
+  53:../scr/main.c **** #if   (defined ( __CC_ARM ))
+  54:../scr/main.c **** __IO uint32_t VectorTable[48] __attribute__((at(0x20000000)));
+  55:../scr/main.c **** #elif (defined (__ICCARM__))
+  56:../scr/main.c **** #pragma location = 0x20000000
+  57:../scr/main.c **** __no_init __IO uint32_t VectorTable[48];
+  58:../scr/main.c **** #elif defined   (  __GNUC__  )
+  59:../scr/main.c **** __IO uint32_t VectorTable[48] __attribute__((section(".RAMVectorTable")));
+  60:../scr/main.c **** #elif defined ( __TASKING__ )
+  61:../scr/main.c **** __IO uint32_t VectorTable[48] __at(0x20000000);
+  62:../scr/main.c **** #endif
+  63:../scr/main.c **** 
+  64:../scr/main.c **** #endif
+  65:../scr/main.c **** /* Private function prototypes -----------------------------------------------*/
+  66:../scr/main.c **** volatile uint32_t ulSecCount = 0;
+  67:../scr/main.c **** volatile uint32_t ulTickCount = 0;
+  68:../scr/main.c **** volatile uint32_t ulMiliCount = 0;
+  69:../scr/main.c **** 
+  70:../scr/main.c **** volatile uint32_t Capture;
+  71:../scr/main.c **** volatile uint32_t TIM1Freq;
+  72:../scr/main.c **** volatile uint32_t interrupt_count;
+  73:../scr/main.c **** 
+  74:../scr/main.c **** APP_STATS g_appStats;
+  75:../scr/main.c **** //START_CONFIG g_config;
+  76:../scr/main.c **** 
+  77:../scr/main.c **** volatile unsigned long ulTick100 = 0; //Tick Count from start to now, 100ms
+  78:../scr/main.c **** static last_check_time =0;
+  79:../scr/main.c **** /* Private functions ---------------------------------------------------------*/
+  80:../scr/main.c **** static void sysTick_clock(void);
+  81:../scr/main.c **** static void LSM6DS3_init(void);
+  82:../scr/main.c **** static void LSM6DS3_get_raw(void);
+  83:../scr/main.c **** static void LSM6DS3_get_angle(void);
+  84:../scr/main.c **** void static setup(void);
+  85:../scr/main.c **** 
+  86:../scr/main.c **** 
+  87:../scr/main.c **** int main(void) {
+  27              		.loc 1 87 0
+  28              		.cfi_startproc
+  29 0000 10B5     		push	{r4, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 8
+  32              		.cfi_offset 4, -8
+  33              		.cfi_offset 14, -4
+  34              	.LBB12:
+  35              	.LBB13:
+  88:../scr/main.c **** #ifdef USING_BOOTLOADER
+  89:../scr/main.c **** 	uint32_t i = 0;
+  90:../scr/main.c **** 	for (i = 0; i < 48; i++) {
+  91:../scr/main.c **** 		VectorTable[i] = *(__IO uint32_t*) (APPLICATION_ADDRESS + (i << 2));
+  92:../scr/main.c **** 	}
+  93:../scr/main.c **** 
+  94:../scr/main.c **** 	/* Enable the SYSCFG peripheral clock*/
+  95:../scr/main.c **** 	RCC_APB2PeriphResetCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+  96:../scr/main.c **** 	/* Remap SRAM at 0x00000000 */
+  97:../scr/main.c **** 	SYSCFG_MemoryRemapConfig(SYSCFG_MemoryRemap_SRAM);
+  98:../scr/main.c **** #endif
+  99:../scr/main.c **** 	//SysTick_Config(SystemCoreClock / 1000);
+ 100:../scr/main.c **** 	setup();
+ 101:../scr/main.c **** 	while(1){
+ 102:../scr/main.c **** 
+ 103:../scr/main.c **** 		if(last_check_time<ulMiliCount){
+ 104:../scr/main.c **** 			//LSM6DS3_get_raw();
+ 105:../scr/main.c **** 			xprintf("%d		%d		%d \r\n",Capture,TIM1Freq,interrupt_count);
+ 106:../scr/main.c **** 			last_check_time = ulMiliCount + 500;
+ 107:../scr/main.c **** 
+ 108:../scr/main.c **** 		}
+ 109:../scr/main.c **** //		Kalman_SetFlag();
+ 110:../scr/main.c **** //		LSM6DS3_get_angle();
+ 111:../scr/main.c **** 	}
+ 112:../scr/main.c **** }
+ 113:../scr/main.c **** 
+ 114:../scr/main.c **** 
+ 115:../scr/main.c **** void static setup(void){
+ 116:../scr/main.c **** 	SystemInit();
+  36              		.loc 1 116 0
+  37 0002 FFF7FEFF 		bl	SystemInit
+  38              	.LBB14:
+  39              	.LBB15:
+ 117:../scr/main.c **** 	sysTick_clock();
+ 118:../scr/main.c **** 	PC_uartInit(PC_BAUDRATE);
+ 119:../scr/main.c **** 	xdev_out(PC_uart_putChar);
+ 120:../scr/main.c **** 	TIM15_Capture_Configuration();
+ 121:../scr/main.c **** 	LSM6DS3_init();
+ 122:../scr/main.c **** 	Start_Kalman_Algorithm(10, 1000000.0f);
+ 123:../scr/main.c **** 
+ 124:../scr/main.c **** 	g_appStats.debug =1;
+ 125:../scr/main.c **** 	xprintf("setup done\r\n");
+ 126:../scr/main.c **** }
+ 127:../scr/main.c **** 
+ 128:../scr/main.c **** static void sysTick_clock(void){
+ 129:../scr/main.c **** 
+ 130:../scr/main.c **** 	SysTick_CLKSourceConfig(SysTick_CLKSource_HCLK);
+  40              		.loc 1 130 0
+  41 0006 0420     		mov	r0, #4
+  42 0008 FFF7FEFF 		bl	SysTick_CLKSourceConfig
+  43              	.LVL0:
+ 131:../scr/main.c **** 	if (SysTick_Config(SystemCoreClock / 1000))
+  44              		.loc 1 131 0
+  45 000c 3848     		ldr	r0, .L18
+  46 000e FA21     		mov	r1, #250
+  47 0010 0068     		ldr	r0, [r0]
+  48 0012 8900     		lsl	r1, r1, #2
+  49 0014 FFF7FEFF 		bl	__aeabi_uidiv
+  50              	.LVL1:
+  51              	.LBB16:
+  52              	.LBB17:
+  53              		.file 2 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\CM
+   1:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /**************************************************************************//**
+   2:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  * @file     core_cm0.h
+   3:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  * @brief    CMSIS Cortex-M0 Core Peripheral Access Layer Header File
+   4:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  * @version  V3.20
+   5:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  * @date     25. February 2013
+   6:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  *
+   7:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  * @note
+   8:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  *
+   9:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+  10:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* Copyright (c) 2009 - 2013 ARM LIMITED
+  11:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  12:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    All rights reserved.
+  13:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    Redistribution and use in source and binary forms, with or without
+  14:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    modification, are permitted provided that the following conditions are met:
+  15:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    - Redistributions of source code must retain the above copyright
+  16:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      notice, this list of conditions and the following disclaimer.
+  17:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    - Redistributions in binary form must reproduce the above copyright
+  18:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      notice, this list of conditions and the following disclaimer in the
+  19:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      documentation and/or other materials provided with the distribution.
+  20:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  21:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      to endorse or promote products derived from this software without
+  22:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      specific prior written permission.
+  23:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    *
+  24:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  28:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    POSSIBILITY OF SUCH DAMAGE.
+  35:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    ---------------------------------------------------------------------------*/
+  36:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  37:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  38:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if defined ( __ICCARM__ )
+  39:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  #pragma system_include  /* treat file as system include file for MISRA check */
+  40:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+  41:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  42:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #ifdef __cplusplus
+  43:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  extern "C" {
+  44:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+  45:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  46:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CORE_CM0_H_GENERIC
+  47:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __CORE_CM0_H_GENERIC
+  48:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  49:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \page CMSIS_MISRA_Exceptions  MISRA-C:2004 Compliance Exceptions
+  50:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   CMSIS violates the following MISRA-C:2004 rules:
+  51:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  52:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    \li Required Rule 8.5, object/function definition in header file.<br>
+  53:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      Function definitions in header files are used to allow 'inlining'.
+  54:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  55:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    \li Required Rule 18.4, declaration of union type or object of union type: '{...}'.<br>
+  56:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      Unions are used for effective representation of core registers.
+  57:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  58:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****    \li Advisory Rule 19.7, Function-like macro defined.<br>
+  59:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****      Function-like macros are used to allow more efficient code.
+  60:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+  61:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  62:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  63:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+  64:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  *                 CMSIS definitions
+  65:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+  66:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup Cortex_M0
+  67:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+  68:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+  69:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  70:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*  CMSIS CM0 definitions */
+  71:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION_MAIN  (0x03)                                   /*!< [31:16] CMSIS HAL m
+  72:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION_SUB   (0x20)                                   /*!< [15:0]  CMSIS HAL s
+  73:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __CM0_CMSIS_VERSION       ((__CM0_CMSIS_VERSION_MAIN << 16) | \
+  74:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****                                     __CM0_CMSIS_VERSION_SUB          )     /*!< CMSIS HAL version n
+  75:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  76:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __CORTEX_M                (0x00)                                   /*!< Cortex-M Core      
+  77:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  78:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  79:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if   defined ( __CC_ARM )
+  80:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for ARM Comp
+  81:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         __inline                                   /*!< inline keyword for ARM C
+  82:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static __inline
+  83:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  84:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __ICCARM__ )
+  85:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for IAR Comp
+  86:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for IAR C
+  87:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  88:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  89:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __GNUC__ )
+  90:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for GNU Comp
+  91:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for GNU C
+  92:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  93:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  94:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __TASKING__ )
+  95:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __ASM            __asm                                      /*!< asm keyword for TASKING 
+  96:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __INLINE         inline                                     /*!< inline keyword for TASKI
+  97:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define __STATIC_INLINE  static inline
+  98:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+  99:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 100:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 101:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** __FPU_USED indicates whether an FPU is used or not. This core does not support an FPU at all
+ 102:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** */
+ 103:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __FPU_USED       0
+ 104:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 105:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if defined ( __CC_ARM )
+ 106:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __TARGET_FPU_VFP
+ 107:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 108:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 109:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 110:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __ICCARM__ )
+ 111:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __ARMVFP__
+ 112:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 113:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 114:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 115:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __GNUC__ )
+ 116:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #if defined (__VFP_FP__) && !defined(__SOFTFP__)
+ 117:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #warning "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)
+ 118:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 119:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 120:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #elif defined ( __TASKING__ )
+ 121:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #if defined __FPU_VFP__
+ 122:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #error "Compiler generates FPU instructions for a device without an FPU (check __FPU_PRESENT)"
+ 123:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 124:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 125:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 126:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #include <stdint.h>                      /* standard types definitions                      */
+ 127:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #include <core_cmInstr.h>                /* Core Instruction Access                         */
+ 128:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #include <core_cmFunc.h>                 /* Core Function Access                            */
+ 129:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #include <stm32f0xx.h>
+ 130:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif /* __CORE_CM0_H_GENERIC */
+ 131:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 132:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CMSIS_GENERIC
+ 133:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 134:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #ifndef __CORE_CM0_H_DEPENDANT
+ 135:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define __CORE_CM0_H_DEPENDANT
+ 136:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 137:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* check device defines and use defaults */
+ 138:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if defined __CHECK_DEVICE_DEFINES
+ 139:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __CM0_REV
+ 140:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #define __CM0_REV               0x0000
+ 141:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__CM0_REV not defined in device header file; using default!"
+ 142:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 143:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 144:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __NVIC_PRIO_BITS
+ 145:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #define __NVIC_PRIO_BITS          2
+ 146:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__NVIC_PRIO_BITS not defined in device header file; using default!"
+ 147:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 148:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 149:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #ifndef __Vendor_SysTickConfig
+ 150:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #define __Vendor_SysTickConfig    0
+ 151:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     #warning "__Vendor_SysTickConfig not defined in device header file; using default!"
+ 152:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #endif
+ 153:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 154:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 155:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* IO definitions (access restrictions to peripheral registers) */
+ 156:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /**
+ 157:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_glob_defs CMSIS Global Defines
+ 158:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 159:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     <strong>IO Type Qualifiers</strong> are used
+ 160:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \li to specify the access to peripheral variables.
+ 161:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \li for automatic generation of peripheral register debug information.
+ 162:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** */
+ 163:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #ifdef __cplusplus
+ 164:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define   __I     volatile             /*!< Defines 'read only' permissions                 */
+ 165:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 166:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   #define   __I     volatile const       /*!< Defines 'read only' permissions                 */
+ 167:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 168:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define     __O     volatile             /*!< Defines 'write only' permissions                */
+ 169:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define     __IO    volatile             /*!< Defines 'read / write' permissions              */
+ 170:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 171:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group Cortex_M0 */
+ 172:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 173:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 174:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 175:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+ 176:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  *                 Register Abstraction
+ 177:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   Core Register contain:
+ 178:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core Register
+ 179:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core NVIC Register
+ 180:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core SCB Register
+ 181:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core SysTick Register
+ 182:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+ 183:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \defgroup CMSIS_core_register Defines and Type Definitions
+ 184:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief Type definitions and defines for Cortex-M processor based devices.
+ 185:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** */
+ 186:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 187:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 188:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_CORE  Status and Control Registers
+ 189:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief  Core Register type definitions.
+ 190:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 191:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 192:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 193:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Application Program Status Register (APSR).
+ 194:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 195:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 196:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 197:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 198:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 199:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if (__CORTEX_M != 0x04)
+ 200:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:27;              /*!< bit:  0..26  Reserved                           */
+ 201:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 202:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:16;              /*!< bit:  0..15  Reserved                           */
+ 203:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t GE:4;                       /*!< bit: 16..19  Greater than or Equal flags        */
+ 204:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved1:7;               /*!< bit: 20..26  Reserved                           */
+ 205:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 206:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Q:1;                        /*!< bit:     27  Saturation condition flag          */
+ 207:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t V:1;                        /*!< bit:     28  Overflow condition code flag       */
+ 208:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t C:1;                        /*!< bit:     29  Carry condition code flag          */
+ 209:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Z:1;                        /*!< bit:     30  Zero condition code flag           */
+ 210:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t N:1;                        /*!< bit:     31  Negative condition code flag       */
+ 211:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 212:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 213:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** } APSR_Type;
+ 214:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 215:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 216:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Interrupt Program Status Register (IPSR).
+ 217:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 218:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 219:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 220:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 221:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 222:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t ISR:9;                      /*!< bit:  0.. 8  Exception number                   */
+ 223:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:23;              /*!< bit:  9..31  Reserved                           */
+ 224:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 225:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 226:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** } IPSR_Type;
+ 227:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 228:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 229:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Special-Purpose Program Status Registers (xPSR).
+ 230:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 231:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 232:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 233:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 234:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 235:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t ISR:9;                      /*!< bit:  0.. 8  Exception number                   */
+ 236:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if (__CORTEX_M != 0x04)
+ 237:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:15;              /*!< bit:  9..23  Reserved                           */
+ 238:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #else
+ 239:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:7;               /*!< bit:  9..15  Reserved                           */
+ 240:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t GE:4;                       /*!< bit: 16..19  Greater than or Equal flags        */
+ 241:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved1:4;               /*!< bit: 20..23  Reserved                           */
+ 242:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #endif
+ 243:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t T:1;                        /*!< bit:     24  Thumb bit        (read 0)          */
+ 244:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t IT:2;                       /*!< bit: 25..26  saved IT state   (read 0)          */
+ 245:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Q:1;                        /*!< bit:     27  Saturation condition flag          */
+ 246:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t V:1;                        /*!< bit:     28  Overflow condition code flag       */
+ 247:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t C:1;                        /*!< bit:     29  Carry condition code flag          */
+ 248:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t Z:1;                        /*!< bit:     30  Zero condition code flag           */
+ 249:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t N:1;                        /*!< bit:     31  Negative condition code flag       */
+ 250:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 251:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 252:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** } xPSR_Type;
+ 253:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 254:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 255:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Union type to access the Control Registers (CONTROL).
+ 256:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 257:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef union
+ 258:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 259:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   struct
+ 260:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   {
+ 261:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t nPRIV:1;                    /*!< bit:      0  Execution privilege in Thread mode */
+ 262:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t SPSEL:1;                    /*!< bit:      1  Stack to be used                   */
+ 263:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t FPCA:1;                     /*!< bit:      2  FP extension active flag           */
+ 264:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     uint32_t _reserved0:29;              /*!< bit:  3..31  Reserved                           */
+ 265:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   } b;                                   /*!< Structure used for bit  access                  */
+ 266:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   uint32_t w;                            /*!< Type      used for word access                  */
+ 267:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** } CONTROL_Type;
+ 268:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 269:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_CORE */
+ 270:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 271:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 272:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 273:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_NVIC  Nested Vectored Interrupt Controller (NVIC)
+ 274:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the NVIC Registers
+ 275:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 276:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 277:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 278:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the Nested Vectored Interrupt Controller (NVIC).
+ 279:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 280:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 281:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 282:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ISER[1];                 /*!< Offset: 0x000 (R/W)  Interrupt Set Enable Register   
+ 283:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED0[31];
+ 284:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICER[1];                 /*!< Offset: 0x080 (R/W)  Interrupt Clear Enable Register 
+ 285:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RSERVED1[31];
+ 286:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ISPR[1];                 /*!< Offset: 0x100 (R/W)  Interrupt Set Pending Register  
+ 287:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED2[31];
+ 288:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICPR[1];                 /*!< Offset: 0x180 (R/W)  Interrupt Clear Pending Register
+ 289:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED3[31];
+ 290:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED4[64];
+ 291:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t IP[8];                   /*!< Offset: 0x300 (R/W)  Interrupt Priority Register     
+ 292:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }  NVIC_Type;
+ 293:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 294:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_NVIC */
+ 295:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 296:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 297:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 298:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_SCB     System Control Block (SCB)
+ 299:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the System Control Block Registers
+ 300:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 301:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 302:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 303:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the System Control Block (SCB).
+ 304:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 305:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 306:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 307:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __I  uint32_t CPUID;                   /*!< Offset: 0x000 (R/ )  CPUID Base Register             
+ 308:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t ICSR;                    /*!< Offset: 0x004 (R/W)  Interrupt Control and State Regi
+ 309:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED0;
+ 310:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t AIRCR;                   /*!< Offset: 0x00C (R/W)  Application Interrupt and Reset 
+ 311:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SCR;                     /*!< Offset: 0x010 (R/W)  System Control Register         
+ 312:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t CCR;                     /*!< Offset: 0x014 (R/W)  Configuration Control Register  
+ 313:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****        uint32_t RESERVED1;
+ 314:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SHP[2];                  /*!< Offset: 0x01C (R/W)  System Handlers Priority Registe
+ 315:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t SHCSR;                   /*!< Offset: 0x024 (R/W)  System Handler Control and State
+ 316:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** } SCB_Type;
+ 317:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 318:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SCB CPUID Register Definitions */
+ 319:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_IMPLEMENTER_Pos          24                                             /*!< SCB 
+ 320:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_IMPLEMENTER_Msk          (0xFFUL << SCB_CPUID_IMPLEMENTER_Pos)          /*!< SCB 
+ 321:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 322:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_VARIANT_Pos              20                                             /*!< SCB 
+ 323:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_VARIANT_Msk              (0xFUL << SCB_CPUID_VARIANT_Pos)               /*!< SCB 
+ 324:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 325:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_ARCHITECTURE_Pos         16                                             /*!< SCB 
+ 326:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_ARCHITECTURE_Msk         (0xFUL << SCB_CPUID_ARCHITECTURE_Pos)          /*!< SCB 
+ 327:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 328:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_PARTNO_Pos                4                                             /*!< SCB 
+ 329:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_PARTNO_Msk               (0xFFFUL << SCB_CPUID_PARTNO_Pos)              /*!< SCB 
+ 330:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 331:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_REVISION_Pos              0                                             /*!< SCB 
+ 332:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CPUID_REVISION_Msk             (0xFUL << SCB_CPUID_REVISION_Pos)              /*!< SCB 
+ 333:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 334:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Interrupt Control State Register Definitions */
+ 335:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_NMIPENDSET_Pos            31                                             /*!< SCB 
+ 336:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_NMIPENDSET_Msk            (1UL << SCB_ICSR_NMIPENDSET_Pos)               /*!< SCB 
+ 337:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 338:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVSET_Pos             28                                             /*!< SCB 
+ 339:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVSET_Msk             (1UL << SCB_ICSR_PENDSVSET_Pos)                /*!< SCB 
+ 340:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 341:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVCLR_Pos             27                                             /*!< SCB 
+ 342:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSVCLR_Msk             (1UL << SCB_ICSR_PENDSVCLR_Pos)                /*!< SCB 
+ 343:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 344:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTSET_Pos             26                                             /*!< SCB 
+ 345:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTSET_Msk             (1UL << SCB_ICSR_PENDSTSET_Pos)                /*!< SCB 
+ 346:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 347:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTCLR_Pos             25                                             /*!< SCB 
+ 348:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_PENDSTCLR_Msk             (1UL << SCB_ICSR_PENDSTCLR_Pos)                /*!< SCB 
+ 349:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 350:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPREEMPT_Pos            23                                             /*!< SCB 
+ 351:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPREEMPT_Msk            (1UL << SCB_ICSR_ISRPREEMPT_Pos)               /*!< SCB 
+ 352:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 353:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPENDING_Pos            22                                             /*!< SCB 
+ 354:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_ISRPENDING_Msk            (1UL << SCB_ICSR_ISRPENDING_Pos)               /*!< SCB 
+ 355:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 356:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTPENDING_Pos           12                                             /*!< SCB 
+ 357:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTPENDING_Msk           (0x1FFUL << SCB_ICSR_VECTPENDING_Pos)          /*!< SCB 
+ 358:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 359:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTACTIVE_Pos             0                                             /*!< SCB 
+ 360:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_ICSR_VECTACTIVE_Msk            (0x1FFUL << SCB_ICSR_VECTACTIVE_Pos)           /*!< SCB 
+ 361:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 362:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Application Interrupt and Reset Control Register Definitions */
+ 363:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEY_Pos              16                                             /*!< SCB 
+ 364:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEY_Msk              (0xFFFFUL << SCB_AIRCR_VECTKEY_Pos)            /*!< SCB 
+ 365:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 366:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEYSTAT_Pos          16                                             /*!< SCB 
+ 367:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTKEYSTAT_Msk          (0xFFFFUL << SCB_AIRCR_VECTKEYSTAT_Pos)        /*!< SCB 
+ 368:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 369:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_ENDIANESS_Pos            15                                             /*!< SCB 
+ 370:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_ENDIANESS_Msk            (1UL << SCB_AIRCR_ENDIANESS_Pos)               /*!< SCB 
+ 371:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 372:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_SYSRESETREQ_Pos           2                                             /*!< SCB 
+ 373:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_SYSRESETREQ_Msk          (1UL << SCB_AIRCR_SYSRESETREQ_Pos)             /*!< SCB 
+ 374:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 375:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTCLRACTIVE_Pos         1                                             /*!< SCB 
+ 376:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_AIRCR_VECTCLRACTIVE_Msk        (1UL << SCB_AIRCR_VECTCLRACTIVE_Pos)           /*!< SCB 
+ 377:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 378:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SCB System Control Register Definitions */
+ 379:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SEVONPEND_Pos               4                                             /*!< SCB 
+ 380:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SEVONPEND_Msk              (1UL << SCB_SCR_SEVONPEND_Pos)                 /*!< SCB 
+ 381:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 382:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPDEEP_Pos               2                                             /*!< SCB 
+ 383:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPDEEP_Msk              (1UL << SCB_SCR_SLEEPDEEP_Pos)                 /*!< SCB 
+ 384:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 385:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPONEXIT_Pos             1                                             /*!< SCB 
+ 386:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SCR_SLEEPONEXIT_Msk            (1UL << SCB_SCR_SLEEPONEXIT_Pos)               /*!< SCB 
+ 387:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 388:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SCB Configuration Control Register Definitions */
+ 389:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_STKALIGN_Pos                9                                             /*!< SCB 
+ 390:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_STKALIGN_Msk               (1UL << SCB_CCR_STKALIGN_Pos)                  /*!< SCB 
+ 391:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 392:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_UNALIGN_TRP_Pos             3                                             /*!< SCB 
+ 393:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_CCR_UNALIGN_TRP_Msk            (1UL << SCB_CCR_UNALIGN_TRP_Pos)               /*!< SCB 
+ 394:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 395:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SCB System Handler Control and State Register Definitions */
+ 396:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SHCSR_SVCALLPENDED_Pos         15                                             /*!< SCB 
+ 397:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_SHCSR_SVCALLPENDED_Msk         (1UL << SCB_SHCSR_SVCALLPENDED_Pos)            /*!< SCB 
+ 398:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 399:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_SCB */
+ 400:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 401:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 402:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 403:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_SysTick     System Tick Timer (SysTick)
+ 404:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Type definitions for the System Timer Registers.
+ 405:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 406:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 407:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 408:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Structure type to access the System Timer (SysTick).
+ 409:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 410:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** typedef struct
+ 411:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 412:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t CTRL;                    /*!< Offset: 0x000 (R/W)  SysTick Control and Status Regis
+ 413:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t LOAD;                    /*!< Offset: 0x004 (R/W)  SysTick Reload Value Register   
+ 414:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __IO uint32_t VAL;                     /*!< Offset: 0x008 (R/W)  SysTick Current Value Register  
+ 415:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __I  uint32_t CALIB;                   /*!< Offset: 0x00C (R/ )  SysTick Calibration Register    
+ 416:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** } SysTick_Type;
+ 417:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 418:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Control / Status Register Definitions */
+ 419:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_COUNTFLAG_Pos         16                                             /*!< SysT
+ 420:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_COUNTFLAG_Msk         (1UL << SysTick_CTRL_COUNTFLAG_Pos)            /*!< SysT
+ 421:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 422:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_CLKSOURCE_Pos          2                                             /*!< SysT
+ 423:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_CLKSOURCE_Msk         (1UL << SysTick_CTRL_CLKSOURCE_Pos)            /*!< SysT
+ 424:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 425:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_TICKINT_Pos            1                                             /*!< SysT
+ 426:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_TICKINT_Msk           (1UL << SysTick_CTRL_TICKINT_Pos)              /*!< SysT
+ 427:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 428:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_ENABLE_Pos             0                                             /*!< SysT
+ 429:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CTRL_ENABLE_Msk            (1UL << SysTick_CTRL_ENABLE_Pos)               /*!< SysT
+ 430:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 431:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Reload Register Definitions */
+ 432:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_LOAD_RELOAD_Pos             0                                             /*!< SysT
+ 433:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_LOAD_RELOAD_Msk            (0xFFFFFFUL << SysTick_LOAD_RELOAD_Pos)        /*!< SysT
+ 434:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 435:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Current Register Definitions */
+ 436:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_VAL_CURRENT_Pos             0                                             /*!< SysT
+ 437:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_VAL_CURRENT_Msk            (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)        /*!< SysT
+ 438:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 439:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* SysTick Calibration Register Definitions */
+ 440:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_NOREF_Pos            31                                             /*!< SysT
+ 441:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_NOREF_Msk            (1UL << SysTick_CALIB_NOREF_Pos)               /*!< SysT
+ 442:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 443:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_SKEW_Pos             30                                             /*!< SysT
+ 444:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_SKEW_Msk             (1UL << SysTick_CALIB_SKEW_Pos)                /*!< SysT
+ 445:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 446:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_TENMS_Pos             0                                             /*!< SysT
+ 447:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_CALIB_TENMS_Msk            (0xFFFFFFUL << SysTick_VAL_CURRENT_Pos)        /*!< SysT
+ 448:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 449:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_SysTick */
+ 450:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 451:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 452:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_core_register
+ 453:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_CoreDebug       Core Debug Registers (CoreDebug)
+ 454:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Cortex-M0 Core Debug Registers (DCB registers, SHCSR, and DFSR)
+ 455:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****                 are only accessible over DAP and not via processor. Therefore
+ 456:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****                 they are not covered by the Cortex-M0 header file.
+ 457:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 458:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 459:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of group CMSIS_CoreDebug */
+ 460:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 461:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 462:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup    CMSIS_core_register
+ 463:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup   CMSIS_core_base     Core Definitions
+ 464:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Definitions for base addresses, unions, and structures.
+ 465:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 466:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 467:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 468:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* Memory mapping of Cortex-M0 Hardware */
+ 469:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCS_BASE            (0xE000E000UL)                            /*!< System Control Space Bas
+ 470:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick_BASE        (SCS_BASE +  0x0010UL)                    /*!< SysTick Base Address    
+ 471:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define NVIC_BASE           (SCS_BASE +  0x0100UL)                    /*!< NVIC Base Address       
+ 472:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB_BASE            (SCS_BASE +  0x0D00UL)                    /*!< System Control Block Bas
+ 473:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 474:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SCB                 ((SCB_Type       *)     SCB_BASE      )   /*!< SCB configuration struct
+ 475:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define SysTick             ((SysTick_Type   *)     SysTick_BASE  )   /*!< SysTick configuration st
+ 476:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define NVIC                ((NVIC_Type      *)     NVIC_BASE     )   /*!< NVIC configuration struc
+ 477:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 478:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 479:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} */
+ 480:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 481:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 482:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 483:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*******************************************************************************
+ 484:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  *                Hardware Abstraction Layer
+ 485:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   Core Function Interface contains:
+ 486:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core NVIC Functions
+ 487:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core SysTick Functions
+ 488:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   - Core Register Access Functions
+ 489:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  ******************************************************************************/
+ 490:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \defgroup CMSIS_Core_FunctionInterface Functions and Instructions Reference
+ 491:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** */
+ 492:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 493:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 494:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 495:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* ##########################   NVIC functions  #################################### */
+ 496:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 497:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_Core_NVICFunctions NVIC Functions
+ 498:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Functions that manage interrupts and exceptions via the NVIC.
+ 499:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     @{
+ 500:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 501:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 502:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* Interrupt Priorities are WORD accessible only under ARMv6M                   */
+ 503:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* The following MACROS handle generation of the register offset and byte masks */
+ 504:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define _BIT_SHIFT(IRQn)         (  (((uint32_t)(IRQn)       )    &  0x03) * 8 )
+ 505:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define _SHP_IDX(IRQn)           ( ((((uint32_t)(IRQn) & 0x0F)-8) >>    2)     )
+ 506:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #define _IP_IDX(IRQn)            (   ((uint32_t)(IRQn)            >>    2)     )
+ 507:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 508:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 509:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Enable External Interrupt
+ 510:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 511:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function enables a device-specific interrupt in the NVIC interrupt controller.
+ 512:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 513:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 514:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 515:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_EnableIRQ(IRQn_Type IRQn)
+ 516:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 517:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ISER[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 518:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 519:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 520:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 521:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Disable External Interrupt
+ 522:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 523:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function disables a device-specific interrupt in the NVIC interrupt controller.
+ 524:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 525:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 526:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 527:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_DisableIRQ(IRQn_Type IRQn)
+ 528:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 529:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ICER[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 530:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 531:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 532:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 533:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Get Pending Interrupt
+ 534:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 535:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function reads the pending register in the NVIC and returns the pending bit
+ 536:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     for the specified interrupt.
+ 537:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 538:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number.
+ 539:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 540:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \return             0  Interrupt status is not pending.
+ 541:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \return             1  Interrupt status is pending.
+ 542:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 543:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t NVIC_GetPendingIRQ(IRQn_Type IRQn)
+ 544:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 545:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   return((uint32_t) ((NVIC->ISPR[0] & (1 << ((uint32_t)(IRQn) & 0x1F)))?1:0));
+ 546:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 547:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 548:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 549:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Set Pending Interrupt
+ 550:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 551:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function sets the pending bit of an external interrupt.
+ 552:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 553:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number. Value cannot be negative.
+ 554:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 555:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SetPendingIRQ(IRQn_Type IRQn)
+ 556:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 557:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ISPR[0] = (1 << ((uint32_t)(IRQn) & 0x1F));
+ 558:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 559:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 560:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 561:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Clear Pending Interrupt
+ 562:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 563:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function clears the pending bit of an external interrupt.
+ 564:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 565:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  External interrupt number. Value cannot be negative.
+ 566:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 567:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_ClearPendingIRQ(IRQn_Type IRQn)
+ 568:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 569:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   NVIC->ICPR[0] = (1 << ((uint32_t)(IRQn) & 0x1F)); /* Clear pending interrupt */
+ 570:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 571:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 572:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 573:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Set Interrupt Priority
+ 574:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 575:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function sets the priority of an interrupt.
+ 576:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 577:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \note The priority cannot be set for every core interrupt.
+ 578:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 579:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]      IRQn  Interrupt number.
+ 580:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]  priority  Priority to set.
+ 581:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 582:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
+ 583:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 584:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   if(IRQn < 0) {
+ 585:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 586:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****         (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+ 587:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   else {
+ 588:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     NVIC->IP[_IP_IDX(IRQn)] = (NVIC->IP[_IP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+ 589:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****         (((priority << (8 - __NVIC_PRIO_BITS)) & 0xFF) << _BIT_SHIFT(IRQn)); }
+ 590:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 591:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 592:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 593:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  Get Interrupt Priority
+ 594:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 595:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function reads the priority of an interrupt. The interrupt
+ 596:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     number can be positive to specify an external (device specific)
+ 597:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     interrupt, or negative to specify an internal (core) interrupt.
+ 598:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 599:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 600:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]   IRQn  Interrupt number.
+ 601:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \return             Interrupt Priority. Value is aligned automatically to the implemented
+ 602:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****                         priority bits of the microcontroller.
+ 603:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 604:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t NVIC_GetPriority(IRQn_Type IRQn)
+ 605:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 606:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 607:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   if(IRQn < 0) {
+ 608:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     return((uint32_t)(((SCB->SHP[_SHP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) & 0xFF) >> (8 - __NVIC_PRIO_
+ 609:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   else {
+ 610:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     return((uint32_t)(((NVIC->IP[ _IP_IDX(IRQn)] >> _BIT_SHIFT(IRQn) ) & 0xFF) >> (8 - __NVIC_PRIO_
+ 611:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 612:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 613:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 614:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  System Reset
+ 615:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 616:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function initiates a system reset request to reset the MCU.
+ 617:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 618:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE void NVIC_SystemReset(void)
+ 619:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 620:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __DSB();                                                     /* Ensure all outstanding memory acc
+ 621:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****                                                                   buffered write are completed befo
+ 622:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   SCB->AIRCR  = ((0x5FA << SCB_AIRCR_VECTKEY_Pos)      |
+ 623:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****                  SCB_AIRCR_SYSRESETREQ_Msk);
+ 624:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   __DSB();                                                     /* Ensure completion of memory acces
+ 625:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   while(1);                                                    /* wait until reset */
+ 626:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** }
+ 627:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 628:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /*@} end of CMSIS_Core_NVICFunctions */
+ 629:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 630:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 631:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 632:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /* ##################################    SysTick function  ########################################
+ 633:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \ingroup  CMSIS_Core_FunctionInterface
+ 634:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \defgroup CMSIS_Core_SysTickFunctions SysTick Functions
+ 635:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \brief      Functions that configure the System.
+ 636:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   @{
+ 637:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 638:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 639:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** #if (__Vendor_SysTickConfig == 0)
+ 640:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 641:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** /** \brief  System Tick Configuration
+ 642:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 643:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     The function initializes the System Timer and its interrupt, and starts the System Tick Timer.
+ 644:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     Counter is in free running mode to generate periodic interrupts.
+ 645:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 646:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \param [in]  ticks  Number of ticks between two interrupts.
+ 647:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 648:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \return          0  Function succeeded.
+ 649:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \return          1  Function failed.
+ 650:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 651:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     \note     When the variable <b>__Vendor_SysTickConfig</b> is set to 1, then the
+ 652:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     function <b>SysTick_Config</b> is not included. In this case, the file <b><i>device</i>.h</b>
+ 653:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     must contain a vendor-specific implementation of this function.
+ 654:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 655:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****  */
+ 656:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** __STATIC_INLINE uint32_t SysTick_Config(uint32_t ticks)
+ 657:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** {
+ 658:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   if ((ticks - 1) > SysTick_LOAD_RELOAD_Msk)  return (1);      /* Reload value impossible */
+  54              		.loc 2 658 0
+  55 0018 364B     		ldr	r3, .L18+4
+  56 001a 0138     		sub	r0, r0, #1
+  57 001c 9842     		cmp	r0, r3
+  58 001e 23D8     		bhi	.L13
+ 659:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h **** 
+ 660:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->LOAD  = ticks - 1;                                  /* set reload register */
+  59              		.loc 2 660 0
+  60 0020 354B     		ldr	r3, .L18+8
+  61              	.LBB18:
+  62              	.LBB19:
+ 585:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+  63              		.loc 2 585 0
+  64 0022 364A     		ldr	r2, .L18+12
+  65              	.LBE19:
+  66              	.LBE18:
+  67              		.loc 2 660 0
+  68 0024 5860     		str	r0, [r3, #4]
+  69              	.LVL2:
+  70              	.LBB22:
+  71              	.LBB20:
+ 585:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+  72              		.loc 2 585 0
+  73 0026 106A     		ldr	r0, [r2, #32]
+  74 0028 C021     		mov	r1, #192
+  75 002a 0402     		lsl	r4, r0, #8
+  76 002c 200A     		lsr	r0, r4, #8
+  77 002e 0C06     		lsl	r4, r1, #24
+  78 0030 0443     		orr	r4, r0
+  79              	.LBE20:
+  80              	.LBE22:
+ 661:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   NVIC_SetPriority (SysTick_IRQn, (1<<__NVIC_PRIO_BITS) - 1);  /* set Priority for Systick Interrup
+ 662:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+  81              		.loc 2 662 0
+  82 0032 0020     		mov	r0, #0
+  83              	.LBB23:
+  84              	.LBB21:
+ 585:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****     SCB->SHP[_SHP_IDX(IRQn)] = (SCB->SHP[_SHP_IDX(IRQn)] & ~(0xFF << _BIT_SHIFT(IRQn))) |
+  85              		.loc 2 585 0
+  86 0034 1462     		str	r4, [r2, #32]
+  87              	.LBE21:
+  88              	.LBE23:
+ 663:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->CTRL  = SysTick_CTRL_CLKSOURCE_Msk |
+  89              		.loc 2 663 0
+  90 0036 0721     		mov	r1, #7
+ 662:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cm0.h ****   SysTick->VAL   = 0;                                          /* Load the SysTick Counter Value */
+  91              		.loc 2 662 0
+  92 0038 9860     		str	r0, [r3, #8]
+  93              	.LBE17:
+  94              	.LBE16:
+  95              	.LBE15:
+  96              	.LBE14:
+ 118:../scr/main.c **** 	PC_uartInit(PC_BAUDRATE);
+  97              		.loc 1 118 0
+  98 003a 9620     		mov	r0, #150
+  99              	.LBB27:
+ 100              	.LBB26:
+ 101              	.LBB25:
+ 102              	.LBB24:
+ 103              		.loc 2 663 0
+ 104 003c 1960     		str	r1, [r3]
+ 105              	.LBE24:
+ 106              	.LBE25:
+ 107              	.LBE26:
+ 108              	.LBE27:
+ 118:../scr/main.c **** 	PC_uartInit(PC_BAUDRATE);
+ 109              		.loc 1 118 0
+ 110 003e 8840     		lsl	r0, r0, r1
+ 111 0040 FFF7FEFF 		bl	PC_uartInit
+ 119:../scr/main.c **** 	xdev_out(PC_uart_putChar);
+ 112              		.loc 1 119 0
+ 113 0044 2E4A     		ldr	r2, .L18+16
+ 114 0046 2F4C     		ldr	r4, .L18+20
+ 115 0048 2260     		str	r2, [r4]
+ 120:../scr/main.c **** 	TIM15_Capture_Configuration();
+ 116              		.loc 1 120 0
+ 117 004a FFF7FEFF 		bl	TIM15_Capture_Configuration
+ 118              	.LVL3:
+ 119              	.LBB28:
+ 120              	.LBB29:
+ 132:../scr/main.c **** 		while (1);
+ 133:../scr/main.c **** }
+ 134:../scr/main.c **** 
+ 135:../scr/main.c **** static void LSM6DS3_init(void){
+ 136:../scr/main.c **** 	uint8_t test =0;
+ 137:../scr/main.c **** 	LSM6DS3_Initialize(LSM6DS3_SPI,LSM6DS3_DEFAULT_TIMEOUT);
+ 121              		.loc 1 137 0
+ 122 004e 6421     		mov	r1, #100
+ 123 0050 2D48     		ldr	r0, .L18+24
+ 124 0052 FFF7FEFF 		bl	LSM6DS3_Initialize
+ 138:../scr/main.c **** 	delay_ms(200);
+ 125              		.loc 1 138 0
+ 126 0056 C820     		mov	r0, #200
+ 127 0058 FFF7FEFF 		bl	delay_ms
+ 139:../scr/main.c **** 
+ 140:../scr/main.c **** 	if(LSM6DS3_Detect(10) == LSM6DS3_OK)
+ 128              		.loc 1 140 0
+ 129 005c 0A20     		mov	r0, #10
+ 130 005e FFF7FEFF 		bl	LSM6DS3_Detect
+ 131 0062 041E     		sub	r4, r0, #0
+ 132 0064 01D0     		beq	.L3
+ 133 0066 21E0     		b	.L17
+ 134              	.LVL4:
+ 135              	.L13:
+ 136 0068 FEE7     		b	.L13
+ 137              	.LVL5:
+ 138              	.L3:
+ 141:../scr/main.c **** 	{
+ 142:../scr/main.c **** 		xprintf("LSM6DS3 found\r\n");
+ 139              		.loc 1 142 0
+ 140 006a 2848     		ldr	r0, .L18+28
+ 141 006c FFF7FEFF 		bl	xprintf
+ 143:../scr/main.c **** 		if(LSM6DS3_XL_Start(XL_1666Hz, XL_RANGE_16G, XL_FILTER_400Hz)==LSM6DS3_FAIL){
+ 142              		.loc 1 143 0
+ 143 0070 0820     		mov	r0, #8
+ 144 0072 0121     		mov	r1, #1
+ 145 0074 221C     		mov	r2, r4
+ 146 0076 FFF7FEFF 		bl	LSM6DS3_XL_Start
+ 147 007a 0128     		cmp	r0, #1
+ 148 007c 01D1     		bne	.L5
+ 144:../scr/main.c **** 			xprintf("LSM6DS3_XL_Start fail\r\n");
+ 149              		.loc 1 144 0
+ 150 007e 2448     		ldr	r0, .L18+32
+ 151 0080 00E0     		b	.L15
+ 152              	.L5:
+ 145:../scr/main.c **** 		}
+ 146:../scr/main.c **** 		else{
+ 147:../scr/main.c **** 			xprintf("LSM6DS3_XL_Start ok\r\n");
+ 153              		.loc 1 147 0
+ 154 0082 2448     		ldr	r0, .L18+36
+ 155              	.L15:
+ 156 0084 FFF7FEFF 		bl	xprintf
+ 148:../scr/main.c **** 		}
+ 149:../scr/main.c **** 		delay_ms(10);
+ 157              		.loc 1 149 0
+ 158 0088 0A20     		mov	r0, #10
+ 159 008a FFF7FEFF 		bl	delay_ms
+ 150:../scr/main.c **** 
+ 151:../scr/main.c **** 		if(LSM6DS3_GS_Start(GS_1666Hz, GS_RANGE_2000dps)!=LSM6DS3_OK){
+ 160              		.loc 1 151 0
+ 161 008e 0820     		mov	r0, #8
+ 162 0090 0621     		mov	r1, #6
+ 163 0092 FFF7FEFF 		bl	LSM6DS3_GS_Start
+ 164 0096 0028     		cmp	r0, #0
+ 165 0098 01D0     		beq	.L7
+ 152:../scr/main.c **** 			xprintf("LSM6DS3_GS_Start fail\r\n");
+ 166              		.loc 1 152 0
+ 167 009a 1F48     		ldr	r0, .L18+40
+ 168 009c 00E0     		b	.L16
+ 169              	.L7:
+ 153:../scr/main.c **** 		}
+ 154:../scr/main.c **** 		else{
+ 155:../scr/main.c **** 			xprintf("LSM6DS3_GS_Start ok\r\n");
+ 170              		.loc 1 155 0
+ 171 009e 1F48     		ldr	r0, .L18+44
+ 172              	.L16:
+ 173 00a0 FFF7FEFF 		bl	xprintf
+ 156:../scr/main.c **** 		}
+ 157:../scr/main.c **** 		delay_ms(10);
+ 174              		.loc 1 157 0
+ 175 00a4 0A20     		mov	r0, #10
+ 176 00a6 FFF7FEFF 		bl	delay_ms
+ 177 00aa 02E0     		b	.L9
+ 178              	.L17:
+ 158:../scr/main.c **** 
+ 159:../scr/main.c ****   }
+ 160:../scr/main.c ****   else
+ 161:../scr/main.c ****   {
+ 162:../scr/main.c **** 		xprintf("LSM6DS3 not found\r\n");
+ 179              		.loc 1 162 0
+ 180 00ac 1C48     		ldr	r0, .L18+48
+ 181 00ae FFF7FEFF 		bl	xprintf
+ 182              	.L9:
+ 183              	.LBE29:
+ 184              	.LBE28:
+ 122:../scr/main.c **** 	Start_Kalman_Algorithm(10, 1000000.0f);
+ 185              		.loc 1 122 0
+ 186 00b2 1C48     		ldr	r0, .L18+52
+ 187 00b4 1C49     		ldr	r1, .L18+56
+ 188 00b6 FFF7FEFF 		bl	Start_Kalman_Algorithm
+ 124:../scr/main.c **** 	g_appStats.debug =1;
+ 189              		.loc 1 124 0
+ 190 00ba 1C4B     		ldr	r3, .L18+60
+ 191 00bc 0122     		mov	r2, #1
+ 192 00be 1A62     		str	r2, [r3, #32]
+ 125:../scr/main.c **** 	xprintf("setup done\r\n");
+ 193              		.loc 1 125 0
+ 194 00c0 1B48     		ldr	r0, .L18+64
+ 195 00c2 FFF7FEFF 		bl	xprintf
+ 196              	.L11:
+ 197              	.LBE13:
+ 198              	.LBE12:
+ 103:../scr/main.c **** 		if(last_check_time<ulMiliCount){
+ 199              		.loc 1 103 0
+ 200 00c6 1B49     		ldr	r1, .L18+68
+ 201 00c8 0B68     		ldr	r3, [r1]
+ 202              	.L10:
+ 203 00ca 1B4C     		ldr	r4, .L18+72
+ 204 00cc 2068     		ldr	r0, [r4]
+ 205 00ce 8342     		cmp	r3, r0
+ 206 00d0 FBD2     		bcs	.L10
+ 105:../scr/main.c **** 			xprintf("%d		%d		%d \r\n",Capture,TIM1Freq,interrupt_count);
+ 207              		.loc 1 105 0
+ 208 00d2 1A48     		ldr	r0, .L18+76
+ 209 00d4 1A49     		ldr	r1, .L18+80
+ 210 00d6 1B4B     		ldr	r3, .L18+84
+ 211 00d8 0968     		ldr	r1, [r1]
+ 212 00da 0268     		ldr	r2, [r0]
+ 213 00dc 1B68     		ldr	r3, [r3]
+ 214 00de 1A48     		ldr	r0, .L18+88
+ 215 00e0 FFF7FEFF 		bl	xprintf
+ 106:../scr/main.c **** 			last_check_time = ulMiliCount + 500;
+ 216              		.loc 1 106 0
+ 217 00e4 2468     		ldr	r4, [r4]
+ 218 00e6 134A     		ldr	r2, .L18+68
+ 219 00e8 F534     		add	r4, r4, #245
+ 220 00ea FF34     		add	r4, r4, #255
+ 221 00ec 1460     		str	r4, [r2]
+ 222 00ee EAE7     		b	.L11
+ 223              	.L19:
+ 224              		.align	2
+ 225              	.L18:
+ 226 00f0 00000000 		.word	SystemCoreClock
+ 227 00f4 FFFFFF00 		.word	16777215
+ 228 00f8 10E000E0 		.word	-536813552
+ 229 00fc 00ED00E0 		.word	-536810240
+ 230 0100 00000000 		.word	PC_uart_putChar
+ 231 0104 00000000 		.word	xfunc_out
+ 232 0108 00380040 		.word	1073756160
+ 233 010c 00000000 		.word	.LC3
+ 234 0110 10000000 		.word	.LC5
+ 235 0114 28000000 		.word	.LC7
+ 236 0118 3E000000 		.word	.LC9
+ 237 011c 56000000 		.word	.LC11
+ 238 0120 6C000000 		.word	.LC13
+ 239 0124 00002041 		.word	1092616192
+ 240 0128 00247449 		.word	1232348160
+ 241 012c 00000000 		.word	g_appStats
+ 242 0130 80000000 		.word	.LC16
+ 243 0134 00000000 		.word	.LANCHOR0
+ 244 0138 00000000 		.word	.LANCHOR1
+ 245 013c 00000000 		.word	TIM1Freq
+ 246 0140 00000000 		.word	Capture
+ 247 0144 00000000 		.word	interrupt_count
+ 248 0148 8D000000 		.word	.LC23
+ 249              		.cfi_endproc
+ 250              	.LFE33:
+ 252              		.global	ulTick100
+ 253              		.comm	g_appStats,40,4
+ 254              		.comm	interrupt_count,4,4
+ 255              		.comm	TIM1Freq,4,4
+ 256              		.comm	Capture,4,4
+ 257              		.global	ulMiliCount
+ 258              		.global	ulTickCount
+ 259              		.global	ulSecCount
+ 260              		.section	.bss.ulTickCount,"aw",%nobits
+ 261              		.align	2
+ 264              	ulTickCount:
+ 265 0000 00000000 		.space	4
+ 266              		.section	.bss.ulMiliCount,"aw",%nobits
+ 267              		.align	2
+ 268              		.set	.LANCHOR1,. + 0
+ 271              	ulMiliCount:
+ 272 0000 00000000 		.space	4
+ 273              		.section	.bss.ulTick100,"aw",%nobits
+ 274              		.align	2
+ 277              	ulTick100:
+ 278 0000 00000000 		.space	4
+ 279              		.section	.bss.ulSecCount,"aw",%nobits
+ 280              		.align	2
+ 283              	ulSecCount:
+ 284 0000 00000000 		.space	4
+ 285              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 286              	.LC3:
+ 287 0000 4C534D36 		.ascii	"LSM6DS3 found\015\012\000"
+ 287      44533320 
+ 287      666F756E 
+ 287      640D0A00 
+ 288              	.LC5:
+ 289 0010 4C534D36 		.ascii	"LSM6DS3_XL_Start fail\015\012\000"
+ 289      4453335F 
+ 289      584C5F53 
+ 289      74617274 
+ 289      20666169 
+ 290              	.LC7:
+ 291 0028 4C534D36 		.ascii	"LSM6DS3_XL_Start ok\015\012\000"
+ 291      4453335F 
+ 291      584C5F53 
+ 291      74617274 
+ 291      206F6B0D 
+ 292              	.LC9:
+ 293 003e 4C534D36 		.ascii	"LSM6DS3_GS_Start fail\015\012\000"
+ 293      4453335F 
+ 293      47535F53 
+ 293      74617274 
+ 293      20666169 
+ 294              	.LC11:
+ 295 0056 4C534D36 		.ascii	"LSM6DS3_GS_Start ok\015\012\000"
+ 295      4453335F 
+ 295      47535F53 
+ 295      74617274 
+ 295      206F6B0D 
+ 296              	.LC13:
+ 297 006c 4C534D36 		.ascii	"LSM6DS3 not found\015\012\000"
+ 297      44533320 
+ 297      6E6F7420 
+ 297      666F756E 
+ 297      640D0A00 
+ 298              	.LC16:
+ 299 0080 73657475 		.ascii	"setup done\015\012\000"
+ 299      7020646F 
+ 299      6E650D0A 
+ 299      00
+ 300              	.LC23:
+ 301 008d 25640909 		.ascii	"%d\011\011%d\011\011%d \015\012\000"
+ 301      25640909 
+ 301      2564200D 
+ 301      0A00
+ 302              		.section	.bss.last_check_time,"aw",%nobits
+ 303              		.align	2
+ 304              		.set	.LANCHOR0,. + 0
+ 307              	last_check_time:
+ 308 0000 00000000 		.space	4
+ 309              		.text
+ 310              	.Letext0:
+ 311              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\scr/stm32f0xx
+ 312              		.file 4 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 313              		.file 5 "../scr/global.h"
+ 314              		.file 6 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\CM
+ 315              		.file 7 "../scr/xprintf.h"
+ 316              		.file 8 "../scr/LSM6DS3.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 main.c
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:19     .text.startup.main:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:24     .text.startup.main:00000000 main
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:226    .text.startup.main:000000f0 $d
+                            *COM*:00000028 g_appStats
+                            *COM*:00000004 TIM1Freq
+                            *COM*:00000004 Capture
+                            *COM*:00000004 interrupt_count
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:277    .bss.ulTick100:00000000 ulTick100
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:271    .bss.ulMiliCount:00000000 ulMiliCount
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:264    .bss.ulTickCount:00000000 ulTickCount
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:283    .bss.ulSecCount:00000000 ulSecCount
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:261    .bss.ulTickCount:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:267    .bss.ulMiliCount:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:274    .bss.ulTick100:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:280    .bss.ulSecCount:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:303    .bss.last_check_time:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccaBgRNT.s:307    .bss.last_check_time:00000000 last_check_time
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uidiv
+SystemInit
+SysTick_CLKSourceConfig
+PC_uartInit
+TIM15_Capture_Configuration
+LSM6DS3_Initialize
+delay_ms
+LSM6DS3_Detect
+xprintf
+LSM6DS3_XL_Start
+LSM6DS3_GS_Start
+Start_Kalman_Algorithm
+SystemCoreClock
+PC_uart_putChar
+xfunc_out

@@ -1,0 +1,348 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"DataUtil.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.read_device_config,"ax",%progbits
+  18              		.align	1
+  19              		.global	read_device_config
+  20              		.code	16
+  21              		.thumb_func
+  23              	read_device_config:
+  24              	.LFB0:
+  25              		.file 1 "../Source - Copy/DataUtil.c"
+   1:../Source - Copy/DataUtil.c **** #include "stdio.h"
+   2:../Source - Copy/DataUtil.c **** #include "time.h"
+   3:../Source - Copy/DataUtil.c **** #include "config.h"
+   4:../Source - Copy/DataUtil.c **** #include "DataUtil.h"
+   5:../Source - Copy/DataUtil.c **** #include "Util.h"
+   6:../Source - Copy/DataUtil.c **** #include "main.h"
+   7:../Source - Copy/DataUtil.c **** //#include "common.h"
+   8:../Source - Copy/DataUtil.c **** #include "xprintf.h"
+   9:../Source - Copy/DataUtil.c **** 
+  10:../Source - Copy/DataUtil.c **** extern struct tm c_date_time;
+  11:../Source - Copy/DataUtil.c **** 
+  12:../Source - Copy/DataUtil.c **** unsigned int checkTripIdx = 0;
+  13:../Source - Copy/DataUtil.c **** extern char buffer32[BUFFER_32];
+  14:../Source - Copy/DataUtil.c **** 
+  15:../Source - Copy/DataUtil.c **** /*
+  16:../Source - Copy/DataUtil.c **** Read general configuration
+  17:../Source - Copy/DataUtil.c **** */
+  18:../Source - Copy/DataUtil.c **** void read_device_config() {
+  26              		.loc 1 18 0
+  27              		.cfi_startproc
+  28 0000 10B5     		push	{r4, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 8
+  31              		.cfi_offset 4, -8
+  32              		.cfi_offset 14, -4
+  19:../Source - Copy/DataUtil.c **** 	flash_read_config_info(&g_config);
+  33              		.loc 1 19 0
+  34 0002 124C     		ldr	r4, .L6
+  35 0004 201C     		mov	r0, r4
+  36 0006 FFF7FEFF 		bl	flash_read_config_info
+  20:../Source - Copy/DataUtil.c **** 
+  21:../Source - Copy/DataUtil.c **** 	if(g_config.diffX < 3) {
+  37              		.loc 1 21 0
+  38 000a 237E     		ldrb	r3, [r4, #24]
+  39 000c 022B     		cmp	r3, #2
+  40 000e 06D8     		bhi	.L2
+  22:../Source - Copy/DataUtil.c **** 		g_config.diffX = 5;
+  23:../Source - Copy/DataUtil.c **** 
+  24:../Source - Copy/DataUtil.c **** 		if(g_config.timeout3D <= 1) {
+  41              		.loc 1 24 0
+  42 0010 A08A     		ldrh	r0, [r4, #20]
+  22:../Source - Copy/DataUtil.c **** 		g_config.diffX = 5;
+  43              		.loc 1 22 0
+  44 0012 0521     		mov	r1, #5
+  45 0014 2176     		strb	r1, [r4, #24]
+  46              		.loc 1 24 0
+  47 0016 0128     		cmp	r0, #1
+  48 0018 01D8     		bhi	.L2
+  25:../Source - Copy/DataUtil.c **** 			g_config.timeout3D = 3;
+  49              		.loc 1 25 0
+  50 001a 0322     		mov	r2, #3
+  51 001c A282     		strh	r2, [r4, #20]
+  52              	.L2:
+  26:../Source - Copy/DataUtil.c **** 		}
+  27:../Source - Copy/DataUtil.c **** 	}
+  28:../Source - Copy/DataUtil.c **** 
+  29:../Source - Copy/DataUtil.c **** 	if(g_config.diffY < 3) {
+  53              		.loc 1 29 0
+  54 001e 637E     		ldrb	r3, [r4, #25]
+  55 0020 022B     		cmp	r3, #2
+  56 0022 06D8     		bhi	.L3
+  30:../Source - Copy/DataUtil.c **** 		g_config.diffY = 5;
+  31:../Source - Copy/DataUtil.c **** 
+  32:../Source - Copy/DataUtil.c **** 		if(g_config.timeout3D <= 1) {
+  57              		.loc 1 32 0
+  58 0024 A08A     		ldrh	r0, [r4, #20]
+  30:../Source - Copy/DataUtil.c **** 		g_config.diffY = 5;
+  59              		.loc 1 30 0
+  60 0026 0521     		mov	r1, #5
+  61 0028 6176     		strb	r1, [r4, #25]
+  62              		.loc 1 32 0
+  63 002a 0128     		cmp	r0, #1
+  64 002c 01D8     		bhi	.L3
+  33:../Source - Copy/DataUtil.c **** 			g_config.timeout3D = 3;
+  65              		.loc 1 33 0
+  66 002e 0322     		mov	r2, #3
+  67 0030 A282     		strh	r2, [r4, #20]
+  68              	.L3:
+  34:../Source - Copy/DataUtil.c **** 		}
+  35:../Source - Copy/DataUtil.c **** 	}
+  36:../Source - Copy/DataUtil.c **** 
+  37:../Source - Copy/DataUtil.c **** 	if(g_config.diffX > 30) {
+  69              		.loc 1 37 0
+  70 0032 237E     		ldrb	r3, [r4, #24]
+  71 0034 1E2B     		cmp	r3, #30
+  72 0036 01D9     		bls	.L4
+  38:../Source - Copy/DataUtil.c **** 		g_config.diffX = 5;
+  73              		.loc 1 38 0
+  74 0038 0520     		mov	r0, #5
+  75 003a 2076     		strb	r0, [r4, #24]
+  76              	.L4:
+  39:../Source - Copy/DataUtil.c **** 	}
+  40:../Source - Copy/DataUtil.c **** 
+  41:../Source - Copy/DataUtil.c **** 	if(g_config.diffY > 30) {
+  77              		.loc 1 41 0
+  78 003c 034B     		ldr	r3, .L6
+  79 003e 5C7E     		ldrb	r4, [r3, #25]
+  80 0040 1E2C     		cmp	r4, #30
+  81 0042 01D9     		bls	.L1
+  42:../Source - Copy/DataUtil.c **** 		g_config.diffY = 5;
+  82              		.loc 1 42 0
+  83 0044 0521     		mov	r1, #5
+  84 0046 5976     		strb	r1, [r3, #25]
+  85              	.L1:
+  86              		@ sp needed for prologue
+  43:../Source - Copy/DataUtil.c **** 	}
+  44:../Source - Copy/DataUtil.c **** }
+  87              		.loc 1 44 0
+  88 0048 10BD     		pop	{r4, pc}
+  89              	.L7:
+  90 004a C046     		.align	2
+  91              	.L6:
+  92 004c 00000000 		.word	g_config
+  93              		.cfi_endproc
+  94              	.LFE0:
+  96              		.section	.text.write_device_config,"ax",%progbits
+  97              		.align	1
+  98              		.global	write_device_config
+  99              		.code	16
+ 100              		.thumb_func
+ 102              	write_device_config:
+ 103              	.LFB1:
+  45:../Source - Copy/DataUtil.c **** 
+  46:../Source - Copy/DataUtil.c **** /*
+  47:../Source - Copy/DataUtil.c **** Write general configuration to ROM
+  48:../Source - Copy/DataUtil.c **** */
+  49:../Source - Copy/DataUtil.c **** void write_device_config() {
+ 104              		.loc 1 49 0
+ 105              		.cfi_startproc
+ 106 0000 08B5     		push	{r3, lr}
+ 107              	.LCFI1:
+ 108              		.cfi_def_cfa_offset 8
+ 109              		.cfi_offset 3, -8
+ 110              		.cfi_offset 14, -4
+  50:../Source - Copy/DataUtil.c **** 	flash_write_config_info(&g_config);
+ 111              		.loc 1 50 0
+ 112 0002 0248     		ldr	r0, .L9
+ 113 0004 FFF7FEFF 		bl	flash_write_config_info
+ 114              		@ sp needed for prologue
+  51:../Source - Copy/DataUtil.c **** }
+ 115              		.loc 1 51 0
+ 116 0008 08BD     		pop	{r3, pc}
+ 117              	.L10:
+ 118 000a C046     		.align	2
+ 119              	.L9:
+ 120 000c 00000000 		.word	g_config
+ 121              		.cfi_endproc
+ 122              	.LFE1:
+ 124              		.section	.text.write_default_config,"ax",%progbits
+ 125              		.align	1
+ 126              		.global	write_default_config
+ 127              		.code	16
+ 128              		.thumb_func
+ 130              	write_default_config:
+ 131              	.LFB3:
+  52:../Source - Copy/DataUtil.c **** 
+  53:../Source - Copy/DataUtil.c **** void init_config() {
+  54:../Source - Copy/DataUtil.c **** 	read_device_config(); //read config from ROM
+  55:../Source - Copy/DataUtil.c **** 	write_default_config(); //write default config if not configured yet
+  56:../Source - Copy/DataUtil.c **** }
+  57:../Source - Copy/DataUtil.c **** 
+  58:../Source - Copy/DataUtil.c **** void write_default_config() {
+ 132              		.loc 1 58 0
+ 133              		.cfi_startproc
+ 134 0000 10B5     		push	{r4, lr}
+ 135              	.LCFI2:
+ 136              		.cfi_def_cfa_offset 8
+ 137              		.cfi_offset 4, -8
+ 138              		.cfi_offset 14, -4
+  59:../Source - Copy/DataUtil.c **** 	//set default
+  60:../Source - Copy/DataUtil.c **** 	if(g_config.configState != 2) {
+ 139              		.loc 1 60 0
+ 140 0002 0D4C     		ldr	r4, .L13
+ 141 0004 6378     		ldrb	r3, [r4, #1]
+ 142 0006 022B     		cmp	r3, #2
+ 143 0008 15D0     		beq	.L11
+  61:../Source - Copy/DataUtil.c **** 		//xprintf(, "1234567890");
+  62:../Source - Copy/DataUtil.c **** 
+  63:../Source - Copy/DataUtil.c **** 		sprintf(g_config.deviceCode, "%s", "1234567890");
+ 144              		.loc 1 63 0
+ 145 000a 0C49     		ldr	r1, .L13+4
+ 146 000c A01C     		add	r0, r4, #2
+ 147 000e FFF7FEFF 		bl	strcpy
+  64:../Source - Copy/DataUtil.c **** 
+  65:../Source - Copy/DataUtil.c **** 		g_config.emptyValue = 0;
+  66:../Source - Copy/DataUtil.c **** 		g_config.fullValue = 0;
+  67:../Source - Copy/DataUtil.c **** 		g_config.timeout3D = 3; //3 minutes
+ 148              		.loc 1 67 0
+ 149 0012 0320     		mov	r0, #3
+  65:../Source - Copy/DataUtil.c **** 		g_config.emptyValue = 0;
+ 150              		.loc 1 65 0
+ 151 0014 0023     		mov	r3, #0
+  68:../Source - Copy/DataUtil.c **** 		g_config.outputMode = 0;
+  69:../Source - Copy/DataUtil.c **** 		g_config.diffX = 6;
+ 152              		.loc 1 69 0
+ 153 0016 0622     		mov	r2, #6
+  67:../Source - Copy/DataUtil.c **** 		g_config.timeout3D = 3; //3 minutes
+ 154              		.loc 1 67 0
+ 155 0018 A082     		strh	r0, [r4, #20]
+  70:../Source - Copy/DataUtil.c **** 		g_config.diffY = 6;
+  71:../Source - Copy/DataUtil.c **** 		g_config.interval = 1;
+ 156              		.loc 1 71 0
+ 157 001a 0121     		mov	r1, #1
+  72:../Source - Copy/DataUtil.c **** 
+  73:../Source - Copy/DataUtil.c **** 		g_config.configState = 2;
+ 158              		.loc 1 73 0
+ 159 001c 0220     		mov	r0, #2
+ 160 001e 6070     		strb	r0, [r4, #1]
+  65:../Source - Copy/DataUtil.c **** 		g_config.emptyValue = 0;
+ 161              		.loc 1 65 0
+ 162 0020 2361     		str	r3, [r4, #16]
+  66:../Source - Copy/DataUtil.c **** 		g_config.fullValue = 0;
+ 163              		.loc 1 66 0
+ 164 0022 E360     		str	r3, [r4, #12]
+  68:../Source - Copy/DataUtil.c **** 		g_config.outputMode = 0;
+ 165              		.loc 1 68 0
+ 166 0024 A375     		strb	r3, [r4, #22]
+  69:../Source - Copy/DataUtil.c **** 		g_config.diffX = 6;
+ 167              		.loc 1 69 0
+ 168 0026 2276     		strb	r2, [r4, #24]
+  70:../Source - Copy/DataUtil.c **** 		g_config.diffY = 6;
+ 169              		.loc 1 70 0
+ 170 0028 6276     		strb	r2, [r4, #25]
+  71:../Source - Copy/DataUtil.c **** 		g_config.interval = 1;
+ 171              		.loc 1 71 0
+ 172 002a A176     		strb	r1, [r4, #26]
+  74:../Source - Copy/DataUtil.c **** 
+  75:../Source - Copy/DataUtil.c **** 		write_device_config();
+ 173              		.loc 1 75 0
+ 174 002c FFF7FEFF 		bl	write_device_config
+  76:../Source - Copy/DataUtil.c **** 
+  77:../Source - Copy/DataUtil.c **** 		xprintf("\r\nWrite default config.\r\n\r\n");
+ 175              		.loc 1 77 0
+ 176 0030 0348     		ldr	r0, .L13+8
+ 177 0032 FFF7FEFF 		bl	xprintf
+ 178              	.L11:
+ 179              		@ sp needed for prologue
+  78:../Source - Copy/DataUtil.c **** 	} else {
+  79:../Source - Copy/DataUtil.c **** 		//xprintf("\r\nLoaded config.\r\n\r\n");
+  80:../Source - Copy/DataUtil.c **** 	}
+  81:../Source - Copy/DataUtil.c **** }
+ 180              		.loc 1 81 0
+ 181 0036 10BD     		pop	{r4, pc}
+ 182              	.L14:
+ 183              		.align	2
+ 184              	.L13:
+ 185 0038 00000000 		.word	g_config
+ 186 003c 00000000 		.word	.LC7
+ 187 0040 0B000000 		.word	.LC9
+ 188              		.cfi_endproc
+ 189              	.LFE3:
+ 191              		.section	.text.init_config,"ax",%progbits
+ 192              		.align	1
+ 193              		.global	init_config
+ 194              		.code	16
+ 195              		.thumb_func
+ 197              	init_config:
+ 198              	.LFB2:
+  53:../Source - Copy/DataUtil.c **** void init_config() {
+ 199              		.loc 1 53 0
+ 200              		.cfi_startproc
+ 201 0000 08B5     		push	{r3, lr}
+ 202              	.LCFI3:
+ 203              		.cfi_def_cfa_offset 8
+ 204              		.cfi_offset 3, -8
+ 205              		.cfi_offset 14, -4
+  54:../Source - Copy/DataUtil.c **** 	read_device_config(); //read config from ROM
+ 206              		.loc 1 54 0
+ 207 0002 FFF7FEFF 		bl	read_device_config
+ 208              		@ sp needed for prologue
+  55:../Source - Copy/DataUtil.c **** 	write_default_config(); //write default config if not configured yet
+ 209              		.loc 1 55 0
+ 210 0006 FFF7FEFF 		bl	write_default_config
+  56:../Source - Copy/DataUtil.c **** }
+ 211              		.loc 1 56 0
+ 212 000a 08BD     		pop	{r3, pc}
+ 213              		.cfi_endproc
+ 214              	.LFE2:
+ 216              		.global	checkTripIdx
+ 217              		.comm	g_appStats,136,4
+ 218              		.comm	g_config,28,4
+ 219              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 220              	.LC7:
+ 221 0000 31323334 		.ascii	"1234567890\000"
+ 221      35363738 
+ 221      393000
+ 222              	.LC9:
+ 223 000b 0D0A5772 		.ascii	"\015\012Write default config.\015\012\015\012\000"
+ 223      69746520 
+ 223      64656661 
+ 223      756C7420 
+ 223      636F6E66 
+ 224              		.section	.bss.checkTripIdx,"aw",%nobits
+ 225              		.align	2
+ 228              	checkTripIdx:
+ 229 0000 00000000 		.space	4
+ 230              		.text
+ 231              	.Letext0:
+ 232              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 233              		.file 3 "../Source - Copy/DataUtil.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 DataUtil.c
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:18     .text.read_device_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:23     .text.read_device_config:00000000 read_device_config
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:92     .text.read_device_config:0000004c $d
+                            *COM*:0000001c g_config
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:97     .text.write_device_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:102    .text.write_device_config:00000000 write_device_config
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:120    .text.write_device_config:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:125    .text.write_default_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:130    .text.write_default_config:00000000 write_default_config
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:185    .text.write_default_config:00000038 $d
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:192    .text.init_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:197    .text.init_config:00000000 init_config
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:228    .bss.checkTripIdx:00000000 checkTripIdx
+                            *COM*:00000088 g_appStats
+C:\Users\khanh\AppData\Local\Temp\cc4xdWib.s:225    .bss.checkTripIdx:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+flash_read_config_info
+flash_write_config_info
+strcpy
+xprintf

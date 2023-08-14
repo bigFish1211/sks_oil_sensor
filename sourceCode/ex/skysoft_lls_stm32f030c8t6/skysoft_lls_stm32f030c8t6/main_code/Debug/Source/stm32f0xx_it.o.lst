@@ -1,0 +1,773 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"stm32f0xx_it.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.NMI_Handler,"ax",%progbits
+  18              		.align	1
+  19              		.global	NMI_Handler
+  20              		.code	16
+  21              		.thumb_func
+  23              	NMI_Handler:
+  24              	.LFB33:
+  25              		.file 1 "../Source/stm32f0xx_it.c"
+   1:../Source/stm32f0xx_it.c **** /**
+   2:../Source/stm32f0xx_it.c ****  ******************************************************************************
+   3:../Source/stm32f0xx_it.c ****  * @file    Project/STM32F0xx_StdPeriph_Templates/stm32f0xx_it.c
+   4:../Source/stm32f0xx_it.c ****  * @author  MCD Application Team
+   5:../Source/stm32f0xx_it.c ****  * @version V1.5.0
+   6:../Source/stm32f0xx_it.c ****  * @date    05-December-2014
+   7:../Source/stm32f0xx_it.c ****  * @brief   Main Interrupt Service Routines.
+   8:../Source/stm32f0xx_it.c ****  *          This file provides template for all exceptions handler and
+   9:../Source/stm32f0xx_it.c ****  *          peripherals interrupt service routine.
+  10:../Source/stm32f0xx_it.c ****  ******************************************************************************
+  11:../Source/stm32f0xx_it.c ****  * @attention
+  12:../Source/stm32f0xx_it.c ****  *
+  13:../Source/stm32f0xx_it.c ****  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  14:../Source/stm32f0xx_it.c ****  *
+  15:../Source/stm32f0xx_it.c ****  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  16:../Source/stm32f0xx_it.c ****  * You may not use this file except in compliance with the License.
+  17:../Source/stm32f0xx_it.c ****  * You may obtain a copy of the License at:
+  18:../Source/stm32f0xx_it.c ****  *
+  19:../Source/stm32f0xx_it.c ****  *        http://www.st.com/software_license_agreement_liberty_v2
+  20:../Source/stm32f0xx_it.c ****  *
+  21:../Source/stm32f0xx_it.c ****  * Unless required by applicable law or agreed to in writing, software
+  22:../Source/stm32f0xx_it.c ****  * distributed under the License is distributed on an "AS IS" BASIS,
+  23:../Source/stm32f0xx_it.c ****  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  24:../Source/stm32f0xx_it.c ****  * See the License for the specific language governing permissions and
+  25:../Source/stm32f0xx_it.c ****  * limitations under the License.
+  26:../Source/stm32f0xx_it.c ****  *
+  27:../Source/stm32f0xx_it.c ****  ******************************************************************************
+  28:../Source/stm32f0xx_it.c ****  */
+  29:../Source/stm32f0xx_it.c **** 
+  30:../Source/stm32f0xx_it.c **** /* Includes ------------------------------------------------------------------*/
+  31:../Source/stm32f0xx_it.c **** #include "stm32f0xx.h"
+  32:../Source/stm32f0xx_it.c **** #include "stm32f0xx_it.h"
+  33:../Source/stm32f0xx_it.c **** #include "xprintf.h"
+  34:../Source/stm32f0xx_it.c **** #include "string.h"
+  35:../Source/stm32f0xx_it.c **** #include "config.h"
+  36:../Source/stm32f0xx_it.c **** #include "uart.h"
+  37:../Source/stm32f0xx_it.c **** #include "timer.h"
+  38:../Source/stm32f0xx_it.c **** #include "DataUtil.h"
+  39:../Source/stm32f0xx_it.c **** #include "define.h"
+  40:../Source/stm32f0xx_it.c **** 
+  41:../Source/stm32f0xx_it.c **** /** @addtogroup Template_Project
+  42:../Source/stm32f0xx_it.c ****  * @{
+  43:../Source/stm32f0xx_it.c ****  */
+  44:../Source/stm32f0xx_it.c **** 
+  45:../Source/stm32f0xx_it.c **** /* Private typedef -----------------------------------------------------------*/
+  46:../Source/stm32f0xx_it.c **** /* Private define ------------------------------------------------------------*/
+  47:../Source/stm32f0xx_it.c **** /* Private macro -------------------------------------------------------------*/
+  48:../Source/stm32f0xx_it.c **** /* Private variables ---------------------------------------------------------*/
+  49:../Source/stm32f0xx_it.c **** volatile extern uint32_t ulSecCount;
+  50:../Source/stm32f0xx_it.c **** volatile extern uint32_t ulTickCount;
+  51:../Source/stm32f0xx_it.c **** volatile extern uint32_t ulMiliCount;
+  52:../Source/stm32f0xx_it.c **** volatile extern unsigned long ulTick100;
+  53:../Source/stm32f0xx_it.c **** 
+  54:../Source/stm32f0xx_it.c **** uint16_t IC3ReadValue1 = 0, IC3ReadValue2 = 0;
+  55:../Source/stm32f0xx_it.c **** uint16_t CaptureNumber = 0;
+  56:../Source/stm32f0xx_it.c **** uint8_t TIM3_isFull =0;
+  57:../Source/stm32f0xx_it.c **** extern uint32_t Capture;
+  58:../Source/stm32f0xx_it.c **** //extern uint32_t TIM1Freq;
+  59:../Source/stm32f0xx_it.c **** extern uint32_t interrupt_count;
+  60:../Source/stm32f0xx_it.c **** uint32_t pulse_count = 0;
+  61:../Source/stm32f0xx_it.c **** uint32_t last_pulse_count = 0;
+  62:../Source/stm32f0xx_it.c **** uint16_t pulse_per_sec = 0;
+  63:../Source/stm32f0xx_it.c **** /* Private function prototypes -----------------------------------------------*/
+  64:../Source/stm32f0xx_it.c **** /* Private functions ---------------------------------------------------------*/
+  65:../Source/stm32f0xx_it.c **** 
+  66:../Source/stm32f0xx_it.c **** /******************************************************************************/
+  67:../Source/stm32f0xx_it.c **** /*            Cortex-M0 Processor Exceptions Handlers                         */
+  68:../Source/stm32f0xx_it.c **** /******************************************************************************/
+  69:../Source/stm32f0xx_it.c **** 
+  70:../Source/stm32f0xx_it.c **** /**
+  71:../Source/stm32f0xx_it.c ****  * @brief  This function handles NMI exception.
+  72:../Source/stm32f0xx_it.c ****  * @param  None
+  73:../Source/stm32f0xx_it.c ****  * @retval None
+  74:../Source/stm32f0xx_it.c ****  */
+  75:../Source/stm32f0xx_it.c **** void NMI_Handler(void) {
+  26              		.loc 1 75 0
+  27              		.cfi_startproc
+  28              		@ sp needed for prologue
+  76:../Source/stm32f0xx_it.c **** }
+  29              		.loc 1 76 0
+  30 0000 7047     		bx	lr
+  31              		.cfi_endproc
+  32              	.LFE33:
+  34              		.section	.text.HardFault_Handler,"ax",%progbits
+  35              		.align	1
+  36              		.global	HardFault_Handler
+  37              		.code	16
+  38              		.thumb_func
+  40              	HardFault_Handler:
+  41              	.LFB34:
+  77:../Source/stm32f0xx_it.c **** 
+  78:../Source/stm32f0xx_it.c **** /**
+  79:../Source/stm32f0xx_it.c ****  * @brief  This function handles Hard Fault exception.
+  80:../Source/stm32f0xx_it.c ****  * @param  None
+  81:../Source/stm32f0xx_it.c ****  * @retval None
+  82:../Source/stm32f0xx_it.c ****  */
+  83:../Source/stm32f0xx_it.c **** void HardFault_Handler(void) {
+  42              		.loc 1 83 0
+  43              		.cfi_startproc
+  44 0000 00B5     		push	{lr}
+  45              	.LCFI0:
+  46              		.cfi_def_cfa_offset 4
+  47              		.cfi_offset 14, -4
+  48              	.L3:
+  49 0002 FEE7     		b	.L3
+  50              		.cfi_endproc
+  51              	.LFE34:
+  53              		.section	.text.SVC_Handler,"ax",%progbits
+  54              		.align	1
+  55              		.global	SVC_Handler
+  56              		.code	16
+  57              		.thumb_func
+  59              	SVC_Handler:
+  60              	.LFB35:
+  84:../Source/stm32f0xx_it.c **** 	/* Go to infinite loop when Hard Fault exception occurs */
+  85:../Source/stm32f0xx_it.c **** 	while (1) {
+  86:../Source/stm32f0xx_it.c **** 	}
+  87:../Source/stm32f0xx_it.c **** }
+  88:../Source/stm32f0xx_it.c **** 
+  89:../Source/stm32f0xx_it.c **** /**
+  90:../Source/stm32f0xx_it.c ****  * @brief  This function handles SVCall exception.
+  91:../Source/stm32f0xx_it.c ****  * @param  None
+  92:../Source/stm32f0xx_it.c ****  * @retval None
+  93:../Source/stm32f0xx_it.c ****  */
+  94:../Source/stm32f0xx_it.c **** void SVC_Handler(void) {
+  61              		.loc 1 94 0
+  62              		.cfi_startproc
+  63              		@ sp needed for prologue
+  95:../Source/stm32f0xx_it.c **** }
+  64              		.loc 1 95 0
+  65 0000 7047     		bx	lr
+  66              		.cfi_endproc
+  67              	.LFE35:
+  69              		.section	.text.PendSV_Handler,"ax",%progbits
+  70              		.align	1
+  71              		.global	PendSV_Handler
+  72              		.code	16
+  73              		.thumb_func
+  75              	PendSV_Handler:
+  76              	.LFB36:
+  96:../Source/stm32f0xx_it.c **** 
+  97:../Source/stm32f0xx_it.c **** /**
+  98:../Source/stm32f0xx_it.c ****  * @brief  This function handles PendSVC exception.
+  99:../Source/stm32f0xx_it.c ****  * @param  None
+ 100:../Source/stm32f0xx_it.c ****  * @retval None
+ 101:../Source/stm32f0xx_it.c ****  */
+ 102:../Source/stm32f0xx_it.c **** void PendSV_Handler(void) {
+  77              		.loc 1 102 0
+  78              		.cfi_startproc
+  79              		@ sp needed for prologue
+ 103:../Source/stm32f0xx_it.c **** }
+  80              		.loc 1 103 0
+  81 0000 7047     		bx	lr
+  82              		.cfi_endproc
+  83              	.LFE36:
+  85              		.global	__aeabi_uidivmod
+  86              		.section	.text.SysTick_Handler,"ax",%progbits
+  87              		.align	1
+  88              		.global	SysTick_Handler
+  89              		.code	16
+  90              		.thumb_func
+  92              	SysTick_Handler:
+  93              	.LFB37:
+ 104:../Source/stm32f0xx_it.c **** 
+ 105:../Source/stm32f0xx_it.c **** /**
+ 106:../Source/stm32f0xx_it.c ****  * @brief  This function handles SysTick Handler.
+ 107:../Source/stm32f0xx_it.c ****  * @param  None
+ 108:../Source/stm32f0xx_it.c ****  * @retval None
+ 109:../Source/stm32f0xx_it.c ****  */
+ 110:../Source/stm32f0xx_it.c **** void SysTick_Handler(void) {
+  94              		.loc 1 110 0
+  95              		.cfi_startproc
+  96 0000 10B5     		push	{r4, lr}
+  97              	.LCFI1:
+  98              		.cfi_def_cfa_offset 8
+  99              		.cfi_offset 4, -8
+ 100              		.cfi_offset 14, -4
+ 111:../Source/stm32f0xx_it.c **** 	ulTickCount++;
+ 101              		.loc 1 111 0
+ 102 0002 0F48     		ldr	r0, .L9
+ 112:../Source/stm32f0xx_it.c **** 	ulMiliCount++;
+ 103              		.loc 1 112 0
+ 104 0004 0F4C     		ldr	r4, .L9+4
+ 111:../Source/stm32f0xx_it.c **** 	ulTickCount++;
+ 105              		.loc 1 111 0
+ 106 0006 0268     		ldr	r2, [r0]
+ 113:../Source/stm32f0xx_it.c **** 
+ 114:../Source/stm32f0xx_it.c **** 	if ((ulMiliCount % 100) == 0) { //10 mili seconds
+ 107              		.loc 1 114 0
+ 108 0008 6421     		mov	r1, #100
+ 111:../Source/stm32f0xx_it.c **** 	ulTickCount++;
+ 109              		.loc 1 111 0
+ 110 000a 0132     		add	r2, r2, #1
+ 111              	.LVL0:
+ 112 000c 0260     		str	r2, [r0]
+ 113              	.LVL1:
+ 112:../Source/stm32f0xx_it.c **** 	ulMiliCount++;
+ 114              		.loc 1 112 0
+ 115 000e 2368     		ldr	r3, [r4]
+ 116 0010 0133     		add	r3, r3, #1
+ 117              	.LVL2:
+ 118 0012 2360     		str	r3, [r4]
+ 119              	.LVL3:
+ 120              		.loc 1 114 0
+ 121 0014 2068     		ldr	r0, [r4]
+ 122 0016 FFF7FEFF 		bl	__aeabi_uidivmod
+ 123              	.LVL4:
+ 124 001a 0029     		cmp	r1, #0
+ 125 001c 03D1     		bne	.L7
+ 115:../Source/stm32f0xx_it.c **** 		ulTick100++;
+ 126              		.loc 1 115 0
+ 127 001e 0A4B     		ldr	r3, .L9+8
+ 128 0020 1968     		ldr	r1, [r3]
+ 129 0022 0131     		add	r1, r1, #1
+ 130              	.LVL5:
+ 131 0024 1960     		str	r1, [r3]
+ 132              	.LVL6:
+ 133              	.L7:
+ 116:../Source/stm32f0xx_it.c **** 	}
+ 117:../Source/stm32f0xx_it.c **** 
+ 118:../Source/stm32f0xx_it.c **** 	if (ulMiliCount % 1000 == 0) { //1 seconds
+ 134              		.loc 1 118 0
+ 135 0026 2068     		ldr	r0, [r4]
+ 136 0028 FA24     		mov	r4, #250
+ 137 002a A100     		lsl	r1, r4, #2
+ 138              	.LVL7:
+ 139 002c FFF7FEFF 		bl	__aeabi_uidivmod
+ 140 0030 0029     		cmp	r1, #0
+ 141 0032 03D1     		bne	.L6
+ 119:../Source/stm32f0xx_it.c **** 		ulSecCount++;
+ 142              		.loc 1 119 0
+ 143 0034 0548     		ldr	r0, .L9+12
+ 144 0036 0268     		ldr	r2, [r0]
+ 145 0038 0132     		add	r2, r2, #1
+ 146              	.LVL8:
+ 147 003a 0260     		str	r2, [r0]
+ 148              	.LVL9:
+ 149              	.L6:
+ 150              		@ sp needed for prologue
+ 120:../Source/stm32f0xx_it.c **** 	}
+ 121:../Source/stm32f0xx_it.c **** }
+ 151              		.loc 1 121 0
+ 152 003c 10BD     		pop	{r4, pc}
+ 153              	.L10:
+ 154 003e C046     		.align	2
+ 155              	.L9:
+ 156 0040 00000000 		.word	ulTickCount
+ 157 0044 00000000 		.word	ulMiliCount
+ 158 0048 00000000 		.word	ulTick100
+ 159 004c 00000000 		.word	ulSecCount
+ 160              		.cfi_endproc
+ 161              	.LFE37:
+ 163              		.section	.text.USART1_IRQHandler,"ax",%progbits
+ 164              		.align	1
+ 165              		.global	USART1_IRQHandler
+ 166              		.code	16
+ 167              		.thumb_func
+ 169              	USART1_IRQHandler:
+ 170              	.LFB38:
+ 122:../Source/stm32f0xx_it.c **** 
+ 123:../Source/stm32f0xx_it.c **** extern char buff_cmd[256];
+ 124:../Source/stm32f0xx_it.c **** volatile char buff_cmd_tmp[256] = {0};
+ 125:../Source/stm32f0xx_it.c **** int buff_idx = 0;
+ 126:../Source/stm32f0xx_it.c **** void USART1_IRQHandler(void) {
+ 171              		.loc 1 126 0
+ 172              		.cfi_startproc
+ 173 0000 38B5     		push	{r3, r4, r5, lr}
+ 174              	.LCFI2:
+ 175              		.cfi_def_cfa_offset 16
+ 176              		.cfi_offset 3, -16
+ 177              		.cfi_offset 4, -12
+ 178              		.cfi_offset 5, -8
+ 179              		.cfi_offset 14, -4
+ 127:../Source/stm32f0xx_it.c **** 	if (USART_GetITStatus(USART1, USART_IT_RXNE) == SET) {
+ 180              		.loc 1 127 0
+ 181 0002 1E48     		ldr	r0, .L20
+ 182 0004 1E49     		ldr	r1, .L20+4
+ 183 0006 FFF7FEFF 		bl	USART_GetITStatus
+ 184 000a 0128     		cmp	r0, #1
+ 185 000c 34D1     		bne	.L11
+ 186              	.LBB2:
+ 128:../Source/stm32f0xx_it.c **** 		uint16_t cChar;
+ 129:../Source/stm32f0xx_it.c **** 		cChar = USART_ReceiveData(USART1);
+ 187              		.loc 1 129 0
+ 188 000e 1B48     		ldr	r0, .L20
+ 189 0010 FFF7FEFF 		bl	USART_ReceiveData
+ 130:../Source/stm32f0xx_it.c **** 
+ 131:../Source/stm32f0xx_it.c **** 		USART_ClearITPendingBit(USART1, USART_IT_RXNE);
+ 190              		.loc 1 131 0
+ 191 0014 1A49     		ldr	r1, .L20+4
+ 129:../Source/stm32f0xx_it.c **** 		cChar = USART_ReceiveData(USART1);
+ 192              		.loc 1 129 0
+ 193 0016 041C     		mov	r4, r0
+ 194              	.LVL10:
+ 195              		.loc 1 131 0
+ 196 0018 1848     		ldr	r0, .L20
+ 197              	.LVL11:
+ 198 001a FFF7FEFF 		bl	USART_ClearITPendingBit
+ 199 001e 194B     		ldr	r3, .L20+8
+ 132:../Source/stm32f0xx_it.c **** 
+ 133:../Source/stm32f0xx_it.c **** 		if (buff_idx >= 255 || cChar == '*') {
+ 200              		.loc 1 133 0
+ 201 0020 2A2C     		cmp	r4, #42
+ 202 0022 02D0     		beq	.L18
+ 203 0024 1A68     		ldr	r2, [r3]
+ 204 0026 FE2A     		cmp	r2, #254
+ 205 0028 01DD     		ble	.L13
+ 206              	.L18:
+ 134:../Source/stm32f0xx_it.c **** 			buff_idx = 0;
+ 207              		.loc 1 134 0
+ 208 002a 0020     		mov	r0, #0
+ 209 002c 1860     		str	r0, [r3]
+ 210              	.L13:
+ 135:../Source/stm32f0xx_it.c **** 		}
+ 136:../Source/stm32f0xx_it.c **** 
+ 137:../Source/stm32f0xx_it.c **** 		if(cChar != '\r' && cChar != '\n') {
+ 211              		.loc 1 137 0
+ 212 002e 0A2C     		cmp	r4, #10
+ 213 0030 07D0     		beq	.L16
+ 214 0032 0D2C     		cmp	r4, #13
+ 215 0034 05D0     		beq	.L16
+ 138:../Source/stm32f0xx_it.c **** 			buff_cmd_tmp[buff_idx] = cChar;
+ 216              		.loc 1 138 0
+ 217 0036 134B     		ldr	r3, .L20+8
+ 218 0038 1349     		ldr	r1, .L20+12
+ 219 003a 1D68     		ldr	r5, [r3]
+ 220 003c 4C55     		strb	r4, [r1, r5]
+ 139:../Source/stm32f0xx_it.c **** 			buff_idx++;
+ 221              		.loc 1 139 0
+ 222 003e 0135     		add	r5, r5, #1
+ 223 0040 1D60     		str	r5, [r3]
+ 224              	.L16:
+ 140:../Source/stm32f0xx_it.c **** 		}
+ 141:../Source/stm32f0xx_it.c **** 
+ 142:../Source/stm32f0xx_it.c **** 		//xprintf("len: %d, %c\r\n", buff_idx, cChar);
+ 143:../Source/stm32f0xx_it.c **** 		PC_uart_putChar(cChar);
+ 225              		.loc 1 143 0
+ 226 0042 E0B2     		uxtb	r0, r4
+ 227 0044 FFF7FEFF 		bl	PC_uart_putChar
+ 144:../Source/stm32f0xx_it.c **** 
+ 145:../Source/stm32f0xx_it.c **** 		if (cChar == '#') {
+ 228              		.loc 1 145 0
+ 229 0048 232C     		cmp	r4, #35
+ 230 004a 11D1     		bne	.L17
+ 146:../Source/stm32f0xx_it.c **** 			//copy
+ 147:../Source/stm32f0xx_it.c **** 			memcpy(buff_cmd, buff_cmd_tmp, buff_idx);
+ 231              		.loc 1 147 0
+ 232 004c 0D4C     		ldr	r4, .L20+8
+ 233              	.LVL12:
+ 234 004e 0E4D     		ldr	r5, .L20+12
+ 235 0050 2268     		ldr	r2, [r4]
+ 236 0052 291C     		mov	r1, r5
+ 237 0054 0D48     		ldr	r0, .L20+16
+ 238 0056 FFF7FEFF 		bl	memcpy
+ 148:../Source/stm32f0xx_it.c **** //			xprintf("pc command, len: %d, %s\r\n", buff_idx, buff_cmd);
+ 149:../Source/stm32f0xx_it.c **** 			buff_idx = 0;
+ 150:../Source/stm32f0xx_it.c **** 			g_appStats.processPcCommand = 1;
+ 239              		.loc 1 150 0
+ 240 005a 0D4B     		ldr	r3, .L20+20
+ 149:../Source/stm32f0xx_it.c **** 			buff_idx = 0;
+ 241              		.loc 1 149 0
+ 242 005c 0021     		mov	r1, #0
+ 243              		.loc 1 150 0
+ 244 005e 0120     		mov	r0, #1
+ 149:../Source/stm32f0xx_it.c **** 			buff_idx = 0;
+ 245              		.loc 1 149 0
+ 246 0060 2160     		str	r1, [r4]
+ 247              		.loc 1 150 0
+ 248 0062 6633     		add	r3, r3, #102
+ 151:../Source/stm32f0xx_it.c **** 			memset(buff_cmd_tmp, 0, sizeof(buff_cmd_tmp));
+ 249              		.loc 1 151 0
+ 250 0064 8024     		mov	r4, #128
+ 150:../Source/stm32f0xx_it.c **** 			g_appStats.processPcCommand = 1;
+ 251              		.loc 1 150 0
+ 252 0066 1870     		strb	r0, [r3]
+ 253              		.loc 1 151 0
+ 254 0068 6200     		lsl	r2, r4, #1
+ 255 006a 281C     		mov	r0, r5
+ 256 006c FFF7FEFF 		bl	memset
+ 257              	.L17:
+ 152:../Source/stm32f0xx_it.c **** 		}
+ 153:../Source/stm32f0xx_it.c **** 
+ 154:../Source/stm32f0xx_it.c **** 		g_appStats.lastReceiveUart = ulSecCount;
+ 258              		.loc 1 154 0
+ 259 0070 084D     		ldr	r5, .L20+24
+ 260 0072 0749     		ldr	r1, .L20+20
+ 261 0074 2A68     		ldr	r2, [r5]
+ 262 0076 8A65     		str	r2, [r1, #88]
+ 263              	.L11:
+ 264              	.LBE2:
+ 265              		@ sp needed for prologue
+ 155:../Source/stm32f0xx_it.c **** 	}
+ 156:../Source/stm32f0xx_it.c **** }
+ 266              		.loc 1 156 0
+ 267 0078 38BD     		pop	{r3, r4, r5, pc}
+ 268              	.L21:
+ 269 007a C046     		.align	2
+ 270              	.L20:
+ 271 007c 00380140 		.word	1073821696
+ 272 0080 05010500 		.word	327941
+ 273 0084 00000000 		.word	.LANCHOR0
+ 274 0088 00000000 		.word	.LANCHOR1
+ 275 008c 00000000 		.word	buff_cmd
+ 276 0090 00000000 		.word	g_appStats
+ 277 0094 00000000 		.word	ulSecCount
+ 278              		.cfi_endproc
+ 279              	.LFE38:
+ 281              		.global	__aeabi_uidiv
+ 282              		.section	.text.TIM15_IRQHandler,"ax",%progbits
+ 283              		.align	1
+ 284              		.global	TIM15_IRQHandler
+ 285              		.code	16
+ 286              		.thumb_func
+ 288              	TIM15_IRQHandler:
+ 289              	.LFB39:
+ 157:../Source/stm32f0xx_it.c **** 
+ 158:../Source/stm32f0xx_it.c **** void TIM15_IRQHandler(void) {
+ 290              		.loc 1 158 0
+ 291              		.cfi_startproc
+ 292 0000 70B5     		push	{r4, r5, r6, lr}
+ 293              	.LCFI3:
+ 294              		.cfi_def_cfa_offset 16
+ 295              		.cfi_offset 4, -16
+ 296              		.cfi_offset 5, -12
+ 297              		.cfi_offset 6, -8
+ 298              		.cfi_offset 14, -4
+ 159:../Source/stm32f0xx_it.c **** 	if (TIM_GetITStatus(TIM15, TIM_IT_CC2) == SET) {
+ 299              		.loc 1 159 0
+ 300 0002 2348     		ldr	r0, .L27
+ 301 0004 0421     		mov	r1, #4
+ 302 0006 FFF7FEFF 		bl	TIM_GetITStatus
+ 303 000a 051C     		mov	r5, r0
+ 304 000c 0128     		cmp	r0, #1
+ 305 000e 3DD1     		bne	.L22
+ 160:../Source/stm32f0xx_it.c **** 		/* Clear TIM1 Capture compare interrupt pending bit */
+ 161:../Source/stm32f0xx_it.c **** 		TIM_ClearITPendingBit(TIM15, TIM_IT_CC2);
+ 306              		.loc 1 161 0
+ 307 0010 1F48     		ldr	r0, .L27
+ 308 0012 0421     		mov	r1, #4
+ 309 0014 FFF7FEFF 		bl	TIM_ClearITPendingBit
+ 162:../Source/stm32f0xx_it.c **** 
+ 163:../Source/stm32f0xx_it.c **** 		if (CaptureNumber == 0) {
+ 310              		.loc 1 163 0
+ 311 0018 1E4C     		ldr	r4, .L27+4
+ 312 001a 2688     		ldrh	r6, [r4]
+ 313 001c 002E     		cmp	r6, #0
+ 314 001e 09D1     		bne	.L24
+ 164:../Source/stm32f0xx_it.c **** 			/* Get the Input Capture value */
+ 165:../Source/stm32f0xx_it.c **** 			IC3ReadValue1 = TIM_GetCapture2(TIM15);
+ 315              		.loc 1 165 0
+ 316 0020 1B48     		ldr	r0, .L27
+ 317 0022 FFF7FEFF 		bl	TIM_GetCapture2
+ 318 0026 1C4B     		ldr	r3, .L27+8
+ 319 0028 1880     		strh	r0, [r3]
+ 166:../Source/stm32f0xx_it.c **** 			TIM3_startIT();
+ 320              		.loc 1 166 0
+ 321 002a FFF7FEFF 		bl	TIM3_startIT
+ 167:../Source/stm32f0xx_it.c **** 			CaptureNumber = 1;
+ 322              		.loc 1 167 0
+ 323 002e 2580     		strh	r5, [r4]
+ 168:../Source/stm32f0xx_it.c **** 			TIM3_isFull = 0;
+ 324              		.loc 1 168 0
+ 325 0030 1A4B     		ldr	r3, .L27+12
+ 326 0032 2AE0     		b	.L26
+ 327              	.L24:
+ 169:../Source/stm32f0xx_it.c **** 		} else if (CaptureNumber == 1) {
+ 328              		.loc 1 169 0
+ 329 0034 012E     		cmp	r6, #1
+ 330 0036 29D1     		bne	.L22
+ 170:../Source/stm32f0xx_it.c **** 			/* Get the Input Capture value */
+ 171:../Source/stm32f0xx_it.c **** 			CaptureNumber = 0;
+ 331              		.loc 1 171 0
+ 332 0038 0020     		mov	r0, #0
+ 333 003a 2080     		strh	r0, [r4]
+ 334 003c 051C     		add	r5, r0, #0
+ 172:../Source/stm32f0xx_it.c **** 			IC3ReadValue2 = TIM_GetCapture2(TIM15);
+ 335              		.loc 1 172 0
+ 336 003e 1448     		ldr	r0, .L27
+ 337 0040 FFF7FEFF 		bl	TIM_GetCapture2
+ 173:../Source/stm32f0xx_it.c **** 			if (!TIM3_isFull) {
+ 338              		.loc 1 173 0
+ 339 0044 154B     		ldr	r3, .L27+12
+ 172:../Source/stm32f0xx_it.c **** 			IC3ReadValue2 = TIM_GetCapture2(TIM15);
+ 340              		.loc 1 172 0
+ 341 0046 1649     		ldr	r1, .L27+16
+ 342              		.loc 1 173 0
+ 343 0048 1A78     		ldrb	r2, [r3]
+ 172:../Source/stm32f0xx_it.c **** 			IC3ReadValue2 = TIM_GetCapture2(TIM15);
+ 344              		.loc 1 172 0
+ 345 004a 80B2     		uxth	r0, r0
+ 346 004c 0880     		strh	r0, [r1]
+ 347 004e 154C     		ldr	r4, .L27+20
+ 348              		.loc 1 173 0
+ 349 0050 002A     		cmp	r2, #0
+ 350 0052 13D1     		bne	.L25
+ 174:../Source/stm32f0xx_it.c **** 				Capture = (uint16_t) (IC3ReadValue2 - IC3ReadValue1);
+ 351              		.loc 1 174 0
+ 352 0054 104D     		ldr	r5, .L27+8
+ 353 0056 144A     		ldr	r2, .L27+24
+ 354 0058 2B88     		ldrh	r3, [r5]
+ 175:../Source/stm32f0xx_it.c **** 				g_appStats.capture = Capture;
+ 355              		.loc 1 175 0
+ 356 005a 251C     		mov	r5, r4
+ 174:../Source/stm32f0xx_it.c **** 				Capture = (uint16_t) (IC3ReadValue2 - IC3ReadValue1);
+ 357              		.loc 1 174 0
+ 358 005c C11A     		sub	r1, r0, r3
+ 359 005e 89B2     		uxth	r1, r1
+ 360              		.loc 1 175 0
+ 361 0060 6835     		add	r5, r5, #104
+ 362 0062 2980     		strh	r1, [r5]
+ 176:../Source/stm32f0xx_it.c **** 				if(!g_appStats.freqUpdated) {
+ 363              		.loc 1 176 0
+ 364 0064 251C     		mov	r5, r4
+ 174:../Source/stm32f0xx_it.c **** 				Capture = (uint16_t) (IC3ReadValue2 - IC3ReadValue1);
+ 365              		.loc 1 174 0
+ 366 0066 1160     		str	r1, [r2]
+ 367              		.loc 1 176 0
+ 368 0068 6435     		add	r5, r5, #100
+ 369 006a 2B78     		ldrb	r3, [r5]
+ 370 006c 002B     		cmp	r3, #0
+ 371 006e 0DD1     		bne	.L22
+ 177:../Source/stm32f0xx_it.c **** 					g_appStats.tim15Freq = (uint32_t) (TIM15_CLOCK / Capture);
+ 372              		.loc 1 177 0
+ 373 0070 0E48     		ldr	r0, .L27+28
+ 374 0072 FFF7FEFF 		bl	__aeabi_uidiv
+ 178:../Source/stm32f0xx_it.c **** 					g_appStats.freqUpdated = 1;
+ 375              		.loc 1 178 0
+ 376 0076 2E70     		strb	r6, [r5]
+ 177:../Source/stm32f0xx_it.c **** 					g_appStats.tim15Freq = (uint32_t) (TIM15_CLOCK / Capture);
+ 377              		.loc 1 177 0
+ 378 0078 E061     		str	r0, [r4, #28]
+ 379 007a 07E0     		b	.L22
+ 380              	.L25:
+ 179:../Source/stm32f0xx_it.c **** 				}
+ 180:../Source/stm32f0xx_it.c **** 			} else {
+ 181:../Source/stm32f0xx_it.c **** 				TIM3_isFull = 0;
+ 381              		.loc 1 181 0
+ 382 007c 1D70     		strb	r5, [r3]
+ 182:../Source/stm32f0xx_it.c **** 				if(!g_appStats.freqUpdated) {
+ 383              		.loc 1 182 0
+ 384 007e 231C     		mov	r3, r4
+ 385 0080 6433     		add	r3, r3, #100
+ 386 0082 1A78     		ldrb	r2, [r3]
+ 387 0084 002A     		cmp	r2, #0
+ 388 0086 01D1     		bne	.L22
+ 183:../Source/stm32f0xx_it.c **** 					g_appStats.tim15Freq = 0;
+ 389              		.loc 1 183 0
+ 390 0088 E261     		str	r2, [r4, #28]
+ 391              	.L26:
+ 184:../Source/stm32f0xx_it.c **** 					g_appStats.freqUpdated = 1;
+ 392              		.loc 1 184 0
+ 393 008a 1E70     		strb	r6, [r3]
+ 394              	.L22:
+ 395              		@ sp needed for prologue
+ 185:../Source/stm32f0xx_it.c **** 				}
+ 186:../Source/stm32f0xx_it.c **** 			}
+ 187:../Source/stm32f0xx_it.c **** 		}
+ 188:../Source/stm32f0xx_it.c **** 	}
+ 189:../Source/stm32f0xx_it.c **** }
+ 396              		.loc 1 189 0
+ 397 008c 70BD     		pop	{r4, r5, r6, pc}
+ 398              	.L28:
+ 399 008e C046     		.align	2
+ 400              	.L27:
+ 401 0090 00400140 		.word	1073823744
+ 402 0094 00000000 		.word	.LANCHOR2
+ 403 0098 00000000 		.word	.LANCHOR3
+ 404 009c 00000000 		.word	.LANCHOR4
+ 405 00a0 00000000 		.word	.LANCHOR5
+ 406 00a4 00000000 		.word	g_appStats
+ 407 00a8 00000000 		.word	Capture
+ 408 00ac 00366E01 		.word	24000000
+ 409              		.cfi_endproc
+ 410              	.LFE39:
+ 412              		.section	.text.TIM3_IRQHandler,"ax",%progbits
+ 413              		.align	1
+ 414              		.global	TIM3_IRQHandler
+ 415              		.code	16
+ 416              		.thumb_func
+ 418              	TIM3_IRQHandler:
+ 419              	.LFB40:
+ 190:../Source/stm32f0xx_it.c **** 
+ 191:../Source/stm32f0xx_it.c **** void TIM3_IRQHandler(void){
+ 420              		.loc 1 191 0
+ 421              		.cfi_startproc
+ 422 0000 10B5     		push	{r4, lr}
+ 423              	.LCFI4:
+ 424              		.cfi_def_cfa_offset 8
+ 425              		.cfi_offset 4, -8
+ 426              		.cfi_offset 14, -4
+ 192:../Source/stm32f0xx_it.c **** 	if (TIM_GetITStatus(TIM3, TIM_IT_Update) == SET) {
+ 427              		.loc 1 192 0
+ 428 0002 0848     		ldr	r0, .L31
+ 429 0004 0121     		mov	r1, #1
+ 430 0006 FFF7FEFF 		bl	TIM_GetITStatus
+ 431 000a 041C     		mov	r4, r0
+ 432 000c 0128     		cmp	r0, #1
+ 433 000e 07D1     		bne	.L29
+ 193:../Source/stm32f0xx_it.c **** //		g_appStats.countInterup3++;
+ 194:../Source/stm32f0xx_it.c **** 		TIM_ClearITPendingBit(TIM3, TIM_IT_Update);
+ 434              		.loc 1 194 0
+ 435 0010 0448     		ldr	r0, .L31
+ 436 0012 211C     		mov	r1, r4
+ 437 0014 FFF7FEFF 		bl	TIM_ClearITPendingBit
+ 195:../Source/stm32f0xx_it.c **** 		TIM3_isFull = 1;
+ 438              		.loc 1 195 0
+ 439 0018 034B     		ldr	r3, .L31+4
+ 440 001a 1C70     		strb	r4, [r3]
+ 196:../Source/stm32f0xx_it.c **** 		TIM3_stopIT();
+ 441              		.loc 1 196 0
+ 442 001c FFF7FEFF 		bl	TIM3_stopIT
+ 443              	.L29:
+ 444              		@ sp needed for prologue
+ 197:../Source/stm32f0xx_it.c **** 	}
+ 198:../Source/stm32f0xx_it.c **** }
+ 445              		.loc 1 198 0
+ 446 0020 10BD     		pop	{r4, pc}
+ 447              	.L32:
+ 448 0022 C046     		.align	2
+ 449              	.L31:
+ 450 0024 00040040 		.word	1073742848
+ 451 0028 00000000 		.word	.LANCHOR4
+ 452              		.cfi_endproc
+ 453              	.LFE40:
+ 455              		.global	buff_idx
+ 456              		.global	buff_cmd_tmp
+ 457              		.global	pulse_per_sec
+ 458              		.global	last_pulse_count
+ 459              		.global	pulse_count
+ 460              		.global	TIM3_isFull
+ 461              		.global	CaptureNumber
+ 462              		.global	IC3ReadValue2
+ 463              		.global	IC3ReadValue1
+ 464              		.comm	g_appStats,108,4
+ 465              		.comm	g_config,28,4
+ 466              		.section	.bss.last_pulse_count,"aw",%nobits
+ 467              		.align	2
+ 470              	last_pulse_count:
+ 471 0000 00000000 		.space	4
+ 472              		.section	.bss.TIM3_isFull,"aw",%nobits
+ 473              		.set	.LANCHOR4,. + 0
+ 476              	TIM3_isFull:
+ 477 0000 00       		.space	1
+ 478              		.section	.bss.CaptureNumber,"aw",%nobits
+ 479              		.align	1
+ 480              		.set	.LANCHOR2,. + 0
+ 483              	CaptureNumber:
+ 484 0000 0000     		.space	2
+ 485              		.section	.bss.buff_idx,"aw",%nobits
+ 486              		.align	2
+ 487              		.set	.LANCHOR0,. + 0
+ 490              	buff_idx:
+ 491 0000 00000000 		.space	4
+ 492              		.section	.bss.pulse_per_sec,"aw",%nobits
+ 493              		.align	1
+ 496              	pulse_per_sec:
+ 497 0000 0000     		.space	2
+ 498              		.section	.bss.pulse_count,"aw",%nobits
+ 499              		.align	2
+ 502              	pulse_count:
+ 503 0000 00000000 		.space	4
+ 504              		.section	.bss.IC3ReadValue1,"aw",%nobits
+ 505              		.align	1
+ 506              		.set	.LANCHOR3,. + 0
+ 509              	IC3ReadValue1:
+ 510 0000 0000     		.space	2
+ 511              		.section	.bss.IC3ReadValue2,"aw",%nobits
+ 512              		.align	1
+ 513              		.set	.LANCHOR5,. + 0
+ 516              	IC3ReadValue2:
+ 517 0000 0000     		.space	2
+ 518              		.section	.bss.buff_cmd_tmp,"aw",%nobits
+ 519              		.set	.LANCHOR1,. + 0
+ 522              	buff_cmd_tmp:
+ 523 0000 00000000 		.space	256
+ 523      00000000 
+ 523      00000000 
+ 523      00000000 
+ 523      00000000 
+ 524              		.text
+ 525              	.Letext0:
+ 526              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 527              		.file 3 "../Source/stm32f0xx.h"
+ 528              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/global
+ 529              		.file 5 "../Source/DataUtil.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f0xx_it.c
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:18     .text.NMI_Handler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:23     .text.NMI_Handler:00000000 NMI_Handler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:35     .text.HardFault_Handler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:40     .text.HardFault_Handler:00000000 HardFault_Handler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:54     .text.SVC_Handler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:59     .text.SVC_Handler:00000000 SVC_Handler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:70     .text.PendSV_Handler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:75     .text.PendSV_Handler:00000000 PendSV_Handler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:87     .text.SysTick_Handler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:92     .text.SysTick_Handler:00000000 SysTick_Handler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:156    .text.SysTick_Handler:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:164    .text.USART1_IRQHandler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:169    .text.USART1_IRQHandler:00000000 USART1_IRQHandler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:271    .text.USART1_IRQHandler:0000007c $d
+                            *COM*:0000006c g_appStats
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:283    .text.TIM15_IRQHandler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:288    .text.TIM15_IRQHandler:00000000 TIM15_IRQHandler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:401    .text.TIM15_IRQHandler:00000090 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:413    .text.TIM3_IRQHandler:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:418    .text.TIM3_IRQHandler:00000000 TIM3_IRQHandler
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:450    .text.TIM3_IRQHandler:00000024 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:490    .bss.buff_idx:00000000 buff_idx
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:522    .bss.buff_cmd_tmp:00000000 buff_cmd_tmp
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:496    .bss.pulse_per_sec:00000000 pulse_per_sec
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:470    .bss.last_pulse_count:00000000 last_pulse_count
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:502    .bss.pulse_count:00000000 pulse_count
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:476    .bss.TIM3_isFull:00000000 TIM3_isFull
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:483    .bss.CaptureNumber:00000000 CaptureNumber
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:516    .bss.IC3ReadValue2:00000000 IC3ReadValue2
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:509    .bss.IC3ReadValue1:00000000 IC3ReadValue1
+                            *COM*:0000001c g_config
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:467    .bss.last_pulse_count:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:477    .bss.TIM3_isFull:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:479    .bss.CaptureNumber:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:486    .bss.buff_idx:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:493    .bss.pulse_per_sec:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:499    .bss.pulse_count:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:505    .bss.IC3ReadValue1:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:512    .bss.IC3ReadValue2:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cctrkxtC.s:523    .bss.buff_cmd_tmp:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uidivmod
+ulTickCount
+ulMiliCount
+ulTick100
+ulSecCount
+USART_GetITStatus
+USART_ReceiveData
+USART_ClearITPendingBit
+PC_uart_putChar
+memcpy
+memset
+buff_cmd
+__aeabi_uidiv
+TIM_GetITStatus
+TIM_ClearITPendingBit
+TIM_GetCapture2
+TIM3_startIT
+Capture
+TIM3_stopIT

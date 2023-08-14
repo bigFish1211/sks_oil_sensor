@@ -1,0 +1,2699 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"printf-stdarg.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_uidivmod
+  18              		.global	__aeabi_uidiv
+  19              		.section	.text.mini_itoa,"ax",%progbits
+  20              		.align	1
+  21              		.code	16
+  22              		.thumb_func
+  24              	mini_itoa:
+  25              	.LFB1:
+  26              		.file 1 "../Source/printf-stdarg.c"
+   1:../Source/printf-stdarg.c **** /*
+   2:../Source/printf-stdarg.c **** 	Copyright 2001, 2002 Georges Menie (www.menie.org)
+   3:../Source/printf-stdarg.c **** 	stdarg version contributed by Christian Ettinger
+   4:../Source/printf-stdarg.c **** 
+   5:../Source/printf-stdarg.c ****     This program is free software; you can redistribute it and/or modify
+   6:../Source/printf-stdarg.c ****     it under the terms of the GNU Lesser General Public License as published by
+   7:../Source/printf-stdarg.c ****     the Free Software Foundation; either version 2 of the License, or
+   8:../Source/printf-stdarg.c ****     (at your option) any later version.
+   9:../Source/printf-stdarg.c **** 
+  10:../Source/printf-stdarg.c ****     This program is distributed in the hope that it will be useful,
+  11:../Source/printf-stdarg.c ****     but WITHOUT ANY WARRANTY; without even the implied warranty of
+  12:../Source/printf-stdarg.c ****     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  13:../Source/printf-stdarg.c ****     GNU Lesser General Public License for more details.
+  14:../Source/printf-stdarg.c **** 
+  15:../Source/printf-stdarg.c ****     You should have received a copy of the GNU Lesser General Public License
+  16:../Source/printf-stdarg.c ****     along with this program; if not, write to the Free Software
+  17:../Source/printf-stdarg.c ****     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  18:../Source/printf-stdarg.c **** */
+  19:../Source/printf-stdarg.c **** 
+  20:../Source/printf-stdarg.c **** /*
+  21:../Source/printf-stdarg.c **** 	putchar is the only external dependency for this file,
+  22:../Source/printf-stdarg.c **** 	if you have a working putchar, leave it commented out.
+  23:../Source/printf-stdarg.c **** 	If not, uncomment the define below and
+  24:../Source/printf-stdarg.c **** 	replace outbyte(c) by your own function call.
+  25:../Source/printf-stdarg.c **** 
+  26:../Source/printf-stdarg.c **** #define putchar(c) outbyte(c)
+  27:../Source/printf-stdarg.c **** */
+  28:../Source/printf-stdarg.c **** 
+  29:../Source/printf-stdarg.c **** #include <stdarg.h>
+  30:../Source/printf-stdarg.c **** 
+  31:../Source/printf-stdarg.c **** #if 0
+  32:../Source/printf-stdarg.c **** static void printchar(char **str, int c)
+  33:../Source/printf-stdarg.c **** {
+  34:../Source/printf-stdarg.c **** 	extern int putchar(int c);
+  35:../Source/printf-stdarg.c **** 	
+  36:../Source/printf-stdarg.c **** 	if (str) {
+  37:../Source/printf-stdarg.c **** 		**str = c;
+  38:../Source/printf-stdarg.c **** 		++(*str);
+  39:../Source/printf-stdarg.c **** 	}
+  40:../Source/printf-stdarg.c **** 	//else (void)putchar(c);
+  41:../Source/printf-stdarg.c **** }
+  42:../Source/printf-stdarg.c **** 
+  43:../Source/printf-stdarg.c **** #define PAD_RIGHT 1
+  44:../Source/printf-stdarg.c **** #define PAD_ZERO 2
+  45:../Source/printf-stdarg.c **** 
+  46:../Source/printf-stdarg.c **** #endif
+  47:../Source/printf-stdarg.c **** 
+  48:../Source/printf-stdarg.c **** #if 0
+  49:../Source/printf-stdarg.c **** static int prints(char **out, const char *string, int width, int pad)
+  50:../Source/printf-stdarg.c **** {
+  51:../Source/printf-stdarg.c **** 	register int pc = 0, padchar = ' ';
+  52:../Source/printf-stdarg.c **** 
+  53:../Source/printf-stdarg.c **** 	if (width > 0) {
+  54:../Source/printf-stdarg.c **** 		register int len = 0;
+  55:../Source/printf-stdarg.c **** 		register const char *ptr;
+  56:../Source/printf-stdarg.c **** 		for (ptr = string; *ptr; ++ptr) ++len;
+  57:../Source/printf-stdarg.c **** 		if (len >= width) width = 0;
+  58:../Source/printf-stdarg.c **** 		else width -= len;
+  59:../Source/printf-stdarg.c **** 		if (pad & PAD_ZERO) padchar = '0';
+  60:../Source/printf-stdarg.c **** 	}
+  61:../Source/printf-stdarg.c **** 	if (!(pad & PAD_RIGHT)) {
+  62:../Source/printf-stdarg.c **** 		for ( ; width > 0; --width) {
+  63:../Source/printf-stdarg.c **** 			printchar (out, padchar);
+  64:../Source/printf-stdarg.c **** 			++pc;
+  65:../Source/printf-stdarg.c **** 		}
+  66:../Source/printf-stdarg.c **** 	}
+  67:../Source/printf-stdarg.c **** 	for ( ; *string ; ++string) {
+  68:../Source/printf-stdarg.c **** 		printchar (out, *string);
+  69:../Source/printf-stdarg.c **** 		++pc;
+  70:../Source/printf-stdarg.c **** 	}
+  71:../Source/printf-stdarg.c **** 	for ( ; width > 0; --width) {
+  72:../Source/printf-stdarg.c **** 		printchar (out, padchar);
+  73:../Source/printf-stdarg.c **** 		++pc;
+  74:../Source/printf-stdarg.c **** 	}
+  75:../Source/printf-stdarg.c **** 
+  76:../Source/printf-stdarg.c **** 	return pc;
+  77:../Source/printf-stdarg.c **** }
+  78:../Source/printf-stdarg.c **** #endif
+  79:../Source/printf-stdarg.c **** 
+  80:../Source/printf-stdarg.c **** /* the following should be enough for 32 bit int */
+  81:../Source/printf-stdarg.c **** #define PRINT_BUF_LEN 12
+  82:../Source/printf-stdarg.c **** 
+  83:../Source/printf-stdarg.c **** #if 0
+  84:../Source/printf-stdarg.c **** static int printi(char **out, int i, int b, int sg, int width, int pad, int letbase)
+  85:../Source/printf-stdarg.c **** {
+  86:../Source/printf-stdarg.c **** 	char print_buf[PRINT_BUF_LEN];
+  87:../Source/printf-stdarg.c **** 	register char *s;
+  88:../Source/printf-stdarg.c **** 	register int t, neg = 0, pc = 0;
+  89:../Source/printf-stdarg.c **** 	register unsigned int u = i;
+  90:../Source/printf-stdarg.c **** 
+  91:../Source/printf-stdarg.c **** 	if (i == 0) {
+  92:../Source/printf-stdarg.c **** 		print_buf[0] = '0';
+  93:../Source/printf-stdarg.c **** 		print_buf[1] = '\0';
+  94:../Source/printf-stdarg.c **** 		return prints (out, print_buf, width, pad);
+  95:../Source/printf-stdarg.c **** 	}
+  96:../Source/printf-stdarg.c **** 
+  97:../Source/printf-stdarg.c **** 	if (sg && b == 10 && i < 0) {
+  98:../Source/printf-stdarg.c **** 		neg = 1;
+  99:../Source/printf-stdarg.c **** 		u = -i;
+ 100:../Source/printf-stdarg.c **** 	}
+ 101:../Source/printf-stdarg.c **** 
+ 102:../Source/printf-stdarg.c **** 	s = print_buf + PRINT_BUF_LEN-1;
+ 103:../Source/printf-stdarg.c **** 	*s = '\0';
+ 104:../Source/printf-stdarg.c **** 
+ 105:../Source/printf-stdarg.c **** 	while (u) {
+ 106:../Source/printf-stdarg.c **** 		t = u % b;
+ 107:../Source/printf-stdarg.c **** 		if( t >= 10 )
+ 108:../Source/printf-stdarg.c **** 			t += letbase - '0' - 10;
+ 109:../Source/printf-stdarg.c **** 		*--s = t + '0';
+ 110:../Source/printf-stdarg.c **** 		u /= b;
+ 111:../Source/printf-stdarg.c **** 	}
+ 112:../Source/printf-stdarg.c **** 
+ 113:../Source/printf-stdarg.c **** 	if (neg) {
+ 114:../Source/printf-stdarg.c **** 		if( width && (pad & PAD_ZERO) ) {
+ 115:../Source/printf-stdarg.c **** 			printchar (out, '-');
+ 116:../Source/printf-stdarg.c **** 			++pc;
+ 117:../Source/printf-stdarg.c **** 			--width;
+ 118:../Source/printf-stdarg.c **** 		}
+ 119:../Source/printf-stdarg.c **** 		else {
+ 120:../Source/printf-stdarg.c **** 			*--s = '-';
+ 121:../Source/printf-stdarg.c **** 		}
+ 122:../Source/printf-stdarg.c **** 	}
+ 123:../Source/printf-stdarg.c **** 
+ 124:../Source/printf-stdarg.c **** 	return pc + prints (out, s, width, pad);
+ 125:../Source/printf-stdarg.c **** }
+ 126:../Source/printf-stdarg.c **** 
+ 127:../Source/printf-stdarg.c **** int skprint(char **out, unsigned long size, const char *format, va_list args )
+ 128:../Source/printf-stdarg.c **** {
+ 129:../Source/printf-stdarg.c **** 	register int width, pad;
+ 130:../Source/printf-stdarg.c **** 	register int pc = 0;
+ 131:../Source/printf-stdarg.c **** 	char scr[2];
+ 132:../Source/printf-stdarg.c **** 	if (size) size--;
+ 133:../Source/printf-stdarg.c **** 	for (; *format != 0; ++format) {
+ 134:../Source/printf-stdarg.c **** 		if (*format == '%') {
+ 135:../Source/printf-stdarg.c **** 			++format;
+ 136:../Source/printf-stdarg.c **** 			width = pad = 0;
+ 137:../Source/printf-stdarg.c **** 			if (*format == '\0') break;
+ 138:../Source/printf-stdarg.c **** 			if (*format == '%') goto out;
+ 139:../Source/printf-stdarg.c **** 			if (*format == '-') {
+ 140:../Source/printf-stdarg.c **** 				++format;
+ 141:../Source/printf-stdarg.c **** 				pad = PAD_RIGHT;
+ 142:../Source/printf-stdarg.c **** 			}
+ 143:../Source/printf-stdarg.c **** 			while (*format == '0') {
+ 144:../Source/printf-stdarg.c **** 				++format;
+ 145:../Source/printf-stdarg.c **** 				pad |= PAD_ZERO;
+ 146:../Source/printf-stdarg.c **** 			}
+ 147:../Source/printf-stdarg.c **** 			for ( ; *format >= '0' && *format <= '9'; ++format) {
+ 148:../Source/printf-stdarg.c **** 				width *= 10;
+ 149:../Source/printf-stdarg.c **** 				width += *format - '0';
+ 150:../Source/printf-stdarg.c **** 			}
+ 151:../Source/printf-stdarg.c **** 			if( *format == 's' ) {
+ 152:../Source/printf-stdarg.c **** 				register char *s = (char *)va_arg( args, int );
+ 153:../Source/printf-stdarg.c **** 				pc += prints (out, s?s:"(null)", width, pad);
+ 154:../Source/printf-stdarg.c **** 				continue;
+ 155:../Source/printf-stdarg.c **** 			}
+ 156:../Source/printf-stdarg.c **** 			if( *format == 'd' ) {
+ 157:../Source/printf-stdarg.c **** 				pc += printi (out, va_arg( args, int ), 10, 1, width, pad, 'a');
+ 158:../Source/printf-stdarg.c **** 				continue;
+ 159:../Source/printf-stdarg.c **** 			}
+ 160:../Source/printf-stdarg.c **** 			if( *format == 'x' ) {
+ 161:../Source/printf-stdarg.c **** 				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'a');
+ 162:../Source/printf-stdarg.c **** 				continue;
+ 163:../Source/printf-stdarg.c **** 			}
+ 164:../Source/printf-stdarg.c **** 			if( *format == 'X' ) {
+ 165:../Source/printf-stdarg.c **** 				pc += printi (out, va_arg( args, int ), 16, 0, width, pad, 'A');
+ 166:../Source/printf-stdarg.c **** 				continue;
+ 167:../Source/printf-stdarg.c **** 			}
+ 168:../Source/printf-stdarg.c **** 			if( *format == 'u' ) {
+ 169:../Source/printf-stdarg.c **** 				pc += printi (out, va_arg( args, int ), 10, 0, width, pad, 'a');
+ 170:../Source/printf-stdarg.c **** 				continue;
+ 171:../Source/printf-stdarg.c **** 			}
+ 172:../Source/printf-stdarg.c **** 			if( *format == 'c' ) {
+ 173:../Source/printf-stdarg.c **** 				/* char are converted to int then pushed on the stack */
+ 174:../Source/printf-stdarg.c **** 				scr[0] = (char)va_arg( args, int );
+ 175:../Source/printf-stdarg.c **** 				scr[1] = '\0';
+ 176:../Source/printf-stdarg.c **** 				pc += prints (out, scr, width, pad);
+ 177:../Source/printf-stdarg.c **** 				continue;
+ 178:../Source/printf-stdarg.c **** 			}
+ 179:../Source/printf-stdarg.c **** 		}
+ 180:../Source/printf-stdarg.c **** 		else {
+ 181:../Source/printf-stdarg.c **** 		out:
+ 182:../Source/printf-stdarg.c **** 			printchar (out, *format);
+ 183:../Source/printf-stdarg.c **** 			++pc;
+ 184:../Source/printf-stdarg.c **** 		}
+ 185:../Source/printf-stdarg.c **** 	}
+ 186:../Source/printf-stdarg.c **** 	if (out) **out = '\0';
+ 187:../Source/printf-stdarg.c **** 	va_end( args );
+ 188:../Source/printf-stdarg.c **** 	return pc;
+ 189:../Source/printf-stdarg.c **** }
+ 190:../Source/printf-stdarg.c **** 
+ 191:../Source/printf-stdarg.c **** int printf(const char *format, ...)
+ 192:../Source/printf-stdarg.c **** {
+ 193:../Source/printf-stdarg.c ****         va_list args;
+ 194:../Source/printf-stdarg.c ****         
+ 195:../Source/printf-stdarg.c ****         va_start( args, format );
+ 196:../Source/printf-stdarg.c ****         return skprint( 0, 0xFFFF, format, args );
+ 197:../Source/printf-stdarg.c **** }
+ 198:../Source/printf-stdarg.c **** #endif
+ 199:../Source/printf-stdarg.c **** 
+ 200:../Source/printf-stdarg.c **** /*
+ 201:../Source/printf-stdarg.c **** * The Minimal snprintf() implementation
+ 202:../Source/printf-stdarg.c **** * Copyright (c) 2013 Michal Ludvig <michal@logix.cz>
+ 203:../Source/printf-stdarg.c **** *
+ 204:../Source/printf-stdarg.c **** * This is a minimal snprintf() implementation optimised
+ 205:../Source/printf-stdarg.c **** * for embedded systems with a very limited program memory.
+ 206:../Source/printf-stdarg.c **** * mini_snprintf() doesn't support _all_ the formatting
+ 207:../Source/printf-stdarg.c **** * the glibc does but on the other hand is a lot smaller.
+ 208:../Source/printf-stdarg.c **** * Here are some numbers from my STM32 project (.bin file size):
+ 209:../Source/printf-stdarg.c **** * no snprintf(): 10768 bytes
+ 210:../Source/printf-stdarg.c **** * mini snprintf(): 11420 bytes (+ 652 bytes)
+ 211:../Source/printf-stdarg.c **** * glibc snprintf(): 34860 bytes (+24092 bytes)
+ 212:../Source/printf-stdarg.c **** * Wasting nearly 24kB of memory just for snprintf() on
+ 213:../Source/printf-stdarg.c **** * a chip with 32kB flash is crazy. Use mini_snprintf() instead.
+ 214:../Source/printf-stdarg.c **** */
+ 215:../Source/printf-stdarg.c **** 
+ 216:../Source/printf-stdarg.c **** #include <string.h>
+ 217:../Source/printf-stdarg.c **** #include <stdarg.h>
+ 218:../Source/printf-stdarg.c **** //#include "mini-printf.h"
+ 219:../Source/printf-stdarg.c **** 
+ 220:../Source/printf-stdarg.c **** static unsigned int
+ 221:../Source/printf-stdarg.c **** mini_strlen(const char *s)
+ 222:../Source/printf-stdarg.c **** {
+ 223:../Source/printf-stdarg.c **** unsigned int len = 0;
+ 224:../Source/printf-stdarg.c **** while (s[++len]) /* do nothing */;
+ 225:../Source/printf-stdarg.c **** return len;
+ 226:../Source/printf-stdarg.c **** }
+ 227:../Source/printf-stdarg.c **** 
+ 228:../Source/printf-stdarg.c **** static unsigned int
+ 229:../Source/printf-stdarg.c **** mini_itoa(int value, unsigned int radix, unsigned int uppercase,
+ 230:../Source/printf-stdarg.c **** char *buffer, unsigned int zero_pad)
+ 231:../Source/printf-stdarg.c **** {
+  27              		.loc 1 231 0
+  28              		.cfi_startproc
+  29 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+  30              	.LCFI0:
+  31              		.cfi_def_cfa_offset 32
+  32              		.cfi_offset 0, -32
+  33              		.cfi_offset 1, -28
+  34              		.cfi_offset 2, -24
+  35              		.cfi_offset 4, -20
+  36              		.cfi_offset 5, -16
+  37              		.cfi_offset 6, -12
+  38              		.cfi_offset 7, -8
+  39              		.cfi_offset 14, -4
+  40              	.LVL0:
+  41              		.loc 1 231 0
+  42 0002 051C     		mov	r5, r0
+  43 0004 0F1C     		mov	r7, r1
+  44 0006 0192     		str	r2, [sp, #4]
+  45 0008 1E1C     		mov	r6, r3
+  46              	.LVL1:
+ 232:../Source/printf-stdarg.c **** char	*pbuffer = buffer;
+ 233:../Source/printf-stdarg.c **** int	negative = 0;
+ 234:../Source/printf-stdarg.c **** unsigned int	i, len;
+ 235:../Source/printf-stdarg.c **** 
+ 236:../Source/printf-stdarg.c **** /* No support for unusual radixes. */
+ 237:../Source/printf-stdarg.c **** if (radix > 16)
+ 238:../Source/printf-stdarg.c **** return 0;
+  47              		.loc 1 238 0
+  48 000a 0020     		mov	r0, #0
+  49              	.LVL2:
+ 237:../Source/printf-stdarg.c **** if (radix > 16)
+  50              		.loc 1 237 0
+  51 000c 1029     		cmp	r1, #16
+  52 000e 3DD8     		bhi	.L2
+ 233:../Source/printf-stdarg.c **** int	negative = 0;
+  53              		.loc 1 233 0
+  54 0010 0090     		str	r0, [sp]
+ 239:../Source/printf-stdarg.c **** 
+ 240:../Source/printf-stdarg.c **** if (value < 0) {
+  55              		.loc 1 240 0
+  56 0012 8542     		cmp	r5, r0
+  57 0014 02DA     		bge	.L3
+  58              	.LVL3:
+ 241:../Source/printf-stdarg.c **** negative = 1;
+  59              		.loc 1 241 0
+  60 0016 0120     		mov	r0, #1
+ 242:../Source/printf-stdarg.c **** value = -value;
+  61              		.loc 1 242 0
+  62 0018 6D42     		neg	r5, r5
+  63              	.LVL4:
+ 241:../Source/printf-stdarg.c **** negative = 1;
+  64              		.loc 1 241 0
+  65 001a 0090     		str	r0, [sp]
+  66              	.LVL5:
+  67              	.L3:
+  68 001c 341C     		mov	r4, r6
+  69              	.LVL6:
+  70              	.L7:
+  71              	.LBB2:
+ 243:../Source/printf-stdarg.c **** }
+ 244:../Source/printf-stdarg.c **** 
+ 245:../Source/printf-stdarg.c **** /* This builds the string back to front ... */
+ 246:../Source/printf-stdarg.c **** do {
+ 247:../Source/printf-stdarg.c **** int digit = value % radix;
+  72              		.loc 1 247 0
+  73 001e 281C     		mov	r0, r5
+  74 0020 391C     		mov	r1, r7
+  75 0022 FFF7FEFF 		bl	__aeabi_uidivmod
+  76              	.LVL7:
+ 248:../Source/printf-stdarg.c **** *(pbuffer++) = (digit < 10 ? '0' + digit : (uppercase ? 'A' : 'a') + digit - 10);
+  77              		.loc 1 248 0
+  78 0026 0929     		cmp	r1, #9
+  79 0028 01DC     		bgt	.L4
+  80              		.loc 1 248 0 is_stmt 0 discriminator 1
+  81 002a 3031     		add	r1, r1, #48
+  82              	.LVL8:
+  83 002c 06E0     		b	.L5
+  84              	.LVL9:
+  85              	.L4:
+  86              		.loc 1 248 0 discriminator 2
+  87 002e 019A     		ldr	r2, [sp, #4]
+  88 0030 6123     		mov	r3, #97
+  89 0032 002A     		cmp	r2, #0
+  90 0034 00D0     		beq	.L6
+  91              		.loc 1 248 0
+  92 0036 4123     		mov	r3, #65
+  93              	.L6:
+  94              		.loc 1 248 0 discriminator 5
+  95 0038 0A39     		sub	r1, r1, #10
+  96              	.LVL10:
+  97 003a 5918     		add	r1, r3, r1
+  98              	.LVL11:
+  99              	.L5:
+ 100              		.loc 1 248 0 discriminator 6
+ 101 003c 2170     		strb	r1, [r4]
+ 249:../Source/printf-stdarg.c **** value /= radix;
+ 102              		.loc 1 249 0 is_stmt 1 discriminator 6
+ 103 003e 281C     		mov	r0, r5
+ 104 0040 391C     		mov	r1, r7
+ 105 0042 FFF7FEFF 		bl	__aeabi_uidiv
+ 248:../Source/printf-stdarg.c **** *(pbuffer++) = (digit < 10 ? '0' + digit : (uppercase ? 'A' : 'a') + digit - 10);
+ 106              		.loc 1 248 0 discriminator 6
+ 107 0046 0134     		add	r4, r4, #1
+ 108              	.LVL12:
+ 109              	.LBE2:
+ 250:../Source/printf-stdarg.c **** } while (value > 0);
+ 110              		.loc 1 250 0 discriminator 6
+ 111 0048 051E     		sub	r5, r0, #0
+ 112              	.LVL13:
+ 113 004a E8DC     		bgt	.L7
+ 248:../Source/printf-stdarg.c **** *(pbuffer++) = (digit < 10 ? '0' + digit : (uppercase ? 'A' : 'a') + digit - 10);
+ 114              		.loc 1 248 0
+ 115 004c 221C     		mov	r2, r4
+ 251:../Source/printf-stdarg.c **** 
+ 252:../Source/printf-stdarg.c **** for (i = (pbuffer - buffer); i < zero_pad; i++)
+ 116              		.loc 1 252 0
+ 117 004e A31B     		sub	r3, r4, r6
+ 118              	.LVL14:
+ 119 0050 02E0     		b	.L8
+ 120              	.LVL15:
+ 121              	.L9:
+ 253:../Source/printf-stdarg.c **** *(pbuffer++) = '0';
+ 122              		.loc 1 253 0 discriminator 2
+ 123 0052 3021     		mov	r1, #48
+ 124 0054 2170     		strb	r1, [r4]
+ 125 0056 0134     		add	r4, r4, #1
+ 126              	.LVL16:
+ 127              	.L8:
+ 229:../Source/printf-stdarg.c **** mini_itoa(int value, unsigned int radix, unsigned int uppercase,
+ 128              		.loc 1 229 0 discriminator 1
+ 129 0058 981A     		sub	r0, r3, r2
+ 252:../Source/printf-stdarg.c **** for (i = (pbuffer - buffer); i < zero_pad; i++)
+ 130              		.loc 1 252 0 discriminator 1
+ 131 005a 089D     		ldr	r5, [sp, #32]
+ 132 005c 2718     		add	r7, r4, r0
+ 133 005e AF42     		cmp	r7, r5
+ 134 0060 F7D3     		bcc	.L9
+ 254:../Source/printf-stdarg.c **** 
+ 255:../Source/printf-stdarg.c **** if (negative)
+ 135              		.loc 1 255 0
+ 136 0062 009B     		ldr	r3, [sp]
+ 137 0064 002B     		cmp	r3, #0
+ 138 0066 02D0     		beq	.L10
+ 256:../Source/printf-stdarg.c **** *(pbuffer++) = '-';
+ 139              		.loc 1 256 0
+ 140 0068 2D22     		mov	r2, #45
+ 141 006a 2270     		strb	r2, [r4]
+ 142 006c 0134     		add	r4, r4, #1
+ 143              	.LVL17:
+ 144              	.L10:
+ 257:../Source/printf-stdarg.c **** 
+ 258:../Source/printf-stdarg.c **** *(pbuffer) = '\0';
+ 145              		.loc 1 258 0
+ 146 006e 0022     		mov	r2, #0
+ 259:../Source/printf-stdarg.c **** 
+ 260:../Source/printf-stdarg.c **** /* ... now we reverse it (could do it recursively but will
+ 261:../Source/printf-stdarg.c **** * conserve the stack space) */
+ 262:../Source/printf-stdarg.c **** len = (pbuffer - buffer);
+ 147              		.loc 1 262 0
+ 148 0070 A01B     		sub	r0, r4, r6
+ 149              	.LVL18:
+ 258:../Source/printf-stdarg.c **** *(pbuffer) = '\0';
+ 150              		.loc 1 258 0
+ 151 0072 2270     		strb	r2, [r4]
+ 263:../Source/printf-stdarg.c **** for (i = 0; i < len / 2; i++) {
+ 152              		.loc 1 263 0
+ 153 0074 131C     		mov	r3, r2
+ 154 0076 4408     		lsr	r4, r0, #1
+ 155              	.LVL19:
+ 156 0078 05E0     		b	.L11
+ 157              	.LVL20:
+ 158              	.L12:
+ 159              	.LBB3:
+ 229:../Source/printf-stdarg.c **** mini_itoa(int value, unsigned int radix, unsigned int uppercase,
+ 160              		.loc 1 229 0 discriminator 2
+ 161 007a 3118     		add	r1, r6, r0
+ 264:../Source/printf-stdarg.c **** char j = buffer[i];
+ 162              		.loc 1 264 0 discriminator 2
+ 163 007c F55C     		ldrb	r5, [r6, r3]
+ 164              	.LVL21:
+ 265:../Source/printf-stdarg.c **** buffer[i] = buffer[len-i-1];
+ 165              		.loc 1 265 0 discriminator 2
+ 166 007e 8F5C     		ldrb	r7, [r1, r2]
+ 167 0080 F754     		strb	r7, [r6, r3]
+ 266:../Source/printf-stdarg.c **** buffer[len-i-1] = j;
+ 168              		.loc 1 266 0 discriminator 2
+ 169 0082 8D54     		strb	r5, [r1, r2]
+ 170              	.LBE3:
+ 263:../Source/printf-stdarg.c **** for (i = 0; i < len / 2; i++) {
+ 171              		.loc 1 263 0 discriminator 2
+ 172 0084 0133     		add	r3, r3, #1
+ 173              	.LVL22:
+ 174              	.L11:
+ 263:../Source/printf-stdarg.c **** for (i = 0; i < len / 2; i++) {
+ 175              		.loc 1 263 0 is_stmt 0 discriminator 1
+ 176 0086 013A     		sub	r2, r2, #1
+ 177 0088 A342     		cmp	r3, r4
+ 178 008a F6D1     		bne	.L12
+ 179              	.LVL23:
+ 180              	.L2:
+ 181              		@ sp needed for prologue
+ 182              	.LVL24:
+ 267:../Source/printf-stdarg.c **** }
+ 268:../Source/printf-stdarg.c **** 
+ 269:../Source/printf-stdarg.c **** return len;
+ 270:../Source/printf-stdarg.c **** }
+ 183              		.loc 1 270 0 is_stmt 1
+ 184 008c FEBD     		pop	{r1, r2, r3, r4, r5, r6, r7, pc}
+ 185              		.cfi_endproc
+ 186              	.LFE1:
+ 188              		.section	.text._putc.4296,"ax",%progbits
+ 189              		.align	1
+ 190              		.code	16
+ 191              		.thumb_func
+ 193              	_putc.4296:
+ 194              	.LFB3:
+ 271:../Source/printf-stdarg.c **** 
+ 272:../Source/printf-stdarg.c **** int
+ 273:../Source/printf-stdarg.c **** mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list va)
+ 274:../Source/printf-stdarg.c **** {
+ 275:../Source/printf-stdarg.c **** char *pbuffer = buffer;
+ 276:../Source/printf-stdarg.c **** char bf[24];
+ 277:../Source/printf-stdarg.c **** char ch;
+ 278:../Source/printf-stdarg.c **** 
+ 279:../Source/printf-stdarg.c **** int _putc(char ch)
+ 280:../Source/printf-stdarg.c **** 	{
+ 195              		.loc 1 280 0
+ 196              		.cfi_startproc
+ 197 0000 30B5     		push	{r4, r5, lr}
+ 198              	.LCFI1:
+ 199              		.cfi_def_cfa_offset 12
+ 200              		.cfi_offset 4, -12
+ 201              		.cfi_offset 5, -8
+ 202              		.cfi_offset 14, -4
+ 203              	.LVL25:
+ 204              		.loc 1 280 0
+ 205 0002 6246     		mov	r2, ip
+ 206 0004 031C     		mov	r3, r0
+ 281:../Source/printf-stdarg.c **** 	if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len)
+ 207              		.loc 1 281 0
+ 208 0006 9168     		ldr	r1, [r2, #8]
+ 209 0008 5068     		ldr	r0, [r2, #4]
+ 210              	.LVL26:
+ 211 000a 1468     		ldr	r4, [r2]
+ 212 000c 0D1A     		sub	r5, r1, r0
+ 213 000e 0135     		add	r5, r5, #1
+ 282:../Source/printf-stdarg.c **** 	return 0;
+ 214              		.loc 1 282 0
+ 215 0010 0020     		mov	r0, #0
+ 281:../Source/printf-stdarg.c **** 	if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len)
+ 216              		.loc 1 281 0
+ 217 0012 A542     		cmp	r5, r4
+ 218 0014 05D2     		bcs	.L18
+ 283:../Source/printf-stdarg.c **** 	*(pbuffer++) = ch;
+ 219              		.loc 1 283 0
+ 220 0016 0B70     		strb	r3, [r1]
+ 221 0018 9368     		ldr	r3, [r2, #8]
+ 222 001a 591C     		add	r1, r3, #1
+ 223 001c 9160     		str	r1, [r2, #8]
+ 284:../Source/printf-stdarg.c **** 	*(pbuffer) = '\0';
+ 224              		.loc 1 284 0
+ 225 001e 5870     		strb	r0, [r3, #1]
+ 285:../Source/printf-stdarg.c **** 	return 1;
+ 226              		.loc 1 285 0
+ 227 0020 0120     		mov	r0, #1
+ 228              	.L18:
+ 229              		@ sp needed for prologue
+ 286:../Source/printf-stdarg.c **** }
+ 230              		.loc 1 286 0
+ 231 0022 30BD     		pop	{r4, r5, pc}
+ 232              		.cfi_endproc
+ 233              	.LFE3:
+ 235              		.section	.text._puts.4300,"ax",%progbits
+ 236              		.align	1
+ 237              		.code	16
+ 238              		.thumb_func
+ 240              	_puts.4300:
+ 241              	.LFB4:
+ 287:../Source/printf-stdarg.c **** 
+ 288:../Source/printf-stdarg.c **** int _puts(char *s, unsigned int len)
+ 289:../Source/printf-stdarg.c **** {
+ 242              		.loc 1 289 0
+ 243              		.cfi_startproc
+ 244 0000 30B5     		push	{r4, r5, lr}
+ 245              	.LCFI2:
+ 246              		.cfi_def_cfa_offset 12
+ 247              		.cfi_offset 4, -12
+ 248              		.cfi_offset 5, -8
+ 249              		.cfi_offset 14, -4
+ 250              	.LVL27:
+ 251              		.loc 1 289 0
+ 252 0002 6246     		mov	r2, ip
+ 253 0004 031C     		mov	r3, r0
+ 290:../Source/printf-stdarg.c **** 	unsigned int i;
+ 291:../Source/printf-stdarg.c **** 
+ 292:../Source/printf-stdarg.c **** 	if (buffer_len - (pbuffer - buffer) - 1 < len)
+ 254              		.loc 1 292 0
+ 255 0006 5568     		ldr	r5, [r2, #4]
+ 256 0008 1068     		ldr	r0, [r2]
+ 257              	.LVL28:
+ 258 000a 9468     		ldr	r4, [r2, #8]
+ 259 000c 0138     		sub	r0, r0, #1
+ 260 000e 2C1B     		sub	r4, r5, r4
+ 261 0010 0419     		add	r4, r0, r4
+ 293:../Source/printf-stdarg.c **** 	len = buffer_len - (pbuffer - buffer) - 1;
+ 294:../Source/printf-stdarg.c **** 
+ 295:../Source/printf-stdarg.c **** 	/* Copy to buffer */
+ 296:../Source/printf-stdarg.c **** 	for (i = 0; i < len; i++)
+ 262              		.loc 1 296 0
+ 263 0012 8C42     		cmp	r4, r1
+ 264 0014 00D9     		bls	.L21
+ 265 0016 0C1C     		mov	r4, r1
+ 266              	.L21:
+ 267              	.LVL29:
+ 268 0018 0020     		mov	r0, #0
+ 269 001a 05E0     		b	.L22
+ 270              	.LVL30:
+ 271              	.L23:
+ 297:../Source/printf-stdarg.c **** 	*(pbuffer++) = s[i];
+ 272              		.loc 1 297 0 discriminator 2
+ 273 001c 1D5C     		ldrb	r5, [r3, r0]
+ 296:../Source/printf-stdarg.c **** 	for (i = 0; i < len; i++)
+ 274              		.loc 1 296 0 discriminator 2
+ 275 001e 0130     		add	r0, r0, #1
+ 276              	.LVL31:
+ 277              		.loc 1 297 0 discriminator 2
+ 278 0020 0D70     		strb	r5, [r1]
+ 279 0022 9168     		ldr	r1, [r2, #8]
+ 280 0024 0131     		add	r1, r1, #1
+ 281 0026 9160     		str	r1, [r2, #8]
+ 282              	.LVL32:
+ 283              	.L22:
+ 284 0028 9168     		ldr	r1, [r2, #8]
+ 296:../Source/printf-stdarg.c **** 	for (i = 0; i < len; i++)
+ 285              		.loc 1 296 0 discriminator 1
+ 286 002a A042     		cmp	r0, r4
+ 287 002c F6D1     		bne	.L23
+ 298:../Source/printf-stdarg.c **** 	*(pbuffer) = '\0';
+ 288              		.loc 1 298 0
+ 289 002e 0023     		mov	r3, #0
+ 290              	.LVL33:
+ 291 0030 0B70     		strb	r3, [r1]
+ 292              		@ sp needed for prologue
+ 293              	.LVL34:
+ 299:../Source/printf-stdarg.c **** 
+ 300:../Source/printf-stdarg.c **** 	return len;
+ 301:../Source/printf-stdarg.c **** 	}
+ 294              		.loc 1 301 0
+ 295 0032 30BD     		pop	{r4, r5, pc}
+ 296              		.cfi_endproc
+ 297              	.LFE4:
+ 299              		.section	.text.mini_vsnprintf,"ax",%progbits
+ 300              		.align	1
+ 301              		.global	mini_vsnprintf
+ 302              		.code	16
+ 303              		.thumb_func
+ 305              	mini_vsnprintf:
+ 306              	.LFB2:
+ 274:../Source/printf-stdarg.c **** {
+ 307              		.loc 1 274 0
+ 308              		.cfi_startproc
+ 309 0000 70B5     		push	{r4, r5, r6, lr}
+ 310              	.LCFI3:
+ 311              		.cfi_def_cfa_offset 16
+ 312              		.cfi_offset 4, -16
+ 313              		.cfi_offset 5, -12
+ 314              		.cfi_offset 6, -8
+ 315              		.cfi_offset 14, -4
+ 316              	.LVL35:
+ 317 0002 8CB0     		sub	sp, sp, #48
+ 318              	.LCFI4:
+ 319              		.cfi_def_cfa_offset 64
+ 274:../Source/printf-stdarg.c **** {
+ 320              		.loc 1 274 0
+ 321 0004 151C     		mov	r5, r2
+ 322 0006 1C1C     		mov	r4, r3
+ 323              	.LVL36:
+ 273:../Source/printf-stdarg.c **** mini_vsnprintf(char *buffer, unsigned int buffer_len, const char *fmt, va_list va)
+ 324              		.loc 1 273 0
+ 325 0008 0A90     		str	r0, [sp, #40]
+ 326 000a 0991     		str	r1, [sp, #36]
+ 275:../Source/printf-stdarg.c **** char *pbuffer = buffer;
+ 327              		.loc 1 275 0
+ 328 000c 0B90     		str	r0, [sp, #44]
+ 302:../Source/printf-stdarg.c **** 
+ 303:../Source/printf-stdarg.c **** 	while ((ch=*(fmt++))) {
+ 329              		.loc 1 303 0
+ 330 000e 5CE0     		b	.L42
+ 331              	.LVL37:
+ 332              	.L39:
+ 304:../Source/printf-stdarg.c **** 	if ((unsigned int)((pbuffer - buffer) + 1) >= buffer_len)
+ 333              		.loc 1 304 0
+ 334 0010 0B99     		ldr	r1, [sp, #44]
+ 335 0012 0A9E     		ldr	r6, [sp, #40]
+ 336 0014 099B     		ldr	r3, [sp, #36]
+ 337              	.LVL38:
+ 338 0016 8A1B     		sub	r2, r1, r6
+ 339 0018 0132     		add	r2, r2, #1
+ 340 001a 9A42     		cmp	r2, r3
+ 341 001c 58D2     		bcs	.L26
+ 305:../Source/printf-stdarg.c **** 	break;
+ 306:../Source/printf-stdarg.c **** 	if (ch!='%')
+ 342              		.loc 1 306 0
+ 343 001e 2528     		cmp	r0, #37
+ 344 0020 01D0     		beq	.L27
+ 303:../Source/printf-stdarg.c **** 	while ((ch=*(fmt++))) {
+ 345              		.loc 1 303 0
+ 346 0022 0135     		add	r5, r5, #1
+ 347              	.LVL39:
+ 348 0024 4DE0     		b	.L32
+ 349              	.LVL40:
+ 350              	.L27:
+ 351              	.LBB7:
+ 307:../Source/printf-stdarg.c **** 	_putc(ch);
+ 308:../Source/printf-stdarg.c **** 	else {
+ 309:../Source/printf-stdarg.c **** 	char zero_pad = 0;
+ 310:../Source/printf-stdarg.c **** 	char *ptr;
+ 311:../Source/printf-stdarg.c **** 	unsigned int len;
+ 312:../Source/printf-stdarg.c **** 
+ 313:../Source/printf-stdarg.c **** 	ch=*(fmt++);
+ 352              		.loc 1 313 0
+ 353 0026 6878     		ldrb	r0, [r5, #1]
+ 354              	.LVL41:
+ 314:../Source/printf-stdarg.c **** 
+ 315:../Source/printf-stdarg.c **** 	/* Zero padding requested */
+ 316:../Source/printf-stdarg.c **** 	if (ch=='0') {
+ 355              		.loc 1 316 0
+ 356 0028 3028     		cmp	r0, #48
+ 357 002a 02D0     		beq	.L29
+ 313:../Source/printf-stdarg.c **** 	ch=*(fmt++);
+ 358              		.loc 1 313 0
+ 359 002c 0235     		add	r5, r5, #2
+ 360              	.LVL42:
+ 309:../Source/printf-stdarg.c **** 	char zero_pad = 0;
+ 361              		.loc 1 309 0
+ 362 002e 0023     		mov	r3, #0
+ 363 0030 0CE0     		b	.L30
+ 364              	.LVL43:
+ 365              	.L29:
+ 317:../Source/printf-stdarg.c **** 	ch=*(fmt++);
+ 366              		.loc 1 317 0
+ 367 0032 AA78     		ldrb	r2, [r5, #2]
+ 368              	.LVL44:
+ 318:../Source/printf-stdarg.c **** 	if (ch == '\0')
+ 369              		.loc 1 318 0
+ 370 0034 002A     		cmp	r2, #0
+ 371 0036 4BD0     		beq	.L26
+ 319:../Source/printf-stdarg.c **** 	goto end;
+ 320:../Source/printf-stdarg.c **** 	if (ch >= '0' && ch <= '9')
+ 372              		.loc 1 320 0
+ 373 0038 303A     		sub	r2, r2, #48
+ 374              	.LVL45:
+ 375 003a D0B2     		uxtb	r0, r2
+ 309:../Source/printf-stdarg.c **** 	char zero_pad = 0;
+ 376              		.loc 1 309 0
+ 377 003c 0923     		mov	r3, #9
+ 378 003e 0022     		mov	r2, #0
+ 379              	.LVL46:
+ 380 0040 8342     		cmp	r3, r0
+ 381 0042 5241     		adc	r2, r2, r2
+ 382 0044 5342     		neg	r3, r2
+ 383 0046 0340     		and	r3, r0
+ 384              	.LVL47:
+ 321:../Source/printf-stdarg.c **** 	zero_pad = ch - '0';
+ 322:../Source/printf-stdarg.c **** 	ch=*(fmt++);
+ 385              		.loc 1 322 0
+ 386 0048 E878     		ldrb	r0, [r5, #3]
+ 387              	.LVL48:
+ 388 004a 0435     		add	r5, r5, #4
+ 389              	.LVL49:
+ 390              	.L30:
+ 323:../Source/printf-stdarg.c **** 	}
+ 324:../Source/printf-stdarg.c **** 
+ 325:../Source/printf-stdarg.c **** 	switch (ch) {
+ 391              		.loc 1 325 0
+ 392 004c 6428     		cmp	r0, #100
+ 393 004e 0ED0     		beq	.L35
+ 394 0050 06D8     		bhi	.L37
+ 395 0052 5828     		cmp	r0, #88
+ 396 0054 11D0     		beq	.L33
+ 397 0056 6328     		cmp	r0, #99
+ 398 0058 1FD0     		beq	.L34
+ 399 005a 0028     		cmp	r0, #0
+ 400 005c 38D0     		beq	.L26
+ 401 005e 30E0     		b	.L32
+ 402              	.L37:
+ 403 0060 7528     		cmp	r0, #117
+ 404 0062 04D0     		beq	.L35
+ 405 0064 7828     		cmp	r0, #120
+ 406 0066 08D0     		beq	.L33
+ 407 0068 7328     		cmp	r0, #115
+ 408 006a 2AD1     		bne	.L32
+ 409 006c 1CE0     		b	.L46
+ 410              	.L35:
+ 326:../Source/printf-stdarg.c **** 	case 0:
+ 327:../Source/printf-stdarg.c **** 	goto end;
+ 328:../Source/printf-stdarg.c **** 
+ 329:../Source/printf-stdarg.c **** 	case 'u':
+ 330:../Source/printf-stdarg.c **** 	case 'd':
+ 331:../Source/printf-stdarg.c **** 	len = mini_itoa(va_arg(va, unsigned int), 10, 0, bf, zero_pad);
+ 411              		.loc 1 331 0
+ 412 006e 0093     		str	r3, [sp]
+ 413 0070 261D     		add	r6, r4, #4
+ 414              	.LVL50:
+ 415 0072 2068     		ldr	r0, [r4]
+ 416              	.LVL51:
+ 417 0074 0A21     		mov	r1, #10
+ 418 0076 0022     		mov	r2, #0
+ 419 0078 07E0     		b	.L45
+ 420              	.LVL52:
+ 421              	.L33:
+ 332:../Source/printf-stdarg.c **** 	_puts(bf, len);
+ 333:../Source/printf-stdarg.c **** 	break;
+ 334:../Source/printf-stdarg.c **** 
+ 335:../Source/printf-stdarg.c **** 	case 'x':
+ 336:../Source/printf-stdarg.c **** 	case 'X':
+ 337:../Source/printf-stdarg.c **** 	len = mini_itoa(va_arg(va, unsigned int), 16, (ch=='X'), bf, zero_pad);
+ 422              		.loc 1 337 0
+ 423 007a 021C     		mov	r2, r0
+ 424 007c 583A     		sub	r2, r2, #88
+ 425 007e 0093     		str	r3, [sp]
+ 426 0080 5042     		neg	r0, r2
+ 427 0082 4241     		adc	r2, r2, r0
+ 428              	.LVL53:
+ 429 0084 2068     		ldr	r0, [r4]
+ 430 0086 261D     		add	r6, r4, #4
+ 431              	.LVL54:
+ 432 0088 1021     		mov	r1, #16
+ 433              	.L45:
+ 434 008a 03AB     		add	r3, sp, #12
+ 435              	.LVL55:
+ 436 008c FFF7FEFF 		bl	mini_itoa
+ 437              	.LVL56:
+ 338:../Source/printf-stdarg.c **** 	_puts(bf, len);
+ 438              		.loc 1 338 0
+ 439 0090 09AC     		add	r4, sp, #36
+ 337:../Source/printf-stdarg.c **** 	len = mini_itoa(va_arg(va, unsigned int), 16, (ch=='X'), bf, zero_pad);
+ 440              		.loc 1 337 0
+ 441 0092 011C     		mov	r1, r0
+ 442              	.LVL57:
+ 443              		.loc 1 338 0
+ 444 0094 A446     		mov	ip, r4
+ 445 0096 03A8     		add	r0, sp, #12
+ 446              	.LVL58:
+ 447 0098 0FE0     		b	.L44
+ 448              	.LVL59:
+ 449              	.L34:
+ 339:../Source/printf-stdarg.c **** 	break;
+ 340:../Source/printf-stdarg.c **** 
+ 341:../Source/printf-stdarg.c **** 	case 'c' :
+ 342:../Source/printf-stdarg.c **** 	_putc((char)(va_arg(va, int)));
+ 450              		.loc 1 342 0
+ 451 009a 09A9     		add	r1, sp, #36
+ 452 009c 2078     		ldrb	r0, [r4]
+ 453              	.LVL60:
+ 454 009e 8C46     		mov	ip, r1
+ 455 00a0 261D     		add	r6, r4, #4
+ 456              	.LVL61:
+ 457 00a2 FFF7FEFF 		bl	_putc.4296
+ 458              	.LVL62:
+ 459 00a6 0AE0     		b	.L43
+ 460              	.LVL63:
+ 461              	.L46:
+ 343:../Source/printf-stdarg.c **** 	break;
+ 344:../Source/printf-stdarg.c **** 
+ 345:../Source/printf-stdarg.c **** 	case 's' :
+ 346:../Source/printf-stdarg.c **** 	ptr = va_arg(va, char*);
+ 462              		.loc 1 346 0
+ 463 00a8 2068     		ldr	r0, [r4]
+ 464              	.LVL64:
+ 465 00aa 261D     		add	r6, r4, #4
+ 466              	.LVL65:
+ 223:../Source/printf-stdarg.c **** unsigned int len = 0;
+ 467              		.loc 1 223 0
+ 468 00ac 0021     		mov	r1, #0
+ 469              	.LVL66:
+ 470              	.L38:
+ 471              	.LBB8:
+ 472              	.LBB9:
+ 224:../Source/printf-stdarg.c **** while (s[++len]) /* do nothing */;
+ 473              		.loc 1 224 0
+ 474 00ae 0131     		add	r1, r1, #1
+ 475              	.LVL67:
+ 476 00b0 425C     		ldrb	r2, [r0, r1]
+ 477 00b2 002A     		cmp	r2, #0
+ 478 00b4 FBD1     		bne	.L38
+ 479              	.LBE9:
+ 480              	.LBE8:
+ 347:../Source/printf-stdarg.c **** 	_puts(ptr, mini_strlen(ptr));
+ 481              		.loc 1 347 0
+ 482 00b6 09AB     		add	r3, sp, #36
+ 483              	.LVL68:
+ 484 00b8 9C46     		mov	ip, r3
+ 485              	.LVL69:
+ 486              	.L44:
+ 487 00ba FFF7FEFF 		bl	_puts.4300
+ 488              	.L43:
+ 346:../Source/printf-stdarg.c **** 	ptr = va_arg(va, char*);
+ 489              		.loc 1 346 0
+ 490 00be 341C     		mov	r4, r6
+ 348:../Source/printf-stdarg.c **** 	break;
+ 491              		.loc 1 348 0
+ 492 00c0 03E0     		b	.L42
+ 493              	.LVL70:
+ 494              	.L32:
+ 349:../Source/printf-stdarg.c **** 
+ 350:../Source/printf-stdarg.c **** 	default:
+ 351:../Source/printf-stdarg.c **** 	_putc(ch);
+ 495              		.loc 1 351 0
+ 496 00c2 09AE     		add	r6, sp, #36
+ 497 00c4 B446     		mov	ip, r6
+ 498 00c6 FFF7FEFF 		bl	_putc.4296
+ 499              	.LVL71:
+ 500              	.L42:
+ 501              	.LBE7:
+ 303:../Source/printf-stdarg.c **** 	while ((ch=*(fmt++))) {
+ 502              		.loc 1 303 0 discriminator 1
+ 503 00ca 2878     		ldrb	r0, [r5]
+ 504              	.LVL72:
+ 505 00cc 0028     		cmp	r0, #0
+ 506 00ce 9FD1     		bne	.L39
+ 507              	.LVL73:
+ 508              	.L26:
+ 352:../Source/printf-stdarg.c **** 	break;
+ 353:../Source/printf-stdarg.c **** 	}
+ 354:../Source/printf-stdarg.c **** 	}
+ 355:../Source/printf-stdarg.c **** 	}
+ 356:../Source/printf-stdarg.c **** 	end:
+ 357:../Source/printf-stdarg.c **** 	return pbuffer - buffer;
+ 509              		.loc 1 357 0
+ 510 00d0 0B9D     		ldr	r5, [sp, #44]
+ 511 00d2 0A98     		ldr	r0, [sp, #40]
+ 512 00d4 281A     		sub	r0, r5, r0
+ 358:../Source/printf-stdarg.c **** }
+ 513              		.loc 1 358 0
+ 514 00d6 0CB0     		add	sp, sp, #48
+ 515              		@ sp needed for prologue
+ 516              	.LVL74:
+ 517 00d8 70BD     		pop	{r4, r5, r6, pc}
+ 518              		.cfi_endproc
+ 519              	.LFE2:
+ 521              		.section	.text.mini_snprintf,"ax",%progbits
+ 522              		.align	1
+ 523              		.global	mini_snprintf
+ 524              		.code	16
+ 525              		.thumb_func
+ 527              	mini_snprintf:
+ 528              	.LFB5:
+ 359:../Source/printf-stdarg.c **** 
+ 360:../Source/printf-stdarg.c **** //int mini_snprintf(char* buffer, unsigned int buffer_len, char *fmt, ...)
+ 361:../Source/printf-stdarg.c **** int mini_snprintf(char* buffer, unsigned int buffer_len, const char *fmt, ...)
+ 362:../Source/printf-stdarg.c **** {
+ 529              		.loc 1 362 0
+ 530              		.cfi_startproc
+ 531 0000 0CB4     		push	{r2, r3}
+ 532              	.LCFI5:
+ 533              		.cfi_def_cfa_offset 8
+ 534 0002 07B5     		push	{r0, r1, r2, lr}
+ 535              	.LCFI6:
+ 536              		.cfi_def_cfa_offset 24
+ 537              		.cfi_offset 0, -24
+ 538              		.cfi_offset 1, -20
+ 539              		.cfi_offset 2, -16
+ 540              		.cfi_offset 14, -12
+ 541              	.LVL75:
+ 542              		.loc 1 362 0
+ 543 0004 04AB     		add	r3, sp, #16
+ 544 0006 04CB     		ldmia	r3!, {r2}
+ 363:../Source/printf-stdarg.c **** int ret;
+ 364:../Source/printf-stdarg.c **** va_list va;
+ 365:../Source/printf-stdarg.c **** va_start(va, fmt);
+ 545              		.loc 1 365 0
+ 546 0008 0193     		str	r3, [sp, #4]
+ 366:../Source/printf-stdarg.c **** ret = mini_vsnprintf(buffer, buffer_len, fmt, va);
+ 547              		.loc 1 366 0
+ 548 000a FFF7FEFF 		bl	mini_vsnprintf
+ 549              	.LVL76:
+ 367:../Source/printf-stdarg.c **** va_end(va);
+ 368:../Source/printf-stdarg.c **** 
+ 369:../Source/printf-stdarg.c **** return ret;
+ 370:../Source/printf-stdarg.c **** }
+ 550              		.loc 1 370 0
+ 551 000e 03B0     		add	sp, sp, #12
+ 552              		@ sp needed for prologue
+ 553 0010 08BC     		pop	{r3}
+ 554 0012 02B0     		add	sp, sp, #8
+ 555 0014 1847     		bx	r3
+ 556              		.cfi_endproc
+ 557              	.LFE5:
+ 559              		.section	.text.ustrncpy,"ax",%progbits
+ 560              		.align	1
+ 561              		.global	ustrncpy
+ 562              		.code	16
+ 563              		.thumb_func
+ 565              	ustrncpy:
+ 566              	.LFB6:
+ 371:../Source/printf-stdarg.c **** #ifdef TEST_PRINTF
+ 372:../Source/printf-stdarg.c **** int main(void)
+ 373:../Source/printf-stdarg.c **** {
+ 374:../Source/printf-stdarg.c **** 	char *ptr = "Hello world!";
+ 375:../Source/printf-stdarg.c **** 	char *np = 0;
+ 376:../Source/printf-stdarg.c **** 	int i = 5;
+ 377:../Source/printf-stdarg.c **** 	unsigned int bs = sizeof(int)*8;
+ 378:../Source/printf-stdarg.c **** 	int mi;
+ 379:../Source/printf-stdarg.c **** 	char buf[80];
+ 380:../Source/printf-stdarg.c **** 
+ 381:../Source/printf-stdarg.c **** 	mi = (1 << (bs-1)) + 1;
+ 382:../Source/printf-stdarg.c **** 	printf("%s\n", ptr);
+ 383:../Source/printf-stdarg.c **** 	printf("printf test\n");
+ 384:../Source/printf-stdarg.c **** 	printf("%s is null pointer\n", np);
+ 385:../Source/printf-stdarg.c **** 	printf("%d = 5\n", i);
+ 386:../Source/printf-stdarg.c **** 	printf("%d = - max int\n", mi);
+ 387:../Source/printf-stdarg.c **** 	printf("char %c = 'a'\n", 'a');
+ 388:../Source/printf-stdarg.c **** 	printf("hex %x = ff\n", 0xff);
+ 389:../Source/printf-stdarg.c **** 	printf("hex %02x = 00\n", 0);
+ 390:../Source/printf-stdarg.c **** 	printf("signed %d = unsigned %u = hex %x\n", -3, -3, -3);
+ 391:../Source/printf-stdarg.c **** 	printf("%d %s(s)%", 0, "message");
+ 392:../Source/printf-stdarg.c **** 	printf("\n");
+ 393:../Source/printf-stdarg.c **** 	printf("%d %s(s) with %%\n", 0, "message");
+ 394:../Source/printf-stdarg.c **** 	sprintf(buf, "justif: \"%-10s\"\n", "left"); printf("%s", buf);
+ 395:../Source/printf-stdarg.c **** 	sprintf(buf, "justif: \"%10s\"\n", "right"); printf("%s", buf);
+ 396:../Source/printf-stdarg.c **** 	sprintf(buf, " 3: %04d zero padded\n", 3); printf("%s", buf);
+ 397:../Source/printf-stdarg.c **** 	sprintf(buf, " 3: %-4d left justif.\n", 3); printf("%s", buf);
+ 398:../Source/printf-stdarg.c **** 	sprintf(buf, " 3: %4d right justif.\n", 3); printf("%s", buf);
+ 399:../Source/printf-stdarg.c **** 	sprintf(buf, "-3: %04d zero padded\n", -3); printf("%s", buf);
+ 400:../Source/printf-stdarg.c **** 	sprintf(buf, "-3: %-4d left justif.\n", -3); printf("%s", buf);
+ 401:../Source/printf-stdarg.c **** 	sprintf(buf, "-3: %4d right justif.\n", -3); printf("%s", buf);
+ 402:../Source/printf-stdarg.c **** 
+ 403:../Source/printf-stdarg.c **** 	return 0;
+ 404:../Source/printf-stdarg.c **** }
+ 405:../Source/printf-stdarg.c **** 
+ 406:../Source/printf-stdarg.c **** /*
+ 407:../Source/printf-stdarg.c ****  * if you compile this file with
+ 408:../Source/printf-stdarg.c ****  *   gcc -Wall $(YOUR_C_OPTIONS) -DTEST_PRINTF -c printf.c
+ 409:../Source/printf-stdarg.c ****  * you will get a normal warning:
+ 410:../Source/printf-stdarg.c ****  *   printf.c:214: warning: spurious trailing `%' in format
+ 411:../Source/printf-stdarg.c ****  * this line is testing an invalid % at the end of the format string.
+ 412:../Source/printf-stdarg.c ****  *
+ 413:../Source/printf-stdarg.c ****  * this should display (on 32bit int machine) :
+ 414:../Source/printf-stdarg.c ****  *
+ 415:../Source/printf-stdarg.c ****  * Hello world!
+ 416:../Source/printf-stdarg.c ****  * printf test
+ 417:../Source/printf-stdarg.c ****  * (null) is null pointer
+ 418:../Source/printf-stdarg.c ****  * 5 = 5
+ 419:../Source/printf-stdarg.c ****  * -2147483647 = - max int
+ 420:../Source/printf-stdarg.c ****  * char a = 'a'
+ 421:../Source/printf-stdarg.c ****  * hex ff = ff
+ 422:../Source/printf-stdarg.c ****  * hex 00 = 00
+ 423:../Source/printf-stdarg.c ****  * signed -3 = unsigned 4294967293 = hex fffffffd
+ 424:../Source/printf-stdarg.c ****  * 0 message(s)
+ 425:../Source/printf-stdarg.c ****  * 0 message(s) with %
+ 426:../Source/printf-stdarg.c ****  * justif: "left      "
+ 427:../Source/printf-stdarg.c ****  * justif: "     right"
+ 428:../Source/printf-stdarg.c ****  *  3: 0003 zero padded
+ 429:../Source/printf-stdarg.c ****  *  3: 3    left justif.
+ 430:../Source/printf-stdarg.c ****  *  3:    3 right justif.
+ 431:../Source/printf-stdarg.c ****  * -3: -003 zero padded
+ 432:../Source/printf-stdarg.c ****  * -3: -3   left justif.
+ 433:../Source/printf-stdarg.c ****  * -3:   -3 right justif.
+ 434:../Source/printf-stdarg.c ****  */
+ 435:../Source/printf-stdarg.c **** 
+ 436:../Source/printf-stdarg.c **** #endif
+ 437:../Source/printf-stdarg.c **** 
+ 438:../Source/printf-stdarg.c **** 
+ 439:../Source/printf-stdarg.c **** #include <string.h>
+ 440:../Source/printf-stdarg.c **** 
+ 441:../Source/printf-stdarg.c **** 
+ 442:../Source/printf-stdarg.c **** //*****************************************************************************
+ 443:../Source/printf-stdarg.c **** //
+ 444:../Source/printf-stdarg.c **** //! \addtogroup ustdlib_api
+ 445:../Source/printf-stdarg.c **** //! @{
+ 446:../Source/printf-stdarg.c **** //
+ 447:../Source/printf-stdarg.c **** //*****************************************************************************
+ 448:../Source/printf-stdarg.c **** 
+ 449:../Source/printf-stdarg.c **** //*****************************************************************************
+ 450:../Source/printf-stdarg.c **** //
+ 451:../Source/printf-stdarg.c **** // A mapping from an integer between 0 and 15 to its ASCII character
+ 452:../Source/printf-stdarg.c **** // equivalent.
+ 453:../Source/printf-stdarg.c **** //
+ 454:../Source/printf-stdarg.c **** //*****************************************************************************
+ 455:../Source/printf-stdarg.c **** static const char * const g_pcHex = "0123456789ABCDEF";
+ 456:../Source/printf-stdarg.c **** 
+ 457:../Source/printf-stdarg.c **** //*****************************************************************************
+ 458:../Source/printf-stdarg.c **** //
+ 459:../Source/printf-stdarg.c **** //! Copies a certain number of characters from one string to another.
+ 460:../Source/printf-stdarg.c **** //!
+ 461:../Source/printf-stdarg.c **** //! \param pcDst is a pointer to the destination buffer into which characters
+ 462:../Source/printf-stdarg.c **** //!   are to be copied.
+ 463:../Source/printf-stdarg.c **** //! \param pcSrc is a pointer to the string from which characters are to be
+ 464:../Source/printf-stdarg.c **** //!   copied.
+ 465:../Source/printf-stdarg.c **** //! \param iNum is the number of characters to copy to the destination buffer.
+ 466:../Source/printf-stdarg.c **** //!
+ 467:../Source/printf-stdarg.c **** //! This function copies at most \e iNum characters from the string pointed to
+ 468:../Source/printf-stdarg.c **** //! by \e pcSrc into the buffer pointed to by \e pcDst.  If the end of \e
+ 469:../Source/printf-stdarg.c **** //! pcSrc is found before \e iNum characters have been copied, remaining
+ 470:../Source/printf-stdarg.c **** //! characters in \e pcDst will be padded with zeroes until \e iNum characters
+ 471:../Source/printf-stdarg.c **** //! have been written.  Note that the destination string will only be NULL
+ 472:../Source/printf-stdarg.c **** //! terminated if the number of characters to be copied is greater than the
+ 473:../Source/printf-stdarg.c **** //! length of \e pcSrc.
+ 474:../Source/printf-stdarg.c **** //!
+ 475:../Source/printf-stdarg.c **** //! \return Returns \e pcDst.
+ 476:../Source/printf-stdarg.c **** //
+ 477:../Source/printf-stdarg.c **** //*****************************************************************************
+ 478:../Source/printf-stdarg.c **** char *
+ 479:../Source/printf-stdarg.c **** ustrncpy (char *pcDst, const char *pcSrc, int iNum)
+ 480:../Source/printf-stdarg.c **** {
+ 567              		.loc 1 480 0
+ 568              		.cfi_startproc
+ 569 0000 30B5     		push	{r4, r5, lr}
+ 570              	.LCFI7:
+ 571              		.cfi_def_cfa_offset 12
+ 572              		.cfi_offset 4, -12
+ 573              		.cfi_offset 5, -8
+ 574              		.cfi_offset 14, -4
+ 575              	.LVL77:
+ 481:../Source/printf-stdarg.c ****     int iCount;
+ 482:../Source/printf-stdarg.c **** 
+ 483:../Source/printf-stdarg.c ****     //ASSERT(pcSrc);
+ 484:../Source/printf-stdarg.c ****     //ASSERT(pcDst);
+ 485:../Source/printf-stdarg.c **** 
+ 486:../Source/printf-stdarg.c ****     //
+ 487:../Source/printf-stdarg.c ****     // Start at the beginning of the source string.
+ 488:../Source/printf-stdarg.c ****     //
+ 489:../Source/printf-stdarg.c ****     iCount = 0;
+ 576              		.loc 1 489 0
+ 577 0002 0023     		mov	r3, #0
+ 490:../Source/printf-stdarg.c **** 
+ 491:../Source/printf-stdarg.c ****     //
+ 492:../Source/printf-stdarg.c ****     // Copy the source string until we run out of source characters or
+ 493:../Source/printf-stdarg.c ****     // destination space.
+ 494:../Source/printf-stdarg.c ****     //
+ 495:../Source/printf-stdarg.c ****     while(iNum && pcSrc[iCount])
+ 578              		.loc 1 495 0
+ 579 0004 02E0     		b	.L49
+ 580              	.LVL78:
+ 581              	.L52:
+ 496:../Source/printf-stdarg.c ****     {
+ 497:../Source/printf-stdarg.c ****         pcDst[iCount] = pcSrc[iCount];
+ 582              		.loc 1 497 0
+ 583 0006 C454     		strb	r4, [r0, r3]
+ 498:../Source/printf-stdarg.c ****         iCount++;
+ 499:../Source/printf-stdarg.c ****         iNum--;
+ 584              		.loc 1 499 0
+ 585 0008 013A     		sub	r2, r2, #1
+ 586              	.LVL79:
+ 498:../Source/printf-stdarg.c ****         iCount++;
+ 587              		.loc 1 498 0
+ 588 000a 0133     		add	r3, r3, #1
+ 589              	.LVL80:
+ 590              	.L49:
+ 495:../Source/printf-stdarg.c ****     while(iNum && pcSrc[iCount])
+ 591              		.loc 1 495 0 discriminator 1
+ 592 000c 002A     		cmp	r2, #0
+ 593 000e 01D1     		bne	.L50
+ 594              	.L53:
+ 479:../Source/printf-stdarg.c **** ustrncpy (char *pcDst, const char *pcSrc, int iNum)
+ 595              		.loc 1 479 0 discriminator 1
+ 596 0010 0021     		mov	r1, #0
+ 597              	.LVL81:
+ 598 0012 07E0     		b	.L51
+ 599              	.LVL82:
+ 600              	.L50:
+ 495:../Source/printf-stdarg.c ****     while(iNum && pcSrc[iCount])
+ 601              		.loc 1 495 0 discriminator 2
+ 602 0014 CC5C     		ldrb	r4, [r1, r3]
+ 603 0016 002C     		cmp	r4, #0
+ 604 0018 F5D1     		bne	.L52
+ 605 001a F9E7     		b	.L53
+ 606              	.LVL83:
+ 607              	.L54:
+ 479:../Source/printf-stdarg.c **** ustrncpy (char *pcDst, const char *pcSrc, int iNum)
+ 608              		.loc 1 479 0
+ 609 001c C418     		add	r4, r0, r3
+ 500:../Source/printf-stdarg.c ****     }
+ 501:../Source/printf-stdarg.c **** 
+ 502:../Source/printf-stdarg.c ****     //
+ 503:../Source/printf-stdarg.c ****     // Pad the destination if we are not yet done.
+ 504:../Source/printf-stdarg.c ****     //
+ 505:../Source/printf-stdarg.c ****     while(iNum)
+ 506:../Source/printf-stdarg.c ****     {
+ 507:../Source/printf-stdarg.c ****         pcDst[iCount++] = (char)0;
+ 610              		.loc 1 507 0
+ 611 001e 0025     		mov	r5, #0
+ 612 0020 6554     		strb	r5, [r4, r1]
+ 613 0022 0131     		add	r1, r1, #1
+ 614              	.L51:
+ 505:../Source/printf-stdarg.c ****     while(iNum)
+ 615              		.loc 1 505 0 discriminator 1
+ 616 0024 9142     		cmp	r1, r2
+ 617 0026 F9D1     		bne	.L54
+ 618              		@ sp needed for prologue
+ 508:../Source/printf-stdarg.c ****         iNum--;
+ 509:../Source/printf-stdarg.c ****     }
+ 510:../Source/printf-stdarg.c **** 
+ 511:../Source/printf-stdarg.c ****     //
+ 512:../Source/printf-stdarg.c ****     // Pass the destination pointer back to the caller.
+ 513:../Source/printf-stdarg.c ****     //
+ 514:../Source/printf-stdarg.c ****     return(pcDst);
+ 515:../Source/printf-stdarg.c **** }
+ 619              		.loc 1 515 0
+ 620 0028 30BD     		pop	{r4, r5, pc}
+ 621              		.cfi_endproc
+ 622              	.LFE6:
+ 624              		.section	.text.uvsnprintf,"ax",%progbits
+ 625              		.align	1
+ 626              		.global	uvsnprintf
+ 627              		.code	16
+ 628              		.thumb_func
+ 630              	uvsnprintf:
+ 631              	.LFB7:
+ 516:../Source/printf-stdarg.c **** 
+ 517:../Source/printf-stdarg.c **** //*****************************************************************************
+ 518:../Source/printf-stdarg.c **** //
+ 519:../Source/printf-stdarg.c **** //! A simple vsnprintf function supporting \%c, \%d, \%p, \%s, \%u, \%x, and
+ 520:../Source/printf-stdarg.c **** //! \%X.
+ 521:../Source/printf-stdarg.c **** //!
+ 522:../Source/printf-stdarg.c **** //! \param pcBuf points to the buffer where the converted string is stored.
+ 523:../Source/printf-stdarg.c **** //! \param ulSize is the size of the buffer.
+ 524:../Source/printf-stdarg.c **** //! \param pcString is the format string.
+ 525:../Source/printf-stdarg.c **** //! \param vaArgP is the list of optional arguments, which depend on the
+ 526:../Source/printf-stdarg.c **** //! contents of the format string.
+ 527:../Source/printf-stdarg.c **** //!
+ 528:../Source/printf-stdarg.c **** //! This function is very similar to the C library <tt>vsnprintf()</tt>
+ 529:../Source/printf-stdarg.c **** //! function.  Only the following formatting characters are supported:
+ 530:../Source/printf-stdarg.c **** //!
+ 531:../Source/printf-stdarg.c **** //! - \%c to print a character
+ 532:../Source/printf-stdarg.c **** //! - \%d or \%i to print a decimal value
+ 533:../Source/printf-stdarg.c **** //! - \%s to print a string
+ 534:../Source/printf-stdarg.c **** //! - \%u to print an unsigned decimal value
+ 535:../Source/printf-stdarg.c **** //! - \%x to print a hexadecimal value using lower case letters
+ 536:../Source/printf-stdarg.c **** //! - \%X to print a hexadecimal value using lower case letters (not upper case
+ 537:../Source/printf-stdarg.c **** //! letters as would typically be used)
+ 538:../Source/printf-stdarg.c **** //! - \%p to print a pointer as a hexadecimal value
+ 539:../Source/printf-stdarg.c **** //! - \%\% to print out a \% character
+ 540:../Source/printf-stdarg.c **** //!
+ 541:../Source/printf-stdarg.c **** //! For \%d, \%i, \%p, \%s, \%u, \%x, and \%X, an optional number may reside
+ 542:../Source/printf-stdarg.c **** //! between the \% and the format character, which specifies the minimum number
+ 543:../Source/printf-stdarg.c **** //! of characters to use for that value; if preceded by a 0 then the extra
+ 544:../Source/printf-stdarg.c **** //! characters will be filled with zeros instead of spaces.  For example,
+ 545:../Source/printf-stdarg.c **** //! ``\%8d'' will use eight characters to print the decimal value with spaces
+ 546:../Source/printf-stdarg.c **** //! added to reach eight; ``\%08d'' will use eight characters as well but will
+ 547:../Source/printf-stdarg.c **** //! add zeroes instead of spaces.
+ 548:../Source/printf-stdarg.c **** //!
+ 549:../Source/printf-stdarg.c **** //! The type of the arguments after \e pcString must match the requirements of
+ 550:../Source/printf-stdarg.c **** //! the format string.  For example, if an integer was passed where a string
+ 551:../Source/printf-stdarg.c **** //! was expected, an error of some kind will most likely occur.
+ 552:../Source/printf-stdarg.c **** //!
+ 553:../Source/printf-stdarg.c **** //! The \e ulSize parameter limits the number of characters that will be stored
+ 554:../Source/printf-stdarg.c **** //! in the buffer pointed to by \e pcBuf to prevent the possibility of a buffer
+ 555:../Source/printf-stdarg.c **** //! overflow.  The buffer size should be large enough to hold the expected
+ 556:../Source/printf-stdarg.c **** //! converted output string, including the null termination character.
+ 557:../Source/printf-stdarg.c **** //!
+ 558:../Source/printf-stdarg.c **** //! The function will return the number of characters that would be converted
+ 559:../Source/printf-stdarg.c **** //! as if there were no limit on the buffer size.  Therefore it is possible for
+ 560:../Source/printf-stdarg.c **** //! the function to return a count that is greater than the specified buffer
+ 561:../Source/printf-stdarg.c **** //! size.  If this happens, it means that the output was truncated.
+ 562:../Source/printf-stdarg.c **** //!
+ 563:../Source/printf-stdarg.c **** //! \return Returns the number of characters that were to be stored, not
+ 564:../Source/printf-stdarg.c **** //! including the NULL termination character, regardless of space in the
+ 565:../Source/printf-stdarg.c **** //! buffer.
+ 566:../Source/printf-stdarg.c **** //
+ 567:../Source/printf-stdarg.c **** //*****************************************************************************
+ 568:../Source/printf-stdarg.c **** int
+ 569:../Source/printf-stdarg.c **** uvsnprintf(char *pcBuf, unsigned long ulSize, const char *pcString,
+ 570:../Source/printf-stdarg.c ****            va_list vaArgP)
+ 571:../Source/printf-stdarg.c **** {
+ 632              		.loc 1 571 0
+ 633              		.cfi_startproc
+ 634 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 635              	.LCFI8:
+ 636              		.cfi_def_cfa_offset 20
+ 637              		.cfi_offset 4, -20
+ 638              		.cfi_offset 5, -16
+ 639              		.cfi_offset 6, -12
+ 640              		.cfi_offset 7, -8
+ 641              		.cfi_offset 14, -4
+ 642              	.LVL84:
+ 572:../Source/printf-stdarg.c ****     unsigned long ulIdx, ulValue, ulCount, ulBase, ulNeg;
+ 573:../Source/printf-stdarg.c ****     char *pcStr, cFill;
+ 574:../Source/printf-stdarg.c ****     int iConvertCount = 0;
+ 575:../Source/printf-stdarg.c **** 
+ 576:../Source/printf-stdarg.c ****     //
+ 577:../Source/printf-stdarg.c ****     // Check the arguments.
+ 578:../Source/printf-stdarg.c ****     //
+ 579:../Source/printf-stdarg.c ****     //ASSERT(pcString != 0);
+ 580:../Source/printf-stdarg.c ****     //ASSERT(pcBuf != 0);
+ 581:../Source/printf-stdarg.c ****     //ASSERT(ulSize != 0);
+ 582:../Source/printf-stdarg.c **** 
+ 583:../Source/printf-stdarg.c ****     //
+ 584:../Source/printf-stdarg.c ****     // Adjust buffer size limit to allow one space for null termination.
+ 585:../Source/printf-stdarg.c ****     //
+ 586:../Source/printf-stdarg.c ****     if(ulSize)
+ 587:../Source/printf-stdarg.c ****     {
+ 588:../Source/printf-stdarg.c ****         ulSize--;
+ 643              		.loc 1 588 0
+ 644 0002 0D1C     		mov	r5, r1
+ 571:../Source/printf-stdarg.c **** {
+ 645              		.loc 1 571 0
+ 646 0004 89B0     		sub	sp, sp, #36
+ 647              	.LCFI9:
+ 648              		.cfi_def_cfa_offset 56
+ 571:../Source/printf-stdarg.c **** {
+ 649              		.loc 1 571 0
+ 650 0006 1C1C     		mov	r4, r3
+ 651              	.LVL85:
+ 652              		.loc 1 588 0
+ 653 0008 6B1E     		sub	r3, r5, #1
+ 654 000a 9D41     		sbc	r5, r5, r3
+ 655              	.LVL86:
+ 571:../Source/printf-stdarg.c **** {
+ 656              		.loc 1 571 0
+ 657 000c 061C     		mov	r6, r0
+ 658 000e 0292     		str	r2, [sp, #8]
+ 659              		.loc 1 588 0
+ 660 0010 4D1B     		sub	r5, r1, r5
+ 589:../Source/printf-stdarg.c ****     }
+ 590:../Source/printf-stdarg.c **** 
+ 591:../Source/printf-stdarg.c ****     //
+ 592:../Source/printf-stdarg.c ****     // Initialize the count of characters converted.
+ 593:../Source/printf-stdarg.c ****     //
+ 594:../Source/printf-stdarg.c ****     iConvertCount = 0;
+ 595:../Source/printf-stdarg.c **** 
+ 596:../Source/printf-stdarg.c ****     //
+ 597:../Source/printf-stdarg.c ****     // Loop while there are more characters in the format string.
+ 598:../Source/printf-stdarg.c ****     //
+ 599:../Source/printf-stdarg.c ****     while(*pcString)
+ 600:../Source/printf-stdarg.c ****     {
+ 601:../Source/printf-stdarg.c ****         //
+ 602:../Source/printf-stdarg.c ****         // Find the first non-% character, or the end of the string.
+ 603:../Source/printf-stdarg.c ****         //
+ 604:../Source/printf-stdarg.c ****         for(ulIdx = 0; (pcString[ulIdx] != '%') && (pcString[ulIdx] != '\0');
+ 605:../Source/printf-stdarg.c ****             ulIdx++)
+ 606:../Source/printf-stdarg.c ****         {
+ 607:../Source/printf-stdarg.c ****         }
+ 608:../Source/printf-stdarg.c **** 
+ 609:../Source/printf-stdarg.c ****         //
+ 610:../Source/printf-stdarg.c ****         // Write this portion of the string to the output buffer.  If there are
+ 611:../Source/printf-stdarg.c ****         // more characters to write than there is space in the buffer, then
+ 612:../Source/printf-stdarg.c ****         // only write as much as will fit in the buffer.
+ 613:../Source/printf-stdarg.c ****         //
+ 614:../Source/printf-stdarg.c ****         if(ulIdx > ulSize)
+ 615:../Source/printf-stdarg.c ****         {
+ 616:../Source/printf-stdarg.c ****             ustrncpy(pcBuf, pcString, ulSize);
+ 617:../Source/printf-stdarg.c ****             pcBuf += ulSize;
+ 618:../Source/printf-stdarg.c ****             ulSize = 0;
+ 619:../Source/printf-stdarg.c ****         }
+ 620:../Source/printf-stdarg.c ****         else
+ 621:../Source/printf-stdarg.c ****         {
+ 622:../Source/printf-stdarg.c ****             ustrncpy(pcBuf, pcString, ulIdx);
+ 623:../Source/printf-stdarg.c ****             pcBuf += ulIdx;
+ 624:../Source/printf-stdarg.c ****             ulSize -= ulIdx;
+ 625:../Source/printf-stdarg.c ****         }
+ 626:../Source/printf-stdarg.c **** 
+ 627:../Source/printf-stdarg.c ****         //
+ 628:../Source/printf-stdarg.c ****         // Update the conversion count.  This will be the number of characters
+ 629:../Source/printf-stdarg.c ****         // that should have been written, even if there was not room in the
+ 630:../Source/printf-stdarg.c ****         // buffer.
+ 631:../Source/printf-stdarg.c ****         //
+ 632:../Source/printf-stdarg.c ****         iConvertCount += ulIdx;
+ 633:../Source/printf-stdarg.c **** 
+ 634:../Source/printf-stdarg.c ****         //
+ 635:../Source/printf-stdarg.c ****         // Skip the portion of the format string that was written.
+ 636:../Source/printf-stdarg.c ****         //
+ 637:../Source/printf-stdarg.c ****         pcString += ulIdx;
+ 638:../Source/printf-stdarg.c **** 
+ 639:../Source/printf-stdarg.c ****         //
+ 640:../Source/printf-stdarg.c ****         // See if the next character is a %.
+ 641:../Source/printf-stdarg.c ****         //
+ 642:../Source/printf-stdarg.c ****         if(*pcString == '%')
+ 643:../Source/printf-stdarg.c ****         {
+ 644:../Source/printf-stdarg.c ****             //
+ 645:../Source/printf-stdarg.c ****             // Skip the %.
+ 646:../Source/printf-stdarg.c ****             //
+ 647:../Source/printf-stdarg.c ****             pcString++;
+ 648:../Source/printf-stdarg.c **** 
+ 649:../Source/printf-stdarg.c ****             //
+ 650:../Source/printf-stdarg.c ****             // Set the digit count to zero, and the fill character to space
+ 651:../Source/printf-stdarg.c ****             // (that is, to the defaults).
+ 652:../Source/printf-stdarg.c ****             //
+ 653:../Source/printf-stdarg.c ****             ulCount = 0;
+ 654:../Source/printf-stdarg.c ****             cFill = ' ';
+ 655:../Source/printf-stdarg.c **** 
+ 656:../Source/printf-stdarg.c ****             //
+ 657:../Source/printf-stdarg.c ****             // It may be necessary to get back here to process more characters.
+ 658:../Source/printf-stdarg.c ****             // Goto's aren't pretty, but effective.  I feel extremely dirty for
+ 659:../Source/printf-stdarg.c ****             // using not one but two of the beasts.
+ 660:../Source/printf-stdarg.c ****             //
+ 661:../Source/printf-stdarg.c **** again:
+ 662:../Source/printf-stdarg.c **** 
+ 663:../Source/printf-stdarg.c ****             //
+ 664:../Source/printf-stdarg.c ****             // Determine how to handle the next character.
+ 665:../Source/printf-stdarg.c ****             //
+ 666:../Source/printf-stdarg.c ****             switch(*pcString++)
+ 667:../Source/printf-stdarg.c ****             {
+ 668:../Source/printf-stdarg.c ****                 //
+ 669:../Source/printf-stdarg.c ****                 // Handle the digit characters.
+ 670:../Source/printf-stdarg.c ****                 //
+ 671:../Source/printf-stdarg.c ****                 case '0':
+ 672:../Source/printf-stdarg.c ****                 case '1':
+ 673:../Source/printf-stdarg.c ****                 case '2':
+ 674:../Source/printf-stdarg.c ****                 case '3':
+ 675:../Source/printf-stdarg.c ****                 case '4':
+ 676:../Source/printf-stdarg.c ****                 case '5':
+ 677:../Source/printf-stdarg.c ****                 case '6':
+ 678:../Source/printf-stdarg.c ****                 case '7':
+ 679:../Source/printf-stdarg.c ****                 case '8':
+ 680:../Source/printf-stdarg.c ****                 case '9':
+ 681:../Source/printf-stdarg.c ****                 {
+ 682:../Source/printf-stdarg.c ****                     //
+ 683:../Source/printf-stdarg.c ****                     // If this is a zero, and it is the first digit, then the
+ 684:../Source/printf-stdarg.c ****                     // fill character is a zero instead of a space.
+ 685:../Source/printf-stdarg.c ****                     //
+ 686:../Source/printf-stdarg.c ****                     if((pcString[-1] == '0') && (ulCount == 0))
+ 687:../Source/printf-stdarg.c ****                     {
+ 688:../Source/printf-stdarg.c ****                         cFill = '0';
+ 689:../Source/printf-stdarg.c ****                     }
+ 690:../Source/printf-stdarg.c **** 
+ 691:../Source/printf-stdarg.c ****                     //
+ 692:../Source/printf-stdarg.c ****                     // Update the digit count.
+ 693:../Source/printf-stdarg.c ****                     //
+ 694:../Source/printf-stdarg.c ****                     ulCount *= 10;
+ 695:../Source/printf-stdarg.c ****                     ulCount += pcString[-1] - '0';
+ 696:../Source/printf-stdarg.c **** 
+ 697:../Source/printf-stdarg.c ****                     //
+ 698:../Source/printf-stdarg.c ****                     // Get the next character.
+ 699:../Source/printf-stdarg.c ****                     //
+ 700:../Source/printf-stdarg.c ****                     goto again;
+ 701:../Source/printf-stdarg.c ****                 }
+ 702:../Source/printf-stdarg.c **** 
+ 703:../Source/printf-stdarg.c ****                 //
+ 704:../Source/printf-stdarg.c ****                 // Handle the %c command.
+ 705:../Source/printf-stdarg.c ****                 //
+ 706:../Source/printf-stdarg.c ****                 case 'c':
+ 707:../Source/printf-stdarg.c ****                 {
+ 708:../Source/printf-stdarg.c ****                     //
+ 709:../Source/printf-stdarg.c ****                     // Get the value from the varargs.
+ 710:../Source/printf-stdarg.c ****                     //
+ 711:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 712:../Source/printf-stdarg.c **** 
+ 713:../Source/printf-stdarg.c ****                     //
+ 714:../Source/printf-stdarg.c ****                     // Copy the character to the output buffer, if there is
+ 715:../Source/printf-stdarg.c ****                     // room.  Update the buffer size remaining.
+ 716:../Source/printf-stdarg.c ****                     //
+ 717:../Source/printf-stdarg.c ****                     if(ulSize != 0)
+ 718:../Source/printf-stdarg.c ****                     {
+ 719:../Source/printf-stdarg.c ****                         *pcBuf++ = (char)ulValue;
+ 720:../Source/printf-stdarg.c ****                         ulSize--;
+ 721:../Source/printf-stdarg.c ****                     }
+ 722:../Source/printf-stdarg.c **** 
+ 723:../Source/printf-stdarg.c ****                     //
+ 724:../Source/printf-stdarg.c ****                     // Update the conversion count.
+ 725:../Source/printf-stdarg.c ****                     //
+ 726:../Source/printf-stdarg.c ****                     iConvertCount++;
+ 727:../Source/printf-stdarg.c **** 
+ 728:../Source/printf-stdarg.c ****                     //
+ 729:../Source/printf-stdarg.c ****                     // This command has been handled.
+ 730:../Source/printf-stdarg.c ****                     //
+ 731:../Source/printf-stdarg.c ****                     break;
+ 732:../Source/printf-stdarg.c ****                 }
+ 733:../Source/printf-stdarg.c **** 
+ 734:../Source/printf-stdarg.c ****                 //
+ 735:../Source/printf-stdarg.c ****                 // Handle the %d and %i commands.
+ 736:../Source/printf-stdarg.c ****                 //
+ 737:../Source/printf-stdarg.c ****                 case 'd':
+ 738:../Source/printf-stdarg.c ****                 case 'i':
+ 739:../Source/printf-stdarg.c ****                 {
+ 740:../Source/printf-stdarg.c ****                     //
+ 741:../Source/printf-stdarg.c ****                     // Get the value from the varargs.
+ 742:../Source/printf-stdarg.c ****                     //
+ 743:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 744:../Source/printf-stdarg.c **** 
+ 745:../Source/printf-stdarg.c ****                     //
+ 746:../Source/printf-stdarg.c ****                     // If the value is negative, make it positive and indicate
+ 747:../Source/printf-stdarg.c ****                     // that a minus sign is needed.
+ 748:../Source/printf-stdarg.c ****                     //
+ 749:../Source/printf-stdarg.c ****                     if((long)ulValue < 0)
+ 750:../Source/printf-stdarg.c ****                     {
+ 751:../Source/printf-stdarg.c ****                         //
+ 752:../Source/printf-stdarg.c ****                         // Make the value positive.
+ 753:../Source/printf-stdarg.c ****                         //
+ 754:../Source/printf-stdarg.c ****                         ulValue = -(long)ulValue;
+ 755:../Source/printf-stdarg.c **** 
+ 756:../Source/printf-stdarg.c ****                         //
+ 757:../Source/printf-stdarg.c ****                         // Indicate that the value is negative.
+ 758:../Source/printf-stdarg.c ****                         //
+ 759:../Source/printf-stdarg.c ****                         ulNeg = 1;
+ 760:../Source/printf-stdarg.c ****                     }
+ 761:../Source/printf-stdarg.c ****                     else
+ 762:../Source/printf-stdarg.c ****                     {
+ 763:../Source/printf-stdarg.c ****                         //
+ 764:../Source/printf-stdarg.c ****                         // Indicate that the value is positive so that a
+ 765:../Source/printf-stdarg.c ****                         // negative sign isn't inserted.
+ 766:../Source/printf-stdarg.c ****                         //
+ 767:../Source/printf-stdarg.c ****                         ulNeg = 0;
+ 768:../Source/printf-stdarg.c ****                     }
+ 769:../Source/printf-stdarg.c **** 
+ 770:../Source/printf-stdarg.c ****                     //
+ 771:../Source/printf-stdarg.c ****                     // Set the base to 10.
+ 772:../Source/printf-stdarg.c ****                     //
+ 773:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 774:../Source/printf-stdarg.c **** 
+ 775:../Source/printf-stdarg.c ****                     //
+ 776:../Source/printf-stdarg.c ****                     // Convert the value to ASCII.
+ 777:../Source/printf-stdarg.c ****                     //
+ 778:../Source/printf-stdarg.c ****                     goto convert;
+ 779:../Source/printf-stdarg.c ****                 }
+ 780:../Source/printf-stdarg.c **** 
+ 781:../Source/printf-stdarg.c ****                 //
+ 782:../Source/printf-stdarg.c ****                 // Handle the %s command.
+ 783:../Source/printf-stdarg.c ****                 //
+ 784:../Source/printf-stdarg.c ****                 case 's':
+ 785:../Source/printf-stdarg.c ****                 {
+ 786:../Source/printf-stdarg.c ****                     //
+ 787:../Source/printf-stdarg.c ****                     // Get the string pointer from the varargs.
+ 788:../Source/printf-stdarg.c ****                     //
+ 789:../Source/printf-stdarg.c ****                     pcStr = va_arg(vaArgP, char *);
+ 790:../Source/printf-stdarg.c **** 
+ 791:../Source/printf-stdarg.c ****                     //
+ 792:../Source/printf-stdarg.c ****                     // Determine the length of the string.
+ 793:../Source/printf-stdarg.c ****                     //
+ 794:../Source/printf-stdarg.c ****                     for(ulIdx = 0; pcStr[ulIdx] != '\0'; ulIdx++)
+ 795:../Source/printf-stdarg.c ****                     {
+ 796:../Source/printf-stdarg.c ****                     }
+ 797:../Source/printf-stdarg.c **** 
+ 798:../Source/printf-stdarg.c ****                     //
+ 799:../Source/printf-stdarg.c ****                     // Update the convert count to include any padding that
+ 800:../Source/printf-stdarg.c ****                     // should be necessary (regardless of whether we have space
+ 801:../Source/printf-stdarg.c ****                     // to write it or not).
+ 802:../Source/printf-stdarg.c ****                     //
+ 803:../Source/printf-stdarg.c ****                     if(ulCount > ulIdx)
+ 804:../Source/printf-stdarg.c ****                     {
+ 805:../Source/printf-stdarg.c ****                         iConvertCount += (ulCount - ulIdx);
+ 806:../Source/printf-stdarg.c ****                     }
+ 807:../Source/printf-stdarg.c **** 
+ 808:../Source/printf-stdarg.c ****                     //
+ 809:../Source/printf-stdarg.c ****                     // Copy the string to the output buffer.  Only copy as much
+ 810:../Source/printf-stdarg.c ****                     // as will fit in the buffer.  Update the output buffer
+ 811:../Source/printf-stdarg.c ****                     // pointer and the space remaining.
+ 812:../Source/printf-stdarg.c ****                     //
+ 813:../Source/printf-stdarg.c ****                     if(ulIdx > ulSize)
+ 814:../Source/printf-stdarg.c ****                     {
+ 815:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, pcStr, ulSize);
+ 816:../Source/printf-stdarg.c ****                         pcBuf += ulSize;
+ 817:../Source/printf-stdarg.c ****                         ulSize = 0;
+ 818:../Source/printf-stdarg.c ****                     }
+ 819:../Source/printf-stdarg.c ****                     else
+ 820:../Source/printf-stdarg.c ****                     {
+ 821:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, pcStr, ulIdx);
+ 822:../Source/printf-stdarg.c ****                         pcBuf += ulIdx;
+ 823:../Source/printf-stdarg.c ****                         ulSize -= ulIdx;
+ 824:../Source/printf-stdarg.c **** 
+ 825:../Source/printf-stdarg.c ****                         //
+ 826:../Source/printf-stdarg.c ****                         // Write any required padding spaces assuming there is
+ 827:../Source/printf-stdarg.c ****                         // still space in the buffer.
+ 828:../Source/printf-stdarg.c ****                         //
+ 829:../Source/printf-stdarg.c ****                         if(ulCount > ulIdx)
+ 830:../Source/printf-stdarg.c ****                         {
+ 831:../Source/printf-stdarg.c ****                             ulCount -= ulIdx;
+ 832:../Source/printf-stdarg.c ****                             if(ulCount > ulSize)
+ 833:../Source/printf-stdarg.c ****                             {
+ 834:../Source/printf-stdarg.c ****                                 ulCount = ulSize;
+ 835:../Source/printf-stdarg.c ****                             }
+ 836:../Source/printf-stdarg.c ****                             ulSize =- ulCount;
+ 837:../Source/printf-stdarg.c **** 
+ 838:../Source/printf-stdarg.c ****                             while(ulCount--)
+ 839:../Source/printf-stdarg.c ****                             {
+ 840:../Source/printf-stdarg.c ****                                 *pcBuf++ = ' ';
+ 841:../Source/printf-stdarg.c ****                             }
+ 842:../Source/printf-stdarg.c ****                         }
+ 843:../Source/printf-stdarg.c ****                     }
+ 844:../Source/printf-stdarg.c **** 
+ 845:../Source/printf-stdarg.c ****                     //
+ 846:../Source/printf-stdarg.c ****                     // Update the conversion count.  This will be the number of
+ 847:../Source/printf-stdarg.c ****                     // characters that should have been written, even if there
+ 848:../Source/printf-stdarg.c ****                     // was not room in the buffer.
+ 849:../Source/printf-stdarg.c ****                     //
+ 850:../Source/printf-stdarg.c ****                     iConvertCount += ulIdx;
+ 851:../Source/printf-stdarg.c **** 
+ 852:../Source/printf-stdarg.c ****                     //
+ 853:../Source/printf-stdarg.c ****                     // This command has been handled.
+ 854:../Source/printf-stdarg.c ****                     //
+ 855:../Source/printf-stdarg.c ****                     break;
+ 856:../Source/printf-stdarg.c ****                 }
+ 857:../Source/printf-stdarg.c **** 
+ 858:../Source/printf-stdarg.c ****                 //
+ 859:../Source/printf-stdarg.c ****                 // Handle the %u command.
+ 860:../Source/printf-stdarg.c ****                 //
+ 861:../Source/printf-stdarg.c ****                 case 'u':
+ 862:../Source/printf-stdarg.c ****                 {
+ 863:../Source/printf-stdarg.c ****                     //
+ 864:../Source/printf-stdarg.c ****                     // Get the value from the varargs.
+ 865:../Source/printf-stdarg.c ****                     //
+ 866:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 867:../Source/printf-stdarg.c **** 
+ 868:../Source/printf-stdarg.c ****                     //
+ 869:../Source/printf-stdarg.c ****                     // Set the base to 10.
+ 870:../Source/printf-stdarg.c ****                     //
+ 871:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 872:../Source/printf-stdarg.c **** 
+ 873:../Source/printf-stdarg.c ****                     //
+ 874:../Source/printf-stdarg.c ****                     // Indicate that the value is positive so that a minus sign
+ 875:../Source/printf-stdarg.c ****                     // isn't inserted.
+ 876:../Source/printf-stdarg.c ****                     //
+ 877:../Source/printf-stdarg.c ****                     ulNeg = 0;
+ 878:../Source/printf-stdarg.c **** 
+ 879:../Source/printf-stdarg.c ****                     //
+ 880:../Source/printf-stdarg.c ****                     // Convert the value to ASCII.
+ 881:../Source/printf-stdarg.c ****                     //
+ 882:../Source/printf-stdarg.c ****                     goto convert;
+ 883:../Source/printf-stdarg.c ****                 }
+ 884:../Source/printf-stdarg.c **** 
+ 885:../Source/printf-stdarg.c ****                 //
+ 886:../Source/printf-stdarg.c ****                 // Handle the %x and %X commands.  Note that they are treated
+ 887:../Source/printf-stdarg.c ****                 // identically; that is, %X will use lower case letters for a-f
+ 888:../Source/printf-stdarg.c ****                 // instead of the upper case letters is should use.  We also
+ 889:../Source/printf-stdarg.c ****                 // alias %p to %x.
+ 890:../Source/printf-stdarg.c ****                 //
+ 891:../Source/printf-stdarg.c ****                 case 'x':
+ 892:../Source/printf-stdarg.c ****                 case 'X':
+ 893:../Source/printf-stdarg.c ****                 case 'p':
+ 894:../Source/printf-stdarg.c ****                 {
+ 895:../Source/printf-stdarg.c ****                     //
+ 896:../Source/printf-stdarg.c ****                     // Get the value from the varargs.
+ 897:../Source/printf-stdarg.c ****                     //
+ 898:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 899:../Source/printf-stdarg.c **** 
+ 900:../Source/printf-stdarg.c ****                     //
+ 901:../Source/printf-stdarg.c ****                     // Set the base to 16.
+ 902:../Source/printf-stdarg.c ****                     //
+ 903:../Source/printf-stdarg.c ****                     ulBase = 16;
+ 904:../Source/printf-stdarg.c **** 
+ 905:../Source/printf-stdarg.c ****                     //
+ 906:../Source/printf-stdarg.c ****                     // Indicate that the value is positive so that a minus sign
+ 907:../Source/printf-stdarg.c ****                     // isn't inserted.
+ 908:../Source/printf-stdarg.c ****                     //
+ 909:../Source/printf-stdarg.c ****                     ulNeg = 0;
+ 910:../Source/printf-stdarg.c **** 
+ 911:../Source/printf-stdarg.c ****                     //
+ 912:../Source/printf-stdarg.c ****                     // Determine the number of digits in the string version of
+ 913:../Source/printf-stdarg.c ****                     // the value.
+ 914:../Source/printf-stdarg.c ****                     //
+ 915:../Source/printf-stdarg.c **** convert:
+ 916:../Source/printf-stdarg.c ****                     for(ulIdx = 1;
+ 917:../Source/printf-stdarg.c ****                         (((ulIdx * ulBase) <= ulValue) &&
+ 918:../Source/printf-stdarg.c ****                          (((ulIdx * ulBase) / ulBase) == ulIdx));
+ 919:../Source/printf-stdarg.c ****                         ulIdx *= ulBase, ulCount--)
+ 920:../Source/printf-stdarg.c ****                     {
+ 921:../Source/printf-stdarg.c ****                     }
+ 922:../Source/printf-stdarg.c **** 
+ 923:../Source/printf-stdarg.c ****                     //
+ 924:../Source/printf-stdarg.c ****                     // If the value is negative, reduce the count of padding
+ 925:../Source/printf-stdarg.c ****                     // characters needed.
+ 926:../Source/printf-stdarg.c ****                     //
+ 927:../Source/printf-stdarg.c ****                     if(ulNeg)
+ 928:../Source/printf-stdarg.c ****                     {
+ 929:../Source/printf-stdarg.c ****                         ulCount--;
+ 930:../Source/printf-stdarg.c ****                     }
+ 931:../Source/printf-stdarg.c **** 
+ 932:../Source/printf-stdarg.c ****                     //
+ 933:../Source/printf-stdarg.c ****                     // If the value is negative and the value is padded with
+ 934:../Source/printf-stdarg.c ****                     // zeros, then place the minus sign before the padding.
+ 935:../Source/printf-stdarg.c ****                     //
+ 936:../Source/printf-stdarg.c ****                     if(ulNeg && (ulSize != 0) && (cFill == '0'))
+ 937:../Source/printf-stdarg.c ****                     {
+ 938:../Source/printf-stdarg.c ****                         //
+ 939:../Source/printf-stdarg.c ****                         // Place the minus sign in the output buffer.
+ 940:../Source/printf-stdarg.c ****                         //
+ 941:../Source/printf-stdarg.c ****                         *pcBuf++ = '-';
+ 942:../Source/printf-stdarg.c ****                         ulSize--;
+ 943:../Source/printf-stdarg.c **** 
+ 944:../Source/printf-stdarg.c ****                         //
+ 945:../Source/printf-stdarg.c ****                         // Update the conversion count.
+ 946:../Source/printf-stdarg.c ****                         //
+ 947:../Source/printf-stdarg.c ****                         iConvertCount++;
+ 948:../Source/printf-stdarg.c **** 
+ 949:../Source/printf-stdarg.c ****                         //
+ 950:../Source/printf-stdarg.c ****                         // The minus sign has been placed, so turn off the
+ 951:../Source/printf-stdarg.c ****                         // negative flag.
+ 952:../Source/printf-stdarg.c ****                         //
+ 953:../Source/printf-stdarg.c ****                         ulNeg = 0;
+ 954:../Source/printf-stdarg.c ****                     }
+ 955:../Source/printf-stdarg.c **** 
+ 956:../Source/printf-stdarg.c ****                     //
+ 957:../Source/printf-stdarg.c ****                     // See if there are more characters in the specified field
+ 958:../Source/printf-stdarg.c ****                     // width than there are in the conversion of this value.
+ 959:../Source/printf-stdarg.c ****                     //
+ 960:../Source/printf-stdarg.c ****                     if((ulCount > 1) && (ulCount < 65536))
+ 961:../Source/printf-stdarg.c ****                     {
+ 962:../Source/printf-stdarg.c ****                         //
+ 963:../Source/printf-stdarg.c ****                         // Loop through the required padding characters.
+ 964:../Source/printf-stdarg.c ****                         //
+ 965:../Source/printf-stdarg.c ****                         for(ulCount--; ulCount; ulCount--)
+ 966:../Source/printf-stdarg.c ****                         {
+ 967:../Source/printf-stdarg.c ****                             //
+ 968:../Source/printf-stdarg.c ****                             // Copy the character to the output buffer if there
+ 969:../Source/printf-stdarg.c ****                             // is room.
+ 970:../Source/printf-stdarg.c ****                             //
+ 971:../Source/printf-stdarg.c ****                             if(ulSize != 0)
+ 972:../Source/printf-stdarg.c ****                             {
+ 973:../Source/printf-stdarg.c ****                                 *pcBuf++ = cFill;
+ 974:../Source/printf-stdarg.c ****                                 ulSize--;
+ 975:../Source/printf-stdarg.c ****                             }
+ 976:../Source/printf-stdarg.c **** 
+ 977:../Source/printf-stdarg.c ****                             //
+ 978:../Source/printf-stdarg.c ****                             // Update the conversion count.
+ 979:../Source/printf-stdarg.c ****                             //
+ 980:../Source/printf-stdarg.c ****                             iConvertCount++;
+ 981:../Source/printf-stdarg.c ****                         }
+ 982:../Source/printf-stdarg.c ****                     }
+ 983:../Source/printf-stdarg.c **** 
+ 984:../Source/printf-stdarg.c ****                     //
+ 985:../Source/printf-stdarg.c ****                     // If the value is negative, then place the minus sign
+ 986:../Source/printf-stdarg.c ****                     // before the number.
+ 987:../Source/printf-stdarg.c ****                     //
+ 988:../Source/printf-stdarg.c ****                     if(ulNeg && (ulSize != 0))
+ 989:../Source/printf-stdarg.c ****                     {
+ 990:../Source/printf-stdarg.c ****                         //
+ 991:../Source/printf-stdarg.c ****                         // Place the minus sign in the output buffer.
+ 992:../Source/printf-stdarg.c ****                         //
+ 993:../Source/printf-stdarg.c ****                         *pcBuf++ = '-';
+ 994:../Source/printf-stdarg.c ****                         ulSize--;
+ 995:../Source/printf-stdarg.c **** 
+ 996:../Source/printf-stdarg.c ****                         //
+ 997:../Source/printf-stdarg.c ****                         // Update the conversion count.
+ 998:../Source/printf-stdarg.c ****                         //
+ 999:../Source/printf-stdarg.c ****                         iConvertCount++;
+1000:../Source/printf-stdarg.c ****                     }
+1001:../Source/printf-stdarg.c **** 
+1002:../Source/printf-stdarg.c ****                     //
+1003:../Source/printf-stdarg.c ****                     // Convert the value into a string.
+1004:../Source/printf-stdarg.c ****                     //
+1005:../Source/printf-stdarg.c ****                     for(; ulIdx; ulIdx /= ulBase)
+ 661              		.loc 1 1005 0
+ 662 0012 0027     		mov	r7, #0
+ 663 0014 2EE1     		b	.L113
+ 664              	.LVL87:
+ 665              	.L58:
+ 605:../Source/printf-stdarg.c ****             ulIdx++)
+ 666              		.loc 1 605 0
+ 667 0016 0098     		ldr	r0, [sp]
+ 668 0018 0130     		add	r0, r0, #1
+ 669 001a 0090     		str	r0, [sp]
+ 670              	.LVL88:
+ 671              	.L103:
+ 604:../Source/printf-stdarg.c ****         for(ulIdx = 0; (pcString[ulIdx] != '%') && (pcString[ulIdx] != '\0');
+ 672              		.loc 1 604 0 discriminator 1
+ 673 001c 1A78     		ldrb	r2, [r3]
+ 674 001e 0193     		str	r3, [sp, #4]
+ 675 0020 0133     		add	r3, r3, #1
+ 676 0022 002A     		cmp	r2, #0
+ 677 0024 01D0     		beq	.L108
+ 678 0026 252A     		cmp	r2, #37
+ 679 0028 F5D1     		bne	.L58
+ 680              	.L108:
+ 614:../Source/printf-stdarg.c ****         if(ulIdx > ulSize)
+ 681              		.loc 1 614 0
+ 682 002a 0099     		ldr	r1, [sp]
+ 616:../Source/printf-stdarg.c ****             ustrncpy(pcBuf, pcString, ulSize);
+ 683              		.loc 1 616 0
+ 684 002c 301C     		mov	r0, r6
+ 614:../Source/printf-stdarg.c ****         if(ulIdx > ulSize)
+ 685              		.loc 1 614 0
+ 686 002e A942     		cmp	r1, r5
+ 687 0030 06D9     		bls	.L60
+ 688              	.LVL89:
+ 616:../Source/printf-stdarg.c ****             ustrncpy(pcBuf, pcString, ulSize);
+ 689              		.loc 1 616 0
+ 690 0032 2A1C     		mov	r2, r5
+ 691 0034 0299     		ldr	r1, [sp, #8]
+ 617:../Source/printf-stdarg.c ****             pcBuf += ulSize;
+ 692              		.loc 1 617 0
+ 693 0036 7619     		add	r6, r6, r5
+ 616:../Source/printf-stdarg.c ****             ustrncpy(pcBuf, pcString, ulSize);
+ 694              		.loc 1 616 0
+ 695 0038 FFF7FEFF 		bl	ustrncpy
+ 696              	.LVL90:
+ 618:../Source/printf-stdarg.c ****             ulSize = 0;
+ 697              		.loc 1 618 0
+ 698 003c 0025     		mov	r5, #0
+ 699 003e 06E0     		b	.L61
+ 700              	.LVL91:
+ 701              	.L60:
+ 622:../Source/printf-stdarg.c ****             ustrncpy(pcBuf, pcString, ulIdx);
+ 702              		.loc 1 622 0
+ 703 0040 009A     		ldr	r2, [sp]
+ 704 0042 0299     		ldr	r1, [sp, #8]
+ 705 0044 FFF7FEFF 		bl	ustrncpy
+ 706              	.LVL92:
+ 623:../Source/printf-stdarg.c ****             pcBuf += ulIdx;
+ 707              		.loc 1 623 0
+ 708 0048 009A     		ldr	r2, [sp]
+ 709 004a B618     		add	r6, r6, r2
+ 710              	.LVL93:
+ 624:../Source/printf-stdarg.c ****             ulSize -= ulIdx;
+ 711              		.loc 1 624 0
+ 712 004c AD1A     		sub	r5, r5, r2
+ 713              	.L61:
+ 632:../Source/printf-stdarg.c ****         iConvertCount += ulIdx;
+ 714              		.loc 1 632 0
+ 715 004e 0098     		ldr	r0, [sp]
+ 716 0050 C719     		add	r7, r0, r7
+ 717              	.LVL94:
+ 642:../Source/printf-stdarg.c ****         if(*pcString == '%')
+ 718              		.loc 1 642 0
+ 719 0052 0198     		ldr	r0, [sp, #4]
+ 720 0054 0378     		ldrb	r3, [r0]
+ 721 0056 0290     		str	r0, [sp, #8]
+ 722 0058 252B     		cmp	r3, #37
+ 723 005a 00D0     		beq	.LCB708
+ 724 005c 0AE1     		b	.L113	@long jump
+ 725              	.LCB708:
+ 647:../Source/printf-stdarg.c ****             pcString++;
+ 726              		.loc 1 647 0
+ 727 005e 0130     		add	r0, r0, #1
+ 654:../Source/printf-stdarg.c ****             cFill = ' ';
+ 728              		.loc 1 654 0
+ 729 0060 2021     		mov	r1, #32
+ 642:../Source/printf-stdarg.c ****         if(*pcString == '%')
+ 730              		.loc 1 642 0
+ 731 0062 2A1C     		mov	r2, r5
+ 647:../Source/printf-stdarg.c ****             pcString++;
+ 732              		.loc 1 647 0
+ 733 0064 0290     		str	r0, [sp, #8]
+ 734              	.LVL95:
+ 654:../Source/printf-stdarg.c ****             cFill = ' ';
+ 735              		.loc 1 654 0
+ 736 0066 0691     		str	r1, [sp, #24]
+ 653:../Source/printf-stdarg.c ****             ulCount = 0;
+ 737              		.loc 1 653 0
+ 738 0068 0023     		mov	r3, #0
+ 739              	.LVL96:
+ 740              	.L117:
+ 741              	.L63:
+ 666:../Source/printf-stdarg.c ****             switch(*pcString++)
+ 742              		.loc 1 666 0
+ 743 006a 0298     		ldr	r0, [sp, #8]
+ 653:../Source/printf-stdarg.c ****             ulCount = 0;
+ 744              		.loc 1 653 0
+ 745 006c 0093     		str	r3, [sp]
+ 666:../Source/printf-stdarg.c ****             switch(*pcString++)
+ 746              		.loc 1 666 0
+ 747 006e 0378     		ldrb	r3, [r0]
+ 748 0070 0130     		add	r0, r0, #1
+ 749 0072 0290     		str	r0, [sp, #8]
+ 750              	.LVL97:
+ 751 0074 642B     		cmp	r3, #100
+ 752 0076 34D0     		beq	.L69
+ 753 0078 0DD8     		bhi	.L72
+ 754 007a 392B     		cmp	r3, #57
+ 755 007c 05D8     		bhi	.L73
+ 756 007e 302B     		cmp	r3, #48
+ 757 0080 18D2     		bcs	.L66
+ 758 0082 252B     		cmp	r3, #37
+ 759 0084 00D0     		beq	.LCB742
+ 760 0086 E5E0     		b	.L64	@long jump
+ 761              	.LCB742:
+ 762 0088 DCE0     		b	.L119
+ 763              	.L73:
+ 764 008a 582B     		cmp	r3, #88
+ 765 008c 6FD0     		beq	.L67
+ 766 008e 632B     		cmp	r3, #99
+ 767 0090 00D0     		beq	.LCB750
+ 768 0092 DFE0     		b	.L64	@long jump
+ 769              	.LCB750:
+ 770 0094 1BE0     		b	.L120
+ 771              	.L72:
+ 772 0096 732B     		cmp	r3, #115
+ 773 0098 30D0     		beq	.L70
+ 774 009a 05D8     		bhi	.L74
+ 775 009c 692B     		cmp	r3, #105
+ 776 009e 20D0     		beq	.L69
+ 777 00a0 702B     		cmp	r3, #112
+ 778 00a2 00D0     		beq	.LCB762
+ 779 00a4 D6E0     		b	.L64	@long jump
+ 780              	.LCB762:
+ 781 00a6 62E0     		b	.L67
+ 782              	.L74:
+ 783 00a8 752B     		cmp	r3, #117
+ 784 00aa 57D0     		beq	.L71
+ 785 00ac 782B     		cmp	r3, #120
+ 786 00ae 00D0     		beq	.LCB770
+ 787 00b0 D0E0     		b	.L64	@long jump
+ 788              	.LCB770:
+ 789 00b2 5CE0     		b	.L67
+ 790              	.L66:
+ 686:../Source/printf-stdarg.c ****                     if((pcString[-1] == '0') && (ulCount == 0))
+ 791              		.loc 1 686 0
+ 792 00b4 302B     		cmp	r3, #48
+ 793 00b6 04D1     		bne	.L75
+ 794 00b8 0099     		ldr	r1, [sp]
+ 795 00ba 0029     		cmp	r1, #0
+ 796 00bc 01D1     		bne	.L75
+ 688:../Source/printf-stdarg.c ****                         cFill = '0';
+ 797              		.loc 1 688 0
+ 798 00be 3020     		mov	r0, #48
+ 799              	.LVL98:
+ 800 00c0 0690     		str	r0, [sp, #24]
+ 801              	.L75:
+ 802              	.LVL99:
+ 694:../Source/printf-stdarg.c ****                     ulCount *= 10;
+ 803              		.loc 1 694 0
+ 804 00c2 0098     		ldr	r0, [sp]
+ 805 00c4 0A21     		mov	r1, #10
+ 806 00c6 4143     		mul	r1, r0
+ 695:../Source/printf-stdarg.c ****                     ulCount += pcString[-1] - '0';
+ 807              		.loc 1 695 0
+ 808 00c8 3039     		sub	r1, r1, #48
+ 809 00ca CB18     		add	r3, r1, r3
+ 810 00cc CDE7     		b	.L117
+ 811              	.LVL100:
+ 812              	.L120:
+ 711:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 813              		.loc 1 711 0
+ 814 00ce 231D     		add	r3, r4, #4
+ 815              	.LVL101:
+ 816 00d0 2168     		ldr	r1, [r4]
+ 817              	.LVL102:
+ 717:../Source/printf-stdarg.c ****                     if(ulSize != 0)
+ 818              		.loc 1 717 0
+ 819 00d2 002D     		cmp	r5, #0
+ 820 00d4 02D0     		beq	.L76
+ 719:../Source/printf-stdarg.c ****                         *pcBuf++ = (char)ulValue;
+ 821              		.loc 1 719 0
+ 822 00d6 3170     		strb	r1, [r6]
+ 720:../Source/printf-stdarg.c ****                         ulSize--;
+ 823              		.loc 1 720 0
+ 824 00d8 6A1E     		sub	r2, r5, #1
+ 719:../Source/printf-stdarg.c ****                         *pcBuf++ = (char)ulValue;
+ 825              		.loc 1 719 0
+ 826 00da 0136     		add	r6, r6, #1
+ 827              	.LVL103:
+ 828              	.L76:
+ 726:../Source/printf-stdarg.c ****                     iConvertCount++;
+ 829              		.loc 1 726 0
+ 830 00dc 0137     		add	r7, r7, #1
+ 831              	.LVL104:
+ 711:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 832              		.loc 1 711 0
+ 833 00de 1C1C     		mov	r4, r3
+ 834              	.LVL105:
+ 835 00e0 B6E0     		b	.L118
+ 836              	.LVL106:
+ 837              	.L69:
+ 743:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 838              		.loc 1 743 0
+ 839 00e2 221D     		add	r2, r4, #4
+ 840 00e4 2468     		ldr	r4, [r4]
+ 841 00e6 0792     		str	r2, [sp, #28]
+ 842              	.LVL107:
+ 843 00e8 0394     		str	r4, [sp, #12]
+ 844              	.LVL108:
+ 749:../Source/printf-stdarg.c ****                     if((long)ulValue < 0)
+ 845              		.loc 1 749 0
+ 846 00ea 002C     		cmp	r4, #0
+ 847 00ec 48DA     		bge	.L105
+ 754:../Source/printf-stdarg.c ****                         ulValue = -(long)ulValue;
+ 848              		.loc 1 754 0
+ 849 00ee 6142     		neg	r1, r4
+ 759:../Source/printf-stdarg.c ****                         ulNeg = 1;
+ 850              		.loc 1 759 0
+ 851 00f0 0123     		mov	r3, #1
+ 773:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 852              		.loc 1 773 0
+ 853 00f2 0A24     		mov	r4, #10
+ 754:../Source/printf-stdarg.c ****                         ulValue = -(long)ulValue;
+ 854              		.loc 1 754 0
+ 855 00f4 0391     		str	r1, [sp, #12]
+ 856              	.LVL109:
+ 759:../Source/printf-stdarg.c ****                         ulNeg = 1;
+ 857              		.loc 1 759 0
+ 858 00f6 0193     		str	r3, [sp, #4]
+ 773:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 859              		.loc 1 773 0
+ 860 00f8 0494     		str	r4, [sp, #16]
+ 861 00fa 45E0     		b	.L78
+ 862              	.LVL110:
+ 863              	.L70:
+ 789:../Source/printf-stdarg.c ****                     pcStr = va_arg(vaArgP, char *);
+ 864              		.loc 1 789 0
+ 865 00fc 221D     		add	r2, r4, #4
+ 866 00fe 2168     		ldr	r1, [r4]
+ 867 0100 0192     		str	r2, [sp, #4]
+ 868              	.LVL111:
+ 794:../Source/printf-stdarg.c ****                     for(ulIdx = 0; pcStr[ulIdx] != '\0'; ulIdx++)
+ 869              		.loc 1 794 0
+ 870 0102 0024     		mov	r4, #0
+ 871              	.LVL112:
+ 872 0104 00E0     		b	.L79
+ 873              	.LVL113:
+ 874              	.L80:
+ 794:../Source/printf-stdarg.c ****                     for(ulIdx = 0; pcStr[ulIdx] != '\0'; ulIdx++)
+ 875              		.loc 1 794 0 is_stmt 0 discriminator 2
+ 876 0106 0134     		add	r4, r4, #1
+ 877              	.LVL114:
+ 878              	.L79:
+ 794:../Source/printf-stdarg.c ****                     for(ulIdx = 0; pcStr[ulIdx] != '\0'; ulIdx++)
+ 879              		.loc 1 794 0 discriminator 1
+ 880 0108 0B5D     		ldrb	r3, [r1, r4]
+ 881 010a 002B     		cmp	r3, #0
+ 882 010c FBD1     		bne	.L80
+ 803:../Source/printf-stdarg.c ****                     if(ulCount > ulIdx)
+ 883              		.loc 1 803 0 is_stmt 1
+ 884 010e 009A     		ldr	r2, [sp]
+ 885              	.LVL115:
+ 886 0110 A242     		cmp	r2, r4
+ 887 0112 01D9     		bls	.L81
+ 805:../Source/printf-stdarg.c ****                         iConvertCount += (ulCount - ulIdx);
+ 888              		.loc 1 805 0
+ 889 0114 D719     		add	r7, r2, r7
+ 890              	.LVL116:
+ 891 0116 3F1B     		sub	r7, r7, r4
+ 892              	.LVL117:
+ 893              	.L81:
+ 815:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, pcStr, ulSize);
+ 894              		.loc 1 815 0
+ 895 0118 301C     		mov	r0, r6
+ 813:../Source/printf-stdarg.c ****                     if(ulIdx > ulSize)
+ 896              		.loc 1 813 0
+ 897 011a AC42     		cmp	r4, r5
+ 898 011c 05D9     		bls	.L82
+ 815:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, pcStr, ulSize);
+ 899              		.loc 1 815 0
+ 900 011e 2A1C     		mov	r2, r5
+ 816:../Source/printf-stdarg.c ****                         pcBuf += ulSize;
+ 901              		.loc 1 816 0
+ 902 0120 7619     		add	r6, r6, r5
+ 903              	.LVL118:
+ 815:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, pcStr, ulSize);
+ 904              		.loc 1 815 0
+ 905 0122 FFF7FEFF 		bl	ustrncpy
+ 906              	.LVL119:
+ 817:../Source/printf-stdarg.c ****                         ulSize = 0;
+ 907              		.loc 1 817 0
+ 908 0126 0025     		mov	r5, #0
+ 909 0128 15E0     		b	.L83
+ 910              	.LVL120:
+ 911              	.L82:
+ 821:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, pcStr, ulIdx);
+ 912              		.loc 1 821 0
+ 913 012a 221C     		mov	r2, r4
+ 914 012c FFF7FEFF 		bl	ustrncpy
+ 915              	.LVL121:
+ 829:../Source/printf-stdarg.c ****                         if(ulCount > ulIdx)
+ 916              		.loc 1 829 0
+ 917 0130 009B     		ldr	r3, [sp]
+ 822:../Source/printf-stdarg.c ****                         pcBuf += ulIdx;
+ 918              		.loc 1 822 0
+ 919 0132 3619     		add	r6, r6, r4
+ 920              	.LVL122:
+ 823:../Source/printf-stdarg.c ****                         ulSize -= ulIdx;
+ 921              		.loc 1 823 0
+ 922 0134 2D1B     		sub	r5, r5, r4
+ 829:../Source/printf-stdarg.c ****                         if(ulCount > ulIdx)
+ 923              		.loc 1 829 0
+ 924 0136 A342     		cmp	r3, r4
+ 925 0138 0DD9     		bls	.L83
+ 831:../Source/printf-stdarg.c ****                             ulCount -= ulIdx;
+ 926              		.loc 1 831 0
+ 927 013a 1B1B     		sub	r3, r3, r4
+ 928              	.LVL123:
+ 929 013c AB42     		cmp	r3, r5
+ 930 013e 00D9     		bls	.L84
+ 931 0140 2B1C     		mov	r3, r5
+ 932              	.L84:
+ 933              	.LVL124:
+ 836:../Source/printf-stdarg.c ****                             ulSize =- ulCount;
+ 934              		.loc 1 836 0
+ 935 0142 5D42     		neg	r5, r3
+ 838:../Source/printf-stdarg.c ****                             while(ulCount--)
+ 936              		.loc 1 838 0
+ 937 0144 191C     		mov	r1, r3
+ 822:../Source/printf-stdarg.c ****                         pcBuf += ulIdx;
+ 938              		.loc 1 822 0
+ 939 0146 321C     		mov	r2, r6
+ 838:../Source/printf-stdarg.c ****                             while(ulCount--)
+ 940              		.loc 1 838 0
+ 941 0148 02E0     		b	.L85
+ 942              	.LVL125:
+ 943              	.L86:
+ 840:../Source/printf-stdarg.c ****                                 *pcBuf++ = ' ';
+ 944              		.loc 1 840 0
+ 945 014a 2020     		mov	r0, #32
+ 946 014c 1070     		strb	r0, [r2]
+ 947 014e 0132     		add	r2, r2, #1
+ 948              	.LVL126:
+ 949              	.L85:
+ 838:../Source/printf-stdarg.c ****                             while(ulCount--)
+ 950              		.loc 1 838 0 discriminator 1
+ 951 0150 0139     		sub	r1, r1, #1
+ 952 0152 FAD2     		bcs	.L86
+ 953              	.LVL127:
+ 838:../Source/printf-stdarg.c ****                             while(ulCount--)
+ 954              		.loc 1 838 0 is_stmt 0
+ 955 0154 F618     		add	r6, r6, r3
+ 956              	.LVL128:
+ 957              	.L83:
+ 850:../Source/printf-stdarg.c ****                     iConvertCount += ulIdx;
+ 958              		.loc 1 850 0 is_stmt 1
+ 959 0156 3F19     		add	r7, r7, r4
+ 960              	.LVL129:
+ 789:../Source/printf-stdarg.c ****                     pcStr = va_arg(vaArgP, char *);
+ 961              		.loc 1 789 0
+ 962 0158 019C     		ldr	r4, [sp, #4]
+ 963              	.LVL130:
+ 855:../Source/printf-stdarg.c ****                     break;
+ 964              		.loc 1 855 0
+ 965 015a 8BE0     		b	.L113
+ 966              	.LVL131:
+ 967              	.L71:
+ 866:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 968              		.loc 1 866 0
+ 969 015c 2268     		ldr	r2, [r4]
+ 970 015e 231D     		add	r3, r4, #4
+ 877:../Source/printf-stdarg.c ****                     ulNeg = 0;
+ 971              		.loc 1 877 0
+ 972 0160 0021     		mov	r1, #0
+ 871:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 973              		.loc 1 871 0
+ 974 0162 0A24     		mov	r4, #10
+ 866:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 975              		.loc 1 866 0
+ 976 0164 0793     		str	r3, [sp, #28]
+ 977              	.LVL132:
+ 978 0166 0392     		str	r2, [sp, #12]
+ 979              	.LVL133:
+ 877:../Source/printf-stdarg.c ****                     ulNeg = 0;
+ 980              		.loc 1 877 0
+ 981 0168 0191     		str	r1, [sp, #4]
+ 871:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 982              		.loc 1 871 0
+ 983 016a 0494     		str	r4, [sp, #16]
+ 882:../Source/printf-stdarg.c ****                     goto convert;
+ 984              		.loc 1 882 0
+ 985 016c 0CE0     		b	.L78
+ 986              	.LVL134:
+ 987              	.L67:
+ 898:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 988              		.loc 1 898 0
+ 989 016e 2168     		ldr	r1, [r4]
+ 990 0170 221D     		add	r2, r4, #4
+ 903:../Source/printf-stdarg.c ****                     ulBase = 16;
+ 991              		.loc 1 903 0
+ 992 0172 1020     		mov	r0, #16
+ 909:../Source/printf-stdarg.c ****                     ulNeg = 0;
+ 993              		.loc 1 909 0
+ 994 0174 0024     		mov	r4, #0
+ 898:../Source/printf-stdarg.c ****                     ulValue = va_arg(vaArgP, unsigned long);
+ 995              		.loc 1 898 0
+ 996 0176 0792     		str	r2, [sp, #28]
+ 997              	.LVL135:
+ 998 0178 0391     		str	r1, [sp, #12]
+ 999              	.LVL136:
+ 909:../Source/printf-stdarg.c ****                     ulNeg = 0;
+ 1000              		.loc 1 909 0
+ 1001 017a 0194     		str	r4, [sp, #4]
+ 903:../Source/printf-stdarg.c ****                     ulBase = 16;
+ 1002              		.loc 1 903 0
+ 1003 017c 0490     		str	r0, [sp, #16]
+ 1004 017e 03E0     		b	.L78
+ 1005              	.LVL137:
+ 1006              	.L105:
+ 767:../Source/printf-stdarg.c ****                         ulNeg = 0;
+ 1007              		.loc 1 767 0
+ 1008 0180 0020     		mov	r0, #0
+ 773:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 1009              		.loc 1 773 0
+ 1010 0182 0A23     		mov	r3, #10
+ 767:../Source/printf-stdarg.c ****                         ulNeg = 0;
+ 1011              		.loc 1 767 0
+ 1012 0184 0190     		str	r0, [sp, #4]
+ 773:../Source/printf-stdarg.c ****                     ulBase = 10;
+ 1013              		.loc 1 773 0
+ 1014 0186 0493     		str	r3, [sp, #16]
+ 1015              	.LVL138:
+ 1016              	.L78:
+ 916:../Source/printf-stdarg.c ****                     for(ulIdx = 1;
+ 1017              		.loc 1 916 0
+ 1018 0188 0124     		mov	r4, #1
+ 1019 018a 0594     		str	r4, [sp, #20]
+ 1020 018c 03E0     		b	.L87
+ 1021              	.LVL139:
+ 1022              	.L89:
+ 919:../Source/printf-stdarg.c ****                         ulIdx *= ulBase, ulCount--)
+ 1023              		.loc 1 919 0
+ 1024 018e 0099     		ldr	r1, [sp]
+ 1025 0190 0594     		str	r4, [sp, #20]
+ 1026 0192 0139     		sub	r1, r1, #1
+ 1027 0194 0091     		str	r1, [sp]
+ 1028              	.LVL140:
+ 1029              	.L87:
+ 917:../Source/printf-stdarg.c ****                         (((ulIdx * ulBase) <= ulValue) &&
+ 1030              		.loc 1 917 0 discriminator 1
+ 1031 0196 049C     		ldr	r4, [sp, #16]
+ 1032 0198 059B     		ldr	r3, [sp, #20]
+ 916:../Source/printf-stdarg.c ****                     for(ulIdx = 1;
+ 1033              		.loc 1 916 0 discriminator 1
+ 1034 019a 039A     		ldr	r2, [sp, #12]
+ 917:../Source/printf-stdarg.c ****                         (((ulIdx * ulBase) <= ulValue) &&
+ 1035              		.loc 1 917 0 discriminator 1
+ 1036 019c 5C43     		mul	r4, r3
+ 916:../Source/printf-stdarg.c ****                     for(ulIdx = 1;
+ 1037              		.loc 1 916 0 discriminator 1
+ 1038 019e 9442     		cmp	r4, r2
+ 1039 01a0 06D8     		bhi	.L88
+ 918:../Source/printf-stdarg.c ****                          (((ulIdx * ulBase) / ulBase) == ulIdx));
+ 1040              		.loc 1 918 0
+ 1041 01a2 0499     		ldr	r1, [sp, #16]
+ 1042 01a4 201C     		mov	r0, r4
+ 1043 01a6 FFF7FEFF 		bl	__aeabi_uidiv
+ 917:../Source/printf-stdarg.c ****                         (((ulIdx * ulBase) <= ulValue) &&
+ 1044              		.loc 1 917 0
+ 1045 01aa 0599     		ldr	r1, [sp, #20]
+ 1046 01ac 8842     		cmp	r0, r1
+ 1047 01ae EED0     		beq	.L89
+ 1048              	.L88:
+ 929:../Source/printf-stdarg.c ****                         ulCount--;
+ 1049              		.loc 1 929 0
+ 1050 01b0 009C     		ldr	r4, [sp]
+ 1051 01b2 0198     		ldr	r0, [sp, #4]
+ 1052 01b4 231A     		sub	r3, r4, r0
+ 936:../Source/printf-stdarg.c ****                     if(ulNeg && (ulSize != 0) && (cFill == '0'))
+ 1053              		.loc 1 936 0
+ 1054 01b6 0028     		cmp	r0, #0
+ 1055 01b8 0DD0     		beq	.L91
+ 1056 01ba 002D     		cmp	r5, #0
+ 1057 01bc 0BD0     		beq	.L91
+ 936:../Source/printf-stdarg.c ****                     if(ulNeg && (ulSize != 0) && (cFill == '0'))
+ 1058              		.loc 1 936 0 is_stmt 0 discriminator 1
+ 1059 01be 069A     		ldr	r2, [sp, #24]
+ 1060 01c0 0121     		mov	r1, #1
+ 1061 01c2 0191     		str	r1, [sp, #4]
+ 1062 01c4 302A     		cmp	r2, #48
+ 1063 01c6 06D1     		bne	.L91
+ 941:../Source/printf-stdarg.c ****                         *pcBuf++ = '-';
+ 1064              		.loc 1 941 0 is_stmt 1
+ 1065 01c8 2D20     		mov	r0, #45
+ 1066 01ca 3070     		strb	r0, [r6]
+ 947:../Source/printf-stdarg.c ****                         iConvertCount++;
+ 1067              		.loc 1 947 0
+ 1068 01cc 7F18     		add	r7, r7, r1
+ 1069              	.LVL141:
+ 941:../Source/printf-stdarg.c ****                         *pcBuf++ = '-';
+ 1070              		.loc 1 941 0
+ 1071 01ce 7618     		add	r6, r6, r1
+ 1072              	.LVL142:
+ 953:../Source/printf-stdarg.c ****                         ulNeg = 0;
+ 1073              		.loc 1 953 0
+ 1074 01d0 0021     		mov	r1, #0
+ 942:../Source/printf-stdarg.c ****                         ulSize--;
+ 1075              		.loc 1 942 0
+ 1076 01d2 013D     		sub	r5, r5, #1
+ 1077              	.LVL143:
+ 953:../Source/printf-stdarg.c ****                         ulNeg = 0;
+ 1078              		.loc 1 953 0
+ 1079 01d4 0191     		str	r1, [sp, #4]
+ 1080              	.LVL144:
+ 1081              	.L91:
+ 960:../Source/printf-stdarg.c ****                     if((ulCount > 1) && (ulCount < 65536))
+ 1082              		.loc 1 960 0
+ 1083 01d6 2D4C     		ldr	r4, .L121
+ 1084 01d8 991E     		sub	r1, r3, #2
+ 1085 01da A142     		cmp	r1, r4
+ 1086 01dc 0DD8     		bhi	.L92
+ 965:../Source/printf-stdarg.c ****                         for(ulCount--; ulCount; ulCount--)
+ 1087              		.loc 1 965 0
+ 1088 01de 013B     		sub	r3, r3, #1
+ 1089              	.LVL145:
+ 1090              	.L94:
+ 971:../Source/printf-stdarg.c ****                             if(ulSize != 0)
+ 1091              		.loc 1 971 0
+ 1092 01e0 002D     		cmp	r5, #0
+ 1093 01e2 05D0     		beq	.L93
+ 973:../Source/printf-stdarg.c ****                                 *pcBuf++ = cFill;
+ 1094              		.loc 1 973 0
+ 1095 01e4 6C46     		mov	r4, sp
+ 1096 01e6 1820     		mov	r0, #24
+ 1097 01e8 025D     		ldrb	r2, [r0, r4]
+ 974:../Source/printf-stdarg.c ****                                 ulSize--;
+ 1098              		.loc 1 974 0
+ 1099 01ea 013D     		sub	r5, r5, #1
+ 973:../Source/printf-stdarg.c ****                                 *pcBuf++ = cFill;
+ 1100              		.loc 1 973 0
+ 1101 01ec 3270     		strb	r2, [r6]
+ 1102 01ee 0136     		add	r6, r6, #1
+ 1103              	.LVL146:
+ 1104              	.L93:
+ 965:../Source/printf-stdarg.c ****                         for(ulCount--; ulCount; ulCount--)
+ 1105              		.loc 1 965 0
+ 1106 01f0 013B     		sub	r3, r3, #1
+ 1107              	.LVL147:
+ 1108 01f2 002B     		cmp	r3, #0
+ 1109 01f4 F4D1     		bne	.L94
+ 569:../Source/printf-stdarg.c **** uvsnprintf(char *pcBuf, unsigned long ulSize, const char *pcString,
+ 1110              		.loc 1 569 0
+ 1111 01f6 0137     		add	r7, r7, #1
+ 1112 01f8 7F18     		add	r7, r7, r1
+ 1113              	.LVL148:
+ 1114              	.L92:
+ 988:../Source/printf-stdarg.c ****                     if(ulNeg && (ulSize != 0))
+ 1115              		.loc 1 988 0
+ 1116 01fa 002D     		cmp	r5, #0
+ 1117 01fc 1DD0     		beq	.L116
+ 1118 01fe 019B     		ldr	r3, [sp, #4]
+ 1119 0200 002B     		cmp	r3, #0
+ 1120 0202 1AD0     		beq	.L116
+ 993:../Source/printf-stdarg.c ****                         *pcBuf++ = '-';
+ 1121              		.loc 1 993 0
+ 1122 0204 2D21     		mov	r1, #45
+ 1123 0206 3170     		strb	r1, [r6]
+ 994:../Source/printf-stdarg.c ****                         ulSize--;
+ 1124              		.loc 1 994 0
+ 1125 0208 013D     		sub	r5, r5, #1
+ 993:../Source/printf-stdarg.c ****                         *pcBuf++ = '-';
+ 1126              		.loc 1 993 0
+ 1127 020a 0136     		add	r6, r6, #1
+ 1128              	.LVL149:
+ 999:../Source/printf-stdarg.c ****                         iConvertCount++;
+ 1129              		.loc 1 999 0
+ 1130 020c 0137     		add	r7, r7, #1
+ 1131              	.LVL150:
+ 1132 020e 14E0     		b	.L116
+ 1133              	.LVL151:
+ 1134              	.L98:
+1006:../Source/printf-stdarg.c ****                     {
+1007:../Source/printf-stdarg.c ****                         //
+1008:../Source/printf-stdarg.c ****                         // Copy the character to the output buffer if there is
+1009:../Source/printf-stdarg.c ****                         // room.
+1010:../Source/printf-stdarg.c ****                         //
+1011:../Source/printf-stdarg.c ****                         if(ulSize != 0)
+ 1135              		.loc 1 1011 0
+ 1136 0210 002D     		cmp	r5, #0
+ 1137 0212 0BD0     		beq	.L97
+1012:../Source/printf-stdarg.c ****                         {
+1013:../Source/printf-stdarg.c ****                             *pcBuf++ = g_pcHex[(ulValue / ulIdx) % ulBase];
+ 1138              		.loc 1 1013 0
+ 1139 0214 211C     		mov	r1, r4
+ 1140 0216 0398     		ldr	r0, [sp, #12]
+ 1141 0218 FFF7FEFF 		bl	__aeabi_uidiv
+ 1142 021c 0499     		ldr	r1, [sp, #16]
+ 1143 021e FFF7FEFF 		bl	__aeabi_uidivmod
+ 1144 0222 1B48     		ldr	r0, .L121+4
+1014:../Source/printf-stdarg.c ****                             ulSize--;
+ 1145              		.loc 1 1014 0
+ 1146 0224 013D     		sub	r5, r5, #1
+1013:../Source/printf-stdarg.c ****                             *pcBuf++ = g_pcHex[(ulValue / ulIdx) % ulBase];
+ 1147              		.loc 1 1013 0
+ 1148 0226 425C     		ldrb	r2, [r0, r1]
+ 1149 0228 3270     		strb	r2, [r6]
+ 1150 022a 0136     		add	r6, r6, #1
+ 1151              	.LVL152:
+ 1152              	.L97:
+1005:../Source/printf-stdarg.c ****                     for(; ulIdx; ulIdx /= ulBase)
+ 1153              		.loc 1 1005 0
+ 1154 022c 201C     		mov	r0, r4
+ 1155 022e 0499     		ldr	r1, [sp, #16]
+ 1156 0230 FFF7FEFF 		bl	__aeabi_uidiv
+1015:../Source/printf-stdarg.c ****                         }
+1016:../Source/printf-stdarg.c **** 
+1017:../Source/printf-stdarg.c ****                         //
+1018:../Source/printf-stdarg.c ****                         // Update the conversion count.
+1019:../Source/printf-stdarg.c ****                         //
+1020:../Source/printf-stdarg.c ****                         iConvertCount++;
+ 1157              		.loc 1 1020 0
+ 1158 0234 0137     		add	r7, r7, #1
+ 1159              	.LVL153:
+1005:../Source/printf-stdarg.c ****                     for(; ulIdx; ulIdx /= ulBase)
+ 1160              		.loc 1 1005 0
+ 1161 0236 041C     		mov	r4, r0
+ 1162              	.LVL154:
+ 1163 0238 00E0     		b	.L112
+ 1164              	.LVL155:
+ 1165              	.L116:
+ 1166 023a 059C     		ldr	r4, [sp, #20]
+ 1167              	.LVL156:
+ 1168              	.L112:
+1005:../Source/printf-stdarg.c ****                     for(; ulIdx; ulIdx /= ulBase)
+ 1169              		.loc 1 1005 0 is_stmt 0 discriminator 1
+ 1170 023c 002C     		cmp	r4, #0
+ 1171 023e E7D1     		bne	.L98
+1005:../Source/printf-stdarg.c ****                     for(; ulIdx; ulIdx /= ulBase)
+ 1172              		.loc 1 1005 0
+ 1173 0240 079C     		ldr	r4, [sp, #28]
+ 1174              	.LVL157:
+ 1175 0242 17E0     		b	.L113
+ 1176              	.LVL158:
+ 1177              	.L119:
+1021:../Source/printf-stdarg.c ****                     }
+1022:../Source/printf-stdarg.c **** 
+1023:../Source/printf-stdarg.c ****                     //
+1024:../Source/printf-stdarg.c ****                     // This command has been handled.
+1025:../Source/printf-stdarg.c ****                     //
+1026:../Source/printf-stdarg.c ****                     break;
+1027:../Source/printf-stdarg.c ****                 }
+1028:../Source/printf-stdarg.c **** 
+1029:../Source/printf-stdarg.c ****                 //
+1030:../Source/printf-stdarg.c ****                 // Handle the %% command.
+1031:../Source/printf-stdarg.c ****                 //
+1032:../Source/printf-stdarg.c ****                 case '%':
+1033:../Source/printf-stdarg.c ****                 {
+1034:../Source/printf-stdarg.c ****                     //
+1035:../Source/printf-stdarg.c ****                     // Simply write a single %.
+1036:../Source/printf-stdarg.c ****                     //
+1037:../Source/printf-stdarg.c ****                     if(ulSize != 0)
+ 1178              		.loc 1 1037 0 is_stmt 1
+ 1179 0244 002D     		cmp	r5, #0
+ 1180 0246 02D0     		beq	.L99
+1038:../Source/printf-stdarg.c ****                     {
+1039:../Source/printf-stdarg.c ****                         *pcBuf++ = pcString[-1];
+ 1181              		.loc 1 1039 0
+ 1182 0248 3370     		strb	r3, [r6]
+1040:../Source/printf-stdarg.c ****                         ulSize--;
+ 1183              		.loc 1 1040 0
+ 1184 024a 6A1E     		sub	r2, r5, #1
+1039:../Source/printf-stdarg.c ****                         *pcBuf++ = pcString[-1];
+ 1185              		.loc 1 1039 0
+ 1186 024c 0136     		add	r6, r6, #1
+ 1187              	.LVL159:
+ 1188              	.L99:
+1041:../Source/printf-stdarg.c ****                     }
+1042:../Source/printf-stdarg.c **** 
+1043:../Source/printf-stdarg.c ****                     //
+1044:../Source/printf-stdarg.c ****                     // Update the conversion count.
+1045:../Source/printf-stdarg.c ****                     //
+1046:../Source/printf-stdarg.c ****                     iConvertCount++;
+ 1189              		.loc 1 1046 0
+ 1190 024e 0137     		add	r7, r7, #1
+ 1191              	.LVL160:
+ 1192              	.L118:
+1047:../Source/printf-stdarg.c **** 
+1048:../Source/printf-stdarg.c ****                     //
+1049:../Source/printf-stdarg.c ****                     // This command has been handled.
+1050:../Source/printf-stdarg.c ****                     //
+1051:../Source/printf-stdarg.c ****                     break;
+ 1193              		.loc 1 1051 0
+ 1194 0250 151C     		mov	r5, r2
+ 1195 0252 0FE0     		b	.L113
+ 1196              	.LVL161:
+ 1197              	.L64:
+ 1198 0254 0F49     		ldr	r1, .L121+8
+1052:../Source/printf-stdarg.c ****                 }
+1053:../Source/printf-stdarg.c **** 
+1054:../Source/printf-stdarg.c ****                 //
+1055:../Source/printf-stdarg.c ****                 // Handle all other commands.
+1056:../Source/printf-stdarg.c ****                 //
+1057:../Source/printf-stdarg.c ****                 default:
+1058:../Source/printf-stdarg.c ****                 {
+1059:../Source/printf-stdarg.c ****                     //
+1060:../Source/printf-stdarg.c ****                     // Indicate an error.
+1061:../Source/printf-stdarg.c ****                     //
+1062:../Source/printf-stdarg.c ****                     if(ulSize >= 5)
+1063:../Source/printf-stdarg.c ****                     {
+1064:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, "ERROR", 5);
+ 1199              		.loc 1 1064 0
+ 1200 0256 301C     		mov	r0, r6
+1062:../Source/printf-stdarg.c ****                     if(ulSize >= 5)
+ 1201              		.loc 1 1062 0
+ 1202 0258 042D     		cmp	r5, #4
+ 1203 025a 05D9     		bls	.L100
+ 1204              		.loc 1 1064 0
+ 1205 025c 0522     		mov	r2, #5
+ 1206 025e FFF7FEFF 		bl	ustrncpy
+1065:../Source/printf-stdarg.c ****                         pcBuf += 5;
+ 1207              		.loc 1 1065 0
+ 1208 0262 0536     		add	r6, r6, #5
+ 1209              	.LVL162:
+1066:../Source/printf-stdarg.c ****                         ulSize -= 5;
+ 1210              		.loc 1 1066 0
+ 1211 0264 053D     		sub	r5, r5, #5
+ 1212 0266 04E0     		b	.L101
+ 1213              	.LVL163:
+ 1214              	.L100:
+1067:../Source/printf-stdarg.c ****                     }
+1068:../Source/printf-stdarg.c ****                     else
+1069:../Source/printf-stdarg.c ****                     {
+1070:../Source/printf-stdarg.c ****                         ustrncpy(pcBuf, "ERROR", ulSize);
+ 1215              		.loc 1 1070 0
+ 1216 0268 2A1C     		mov	r2, r5
+ 1217 026a FFF7FEFF 		bl	ustrncpy
+ 1218              	.LVL164:
+1071:../Source/printf-stdarg.c ****                         pcBuf += ulSize;
+ 1219              		.loc 1 1071 0
+ 1220 026e 7619     		add	r6, r6, r5
+ 1221              	.LVL165:
+1072:../Source/printf-stdarg.c ****                         ulSize = 0;
+ 1222              		.loc 1 1072 0
+ 1223 0270 0025     		mov	r5, #0
+ 1224              	.LVL166:
+ 1225              	.L101:
+1073:../Source/printf-stdarg.c ****                     }
+1074:../Source/printf-stdarg.c **** 
+1075:../Source/printf-stdarg.c ****                     //
+1076:../Source/printf-stdarg.c ****                     // Update the conversion count.
+1077:../Source/printf-stdarg.c ****                     //
+1078:../Source/printf-stdarg.c ****                     iConvertCount += 5;
+ 1226              		.loc 1 1078 0
+ 1227 0272 0537     		add	r7, r7, #5
+ 1228              	.LVL167:
+ 1229              	.L113:
+ 599:../Source/printf-stdarg.c ****     while(*pcString)
+ 1230              		.loc 1 599 0 discriminator 1
+ 1231 0274 0298     		ldr	r0, [sp, #8]
+ 1232 0276 0378     		ldrb	r3, [r0]
+ 1233 0278 002B     		cmp	r3, #0
+ 1234 027a 03D0     		beq	.L102
+ 599:../Source/printf-stdarg.c ****     while(*pcString)
+ 1235              		.loc 1 599 0 is_stmt 0
+ 1236 027c 0021     		mov	r1, #0
+ 1237 027e 031C     		mov	r3, r0
+ 1238 0280 0091     		str	r1, [sp]
+ 1239 0282 CBE6     		b	.L103
+ 1240              	.L102:
+1079:../Source/printf-stdarg.c **** 
+1080:../Source/printf-stdarg.c ****                     //
+1081:../Source/printf-stdarg.c ****                     // This command has been handled.
+1082:../Source/printf-stdarg.c ****                     //
+1083:../Source/printf-stdarg.c ****                     break;
+1084:../Source/printf-stdarg.c ****                 }
+1085:../Source/printf-stdarg.c ****             }
+1086:../Source/printf-stdarg.c ****         }
+1087:../Source/printf-stdarg.c ****     }
+1088:../Source/printf-stdarg.c **** 
+1089:../Source/printf-stdarg.c ****     //
+1090:../Source/printf-stdarg.c ****     // Null terminate the string in the buffer.
+1091:../Source/printf-stdarg.c ****     //
+1092:../Source/printf-stdarg.c ****     *pcBuf = 0;
+1093:../Source/printf-stdarg.c **** 
+1094:../Source/printf-stdarg.c ****     //
+1095:../Source/printf-stdarg.c ****     // Return the number of characters in the full converted string.
+1096:../Source/printf-stdarg.c ****     //
+1097:../Source/printf-stdarg.c ****     return(iConvertCount);
+1098:../Source/printf-stdarg.c **** }
+ 1241              		.loc 1 1098 0 is_stmt 1
+ 1242 0284 381C     		mov	r0, r7
+1092:../Source/printf-stdarg.c ****     *pcBuf = 0;
+ 1243              		.loc 1 1092 0
+ 1244 0286 3370     		strb	r3, [r6]
+ 1245              		.loc 1 1098 0
+ 1246 0288 09B0     		add	sp, sp, #36
+ 1247              		@ sp needed for prologue
+ 1248              	.LVL168:
+ 1249              	.LVL169:
+ 1250 028a F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1251              	.L122:
+ 1252              		.align	2
+ 1253              	.L121:
+ 1254 028c FDFF0000 		.word	65533
+ 1255 0290 00000000 		.word	.LC2
+ 1256 0294 11000000 		.word	.LC4
+ 1257              		.cfi_endproc
+ 1258              	.LFE7:
+ 1260              		.section	.text.usnprintf,"ax",%progbits
+ 1261              		.align	1
+ 1262              		.global	usnprintf
+ 1263              		.code	16
+ 1264              		.thumb_func
+ 1266              	usnprintf:
+ 1267              	.LFB8:
+1099:../Source/printf-stdarg.c **** 
+1100:../Source/printf-stdarg.c **** //*****************************************************************************
+1101:../Source/printf-stdarg.c **** //
+1102:../Source/printf-stdarg.c **** //! A simple sprintf function supporting \%c, \%d, \%p, \%s, \%u, \%x, and \%X.
+1103:../Source/printf-stdarg.c **** //!
+1104:../Source/printf-stdarg.c **** //! \param pcBuf is the buffer where the converted string is stored.
+1105:../Source/printf-stdarg.c **** //! \param pcString is the format string.
+1106:../Source/printf-stdarg.c **** //! \param ... are the optional arguments, which depend on the contents of the
+1107:../Source/printf-stdarg.c **** //! format string.
+1108:../Source/printf-stdarg.c **** //!
+1109:../Source/printf-stdarg.c **** //! This function is very similar to the C library <tt>sprintf()</tt> function.
+1110:../Source/printf-stdarg.c **** //! Only the following formatting characters are supported:
+1111:../Source/printf-stdarg.c **** //!
+1112:../Source/printf-stdarg.c **** //! - \%c to print a character
+1113:../Source/printf-stdarg.c **** //! - \%d or \%i to print a decimal value
+1114:../Source/printf-stdarg.c **** //! - \%s to print a string
+1115:../Source/printf-stdarg.c **** //! - \%u to print an unsigned decimal value
+1116:../Source/printf-stdarg.c **** //! - \%x to print a hexadecimal value using lower case letters
+1117:../Source/printf-stdarg.c **** //! - \%X to print a hexadecimal value using lower case letters (not upper case
+1118:../Source/printf-stdarg.c **** //! letters as would typically be used)
+1119:../Source/printf-stdarg.c **** //! - \%p to print a pointer as a hexadecimal value
+1120:../Source/printf-stdarg.c **** //! - \%\% to print out a \% character
+1121:../Source/printf-stdarg.c **** //!
+1122:../Source/printf-stdarg.c **** //! For \%d, \%i, \%p, \%s, \%u, \%x, and \%X, an optional number may reside
+1123:../Source/printf-stdarg.c **** //! between the \% and the format character, which specifies the minimum number
+1124:../Source/printf-stdarg.c **** //! of characters to use for that value; if preceded by a 0 then the extra
+1125:../Source/printf-stdarg.c **** //! characters will be filled with zeros instead of spaces.  For example,
+1126:../Source/printf-stdarg.c **** //! ``\%8d'' will use eight characters to print the decimal value with spaces
+1127:../Source/printf-stdarg.c **** //! added to reach eight; ``\%08d'' will use eight characters as well but will
+1128:../Source/printf-stdarg.c **** //! add zeros instead of spaces.
+1129:../Source/printf-stdarg.c **** //!
+1130:../Source/printf-stdarg.c **** //! The type of the arguments after \e pcString must match the requirements of
+1131:../Source/printf-stdarg.c **** //! the format string.  For example, if an integer was passed where a string
+1132:../Source/printf-stdarg.c **** //! was expected, an error of some kind will most likely occur.
+1133:../Source/printf-stdarg.c **** //!
+1134:../Source/printf-stdarg.c **** //! The caller must ensure that the buffer \e pcBuf is large enough to hold the
+1135:../Source/printf-stdarg.c **** //! entire converted string, including the null termination character.
+1136:../Source/printf-stdarg.c **** //!
+1137:../Source/printf-stdarg.c **** //! \return Returns the count of characters that were written to the output
+1138:../Source/printf-stdarg.c **** //! buffer, not including the NULL termination character.
+1139:../Source/printf-stdarg.c **** //
+1140:../Source/printf-stdarg.c **** //*****************************************************************************
+1141:../Source/printf-stdarg.c **** 
+1142:../Source/printf-stdarg.c **** 
+1143:../Source/printf-stdarg.c **** //*****************************************************************************
+1144:../Source/printf-stdarg.c **** //
+1145:../Source/printf-stdarg.c **** //! A simple snprintf function supporting \%c, \%d, \%p, \%s, \%u, \%x, and
+1146:../Source/printf-stdarg.c **** //! \%X.
+1147:../Source/printf-stdarg.c **** //!
+1148:../Source/printf-stdarg.c **** //! \param pcBuf is the buffer where the converted string is stored.
+1149:../Source/printf-stdarg.c **** //! \param ulSize is the size of the buffer.
+1150:../Source/printf-stdarg.c **** //! \param pcString is the format string.
+1151:../Source/printf-stdarg.c **** //! \param ... are the optional arguments, which depend on the contents of the
+1152:../Source/printf-stdarg.c **** //! format string.
+1153:../Source/printf-stdarg.c **** //!
+1154:../Source/printf-stdarg.c **** //! This function is very similar to the C library <tt>sprintf()</tt> function.
+1155:../Source/printf-stdarg.c **** //! Only the following formatting characters are supported:
+1156:../Source/printf-stdarg.c **** //!
+1157:../Source/printf-stdarg.c **** //! - \%c to print a character
+1158:../Source/printf-stdarg.c **** //! - \%d or \%i to print a decimal value
+1159:../Source/printf-stdarg.c **** //! - \%s to print a string
+1160:../Source/printf-stdarg.c **** //! - \%u to print an unsigned decimal value
+1161:../Source/printf-stdarg.c **** //! - \%x to print a hexadecimal value using lower case letters
+1162:../Source/printf-stdarg.c **** //! - \%X to print a hexadecimal value using lower case letters (not upper case
+1163:../Source/printf-stdarg.c **** //! letters as would typically be used)
+1164:../Source/printf-stdarg.c **** //! - \%p to print a pointer as a hexadecimal value
+1165:../Source/printf-stdarg.c **** //! - \%\% to print out a \% character
+1166:../Source/printf-stdarg.c **** //!
+1167:../Source/printf-stdarg.c **** //! For \%d, \%i, \%p, \%s, \%u, \%x, and \%X, an optional number may reside
+1168:../Source/printf-stdarg.c **** //! between the \% and the format character, which specifies the minimum number
+1169:../Source/printf-stdarg.c **** //! of characters to use for that value; if preceded by a 0 then the extra
+1170:../Source/printf-stdarg.c **** //! characters will be filled with zeros instead of spaces.  For example,
+1171:../Source/printf-stdarg.c **** //! ``\%8d'' will use eight characters to print the decimal value with spaces
+1172:../Source/printf-stdarg.c **** //! added to reach eight; ``\%08d'' will use eight characters as well but will
+1173:../Source/printf-stdarg.c **** //! add zeros instead of spaces.
+1174:../Source/printf-stdarg.c **** //!
+1175:../Source/printf-stdarg.c **** //! The type of the arguments after \e pcString must match the requirements of
+1176:../Source/printf-stdarg.c **** //! the format string.  For example, if an integer was passed where a string
+1177:../Source/printf-stdarg.c **** //! was expected, an error of some kind will most likely occur.
+1178:../Source/printf-stdarg.c **** //!
+1179:../Source/printf-stdarg.c **** //! The function will copy at most \e ulSize - 1 characters into the buffer
+1180:../Source/printf-stdarg.c **** //! \e pcBuf.  One space is reserved in the buffer for the null termination
+1181:../Source/printf-stdarg.c **** //! character.
+1182:../Source/printf-stdarg.c **** //!
+1183:../Source/printf-stdarg.c **** //! The function will return the number of characters that would be converted
+1184:../Source/printf-stdarg.c **** //! as if there were no limit on the buffer size.  Therefore it is possible for
+1185:../Source/printf-stdarg.c **** //! the function to return a count that is greater than the specified buffer
+1186:../Source/printf-stdarg.c **** //! size.  If this happens, it means that the output was truncated.
+1187:../Source/printf-stdarg.c **** //!
+1188:../Source/printf-stdarg.c **** //! \return Returns the number of characters that were to be stored, not
+1189:../Source/printf-stdarg.c **** //! including the NULL termination character, regardless of space in the
+1190:../Source/printf-stdarg.c **** //! buffer.
+1191:../Source/printf-stdarg.c **** //
+1192:../Source/printf-stdarg.c **** //*****************************************************************************
+1193:../Source/printf-stdarg.c **** int usnprintf(char *pcBuf, unsigned long ulSize, const char *pcString, ...)
+1194:../Source/printf-stdarg.c **** {
+ 1268              		.loc 1 1194 0
+ 1269              		.cfi_startproc
+ 1270 0000 0CB4     		push	{r2, r3}
+ 1271              	.LCFI10:
+ 1272              		.cfi_def_cfa_offset 8
+ 1273 0002 07B5     		push	{r0, r1, r2, lr}
+ 1274              	.LCFI11:
+ 1275              		.cfi_def_cfa_offset 24
+ 1276              		.cfi_offset 0, -24
+ 1277              		.cfi_offset 1, -20
+ 1278              		.cfi_offset 2, -16
+ 1279              		.cfi_offset 14, -12
+ 1280              	.LVL170:
+ 1281              		.loc 1 1194 0
+ 1282 0004 04AB     		add	r3, sp, #16
+ 1283 0006 04CB     		ldmia	r3!, {r2}
+1195:../Source/printf-stdarg.c ****     int iRet;
+1196:../Source/printf-stdarg.c ****     va_list vaArgP;
+1197:../Source/printf-stdarg.c **** 
+1198:../Source/printf-stdarg.c ****     //
+1199:../Source/printf-stdarg.c ****     // Start the varargs processing.
+1200:../Source/printf-stdarg.c ****     //
+1201:../Source/printf-stdarg.c ****     va_start(vaArgP, pcString);
+ 1284              		.loc 1 1201 0
+ 1285 0008 0193     		str	r3, [sp, #4]
+1202:../Source/printf-stdarg.c **** 
+1203:../Source/printf-stdarg.c ****     //
+1204:../Source/printf-stdarg.c ****     // Call vsnprintf to perform the conversion.
+1205:../Source/printf-stdarg.c ****     //
+1206:../Source/printf-stdarg.c ****     iRet = uvsnprintf(pcBuf, ulSize, pcString, vaArgP);
+ 1286              		.loc 1 1206 0
+ 1287 000a FFF7FEFF 		bl	uvsnprintf
+ 1288              	.LVL171:
+1207:../Source/printf-stdarg.c **** 
+1208:../Source/printf-stdarg.c ****     //
+1209:../Source/printf-stdarg.c ****     // End the varargs processing.
+1210:../Source/printf-stdarg.c ****     //
+1211:../Source/printf-stdarg.c ****     va_end(vaArgP);
+1212:../Source/printf-stdarg.c **** 
+1213:../Source/printf-stdarg.c ****     //
+1214:../Source/printf-stdarg.c ****     // Return the conversion count.
+1215:../Source/printf-stdarg.c ****     //
+1216:../Source/printf-stdarg.c ****     return(iRet);
+1217:../Source/printf-stdarg.c **** }
+ 1289              		.loc 1 1217 0
+ 1290 000e 03B0     		add	sp, sp, #12
+ 1291              		@ sp needed for prologue
+ 1292 0010 08BC     		pop	{r3}
+ 1293 0012 02B0     		add	sp, sp, #8
+ 1294 0014 1847     		bx	r3
+ 1295              		.cfi_endproc
+ 1296              	.LFE8:
+ 1298              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 1299              	.LC2:
+ 1300 0000 30313233 		.ascii	"0123456789ABCDEF\000"
+ 1300      34353637 
+ 1300      38394142 
+ 1300      43444546 
+ 1300      00
+ 1301              	.LC4:
+ 1302 0011 4552524F 		.ascii	"ERROR\000"
+ 1302      5200
+ 1303              		.text
+ 1304              	.Letext0:
+ 1305              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1306              		.file 3 "<built-in>"
+DEFINED SYMBOLS
+                            *ABS*:00000000 printf-stdarg.c
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:20     .text.mini_itoa:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:24     .text.mini_itoa:00000000 mini_itoa
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:189    .text._putc.4296:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:193    .text._putc.4296:00000000 _putc.4296
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:236    .text._puts.4300:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:240    .text._puts.4300:00000000 _puts.4300
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:300    .text.mini_vsnprintf:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:305    .text.mini_vsnprintf:00000000 mini_vsnprintf
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:522    .text.mini_snprintf:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:527    .text.mini_snprintf:00000000 mini_snprintf
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:560    .text.ustrncpy:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:565    .text.ustrncpy:00000000 ustrncpy
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:625    .text.uvsnprintf:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:630    .text.uvsnprintf:00000000 uvsnprintf
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:1254   .text.uvsnprintf:0000028c $d
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:1261   .text.usnprintf:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc21pjSN.s:1266   .text.usnprintf:00000000 usnprintf
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uidivmod
+__aeabi_uidiv

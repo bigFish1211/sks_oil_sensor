@@ -1,0 +1,798 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"flash.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.NMEAChecksum,"ax",%progbits
+  18              		.align	1
+  19              		.global	NMEAChecksum
+  20              		.code	16
+  21              		.thumb_func
+  23              	NMEAChecksum:
+  24              	.LFB33:
+  25              		.file 1 "../Source - Copy/flash.c"
+   1:../Source - Copy/flash.c **** /*
+   2:../Source - Copy/flash.c ****  * EEprom.c
+   3:../Source - Copy/flash.c ****  *
+   4:../Source - Copy/flash.c ****  *  Created on: Feb 16, 2017
+   5:../Source - Copy/flash.c ****  *      Author: ThangNguyen
+   6:../Source - Copy/flash.c ****  */
+   7:../Source - Copy/flash.c **** #include <string.h>
+   8:../Source - Copy/flash.c **** #include "xprintf.h"
+   9:../Source - Copy/flash.c **** #include "stm32f0xx_flash.h"
+  10:../Source - Copy/flash.c **** 
+  11:../Source - Copy/flash.c **** #include "DataUtil.h"
+  12:../Source - Copy/flash.c **** #include "config.h"
+  13:../Source - Copy/flash.c **** #include "flash.h"
+  14:../Source - Copy/flash.c **** 
+  15:../Source - Copy/flash.c **** volatile FLASH_Status FLASHStatus = FLASH_TIMEOUT;
+  16:../Source - Copy/flash.c **** 
+  17:../Source - Copy/flash.c **** char NMEAChecksum(char *data, int len) {
+  26              		.loc 1 17 0
+  27              		.cfi_startproc
+  28 0000 10B5     		push	{r4, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 8
+  31              		.cfi_offset 4, -8
+  32              		.cfi_offset 14, -4
+  33              	.LVL0:
+  34              		.loc 1 17 0
+  35 0002 031C     		mov	r3, r0
+  18:../Source - Copy/flash.c **** 	char checksum_value = 0;
+  19:../Source - Copy/flash.c **** 
+  20:../Source - Copy/flash.c **** 	int string_length = len;
+  21:../Source - Copy/flash.c **** 	int index = 1; // Skip over the $ at the begining of the sentence
+  36              		.loc 1 21 0
+  37 0004 0122     		mov	r2, #1
+  18:../Source - Copy/flash.c **** 	char checksum_value = 0;
+  38              		.loc 1 18 0
+  39 0006 0020     		mov	r0, #0
+  40              	.LVL1:
+  22:../Source - Copy/flash.c **** 	while (index < string_length) {
+  41              		.loc 1 22 0
+  42 0008 02E0     		b	.L2
+  43              	.LVL2:
+  44              	.L3:
+  23:../Source - Copy/flash.c **** 		checksum_value ^= data[index];
+  45              		.loc 1 23 0
+  46 000a 9C5C     		ldrb	r4, [r3, r2]
+  24:../Source - Copy/flash.c **** 		index++;
+  47              		.loc 1 24 0
+  48 000c 0132     		add	r2, r2, #1
+  49              	.LVL3:
+  23:../Source - Copy/flash.c **** 		checksum_value ^= data[index];
+  50              		.loc 1 23 0
+  51 000e 6040     		eor	r0, r4
+  52              	.LVL4:
+  53              	.L2:
+  22:../Source - Copy/flash.c **** 	while (index < string_length) {
+  54              		.loc 1 22 0 discriminator 1
+  55 0010 8A42     		cmp	r2, r1
+  56 0012 FADB     		blt	.L3
+  57              		@ sp needed for prologue
+  25:../Source - Copy/flash.c **** 	}
+  26:../Source - Copy/flash.c **** 	return (checksum_value);
+  27:../Source - Copy/flash.c **** }
+  58              		.loc 1 27 0
+  59 0014 10BD     		pop	{r4, pc}
+  60              		.cfi_endproc
+  61              	.LFE33:
+  63              		.section	.text.FlashInit,"ax",%progbits
+  64              		.align	1
+  65              		.global	FlashInit
+  66              		.code	16
+  67              		.thumb_func
+  69              	FlashInit:
+  70              	.LFB34:
+  28:../Source - Copy/flash.c **** 
+  29:../Source - Copy/flash.c **** void FlashInit(void) {
+  71              		.loc 1 29 0
+  72              		.cfi_startproc
+  73 0000 08B5     		push	{r3, lr}
+  74              	.LCFI1:
+  75              		.cfi_def_cfa_offset 8
+  76              		.cfi_offset 3, -8
+  77              		.cfi_offset 14, -4
+  30:../Source - Copy/flash.c **** 	FLASH_Unlock();
+  78              		.loc 1 30 0
+  79 0002 FFF7FEFF 		bl	FLASH_Unlock
+  80              		@ sp needed for prologue
+  31:../Source - Copy/flash.c **** 	/*	PageCount = (BANK1_WRITE_END_ADDR - BANK1_WRITE_START_ADDR)
+  32:../Source - Copy/flash.c **** 	 / FLASH_PAGE_SIZE;*/
+  33:../Source - Copy/flash.c **** }
+  81              		.loc 1 33 0
+  82 0006 08BD     		pop	{r3, pc}
+  83              		.cfi_endproc
+  84              	.LFE34:
+  86              		.section	.text.flash_wrire_char,"ax",%progbits
+  87              		.align	1
+  88              		.global	flash_wrire_char
+  89              		.code	16
+  90              		.thumb_func
+  92              	flash_wrire_char:
+  93              	.LFB35:
+  34:../Source - Copy/flash.c **** 
+  35:../Source - Copy/flash.c **** void flash_wrire_char(char c) {
+  94              		.loc 1 35 0
+  95              		.cfi_startproc
+  96 0000 10B5     		push	{r4, lr}
+  97              	.LCFI2:
+  98              		.cfi_def_cfa_offset 8
+  99              		.cfi_offset 4, -8
+ 100              		.cfi_offset 14, -4
+ 101              	.LVL5:
+ 102              		.loc 1 35 0
+ 103 0002 041C     		mov	r4, r0
+  36:../Source - Copy/flash.c **** 	FLASH_Unlock();
+ 104              		.loc 1 36 0
+ 105 0004 FFF7FEFF 		bl	FLASH_Unlock
+ 106              	.LVL6:
+  37:../Source - Copy/flash.c **** 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
+ 107              		.loc 1 37 0
+ 108 0008 3420     		mov	r0, #52
+ 109 000a FFF7FEFF 		bl	FLASH_ClearFlag
+  38:../Source - Copy/flash.c **** 	FLASH_ErasePage(BANK1_WRITE_START_ADDR);
+ 110              		.loc 1 38 0
+ 111 000e 0448     		ldr	r0, .L6
+ 112 0010 FFF7FEFF 		bl	FLASH_ErasePage
+  39:../Source - Copy/flash.c **** 	{
+  40:../Source - Copy/flash.c **** 		FLASH_ProgramHalfWord(BANK1_WRITE_START_ADDR, c);
+ 113              		.loc 1 40 0
+ 114 0014 211C     		mov	r1, r4
+ 115 0016 0248     		ldr	r0, .L6
+ 116 0018 FFF7FEFF 		bl	FLASH_ProgramHalfWord
+ 117              		@ sp needed for prologue
+  41:../Source - Copy/flash.c **** 	}
+  42:../Source - Copy/flash.c **** }
+ 118              		.loc 1 42 0
+ 119 001c 10BD     		pop	{r4, pc}
+ 120              	.L7:
+ 121 001e C046     		.align	2
+ 122              	.L6:
+ 123 0020 00F80008 		.word	134281216
+ 124              		.cfi_endproc
+ 125              	.LFE35:
+ 127              		.section	.text.flash_write_config,"ax",%progbits
+ 128              		.align	1
+ 129              		.global	flash_write_config
+ 130              		.code	16
+ 131              		.thumb_func
+ 133              	flash_write_config:
+ 134              	.LFB36:
+  43:../Source - Copy/flash.c **** 
+  44:../Source - Copy/flash.c **** #if 0
+  45:../Source - Copy/flash.c **** char flash_read_char(uint32_t address) {
+  46:../Source - Copy/flash.c **** 	return (*(char*) address);
+  47:../Source - Copy/flash.c **** }
+  48:../Source - Copy/flash.c **** 
+  49:../Source - Copy/flash.c **** uint32_t Readflash(uint32_t addr)
+  50:../Source - Copy/flash.c **** {
+  51:../Source - Copy/flash.c **** 	uint32_t* data = (uint32_t*)(addr);
+  52:../Source - Copy/flash.c **** 	return *data;
+  53:../Source - Copy/flash.c **** }
+  54:../Source - Copy/flash.c **** #endif
+  55:../Source - Copy/flash.c **** 
+  56:../Source - Copy/flash.c **** void flash_write_config(uint32_t address, char *pdata, int len) {
+ 135              		.loc 1 56 0
+ 136              		.cfi_startproc
+ 137 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 138              	.LCFI3:
+ 139              		.cfi_def_cfa_offset 24
+ 140              		.cfi_offset 3, -24
+ 141              		.cfi_offset 4, -20
+ 142              		.cfi_offset 5, -16
+ 143              		.cfi_offset 6, -12
+ 144              		.cfi_offset 7, -8
+ 145              		.cfi_offset 14, -4
+ 146              	.LVL7:
+ 147              		.loc 1 56 0
+ 148 0002 061C     		mov	r6, r0
+ 149 0004 0C1C     		mov	r4, r1
+ 150              	.LVL8:
+ 151 0006 171C     		mov	r7, r2
+  57:../Source - Copy/flash.c **** 
+  58:../Source - Copy/flash.c **** 	int i;
+  59:../Source - Copy/flash.c **** 	uint32_t *pRecord = (uint32_t*)pdata;
+  60:../Source - Copy/flash.c **** 	uint32_t flash_address = address;
+  61:../Source - Copy/flash.c **** 
+  62:../Source - Copy/flash.c **** 	FLASH_Unlock();
+ 152              		.loc 1 62 0
+ 153 0008 FFF7FEFF 		bl	FLASH_Unlock
+ 154              	.LVL9:
+  63:../Source - Copy/flash.c **** 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
+ 155              		.loc 1 63 0
+ 156 000c 3420     		mov	r0, #52
+ 157 000e FFF7FEFF 		bl	FLASH_ClearFlag
+  64:../Source - Copy/flash.c **** 	if(FLASH_ErasePage(flash_address) != FLASH_COMPLETE)
+ 158              		.loc 1 64 0
+ 159 0012 301C     		mov	r0, r6
+ 160 0014 FFF7FEFF 		bl	FLASH_ErasePage
+ 161 0018 0428     		cmp	r0, #4
+ 162 001a 02D0     		beq	.L9
+  65:../Source - Copy/flash.c **** 		xprintf("erase flash fail\r\n");
+ 163              		.loc 1 65 0
+ 164 001c 0948     		ldr	r0, .L13
+ 165 001e FFF7FEFF 		bl	xprintf
+ 166              	.L9:
+  56:../Source - Copy/flash.c **** void flash_write_config(uint32_t address, char *pdata, int len) {
+ 167              		.loc 1 56 0 discriminator 1
+ 168 0022 0025     		mov	r5, #0
+ 169 0024 08E0     		b	.L10
+ 170              	.LVL10:
+ 171              	.L12:
+  66:../Source - Copy/flash.c **** 	for (i = 0; i < len; i+=4,pRecord++,flash_address+=4) {
+  67:../Source - Copy/flash.c **** 		if(FLASH_ProgramWord(flash_address, *pRecord)!=FLASH_COMPLETE)
+ 172              		.loc 1 67 0
+ 173 0026 02CC     		ldmia	r4!, {r1}
+ 174 0028 FFF7FEFF 		bl	FLASH_ProgramWord
+ 175              	.LVL11:
+ 176 002c 0428     		cmp	r0, #4
+ 177 002e 02D0     		beq	.L11
+  68:../Source - Copy/flash.c **** 			xprintf("write flash fail\r\n");
+ 178              		.loc 1 68 0
+ 179 0030 0548     		ldr	r0, .L13+4
+ 180 0032 FFF7FEFF 		bl	xprintf
+ 181              	.L11:
+  66:../Source - Copy/flash.c **** 	for (i = 0; i < len; i+=4,pRecord++,flash_address+=4) {
+ 182              		.loc 1 66 0
+ 183 0036 0435     		add	r5, r5, #4
+ 184              	.LVL12:
+ 185              	.L10:
+  56:../Source - Copy/flash.c **** void flash_write_config(uint32_t address, char *pdata, int len) {
+ 186              		.loc 1 56 0 discriminator 1
+ 187 0038 A819     		add	r0, r5, r6
+ 188              	.LVL13:
+  66:../Source - Copy/flash.c **** 	for (i = 0; i < len; i+=4,pRecord++,flash_address+=4) {
+ 189              		.loc 1 66 0 discriminator 1
+ 190 003a BD42     		cmp	r5, r7
+ 191 003c F3DB     		blt	.L12
+  69:../Source - Copy/flash.c **** 	}
+  70:../Source - Copy/flash.c **** 	FLASH_Lock();
+ 192              		.loc 1 70 0
+ 193 003e FFF7FEFF 		bl	FLASH_Lock
+ 194              	.LVL14:
+ 195              		@ sp needed for prologue
+ 196              	.LVL15:
+ 197              	.LVL16:
+ 198              	.LVL17:
+  71:../Source - Copy/flash.c **** }
+ 199              		.loc 1 71 0
+ 200 0042 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 201              	.L14:
+ 202              		.align	2
+ 203              	.L13:
+ 204 0044 00000000 		.word	.LC4
+ 205 0048 13000000 		.word	.LC6
+ 206              		.cfi_endproc
+ 207              	.LFE36:
+ 209              		.section	.text.flash_read_config,"ax",%progbits
+ 210              		.align	1
+ 211              		.global	flash_read_config
+ 212              		.code	16
+ 213              		.thumb_func
+ 215              	flash_read_config:
+ 216              	.LFB37:
+  72:../Source - Copy/flash.c **** 
+  73:../Source - Copy/flash.c **** void flash_read_config(uint32_t address, char *pdata, int len) {
+ 217              		.loc 1 73 0
+ 218              		.cfi_startproc
+ 219 0000 10B5     		push	{r4, lr}
+ 220              	.LCFI4:
+ 221              		.cfi_def_cfa_offset 8
+ 222              		.cfi_offset 4, -8
+ 223              		.cfi_offset 14, -4
+ 224              	.LVL18:
+  74:../Source - Copy/flash.c **** 	int i;
+  75:../Source - Copy/flash.c **** 	uint32_t flash_address = address;
+  76:../Source - Copy/flash.c **** 	uint32_t *ptr = (uint32_t*)pdata;
+ 225              		.loc 1 76 0
+ 226 0002 0B1C     		mov	r3, r1
+  77:../Source - Copy/flash.c **** 	for (i = 0; i < len; i+=4,ptr++,flash_address+=4) {
+ 227              		.loc 1 77 0
+ 228 0004 03E0     		b	.L16
+ 229              	.LVL19:
+ 230              	.L17:
+  73:../Source - Copy/flash.c **** void flash_read_config(uint32_t address, char *pdata, int len) {
+ 231              		.loc 1 73 0 discriminator 2
+ 232 0006 441A     		sub	r4, r0, r1
+ 233 0008 E418     		add	r4, r4, r3
+  78:../Source - Copy/flash.c **** 		*ptr=*(__IO uint32_t *)flash_address;
+ 234              		.loc 1 78 0 discriminator 2
+ 235 000a 2468     		ldr	r4, [r4]
+ 236 000c 10C3     		stmia	r3!, {r4}
+ 237              	.LVL20:
+ 238              	.L16:
+  73:../Source - Copy/flash.c **** void flash_read_config(uint32_t address, char *pdata, int len) {
+ 239              		.loc 1 73 0 discriminator 1
+ 240 000e 5C1A     		sub	r4, r3, r1
+  77:../Source - Copy/flash.c **** 	for (i = 0; i < len; i+=4,ptr++,flash_address+=4) {
+ 241              		.loc 1 77 0 discriminator 1
+ 242 0010 9442     		cmp	r4, r2
+ 243 0012 F8DB     		blt	.L17
+ 244              		@ sp needed for prologue
+  79:../Source - Copy/flash.c **** 	}
+  80:../Source - Copy/flash.c **** }
+ 245              		.loc 1 80 0
+ 246 0014 10BD     		pop	{r4, pc}
+ 247              		.cfi_endproc
+ 248              	.LFE37:
+ 250              		.section	.text.write_config,"ax",%progbits
+ 251              		.align	1
+ 252              		.global	write_config
+ 253              		.code	16
+ 254              		.thumb_func
+ 256              	write_config:
+ 257              	.LFB38:
+  81:../Source - Copy/flash.c **** 
+  82:../Source - Copy/flash.c **** void write_config(void) {
+ 258              		.loc 1 82 0
+ 259              		.cfi_startproc
+ 260 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 261              	.LCFI5:
+ 262              		.cfi_def_cfa_offset 20
+ 263              		.cfi_offset 4, -20
+ 264              		.cfi_offset 5, -16
+ 265              		.cfi_offset 6, -12
+ 266              		.cfi_offset 7, -8
+ 267              		.cfi_offset 14, -4
+ 268 0002 C1B0     		sub	sp, sp, #260
+ 269              	.LCFI6:
+ 270              		.cfi_def_cfa_offset 280
+  83:../Source - Copy/flash.c **** 	xprintf("write_config\r\n");
+ 271              		.loc 1 83 0
+ 272 0004 1248     		ldr	r0, .L19
+ 273 0006 FFF7FEFF 		bl	xprintf
+  84:../Source - Copy/flash.c **** 	g_config.sign = SF_CONFIG_SIGN;
+ 274              		.loc 1 84 0
+ 275 000a 124D     		ldr	r5, .L19+4
+  85:../Source - Copy/flash.c **** 	g_config.configState = 2;
+ 276              		.loc 1 85 0
+ 277 000c 0226     		mov	r6, #2
+  86:../Source - Copy/flash.c **** 	char buffConfig[SKS_CONFIG_RECORD_SIZE] = { 0 };
+ 278              		.loc 1 86 0
+ 279 000e 8021     		mov	r1, #128
+  84:../Source - Copy/flash.c **** 	g_config.sign = SF_CONFIG_SIGN;
+ 280              		.loc 1 84 0
+ 281 0010 6423     		mov	r3, #100
+  85:../Source - Copy/flash.c **** 	g_config.configState = 2;
+ 282              		.loc 1 85 0
+ 283 0012 6E70     		strb	r6, [r5, #1]
+ 284              		.loc 1 86 0
+ 285 0014 4E00     		lsl	r6, r1, #1
+  84:../Source - Copy/flash.c **** 	g_config.sign = SF_CONFIG_SIGN;
+ 286              		.loc 1 84 0
+ 287 0016 2B70     		strb	r3, [r5]
+ 288              		.loc 1 86 0
+ 289 0018 0021     		mov	r1, #0
+ 290 001a 321C     		mov	r2, r6
+ 291 001c 6846     		mov	r0, sp
+  87:../Source - Copy/flash.c **** 	int pointerSize = sizeof(DEVICE_CONFIG);
+  88:../Source - Copy/flash.c **** 	int size =
+  89:../Source - Copy/flash.c **** 			pointerSize < SKS_CONFIG_RECORD_SIZE ?
+  90:../Source - Copy/flash.c **** 					pointerSize : SKS_CONFIG_RECORD_SIZE;
+  91:../Source - Copy/flash.c **** 	memcpy(buffConfig, &g_config, size);
+ 292              		.loc 1 91 0
+ 293 001e 6C46     		mov	r4, sp
+  86:../Source - Copy/flash.c **** 	char buffConfig[SKS_CONFIG_RECORD_SIZE] = { 0 };
+ 294              		.loc 1 86 0
+ 295 0020 FFF7FEFF 		bl	memset
+ 296              	.LVL21:
+ 297              		.loc 1 91 0
+ 298 0024 07CD     		ldmia	r5!, {r0, r1, r2}
+ 299 0026 07C4     		stmia	r4!, {r0, r1, r2}
+ 300 0028 221C     		mov	r2, r4
+ 301 002a 83CD     		ldmia	r5!, {r0, r1, r7}
+ 302 002c 83C2     		stmia	r2!, {r0, r1, r7}
+ 303 002e 2868     		ldr	r0, [r5]
+  92:../Source - Copy/flash.c **** 	buffConfig[SKS_CONFIG_RECORD_SIZE - 1] = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 1);
+ 304              		.loc 1 92 0
+ 305 0030 FF21     		mov	r1, #255
+  91:../Source - Copy/flash.c **** 	memcpy(buffConfig, &g_config, size);
+ 306              		.loc 1 91 0
+ 307 0032 1060     		str	r0, [r2]
+ 308              		.loc 1 92 0
+ 309 0034 6846     		mov	r0, sp
+ 310 0036 FFF7FEFF 		bl	NMEAChecksum
+ 311 003a 6B46     		mov	r3, sp
+ 312 003c FF33     		add	r3, r3, #255
+ 313 003e 1870     		strb	r0, [r3]
+  93:../Source - Copy/flash.c **** 	flash_write_config(BANK1_CONFIG_START_ADDR, buffConfig,	SKS_CONFIG_RECORD_SIZE);
+ 314              		.loc 1 93 0
+ 315 0040 6946     		mov	r1, sp
+ 316 0042 0548     		ldr	r0, .L19+8
+ 317 0044 321C     		mov	r2, r6
+ 318 0046 FFF7FEFF 		bl	flash_write_config
+  94:../Source - Copy/flash.c **** }
+ 319              		.loc 1 94 0
+ 320 004a 41B0     		add	sp, sp, #260
+ 321              		@ sp needed for prologue
+ 322 004c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 323              	.L20:
+ 324 004e C046     		.align	2
+ 325              	.L19:
+ 326 0050 26000000 		.word	.LC8
+ 327 0054 00000000 		.word	g_config
+ 328 0058 00F80008 		.word	134281216
+ 329              		.cfi_endproc
+ 330              	.LFE38:
+ 332              		.section	.text.make_default_config,"ax",%progbits
+ 333              		.align	1
+ 334              		.global	make_default_config
+ 335              		.code	16
+ 336              		.thumb_func
+ 338              	make_default_config:
+ 339              	.LFB39:
+  95:../Source - Copy/flash.c **** 
+  96:../Source - Copy/flash.c **** void make_default_config() {
+ 340              		.loc 1 96 0
+ 341              		.cfi_startproc
+ 342 0000 10B5     		push	{r4, lr}
+ 343              	.LCFI7:
+ 344              		.cfi_def_cfa_offset 8
+ 345              		.cfi_offset 4, -8
+ 346              		.cfi_offset 14, -4
+  97:../Source - Copy/flash.c **** 	if(g_config.configState != 2) {
+ 347              		.loc 1 97 0
+ 348 0002 0E4C     		ldr	r4, .L23
+ 349 0004 6378     		ldrb	r3, [r4, #1]
+ 350 0006 022B     		cmp	r3, #2
+ 351 0008 17D0     		beq	.L21
+ 352              	.LBB2:
+  98:../Source - Copy/flash.c **** 		//xprintf(, "1234567890");
+  99:../Source - Copy/flash.c **** 
+ 100:../Source - Copy/flash.c **** 		sprintf(g_config.deviceCode, "%s", "1234567890");
+ 353              		.loc 1 100 0
+ 354 000a 0D49     		ldr	r1, .L23+4
+ 355 000c A01C     		add	r0, r4, #2
+ 356 000e FFF7FEFF 		bl	strcpy
+ 101:../Source - Copy/flash.c **** 
+ 102:../Source - Copy/flash.c **** 		g_config.emptyValue = 0;
+ 357              		.loc 1 102 0
+ 358 0012 0020     		mov	r0, #0
+ 103:../Source - Copy/flash.c **** 		g_config.fullValue = 0;
+ 104:../Source - Copy/flash.c **** 		g_config.timeout3D = 3; //3 minutes
+ 359              		.loc 1 104 0
+ 360 0014 0321     		mov	r1, #3
+ 105:../Source - Copy/flash.c **** 		g_config.outputMode = 0;
+ 106:../Source - Copy/flash.c **** 		g_config.diffX = 6;
+ 361              		.loc 1 106 0
+ 362 0016 0623     		mov	r3, #6
+ 102:../Source - Copy/flash.c **** 		g_config.emptyValue = 0;
+ 363              		.loc 1 102 0
+ 364 0018 2061     		str	r0, [r4, #16]
+ 103:../Source - Copy/flash.c **** 		g_config.fullValue = 0;
+ 365              		.loc 1 103 0
+ 366 001a E060     		str	r0, [r4, #12]
+ 104:../Source - Copy/flash.c **** 		g_config.timeout3D = 3; //3 minutes
+ 367              		.loc 1 104 0
+ 368 001c A182     		strh	r1, [r4, #20]
+ 105:../Source - Copy/flash.c **** 		g_config.outputMode = 0;
+ 369              		.loc 1 105 0
+ 370 001e A075     		strb	r0, [r4, #22]
+ 107:../Source - Copy/flash.c **** 		g_config.diffY = 6;
+ 108:../Source - Copy/flash.c **** 		g_config.interval = 1;
+ 371              		.loc 1 108 0
+ 372 0020 0122     		mov	r2, #1
+ 109:../Source - Copy/flash.c **** 
+ 110:../Source - Copy/flash.c **** 		g_config.configState = 2;
+ 111:../Source - Copy/flash.c **** 
+ 112:../Source - Copy/flash.c **** 		g_config.sign = SF_CONFIG_SIGN;
+ 373              		.loc 1 112 0
+ 374 0022 6420     		mov	r0, #100
+ 110:../Source - Copy/flash.c **** 		g_config.configState = 2;
+ 375              		.loc 1 110 0
+ 376 0024 0221     		mov	r1, #2
+ 377              		.loc 1 112 0
+ 378 0026 2070     		strb	r0, [r4]
+ 106:../Source - Copy/flash.c **** 		g_config.diffX = 6;
+ 379              		.loc 1 106 0
+ 380 0028 2376     		strb	r3, [r4, #24]
+ 107:../Source - Copy/flash.c **** 		g_config.diffY = 6;
+ 381              		.loc 1 107 0
+ 382 002a 6376     		strb	r3, [r4, #25]
+ 108:../Source - Copy/flash.c **** 		g_config.interval = 1;
+ 383              		.loc 1 108 0
+ 384 002c A276     		strb	r2, [r4, #26]
+ 110:../Source - Copy/flash.c **** 		g_config.configState = 2;
+ 385              		.loc 1 110 0
+ 386 002e 6170     		strb	r1, [r4, #1]
+ 113:../Source - Copy/flash.c **** 
+ 114:../Source - Copy/flash.c **** 		write_config();
+ 387              		.loc 1 114 0
+ 388 0030 FFF7FEFF 		bl	write_config
+ 115:../Source - Copy/flash.c **** 
+ 116:../Source - Copy/flash.c **** 		xprintf("\r\nWrite default config.\r\n\r\n");
+ 389              		.loc 1 116 0
+ 390 0034 0348     		ldr	r0, .L23+8
+ 391 0036 FFF7FEFF 		bl	xprintf
+ 392              	.L21:
+ 393              	.LBE2:
+ 394              		@ sp needed for prologue
+ 117:../Source - Copy/flash.c **** 	} else {
+ 118:../Source - Copy/flash.c **** 		//xprintf("\r\nLoaded config.\r\n\r\n");
+ 119:../Source - Copy/flash.c **** 	}
+ 120:../Source - Copy/flash.c **** }
+ 395              		.loc 1 120 0
+ 396 003a 10BD     		pop	{r4, pc}
+ 397              	.L24:
+ 398              		.align	2
+ 399              	.L23:
+ 400 003c 00000000 		.word	g_config
+ 401 0040 35000000 		.word	.LC13
+ 402 0044 40000000 		.word	.LC15
+ 403              		.cfi_endproc
+ 404              	.LFE39:
+ 406              		.section	.text.load_config,"ax",%progbits
+ 407              		.align	1
+ 408              		.global	load_config
+ 409              		.code	16
+ 410              		.thumb_func
+ 412              	load_config:
+ 413              	.LFB40:
+ 121:../Source - Copy/flash.c **** 
+ 122:../Source - Copy/flash.c **** void load_config(void) {
+ 414              		.loc 1 122 0
+ 415              		.cfi_startproc
+ 416 0000 70B5     		push	{r4, r5, r6, lr}
+ 417              	.LCFI8:
+ 418              		.cfi_def_cfa_offset 16
+ 419              		.cfi_offset 4, -16
+ 420              		.cfi_offset 5, -12
+ 421              		.cfi_offset 6, -8
+ 422              		.cfi_offset 14, -4
+ 423 0002 C0B0     		sub	sp, sp, #256
+ 424              	.LCFI9:
+ 425              		.cfi_def_cfa_offset 272
+ 123:../Source - Copy/flash.c **** 	xprintf("load_config\r\n");
+ 426              		.loc 1 123 0
+ 427 0004 2348     		ldr	r0, .L31
+ 124:../Source - Copy/flash.c **** 	char buffConfig[SKS_CONFIG_RECORD_SIZE] = { 0 };
+ 428              		.loc 1 124 0
+ 429 0006 8024     		mov	r4, #128
+ 123:../Source - Copy/flash.c **** 	xprintf("load_config\r\n");
+ 430              		.loc 1 123 0
+ 431 0008 FFF7FEFF 		bl	xprintf
+ 432              		.loc 1 124 0
+ 433 000c 6200     		lsl	r2, r4, #1
+ 434 000e 0021     		mov	r1, #0
+ 435 0010 6846     		mov	r0, sp
+ 436 0012 FFF7FEFF 		bl	memset
+ 125:../Source - Copy/flash.c **** 
+ 126:../Source - Copy/flash.c **** 	flash_read_config(BANK1_CONFIG_START_ADDR, buffConfig,
+ 437              		.loc 1 126 0
+ 438 0016 8022     		mov	r2, #128
+ 439 0018 1F48     		ldr	r0, .L31+4
+ 440 001a 6946     		mov	r1, sp
+ 441 001c 5200     		lsl	r2, r2, #1
+ 442 001e FFF7FEFF 		bl	flash_read_config
+ 124:../Source - Copy/flash.c **** 	char buffConfig[SKS_CONFIG_RECORD_SIZE] = { 0 };
+ 443              		.loc 1 124 0
+ 444 0022 6D46     		mov	r5, sp
+ 127:../Source - Copy/flash.c **** 	SKS_CONFIG_RECORD_SIZE);
+ 128:../Source - Copy/flash.c **** 	char crc = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 1);
+ 445              		.loc 1 128 0
+ 446 0024 6846     		mov	r0, sp
+ 447 0026 FF21     		mov	r1, #255
+ 448 0028 FFF7FEFF 		bl	NMEAChecksum
+ 449              	.LVL22:
+ 129:../Source - Copy/flash.c **** 	if ((buffConfig[0] == SF_CONFIG_SIGN) && (crc == buffConfig[SKS_CONFIG_RECORD_SIZE - 1]))
+ 450              		.loc 1 129 0
+ 451 002c 2B78     		ldrb	r3, [r5]
+ 452 002e 1B4C     		ldr	r4, .L31+8
+ 453 0030 642B     		cmp	r3, #100
+ 454 0032 0CD1     		bne	.L26
+ 455              		.loc 1 129 0 is_stmt 0 discriminator 1
+ 456 0034 6E46     		mov	r6, sp
+ 457 0036 FF36     		add	r6, r6, #255
+ 458 0038 3178     		ldrb	r1, [r6]
+ 459 003a 8142     		cmp	r1, r0
+ 460 003c 07D1     		bne	.L26
+ 461              	.LVL23:
+ 462              	.LBB3:
+ 130:../Source - Copy/flash.c **** 	{
+ 131:../Source - Copy/flash.c **** 		int pointerSize = sizeof(DEVICE_CONFIG);
+ 132:../Source - Copy/flash.c **** 		int size =
+ 133:../Source - Copy/flash.c **** 				pointerSize < SKS_CONFIG_RECORD_SIZE ?
+ 134:../Source - Copy/flash.c **** 						pointerSize : SKS_CONFIG_RECORD_SIZE;
+ 135:../Source - Copy/flash.c **** 		memcpy(&g_config, buffConfig, size);
+ 463              		.loc 1 135 0 is_stmt 1
+ 464 003e 231C     		mov	r3, r4
+ 465 0040 07CD     		ldmia	r5!, {r0, r1, r2}
+ 466 0042 07C3     		stmia	r3!, {r0, r1, r2}
+ 467              	.LVL24:
+ 468 0044 1A1C     		mov	r2, r3
+ 469 0046 43CD     		ldmia	r5!, {r0, r1, r6}
+ 470 0048 43C2     		stmia	r2!, {r0, r1, r6}
+ 471 004a 2868     		ldr	r0, [r5]
+ 472 004c 1060     		str	r0, [r2]
+ 473              	.LVL25:
+ 474              	.L26:
+ 475              	.LBE3:
+ 136:../Source - Copy/flash.c **** 	}
+ 137:../Source - Copy/flash.c **** 
+ 138:../Source - Copy/flash.c **** 	//check and make default config
+ 139:../Source - Copy/flash.c **** 	make_default_config();
+ 476              		.loc 1 139 0
+ 477 004e FFF7FEFF 		bl	make_default_config
+ 140:../Source - Copy/flash.c **** 
+ 141:../Source - Copy/flash.c **** 	if(g_config.diffX < 3) {
+ 478              		.loc 1 141 0
+ 479 0052 257E     		ldrb	r5, [r4, #24]
+ 480 0054 022D     		cmp	r5, #2
+ 481 0056 06D8     		bhi	.L27
+ 142:../Source - Copy/flash.c **** 		g_config.diffX = 5;
+ 143:../Source - Copy/flash.c **** 
+ 144:../Source - Copy/flash.c **** 		if(g_config.timeout3D <= 1) {
+ 482              		.loc 1 144 0
+ 483 0058 A18A     		ldrh	r1, [r4, #20]
+ 142:../Source - Copy/flash.c **** 		g_config.diffX = 5;
+ 484              		.loc 1 142 0
+ 485 005a 0526     		mov	r6, #5
+ 486 005c 2676     		strb	r6, [r4, #24]
+ 487              		.loc 1 144 0
+ 488 005e 0129     		cmp	r1, #1
+ 489 0060 01D8     		bhi	.L27
+ 145:../Source - Copy/flash.c **** 			g_config.timeout3D = 3;
+ 490              		.loc 1 145 0
+ 491 0062 0322     		mov	r2, #3
+ 492 0064 A282     		strh	r2, [r4, #20]
+ 493              	.L27:
+ 146:../Source - Copy/flash.c **** 		}
+ 147:../Source - Copy/flash.c **** 	}
+ 148:../Source - Copy/flash.c **** 
+ 149:../Source - Copy/flash.c **** 	if(g_config.diffY < 3) {
+ 494              		.loc 1 149 0
+ 495 0066 607E     		ldrb	r0, [r4, #25]
+ 496 0068 0228     		cmp	r0, #2
+ 497 006a 06D8     		bhi	.L28
+ 150:../Source - Copy/flash.c **** 		g_config.diffY = 5;
+ 151:../Source - Copy/flash.c **** 
+ 152:../Source - Copy/flash.c **** 		if(g_config.timeout3D <= 1) {
+ 498              		.loc 1 152 0
+ 499 006c A38A     		ldrh	r3, [r4, #20]
+ 150:../Source - Copy/flash.c **** 		g_config.diffY = 5;
+ 500              		.loc 1 150 0
+ 501 006e 0525     		mov	r5, #5
+ 502 0070 6576     		strb	r5, [r4, #25]
+ 503              		.loc 1 152 0
+ 504 0072 012B     		cmp	r3, #1
+ 505 0074 01D8     		bhi	.L28
+ 153:../Source - Copy/flash.c **** 			g_config.timeout3D = 3;
+ 506              		.loc 1 153 0
+ 507 0076 0321     		mov	r1, #3
+ 508 0078 A182     		strh	r1, [r4, #20]
+ 509              	.L28:
+ 154:../Source - Copy/flash.c **** 		}
+ 155:../Source - Copy/flash.c **** 	}
+ 156:../Source - Copy/flash.c **** 
+ 157:../Source - Copy/flash.c **** 	if(g_config.diffX > 30) {
+ 510              		.loc 1 157 0
+ 511 007a 084B     		ldr	r3, .L31+8
+ 512 007c 1C7E     		ldrb	r4, [r3, #24]
+ 513 007e 1E2C     		cmp	r4, #30
+ 514 0080 01D9     		bls	.L29
+ 158:../Source - Copy/flash.c **** 		g_config.diffX = 5;
+ 515              		.loc 1 158 0
+ 516 0082 0526     		mov	r6, #5
+ 517 0084 1E76     		strb	r6, [r3, #24]
+ 518              	.L29:
+ 159:../Source - Copy/flash.c **** 	}
+ 160:../Source - Copy/flash.c **** 
+ 161:../Source - Copy/flash.c **** 	if(g_config.diffY > 30) {
+ 519              		.loc 1 161 0
+ 520 0086 5A7E     		ldrb	r2, [r3, #25]
+ 521 0088 1E2A     		cmp	r2, #30
+ 522 008a 01D9     		bls	.L25
+ 162:../Source - Copy/flash.c **** 		g_config.diffY = 5;
+ 523              		.loc 1 162 0
+ 524 008c 0520     		mov	r0, #5
+ 525 008e 5876     		strb	r0, [r3, #25]
+ 526              	.L25:
+ 163:../Source - Copy/flash.c **** 	}
+ 164:../Source - Copy/flash.c **** }
+ 527              		.loc 1 164 0
+ 528 0090 40B0     		add	sp, sp, #256
+ 529              		@ sp needed for prologue
+ 530 0092 70BD     		pop	{r4, r5, r6, pc}
+ 531              	.L32:
+ 532              		.align	2
+ 533              	.L31:
+ 534 0094 5C000000 		.word	.LC17
+ 535 0098 00F80008 		.word	134281216
+ 536 009c 00000000 		.word	g_config
+ 537              		.cfi_endproc
+ 538              	.LFE40:
+ 540              		.global	FLASHStatus
+ 541              		.comm	g_appStats,136,4
+ 542              		.comm	g_config,28,4
+ 543              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 544              	.LC4:
+ 545 0000 65726173 		.ascii	"erase flash fail\015\012\000"
+ 545      6520666C 
+ 545      61736820 
+ 545      6661696C 
+ 545      0D0A00
+ 546              	.LC6:
+ 547 0013 77726974 		.ascii	"write flash fail\015\012\000"
+ 547      6520666C 
+ 547      61736820 
+ 547      6661696C 
+ 547      0D0A00
+ 548              	.LC8:
+ 549 0026 77726974 		.ascii	"write_config\015\012\000"
+ 549      655F636F 
+ 549      6E666967 
+ 549      0D0A00
+ 550              	.LC13:
+ 551 0035 31323334 		.ascii	"1234567890\000"
+ 551      35363738 
+ 551      393000
+ 552              	.LC15:
+ 553 0040 0D0A5772 		.ascii	"\015\012Write default config.\015\012\015\012\000"
+ 553      69746520 
+ 553      64656661 
+ 553      756C7420 
+ 553      636F6E66 
+ 554              	.LC17:
+ 555 005c 6C6F6164 		.ascii	"load_config\015\012\000"
+ 555      5F636F6E 
+ 555      6669670D 
+ 555      0A00
+ 556              		.section	.data.FLASHStatus,"aw",%progbits
+ 559              	FLASHStatus:
+ 560 0000 05       		.byte	5
+ 561              		.text
+ 562              	.Letext0:
+ 563              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 564              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 565              		.file 4 "../Source - Copy/DataUtil.h"
+ 566              		.file 5 "<built-in>"
+DEFINED SYMBOLS
+                            *ABS*:00000000 flash.c
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:18     .text.NMEAChecksum:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:23     .text.NMEAChecksum:00000000 NMEAChecksum
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:64     .text.FlashInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:69     .text.FlashInit:00000000 FlashInit
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:87     .text.flash_wrire_char:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:92     .text.flash_wrire_char:00000000 flash_wrire_char
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:123    .text.flash_wrire_char:00000020 $d
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:128    .text.flash_write_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:133    .text.flash_write_config:00000000 flash_write_config
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:204    .text.flash_write_config:00000044 $d
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:210    .text.flash_read_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:215    .text.flash_read_config:00000000 flash_read_config
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:251    .text.write_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:256    .text.write_config:00000000 write_config
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:326    .text.write_config:00000050 $d
+                            *COM*:0000001c g_config
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:333    .text.make_default_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:338    .text.make_default_config:00000000 make_default_config
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:400    .text.make_default_config:0000003c $d
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:407    .text.load_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:412    .text.load_config:00000000 load_config
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:534    .text.load_config:00000094 $d
+C:\Users\khanh\AppData\Local\Temp\cc7FqQpl.s:559    .data.FLASHStatus:00000000 FLASHStatus
+                            *COM*:00000088 g_appStats
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+FLASH_Unlock
+FLASH_ClearFlag
+FLASH_ErasePage
+FLASH_ProgramHalfWord
+xprintf
+FLASH_ProgramWord
+FLASH_Lock
+memset
+strcpy

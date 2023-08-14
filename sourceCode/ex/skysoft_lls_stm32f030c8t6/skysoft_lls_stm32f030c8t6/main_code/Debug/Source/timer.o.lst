@@ -1,0 +1,438 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"timer.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.timeInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	timeInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	timeInit:
+  24              	.LFB33:
+  25              		.file 1 "../Source/timer.c"
+   1:../Source/timer.c **** #include "timer.h"
+   2:../Source/timer.c **** #include <stdint.h>
+   3:../Source/timer.c **** #include "stm32f0xx_conf.h"
+   4:../Source/timer.c **** 
+   5:../Source/timer.c **** #define OIL_SENOR_IPU_PIN				GPIO_Pin_3
+   6:../Source/timer.c **** #define OIL_SENOR_IPU_PORT				GPIOA
+   7:../Source/timer.c **** #define OIL_SENOR_IPU_PIN_SOURCE		GPIO_Pin_3
+   8:../Source/timer.c **** #define OIL_SENOR_IPU_PIN_AF			GPIO_AF_3
+   9:../Source/timer.c **** static void TIM3_basicConfiguration();
+  10:../Source/timer.c **** static void TIM15_captureConfiguration(void);
+  11:../Source/timer.c **** 
+  12:../Source/timer.c **** int timeInit(void){
+  26              		.loc 1 12 0
+  27              		.cfi_startproc
+  28 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 20
+  31              		.cfi_offset 4, -20
+  32              		.cfi_offset 5, -16
+  33              		.cfi_offset 6, -12
+  34              		.cfi_offset 7, -8
+  35              		.cfi_offset 14, -4
+  36              	.LBB6:
+  37              	.LBB7:
+  13:../Source/timer.c **** 	TIM3_basicConfiguration();
+  14:../Source/timer.c **** 	TIM15_captureConfiguration();
+  15:../Source/timer.c **** 	return 1;
+  16:../Source/timer.c **** }
+  17:../Source/timer.c **** 
+  18:../Source/timer.c **** void TIM3_startIT(void){
+  19:../Source/timer.c **** 	TIM_Cmd(TIM3, DISABLE);
+  20:../Source/timer.c **** 	TIM3->CNT =0;
+  21:../Source/timer.c **** 	TIM_Cmd(TIM3, ENABLE);
+  22:../Source/timer.c **** 	TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE);
+  23:../Source/timer.c **** 
+  24:../Source/timer.c **** }
+  25:../Source/timer.c **** void TIM3_stopIT(void){
+  26:../Source/timer.c **** 	TIM_Cmd(TIM3, DISABLE);
+  27:../Source/timer.c **** 	TIM_ITConfig(TIM3,TIM_IT_Update,DISABLE);
+  28:../Source/timer.c **** 
+  29:../Source/timer.c **** }
+  30:../Source/timer.c **** 
+  31:../Source/timer.c **** void TIM3_basicConfiguration(void) {
+  32:../Source/timer.c **** 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  33:../Source/timer.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+  34:../Source/timer.c **** 
+  35:../Source/timer.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  36:../Source/timer.c **** 
+  37:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Period = 65535;
+  38              		.loc 1 37 0
+  39 0002 324D     		ldr	r5, .L2
+  40              	.LBE7:
+  41              	.LBE6:
+  12:../Source/timer.c **** int timeInit(void){
+  42              		.loc 1 12 0
+  43 0004 8BB0     		sub	sp, sp, #44
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 64
+  46              	.LBB9:
+  47              	.LBB8:
+  35:../Source/timer.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  48              		.loc 1 35 0
+  49 0006 0220     		mov	r0, #2
+  50 0008 0121     		mov	r1, #1
+  51              		.loc 1 37 0
+  52 000a 01AC     		add	r4, sp, #4
+  35:../Source/timer.c **** 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+  53              		.loc 1 35 0
+  54 000c FFF7FEFF 		bl	RCC_APB1PeriphClockCmd
+  38:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Prescaler = 2-1;
+  39:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+  55              		.loc 1 39 0
+  56 0010 0026     		mov	r6, #0
+  37:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Period = 65535;
+  57              		.loc 1 37 0
+  58 0012 0295     		str	r5, [sp, #8]
+  38:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Prescaler = 2-1;
+  59              		.loc 1 38 0
+  60 0014 0125     		mov	r5, #1
+  61 0016 2580     		strh	r5, [r4]
+  62              		.loc 1 39 0
+  63 0018 2681     		strh	r6, [r4, #8]
+  40:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+  64              		.loc 1 40 0
+  65 001a 6680     		strh	r6, [r4, #2]
+  41:../Source/timer.c **** 
+  42:../Source/timer.c **** 	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure);
+  66              		.loc 1 42 0
+  67 001c 211C     		mov	r1, r4
+  68 001e 2C48     		ldr	r0, .L2+4
+  69 0020 FFF7FEFF 		bl	TIM_TimeBaseInit
+  43:../Source/timer.c **** 
+  44:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+  70              		.loc 1 44 0
+  71 0024 09AF     		add	r7, sp, #36
+  45:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+  72              		.loc 1 45 0
+  73 0026 0022     		mov	r2, #0
+  44:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+  74              		.loc 1 44 0
+  75 0028 1021     		mov	r1, #16
+  46:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  76              		.loc 1 46 0
+  77 002a 0120     		mov	r0, #1
+  45:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+  78              		.loc 1 45 0
+  79 002c 7A70     		strb	r2, [r7, #1]
+  44:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
+  80              		.loc 1 44 0
+  81 002e 3970     		strb	r1, [r7]
+  82              		.loc 1 46 0
+  83 0030 B870     		strb	r0, [r7, #2]
+  47:../Source/timer.c **** 	NVIC_Init(&NVIC_InitStructure);
+  84              		.loc 1 47 0
+  85 0032 381C     		mov	r0, r7
+  86 0034 FFF7FEFF 		bl	NVIC_Init
+  48:../Source/timer.c **** 	/* Enable the CC2 Interrupt Request */
+  49:../Source/timer.c **** 	/* TIM enable counter */
+  50:../Source/timer.c **** 	//TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE);
+  51:../Source/timer.c **** 	TIM_Cmd(TIM3, ENABLE);
+  87              		.loc 1 51 0
+  88 0038 291C     		mov	r1, r5
+  89 003a 2548     		ldr	r0, .L2+4
+  90 003c FFF7FEFF 		bl	TIM_Cmd
+  91              	.LBE8:
+  92              	.LBE9:
+  93              	.LBB10:
+  94              	.LBB11:
+  52:../Source/timer.c **** 
+  53:../Source/timer.c **** }
+  54:../Source/timer.c **** 
+  55:../Source/timer.c **** void TIM15_captureConfiguration(void) {
+  56:../Source/timer.c **** 	TIM_ICInitTypeDef TIM_ICInitStructure;
+  57:../Source/timer.c **** 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
+  58:../Source/timer.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  59:../Source/timer.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+  60:../Source/timer.c **** 	/* TIM1 clock enable */
+  61:../Source/timer.c **** 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM15, ENABLE);
+  95              		.loc 1 61 0
+  96 0040 8023     		mov	r3, #128
+  97 0042 5802     		lsl	r0, r3, #9
+  98 0044 291C     		mov	r1, r5
+  99 0046 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  62:../Source/timer.c **** 	/* GPIOA clock enable */
+  63:../Source/timer.c **** 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
+ 100              		.loc 1 63 0
+ 101 004a 8021     		mov	r1, #128
+ 102 004c 8802     		lsl	r0, r1, #10
+ 103 004e 291C     		mov	r1, r5
+ 104 0050 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  64:../Source/timer.c **** 	/* TIM1 channel 1 pin (PA.4) configuration */
+  65:../Source/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+ 105              		.loc 1 65 0
+ 106 0054 07A9     		add	r1, sp, #28
+ 107 0056 0822     		mov	r2, #8
+  66:../Source/timer.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 108              		.loc 1 66 0
+ 109 0058 0220     		mov	r0, #2
+  65:../Source/timer.c **** 	GPIO_InitStructure.GPIO_Pin = OIL_SENOR_IPU_PIN;
+ 110              		.loc 1 65 0
+ 111 005a 0792     		str	r2, [sp, #28]
+ 112              		.loc 1 66 0
+ 113 005c 0871     		strb	r0, [r1, #4]
+  67:../Source/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  68:../Source/timer.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 114              		.loc 1 68 0
+ 115 005e 0022     		mov	r2, #0
+  67:../Source/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 116              		.loc 1 67 0
+ 117 0060 0323     		mov	r3, #3
+  69:../Source/timer.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  70:../Source/timer.c **** 	GPIO_Init(OIL_SENOR_IPU_PORT, &GPIO_InitStructure);
+ 118              		.loc 1 70 0
+ 119 0062 9020     		mov	r0, #144
+  67:../Source/timer.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+ 120              		.loc 1 67 0
+ 121 0064 4B71     		strb	r3, [r1, #5]
+  68:../Source/timer.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 122              		.loc 1 68 0
+ 123 0066 8A71     		strb	r2, [r1, #6]
+  69:../Source/timer.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+ 124              		.loc 1 69 0
+ 125 0068 CA71     		strb	r2, [r1, #7]
+ 126              		.loc 1 70 0
+ 127 006a C005     		lsl	r0, r0, #23
+ 128 006c FFF7FEFF 		bl	GPIO_Init
+  71:../Source/timer.c **** 	/* Connect TIM pins to AF2 */
+  72:../Source/timer.c **** 	GPIO_PinAFConfig(OIL_SENOR_IPU_PORT, OIL_SENOR_IPU_PIN_SOURCE,
+ 129              		.loc 1 72 0
+ 130 0070 9023     		mov	r3, #144
+ 131 0072 D805     		lsl	r0, r3, #23
+ 132 0074 0821     		mov	r1, #8
+ 133 0076 0322     		mov	r2, #3
+ 134 0078 FFF7FEFF 		bl	GPIO_PinAFConfig
+  73:../Source/timer.c **** 			OIL_SENOR_IPU_PIN_AF);
+  74:../Source/timer.c **** 
+  75:../Source/timer.c **** 	// Time base configuration
+  76:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Period = 65535;
+ 135              		.loc 1 76 0
+ 136 007c 134A     		ldr	r2, .L2
+  77:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Prescaler = 2-1;
+ 137              		.loc 1 77 0
+ 138 007e 2580     		strh	r5, [r4]
+  76:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_Period = 65535;
+ 139              		.loc 1 76 0
+ 140 0080 6260     		str	r2, [r4, #4]
+  78:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_ClockDivision = 0;
+ 141              		.loc 1 78 0
+ 142 0082 2681     		strh	r6, [r4, #8]
+  79:../Source/timer.c **** 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+ 143              		.loc 1 79 0
+ 144 0084 6680     		strh	r6, [r4, #2]
+  80:../Source/timer.c **** 
+  81:../Source/timer.c **** 	TIM_TimeBaseInit(TIM15, &TIM_TimeBaseStructure);
+ 145              		.loc 1 81 0
+ 146 0086 211C     		mov	r1, r4
+ 147 0088 1248     		ldr	r0, .L2+8
+ 148 008a FFF7FEFF 		bl	TIM_TimeBaseInit
+  82:../Source/timer.c **** 
+  83:../Source/timer.c **** 	/* TIM1 configuration: Input Capture mode ---------------------
+  84:../Source/timer.c **** 	 The external signal is connected to TIM1 CH1 pin (PA.08)
+  85:../Source/timer.c **** 	 The Rising edge is used as active edge,
+  86:../Source/timer.c **** 	 The TIM1 CCR1 is used to compute the frequency value
+  87:../Source/timer.c **** 	 ------------------------------------------------------------ */
+  88:../Source/timer.c **** 	TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
+ 149              		.loc 1 88 0
+ 150 008e 0424     		mov	r4, #4
+ 151 0090 04A9     		add	r1, sp, #16
+ 152 0092 0C80     		strh	r4, [r1]
+  89:../Source/timer.c **** 	TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
+ 153              		.loc 1 89 0
+ 154 0094 4E80     		strh	r6, [r1, #2]
+  90:../Source/timer.c **** 	TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
+ 155              		.loc 1 90 0
+ 156 0096 8D80     		strh	r5, [r1, #4]
+  91:../Source/timer.c **** 	TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
+ 157              		.loc 1 91 0
+ 158 0098 CE80     		strh	r6, [r1, #6]
+  92:../Source/timer.c **** 	TIM_ICInitStructure.TIM_ICFilter = 0x0;
+ 159              		.loc 1 92 0
+ 160 009a 0E81     		strh	r6, [r1, #8]
+  93:../Source/timer.c **** 	TIM_ICInit(TIM15, &TIM_ICInitStructure);
+ 161              		.loc 1 93 0
+ 162 009c 0D48     		ldr	r0, .L2+8
+ 163 009e FFF7FEFF 		bl	TIM_ICInit
+  94:../Source/timer.c **** 	/* Enable the TIM4 global Interrupt */
+  95:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+  96:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+  97:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 164              		.loc 1 97 0
+ 165 00a2 0123     		mov	r3, #1
+  95:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+ 166              		.loc 1 95 0
+ 167 00a4 1421     		mov	r1, #20
+  96:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 168              		.loc 1 96 0
+ 169 00a6 0020     		mov	r0, #0
+ 170              		.loc 1 97 0
+ 171 00a8 BB70     		strb	r3, [r7, #2]
+  95:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannel = TIM15_IRQn;
+ 172              		.loc 1 95 0
+ 173 00aa 3970     		strb	r1, [r7]
+  96:../Source/timer.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 174              		.loc 1 96 0
+ 175 00ac 7870     		strb	r0, [r7, #1]
+  98:../Source/timer.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 176              		.loc 1 98 0
+ 177 00ae 381C     		mov	r0, r7
+ 178 00b0 FFF7FEFF 		bl	NVIC_Init
+  99:../Source/timer.c **** 
+ 100:../Source/timer.c **** 	/* Enable the CC2 Interrupt Request */
+ 101:../Source/timer.c **** 	TIM_ITConfig(TIM15, TIM_IT_CC2, ENABLE);
+ 179              		.loc 1 101 0
+ 180 00b4 211C     		mov	r1, r4
+ 181 00b6 2A1C     		mov	r2, r5
+ 182 00b8 0648     		ldr	r0, .L2+8
+ 183 00ba FFF7FEFF 		bl	TIM_ITConfig
+ 102:../Source/timer.c **** 	/* TIM enable counter */
+ 103:../Source/timer.c **** 	TIM_Cmd(TIM15, ENABLE);
+ 184              		.loc 1 103 0
+ 185 00be 0548     		ldr	r0, .L2+8
+ 186 00c0 291C     		mov	r1, r5
+ 187 00c2 FFF7FEFF 		bl	TIM_Cmd
+ 188              	.LBE11:
+ 189              	.LBE10:
+  16:../Source/timer.c **** }
+ 190              		.loc 1 16 0
+ 191 00c6 281C     		mov	r0, r5
+ 192 00c8 0BB0     		add	sp, sp, #44
+ 193              		@ sp needed for prologue
+ 194 00ca F0BD     		pop	{r4, r5, r6, r7, pc}
+ 195              	.L3:
+ 196              		.align	2
+ 197              	.L2:
+ 198 00cc FFFF0000 		.word	65535
+ 199 00d0 00040040 		.word	1073742848
+ 200 00d4 00400140 		.word	1073823744
+ 201              		.cfi_endproc
+ 202              	.LFE33:
+ 204              		.section	.text.TIM3_startIT,"ax",%progbits
+ 205              		.align	1
+ 206              		.global	TIM3_startIT
+ 207              		.code	16
+ 208              		.thumb_func
+ 210              	TIM3_startIT:
+ 211              	.LFB34:
+  18:../Source/timer.c **** void TIM3_startIT(void){
+ 212              		.loc 1 18 0
+ 213              		.cfi_startproc
+ 214 0000 10B5     		push	{r4, lr}
+ 215              	.LCFI2:
+ 216              		.cfi_def_cfa_offset 8
+ 217              		.cfi_offset 4, -8
+ 218              		.cfi_offset 14, -4
+  20:../Source/timer.c **** 	TIM3->CNT =0;
+ 219              		.loc 1 20 0
+ 220 0002 084C     		ldr	r4, .L5
+  19:../Source/timer.c **** 	TIM_Cmd(TIM3, DISABLE);
+ 221              		.loc 1 19 0
+ 222 0004 0748     		ldr	r0, .L5
+ 223 0006 0021     		mov	r1, #0
+ 224 0008 FFF7FEFF 		bl	TIM_Cmd
+  20:../Source/timer.c **** 	TIM3->CNT =0;
+ 225              		.loc 1 20 0
+ 226 000c 0023     		mov	r3, #0
+ 227 000e 6362     		str	r3, [r4, #36]
+  21:../Source/timer.c **** 	TIM_Cmd(TIM3, ENABLE);
+ 228              		.loc 1 21 0
+ 229 0010 201C     		mov	r0, r4
+ 230 0012 0121     		mov	r1, #1
+ 231 0014 FFF7FEFF 		bl	TIM_Cmd
+  22:../Source/timer.c **** 	TIM_ITConfig(TIM3,TIM_IT_Update,ENABLE);
+ 232              		.loc 1 22 0
+ 233 0018 0121     		mov	r1, #1
+ 234 001a 201C     		mov	r0, r4
+ 235 001c 0A1C     		mov	r2, r1
+ 236 001e FFF7FEFF 		bl	TIM_ITConfig
+ 237              		@ sp needed for prologue
+  24:../Source/timer.c **** }
+ 238              		.loc 1 24 0
+ 239 0022 10BD     		pop	{r4, pc}
+ 240              	.L6:
+ 241              		.align	2
+ 242              	.L5:
+ 243 0024 00040040 		.word	1073742848
+ 244              		.cfi_endproc
+ 245              	.LFE34:
+ 247              		.section	.text.TIM3_stopIT,"ax",%progbits
+ 248              		.align	1
+ 249              		.global	TIM3_stopIT
+ 250              		.code	16
+ 251              		.thumb_func
+ 253              	TIM3_stopIT:
+ 254              	.LFB35:
+  25:../Source/timer.c **** void TIM3_stopIT(void){
+ 255              		.loc 1 25 0
+ 256              		.cfi_startproc
+ 257 0000 08B5     		push	{r3, lr}
+ 258              	.LCFI3:
+ 259              		.cfi_def_cfa_offset 8
+ 260              		.cfi_offset 3, -8
+ 261              		.cfi_offset 14, -4
+  26:../Source/timer.c **** 	TIM_Cmd(TIM3, DISABLE);
+ 262              		.loc 1 26 0
+ 263 0002 0548     		ldr	r0, .L8
+ 264 0004 0021     		mov	r1, #0
+ 265 0006 FFF7FEFF 		bl	TIM_Cmd
+  27:../Source/timer.c **** 	TIM_ITConfig(TIM3,TIM_IT_Update,DISABLE);
+ 266              		.loc 1 27 0
+ 267 000a 0348     		ldr	r0, .L8
+ 268 000c 0121     		mov	r1, #1
+ 269 000e 0022     		mov	r2, #0
+ 270 0010 FFF7FEFF 		bl	TIM_ITConfig
+ 271              		@ sp needed for prologue
+  29:../Source/timer.c **** }
+ 272              		.loc 1 29 0
+ 273 0014 08BD     		pop	{r3, pc}
+ 274              	.L9:
+ 275 0016 C046     		.align	2
+ 276              	.L8:
+ 277 0018 00040040 		.word	1073742848
+ 278              		.cfi_endproc
+ 279              	.LFE35:
+ 281              		.text
+ 282              	.Letext0:
+ 283              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 284              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+ 285              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 286              		.file 5 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 287              		.file 6 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+DEFINED SYMBOLS
+                            *ABS*:00000000 timer.c
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:18     .text.timeInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:23     .text.timeInit:00000000 timeInit
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:198    .text.timeInit:000000cc $d
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:205    .text.TIM3_startIT:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:210    .text.TIM3_startIT:00000000 TIM3_startIT
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:243    .text.TIM3_startIT:00000024 $d
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:248    .text.TIM3_stopIT:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:253    .text.TIM3_stopIT:00000000 TIM3_stopIT
+C:\Users\khanh\AppData\Local\Temp\ccKJgwTD.s:277    .text.TIM3_stopIT:00000018 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphClockCmd
+TIM_TimeBaseInit
+NVIC_Init
+TIM_Cmd
+RCC_APB2PeriphClockCmd
+RCC_AHBPeriphClockCmd
+GPIO_Init
+GPIO_PinAFConfig
+TIM_ICInit
+TIM_ITConfig

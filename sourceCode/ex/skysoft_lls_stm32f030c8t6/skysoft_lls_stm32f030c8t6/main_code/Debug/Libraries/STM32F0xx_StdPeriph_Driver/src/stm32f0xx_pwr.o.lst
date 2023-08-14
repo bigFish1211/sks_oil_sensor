@@ -1,0 +1,1417 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"stm32f0xx_pwr.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.PWR_DeInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	PWR_DeInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	PWR_DeInit:
+  24              	.LFB33:
+  25              		.file 1 "../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c"
+   1:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+   2:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ******************************************************************************
+   3:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @file    stm32f0xx_pwr.c
+   4:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @author  MCD Application Team
+   5:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @version V1.5.0
+   6:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @date    05-December-2014
+   7:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          functionalities of the Power Controller (PWR) peripheral:
+   9:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *           + Backup Domain Access
+  10:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *           + PVD configuration
+  11:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *           + WakeUp pins configuration
+  12:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *           + Low Power modes configuration
+  13:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *           + Flags management
+  14:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *
+  15:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ******************************************************************************
+  16:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @attention
+  17:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *
+  18:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  19:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *
+  20:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  21:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * You may not use this file except in compliance with the License.
+  22:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * You may obtain a copy of the License at:
+  23:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *
+  24:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  25:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *
+  26:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * Unless required by applicable law or agreed to in writing, software 
+  27:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  28:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  29:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * See the License for the specific language governing permissions and
+  30:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * limitations under the License.
+  31:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *
+  32:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ******************************************************************************
+  33:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+  34:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  35:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Includes ------------------------------------------------------------------*/
+  36:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** #include "stm32f0xx_pwr.h"
+  37:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** #include "stm32f0xx_rcc.h"
+  38:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  39:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @addtogroup STM32F0xx_StdPeriph_Driver
+  40:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+  41:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+  42:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  43:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR 
+  44:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief PWR driver modules
+  45:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+  46:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */ 
+  47:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  48:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Private typedef -----------------------------------------------------------*/
+  49:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Private define ------------------------------------------------------------*/
+  50:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  51:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* ------------------ PWR registers bit mask ------------------------ */
+  52:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  53:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* CR register bit mask */
+  54:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** #define CR_DS_MASK               ((uint32_t)0xFFFFFFFC)
+  55:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** #define CR_PLS_MASK              ((uint32_t)0xFFFFFF1F)
+  56:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  57:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Private macro -------------------------------------------------------------*/
+  58:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Private variables ---------------------------------------------------------*/
+  59:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Private function prototypes -----------------------------------------------*/
+  60:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /* Private functions ---------------------------------------------------------*/
+  61:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  62:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR_Private_Functions
+  63:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+  64:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+  65:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  66:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR_Group1 Backup Domain Access function 
+  67:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *  @brief   Backup Domain Access function
+  68:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *
+  69:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @verbatim
+  70:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+  71:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    ##### Backup Domain Access function #####
+  72:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+  73:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  74:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     [..] After reset, the Backup Domain Registers (RCC BDCR Register, RTC registers
+  75:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****          and RTC backup registers) are protected against possible stray write accesses.
+  76:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     [..] To enable access to Backup domain use the PWR_BackupAccessCmd(ENABLE) function.
+  77:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  78:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @endverbatim
+  79:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+  80:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+  81:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  82:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+  83:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Deinitializes the PWR peripheral registers to their default reset values.
+  84:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  None
+  85:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+  86:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+  87:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_DeInit(void)
+  88:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+  26              		.loc 1 88 0
+  27              		.cfi_startproc
+  28 0000 08B5     		push	{r3, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 8
+  31              		.cfi_offset 3, -8
+  32              		.cfi_offset 14, -4
+  89:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, ENABLE);
+  33              		.loc 1 89 0
+  34 0002 8021     		mov	r1, #128
+  35 0004 4805     		lsl	r0, r1, #21
+  36 0006 0121     		mov	r1, #1
+  37 0008 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  90:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   RCC_APB1PeriphResetCmd(RCC_APB1Periph_PWR, DISABLE);
+  38              		.loc 1 90 0
+  39 000c 8020     		mov	r0, #128
+  40 000e 4005     		lsl	r0, r0, #21
+  41 0010 0021     		mov	r1, #0
+  42 0012 FFF7FEFF 		bl	RCC_APB1PeriphResetCmd
+  43              		@ sp needed for prologue
+  91:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+  44              		.loc 1 91 0
+  45 0016 08BD     		pop	{r3, pc}
+  46              		.cfi_endproc
+  47              	.LFE33:
+  49              		.section	.text.PWR_BackupAccessCmd,"ax",%progbits
+  50              		.align	1
+  51              		.global	PWR_BackupAccessCmd
+  52              		.code	16
+  53              		.thumb_func
+  55              	PWR_BackupAccessCmd:
+  56              	.LFB34:
+  92:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+  93:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+  94:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Enables or disables access to the Backup domain registers.
+  95:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   If the HSE divided by 32 is used as the RTC clock, the 
+  96:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         Backup Domain Access should be kept enabled.
+  97:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  NewState: new state of the access to the Backup domain registers.
+  98:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be: ENABLE or DISABLE.
+  99:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 100:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 101:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_BackupAccessCmd(FunctionalState NewState)
+ 102:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+  57              		.loc 1 102 0
+  58              		.cfi_startproc
+  59 0000 00B5     		push	{lr}
+  60              	.LCFI1:
+  61              		.cfi_def_cfa_offset 4
+  62              		.cfi_offset 14, -4
+  63              	.LVL0:
+  64 0002 064B     		ldr	r3, .L6
+ 103:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 104:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 105:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 106:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if (NewState != DISABLE)
+ 107:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 108:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Enable the Backup Domain Access */
+ 109:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     PWR->CR |= PWR_CR_DBP;
+  65              		.loc 1 109 0
+  66 0004 1968     		ldr	r1, [r3]
+ 106:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if (NewState != DISABLE)
+  67              		.loc 1 106 0
+  68 0006 0028     		cmp	r0, #0
+  69 0008 03D0     		beq	.L3
+  70              		.loc 1 109 0
+  71 000a 8022     		mov	r2, #128
+  72 000c 5200     		lsl	r2, r2, #1
+  73 000e 0A43     		orr	r2, r1
+  74 0010 01E0     		b	.L5
+  75              	.L3:
+ 110:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 111:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else
+ 112:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 113:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Disable the Backup Domain Access */
+ 114:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     PWR->CR &= (uint32_t)~((uint32_t)PWR_CR_DBP);
+  76              		.loc 1 114 0
+  77 0012 034A     		ldr	r2, .L6+4
+  78 0014 0A40     		and	r2, r1
+  79              	.L5:
+  80 0016 1A60     		str	r2, [r3]
+  81              		@ sp needed for prologue
+ 115:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   } 
+ 116:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+  82              		.loc 1 116 0
+  83 0018 00BD     		pop	{pc}
+  84              	.L7:
+  85 001a C046     		.align	2
+  86              	.L6:
+  87 001c 00700040 		.word	1073770496
+  88 0020 FFFEFFFF 		.word	-257
+  89              		.cfi_endproc
+  90              	.LFE34:
+  92              		.section	.text.PWR_PVDLevelConfig,"ax",%progbits
+  93              		.align	1
+  94              		.global	PWR_PVDLevelConfig
+  95              		.code	16
+  96              		.thumb_func
+  98              	PWR_PVDLevelConfig:
+  99              	.LFB35:
+ 117:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 118:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 119:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @}
+ 120:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 121:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 122:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR_Group2 PVD configuration functions
+ 123:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *  @brief   PVD configuration functions 
+ 124:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *
+ 125:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @verbatim
+ 126:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 127:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                     ##### PVD configuration functions #####
+ 128:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 129:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   [..]
+ 130:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   (+) The PVD is used to monitor the VDD power supply by comparing it to a threshold
+ 131:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       selected by the PVD Level (PLS[2:0] bits in the PWR_CR).
+ 132:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   (+) A PVDO flag is available to indicate if VDD/VDDA is higher or lower than the 
+ 133:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       PVD threshold. This event is internally connected to the EXTI line16
+ 134:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       and can generate an interrupt if enabled through the EXTI registers.
+ 135:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   (+) The PVD is stopped in Standby mode.
+ 136:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 137:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @endverbatim
+ 138:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+ 139:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 140:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 141:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 142:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Configures the voltage threshold detected by the Power Voltage Detector(PVD).
+ 143:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   This function is not applicable for STM32F030 devices. 
+ 144:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_PVDLevel: specifies the PVD detection level
+ 145:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be one of the following values:
+ 146:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_0
+ 147:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_1
+ 148:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_2
+ 149:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_3
+ 150:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_4
+ 151:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_5
+ 152:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_6
+ 153:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_PVDLevel_7
+ 154:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   Refer to the electrical characteristics of your device datasheet for
+ 155:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         more details about the voltage threshold corresponding to each 
+ 156:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         detection level.
+ 157:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 158:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 159:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_PVDLevelConfig(uint32_t PWR_PVDLevel)
+ 160:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 100              		.loc 1 160 0
+ 101              		.cfi_startproc
+ 102              	.LVL1:
+ 161:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   uint32_t tmpreg = 0;
+ 162:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 163:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 164:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_PVD_LEVEL(PWR_PVDLevel));
+ 165:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 166:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg = PWR->CR;
+ 103              		.loc 1 166 0
+ 104 0000 034B     		ldr	r3, .L9
+ 167:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 168:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Clear PLS[7:5] bits */
+ 169:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg &= CR_PLS_MASK;
+ 105              		.loc 1 169 0
+ 106 0002 E021     		mov	r1, #224
+ 166:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg = PWR->CR;
+ 107              		.loc 1 166 0
+ 108 0004 1A68     		ldr	r2, [r3]
+ 109              	.LVL2:
+ 110              		@ sp needed for prologue
+ 111              		.loc 1 169 0
+ 112 0006 8A43     		bic	r2, r1
+ 113              	.LVL3:
+ 170:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 171:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Set PLS[7:5] bits according to PWR_PVDLevel value */
+ 172:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg |= PWR_PVDLevel;
+ 114              		.loc 1 172 0
+ 115 0008 1043     		orr	r0, r2
+ 116              	.LVL4:
+ 173:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 174:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Store the new value */
+ 175:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   PWR->CR = tmpreg;
+ 117              		.loc 1 175 0
+ 118 000a 1860     		str	r0, [r3]
+ 176:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 119              		.loc 1 176 0
+ 120 000c 7047     		bx	lr
+ 121              	.L10:
+ 122 000e C046     		.align	2
+ 123              	.L9:
+ 124 0010 00700040 		.word	1073770496
+ 125              		.cfi_endproc
+ 126              	.LFE35:
+ 128              		.section	.text.PWR_PVDCmd,"ax",%progbits
+ 129              		.align	1
+ 130              		.global	PWR_PVDCmd
+ 131              		.code	16
+ 132              		.thumb_func
+ 134              	PWR_PVDCmd:
+ 135              	.LFB36:
+ 177:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 178:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 179:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Enables or disables the Power Voltage Detector(PVD).
+ 180:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   This function is not applicable for STM32F030 devices.    
+ 181:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  NewState: new state of the PVD.
+ 182:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 183:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 184:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 185:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_PVDCmd(FunctionalState NewState)
+ 186:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 136              		.loc 1 186 0
+ 137              		.cfi_startproc
+ 138 0000 00B5     		push	{lr}
+ 139              	.LCFI2:
+ 140              		.cfi_def_cfa_offset 4
+ 141              		.cfi_offset 14, -4
+ 142              	.LVL5:
+ 143 0002 054B     		ldr	r3, .L15
+ 144 0004 1022     		mov	r2, #16
+ 187:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 188:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 189:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 190:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if (NewState != DISABLE)
+ 191:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 192:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Enable the PVD */
+ 193:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     PWR->CR |= PWR_CR_PVDE;
+ 145              		.loc 1 193 0
+ 146 0006 1968     		ldr	r1, [r3]
+ 190:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if (NewState != DISABLE)
+ 147              		.loc 1 190 0
+ 148 0008 0028     		cmp	r0, #0
+ 149 000a 01D0     		beq	.L12
+ 150              		.loc 1 193 0
+ 151 000c 0A43     		orr	r2, r1
+ 152 000e 01E0     		b	.L14
+ 153              	.L12:
+ 194:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 195:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else
+ 196:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 197:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Disable the PVD */
+ 198:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     PWR->CR &= (uint32_t)~((uint32_t)PWR_CR_PVDE);
+ 154              		.loc 1 198 0
+ 155 0010 9143     		bic	r1, r2
+ 156 0012 0A1C     		mov	r2, r1
+ 157              	.L14:
+ 158 0014 1A60     		str	r2, [r3]
+ 159              		@ sp needed for prologue
+ 199:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   } 
+ 200:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 160              		.loc 1 200 0
+ 161 0016 00BD     		pop	{pc}
+ 162              	.L16:
+ 163              		.align	2
+ 164              	.L15:
+ 165 0018 00700040 		.word	1073770496
+ 166              		.cfi_endproc
+ 167              	.LFE36:
+ 169              		.section	.text.PWR_WakeUpPinCmd,"ax",%progbits
+ 170              		.align	1
+ 171              		.global	PWR_WakeUpPinCmd
+ 172              		.code	16
+ 173              		.thumb_func
+ 175              	PWR_WakeUpPinCmd:
+ 176              	.LFB37:
+ 201:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 202:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 203:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @}
+ 204:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 205:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 206:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR_Group3 WakeUp pins configuration functions
+ 207:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *  @brief   WakeUp pins configuration functions 
+ 208:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *
+ 209:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @verbatim
+ 210:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 211:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                ##### WakeUp pin configuration functions #####
+ 212:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 213:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 214:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   (+) WakeUp pins are used to wakeup the system from Standby mode. These pins are 
+ 215:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       forced in input pull down configuration and are active on rising edges.
+ 216:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   (+) There are eight WakeUp pins: WakeUp Pin 1 on PA.00 and WakeUp Pin 2 on PC.13. 
+ 217:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       The following WakeUp pins are only applicable for STM32F072 dvices:
+ 218:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       WakeUp Pin 3 on PE.06, WakeUp Pin 4 on PA.02, WakeUp Pin 5 on PC.05, 
+ 219:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****       WakeUp Pin 6 on PB.05, WakeUp Pin 7 on PB.15 and WakeUp Pin 8 on PF.02.
+ 220:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 221:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @endverbatim
+ 222:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+ 223:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 224:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 225:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 226:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Enables or disables the WakeUp Pin functionality.
+ 227:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_WakeUpPin: specifies the WakeUpPin.
+ 228:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be one of the following values
+ 229:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_1
+ 230:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_2
+ 231:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_3, only applicable for STM32F072 devices
+ 232:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_4, only applicable for STM32F072 devices
+ 233:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_5, only applicable for STM32F072 devices
+ 234:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_6, only applicable for STM32F072 devices
+ 235:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_7, only applicable for STM32F072 devices
+ 236:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_WakeUpPin_8, only applicable for STM32F072 devices            
+ 237:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  NewState: new state of the WakeUp Pin functionality.
+ 238:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 239:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 240:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 241:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_WakeUpPinCmd(uint32_t PWR_WakeUpPin, FunctionalState NewState)
+ 242:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 177              		.loc 1 242 0
+ 178              		.cfi_startproc
+ 179 0000 00B5     		push	{lr}
+ 180              	.LCFI3:
+ 181              		.cfi_def_cfa_offset 4
+ 182              		.cfi_offset 14, -4
+ 183              	.LVL6:
+ 184 0002 054B     		ldr	r3, .L20
+ 243:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 244:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_WAKEUP_PIN(PWR_WakeUpPin));
+ 245:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 246:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 247:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if (NewState != DISABLE)
+ 248:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 249:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Enable the EWUPx pin */
+ 250:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     PWR->CSR |= PWR_WakeUpPin;
+ 185              		.loc 1 250 0
+ 186 0004 5A68     		ldr	r2, [r3, #4]
+ 247:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if (NewState != DISABLE)
+ 187              		.loc 1 247 0
+ 188 0006 0029     		cmp	r1, #0
+ 189 0008 02D0     		beq	.L18
+ 190              		.loc 1 250 0
+ 191 000a 1043     		orr	r0, r2
+ 192              	.LVL7:
+ 193 000c 5860     		str	r0, [r3, #4]
+ 194 000e 01E0     		b	.L17
+ 195              	.LVL8:
+ 196              	.L18:
+ 251:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 252:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else
+ 253:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 254:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Disable the EWUPx pin */
+ 255:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     PWR->CSR &= ~PWR_WakeUpPin;
+ 197              		.loc 1 255 0
+ 198 0010 8243     		bic	r2, r0
+ 199 0012 5A60     		str	r2, [r3, #4]
+ 200              	.LVL9:
+ 201              	.L17:
+ 202              		@ sp needed for prologue
+ 256:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 257:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 203              		.loc 1 257 0
+ 204 0014 00BD     		pop	{pc}
+ 205              	.L21:
+ 206 0016 C046     		.align	2
+ 207              	.L20:
+ 208 0018 00700040 		.word	1073770496
+ 209              		.cfi_endproc
+ 210              	.LFE37:
+ 212              		.section	.text.PWR_EnterSleepMode,"ax",%progbits
+ 213              		.align	1
+ 214              		.global	PWR_EnterSleepMode
+ 215              		.code	16
+ 216              		.thumb_func
+ 218              	PWR_EnterSleepMode:
+ 219              	.LFB38:
+ 258:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 259:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 260:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @}
+ 261:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 262:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 263:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 264:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR_Group4 Low Power modes configuration functions
+ 265:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *  @brief   Low Power modes configuration functions 
+ 266:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *
+ 267:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @verbatim
+ 268:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 269:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****               ##### Low Power modes configuration functions #####
+ 270:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 271:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 272:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     [..] The devices feature three low-power modes:
+ 273:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Sleep mode: Cortex-M0 core stopped, peripherals kept running.
+ 274:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Stop mode: all clocks are stopped, regulator running, regulator in low power mode
+ 275:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Standby mode: VCORE domain powered off
+ 276:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 277:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *** Sleep mode *** 
+ 278:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==================
+ 279:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   [..] 
+ 280:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Entry:
+ 281:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) The Sleep mode is entered by executing the WFE() or WFI() instructions.
+ 282:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Exit:
+ 283:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) Any peripheral interrupt acknowledged by the nested vectored interrupt 
+ 284:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              controller (NVIC) can wake up the device from Sleep mode.
+ 285:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 286:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *** Stop mode *** 
+ 287:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   =================
+ 288:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   [..] In Stop mode, all clocks in the VCORE domain are stopped, the PLL, the HSI,
+ 289:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        the HSI14 and the HSE RC oscillators are disabled. Internal SRAM and register 
+ 290:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        contents are preserved.
+ 291:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        The voltage regulator can be configured either in normal or low-power mode.
+ 292:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 293:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Entry:
+ 294:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) The Stop mode is entered using the PWR_EnterSTOPMode(PWR_Regulator_LowPower,) 
+ 295:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              function with regulator in LowPower or with Regulator ON.
+ 296:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Exit:
+ 297:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) Any EXTI Line (Internal or External) configured in Interrupt/Event mode
+ 298:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              or any internal IPs (I2C, UASRT or CEC) wakeup event.
+ 299:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 300:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *** Standby mode *** 
+ 301:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ====================
+ 302:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   [..] The Standby mode allows to achieve the lowest power consumption. It is based 
+ 303:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        on the Cortex-M0 deepsleep mode, with the voltage regulator disabled. 
+ 304:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        The VCORE domain is consequently powered off. The PLL, the HSI, the HSI14 
+ 305:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        oscillator and the HSE oscillator are also switched off. SRAM and register 
+ 306:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        contents are lost except for the Backup domain (RTC registers, RTC backup 
+ 307:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        registers and Standby circuitry).
+ 308:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****    
+ 309:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   [..] The voltage regulator is OFF.
+ 310:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 311:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Entry:
+ 312:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) The Standby mode is entered using the PWR_EnterSTANDBYMode() function.
+ 313:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Exit:
+ 314:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) WKUP pin rising edge, RTC alarm (Alarm A and Alarm B), RTC wakeup,
+ 315:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              tamper event, time-stamp event, external reset in NRST pin, IWDG reset.
+ 316:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 317:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *** Auto-wakeup (AWU) from low-power mode *** 
+ 318:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   =============================================
+ 319:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   [..] The MCU can be woken up from low-power mode by an RTC Alarm event, a tamper 
+ 320:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        event, a time-stamp event, or a comparator event, without depending on an 
+ 321:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****        external interrupt (Auto-wakeup mode).
+ 322:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 323:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) RTC auto-wakeup (AWU) from the Stop mode
+ 324:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) To wake up from the Stop mode with an RTC alarm event, it is necessary to:
+ 325:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the EXTI Line 17 to be sensitive to rising edges (Interrupt 
+ 326:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    or Event modes) using the EXTI_Init() function.
+ 327:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Enable the RTC Alarm Interrupt using the RTC_ITConfig() function
+ 328:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the RTC to generate the RTC alarm using the RTC_SetAlarm() 
+ 329:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    and RTC_AlarmCmd() functions.
+ 330:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) To wake up from the Stop mode with an RTC Tamper or time stamp event, it 
+ 331:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              is necessary to:
+ 332:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the EXTI Line 19 to be sensitive to rising edges (Interrupt 
+ 333:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    or Event modes) using the EXTI_Init() function.
+ 334:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Enable the RTC Tamper or time stamp Interrupt using the RTC_ITConfig() 
+ 335:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    function.
+ 336:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the RTC to detect the tamper or time stamp event using the
+ 337:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    RTC_TimeStampConfig(), RTC_TamperTriggerConfig() and RTC_TamperCmd()
+ 338:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    functions.
+ 339:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 340:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) RTC auto-wakeup (AWU) from the Standby mode
+ 341:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) To wake up from the Standby mode with an RTC alarm event, it is necessary to:
+ 342:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Enable the RTC Alarm Interrupt using the RTC_ITConfig() function.
+ 343:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the RTC to generate the RTC alarm using the RTC_SetAlarm() 
+ 344:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    and RTC_AlarmCmd() functions.
+ 345:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) To wake up from the Standby mode with an RTC Tamper or time stamp event, it 
+ 346:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              is necessary to:
+ 347:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Enable the RTC Tamper or time stamp Interrupt using the RTC_ITConfig() 
+ 348:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    function.
+ 349:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the RTC to detect the tamper or time stamp event using the
+ 350:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    RTC_TimeStampConfig(), RTC_TamperTriggerConfig() and RTC_TamperCmd()
+ 351:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    functions.
+ 352:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 353:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     (+) Comparator auto-wakeup (AWU) from the Stop mode
+ 354:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****         (++) To wake up from the Stop mode with an comparator 1 or comparator 2 wakeup
+ 355:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              event, it is necessary to:
+ 356:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the EXTI Line 21 for comparator 1 or EXTI Line 22 for comparator 2 
+ 357:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    to be sensitive to to the selected edges (falling, rising or falling 
+ 358:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                    and rising) (Interrupt or Event modes) using the EXTI_Init() function.
+ 359:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****              (+++) Configure the comparator to generate the event.
+ 360:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 361:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @endverbatim
+ 362:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+ 363:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 364:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 365:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 366:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Enters Sleep mode.
+ 367:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   In Sleep mode, all I/O pins keep the same state as in Run mode.
+ 368:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_SLEEPEntry: specifies if SLEEP mode in entered with WFI or WFE instruction.
+ 369:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be one of the following values:
+ 370:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_SLEEPEntry_WFI: enter SLEEP mode with WFI instruction
+ 371:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_SLEEPEntry_WFE: enter SLEEP mode with WFE instruction
+ 372:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 373:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 374:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_EnterSleepMode(uint8_t PWR_SLEEPEntry)
+ 375:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 220              		.loc 1 375 0
+ 221              		.cfi_startproc
+ 222 0000 00B5     		push	{lr}
+ 223              	.LCFI4:
+ 224              		.cfi_def_cfa_offset 4
+ 225              		.cfi_offset 14, -4
+ 226              	.LVL10:
+ 376:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 377:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_SLEEP_ENTRY(PWR_SLEEPEntry));
+ 378:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 379:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Clear SLEEPDEEP bit of Cortex-M0 System Control Register */
+ 380:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   SCB->SCR &= (uint32_t)~((uint32_t)SCB_SCR_SLEEPDEEP_Msk);
+ 227              		.loc 1 380 0
+ 228 0002 064B     		ldr	r3, .L25
+ 229 0004 0421     		mov	r1, #4
+ 230 0006 1A69     		ldr	r2, [r3, #16]
+ 231 0008 8A43     		bic	r2, r1
+ 232 000a 1A61     		str	r2, [r3, #16]
+ 381:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 382:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Select SLEEP mode entry -------------------------------------------------*/
+ 383:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if(PWR_SLEEPEntry == PWR_SLEEPEntry_WFI)
+ 233              		.loc 1 383 0
+ 234 000c 0128     		cmp	r0, #1
+ 235 000e 01D1     		bne	.L23
+ 236              	.LBB16:
+ 237              	.LBB17:
+ 238              		.file 2 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\CM
+   1:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /**************************************************************************//**
+   2:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * @file     core_cmInstr.h
+   3:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * @brief    CMSIS Cortex-M Core Instruction Access Header File
+   4:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * @version  V3.20
+   5:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * @date     05. March 2013
+   6:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+   7:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * @note
+   8:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  *
+   9:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  ******************************************************************************/
+  10:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* Copyright (c) 2009 - 2013 ARM LIMITED
+  11:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  12:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    All rights reserved.
+  13:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    Redistribution and use in source and binary forms, with or without
+  14:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    modification, are permitted provided that the following conditions are met:
+  15:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    - Redistributions of source code must retain the above copyright
+  16:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****      notice, this list of conditions and the following disclaimer.
+  17:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    - Redistributions in binary form must reproduce the above copyright
+  18:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****      notice, this list of conditions and the following disclaimer in the
+  19:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****      documentation and/or other materials provided with the distribution.
+  20:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    - Neither the name of ARM nor the names of its contributors may be used
+  21:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****      to endorse or promote products derived from this software without
+  22:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****      specific prior written permission.
+  23:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    *
+  24:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  25:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  26:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  27:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  28:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  29:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  30:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  31:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  32:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  33:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  34:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    POSSIBILITY OF SUCH DAMAGE.
+  35:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****    ---------------------------------------------------------------------------*/
+  36:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  37:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  38:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __CORE_CMINSTR_H
+  39:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CORE_CMINSTR_H
+  40:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  41:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  42:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* ##########################  Core Instruction Access  ######################### */
+  43:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \defgroup CMSIS_Core_InstructionInterface CMSIS Core Instruction Interface
+  44:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   Access to dedicated instructions
+  45:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   @{
+  46:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** */
+  47:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  48:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
+  49:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* ARM armcc specific functions */
+  50:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  51:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #if (__ARMCC_VERSION < 400677)
+  52:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   #error "Please use ARM Compiler Toolchain V4.0.677 or later!"
+  53:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+  54:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  55:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  56:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  No Operation
+  57:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  58:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+  59:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  60:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __NOP                             __nop
+  61:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  62:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  63:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Interrupt
+  64:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  65:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+  66:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     until one of a number of events occurs.
+  67:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  68:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __WFI                             __wfi
+  69:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  70:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  71:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Event
+  72:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  73:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+  74:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+  75:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  76:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __WFE                             __wfe
+  77:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  78:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  79:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Send Event
+  80:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  81:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+  82:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  83:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __SEV                             __sev
+  84:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  85:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  86:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Instruction Synchronization Barrier
+  87:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  88:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Instruction Synchronization Barrier flushes the pipeline in the processor,
+  89:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     so that all instructions following the ISB are fetched from cache or
+  90:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     memory, after the instruction has been completed.
+  91:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+  92:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __ISB()                           __isb(0xF)
+  93:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  94:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  95:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Synchronization Barrier
+  96:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+  97:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function acts as a special kind of Data Memory Barrier.
+  98:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     It completes when all explicit memory accesses before this instruction complete.
+  99:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 100:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __DSB()                           __dsb(0xF)
+ 101:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 102:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 103:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Data Memory Barrier
+ 104:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 105:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function ensures the apparent order of the explicit memory operations before
+ 106:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     and after the instruction, without ensuring their completion.
+ 107:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 108:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __DMB()                           __dmb(0xF)
+ 109:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 110:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 111:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order (32 bit)
+ 112:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 113:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in integer value.
+ 114:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 115:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 116:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 117:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 118:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __REV                             __rev
+ 119:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 120:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 121:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order (16 bit)
+ 122:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 123:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in two unsigned short values.
+ 124:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 125:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 126:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 127:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 128:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __NO_EMBEDDED_ASM
+ 129:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__((section(".rev16_text"))) __STATIC_INLINE __ASM uint32_t __REV16(uint32_t value)
+ 130:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 131:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   rev16 r0, r0
+ 132:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   bx lr
+ 133:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 134:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+ 135:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 136:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse byte order in signed short value
+ 137:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 138:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the byte order in a signed short value with sign extension to integer.
+ 139:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 140:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 141:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 142:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 143:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #ifndef __NO_EMBEDDED_ASM
+ 144:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__((section(".revsh_text"))) __STATIC_INLINE __ASM int32_t __REVSH(int32_t value)
+ 145:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 146:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   revsh r0, r0
+ 147:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   bx lr
+ 148:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 149:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+ 150:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 151:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 152:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Rotate Right in unsigned value (32 bit)
+ 153:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 154:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function Rotate Right (immediate) provides the value of the contents of a register rotated
+ 155:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 156:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to rotate
+ 157:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Number of Bits to rotate
+ 158:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Rotated value
+ 159:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 160:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __ROR                             __ror
+ 161:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 162:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 163:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Breakpoint
+ 164:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 165:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function causes the processor to enter Debug state.
+ 166:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Debug tools can use this to investigate system state when the instruction at a particular addre
+ 167:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 168:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  is ignored by the processor.
+ 169:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****                    If required, a debugger can use it to store additional information about the bre
+ 170:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 171:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __BKPT(value)                       __breakpoint(value)
+ 172:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 173:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 174:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #if       (__CORTEX_M >= 0x03)
+ 175:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 176:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Reverse bit order of value
+ 177:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 178:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function reverses the bit order of the given value.
+ 179:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 180:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    value  Value to reverse
+ 181:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return               Reversed value
+ 182:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 183:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __RBIT                            __rbit
+ 184:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 185:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 186:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (8 bit)
+ 187:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 188:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 8 bit value.
+ 189:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 190:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 191:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             value of type uint8_t at (*ptr)
+ 192:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 193:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXB(ptr)                     ((uint8_t ) __ldrex(ptr))
+ 194:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 195:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 196:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (16 bit)
+ 197:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 198:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 16 bit values.
+ 199:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 200:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 201:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return        value of type uint16_t at (*ptr)
+ 202:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 203:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXH(ptr)                     ((uint16_t) __ldrex(ptr))
+ 204:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 205:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 206:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  LDR Exclusive (32 bit)
+ 207:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 208:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive LDR command for 32 bit values.
+ 209:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 210:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to data
+ 211:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return        value of type uint32_t at (*ptr)
+ 212:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 213:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __LDREXW(ptr)                     ((uint32_t ) __ldrex(ptr))
+ 214:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 215:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 216:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (8 bit)
+ 217:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 218:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 8 bit values.
+ 219:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 220:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 221:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 222:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 223:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 224:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 225:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXB(value, ptr)              __strex(value, ptr)
+ 226:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 227:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 228:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (16 bit)
+ 229:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 230:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 16 bit values.
+ 231:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 232:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 233:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 234:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 235:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 236:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 237:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXH(value, ptr)              __strex(value, ptr)
+ 238:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 239:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 240:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  STR Exclusive (32 bit)
+ 241:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 242:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function performs a exclusive STR command for 32 bit values.
+ 243:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 244:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to store
+ 245:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    ptr  Pointer to location
+ 246:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          0  Function succeeded
+ 247:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return          1  Function failed
+ 248:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 249:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __STREXW(value, ptr)              __strex(value, ptr)
+ 250:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 251:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 252:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Remove the exclusive lock
+ 253:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 254:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function removes the exclusive lock which is created by LDREX.
+ 255:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 256:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 257:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CLREX                           __clrex
+ 258:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 259:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 260:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Signed Saturate
+ 261:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 262:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function saturates a signed value.
+ 263:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 264:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 265:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (1..32)
+ 266:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             Saturated value
+ 267:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 268:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __SSAT                            __ssat
+ 269:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 270:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 271:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Unsigned Saturate
+ 272:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 273:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function saturates an unsigned value.
+ 274:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 275:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to be saturated
+ 276:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]    sat  Bit position to saturate to (0..31)
+ 277:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             Saturated value
+ 278:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 279:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __USAT                            __usat
+ 280:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 281:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 282:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Count leading zeros
+ 283:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 284:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     This function counts the number of leading zeros of a data value.
+ 285:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 286:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \param [in]  value  Value to count the leading zeros
+ 287:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     \return             number of leading zeros in value
+ 288:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 289:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CLZ                             __clz
+ 290:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 291:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #endif /* (__CORTEX_M >= 0x03) */
+ 292:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 293:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 294:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 295:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __ICCARM__ ) /*------------------ ICC Compiler -------------------*/
+ 296:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* IAR iccarm specific functions */
+ 297:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 298:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #include <cmsis_iar.h>
+ 299:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 300:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 301:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __TMS470__ ) /*---------------- TI CCS Compiler ------------------*/
+ 302:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* TI CCS specific functions */
+ 303:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 304:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #include <cmsis_ccs.h>
+ 305:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 306:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 307:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
+ 308:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* GNU gcc specific functions */
+ 309:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 310:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /* Define macros for porting to both thumb1 and thumb2.
+ 311:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * For thumb1, use low register (r0-r7), specified by constrant "l"
+ 312:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  * Otherwise, use general registers, specified by constrant "r" */
+ 313:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #if defined (__thumb__) && !defined (__thumb2__)
+ 314:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_OUT_REG(r) "=l" (r)
+ 315:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_USE_REG(r) "l" (r)
+ 316:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #else
+ 317:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_OUT_REG(r) "=r" (r)
+ 318:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #define __CMSIS_GCC_USE_REG(r) "r" (r)
+ 319:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** #endif
+ 320:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 321:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  No Operation
+ 322:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 323:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     No Operation does nothing. This instruction can be used for code alignment purposes.
+ 324:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 325:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __NOP(void)
+ 326:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 327:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("nop");
+ 328:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 329:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 330:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 331:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Interrupt
+ 332:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 333:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Interrupt is a hint instruction that suspends execution
+ 334:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     until one of a number of events occurs.
+ 335:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 336:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __WFI(void)
+ 337:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 338:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 239              		.loc 2 338 0
+ 240              	@ 338 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 241 0010 30BF     		wfi
+ 242              	@ 0 "" 2
+ 243              		.code	16
+ 244 0012 02E0     		b	.L22
+ 245              	.L23:
+ 246              	.LBE17:
+ 247              	.LBE16:
+ 248              	.LBB18:
+ 249              	.LBB19:
+ 339:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 340:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 341:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 342:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Wait For Event
+ 343:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 344:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Wait For Event is a hint instruction that permits the processor to enter
+ 345:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     a low-power state until one of a number of events occurs.
+ 346:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 347:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __WFE(void)
+ 348:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 349:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfe");
+ 350:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** }
+ 351:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 352:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 353:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** /** \brief  Send Event
+ 354:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** 
+ 355:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****     Send Event is a hint instruction. It causes an event to be signaled to the CPU.
+ 356:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****  */
+ 357:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** __attribute__( ( always_inline ) ) __STATIC_INLINE void __SEV(void)
+ 358:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h **** {
+ 359:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("sev");
+ 250              		.loc 2 359 0
+ 251              	@ 359 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 252 0014 40BF     		sev
+ 253              	@ 0 "" 2
+ 254              		.code	16
+ 255              	.LBE19:
+ 256              	.LBE18:
+ 257              	.LBB20:
+ 258              	.LBB21:
+ 349:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfe");
+ 259              		.loc 2 349 0
+ 260              	@ 349 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 261 0016 20BF     		wfe
+ 262              	@ 0 "" 2
+ 263              		.code	16
+ 264              	.LBE21:
+ 265              	.LBE20:
+ 266              	.LBB22:
+ 267              	.LBB23:
+ 268              	@ 349 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 269 0018 20BF     		wfe
+ 270              	@ 0 "" 2
+ 271              		.code	16
+ 272              	.L22:
+ 273              	.LBE23:
+ 274              	.LBE22:
+ 275              		@ sp needed for prologue
+ 384:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 385:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Request Wait For Interrupt */
+ 386:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     __WFI();
+ 387:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 388:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else
+ 389:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 390:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Request Wait For Event */
+ 391:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     __SEV();
+ 392:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     __WFE(); 
+ 393:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     __WFE();
+ 394:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 395:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 276              		.loc 1 395 0
+ 277 001a 00BD     		pop	{pc}
+ 278              	.L26:
+ 279              		.align	2
+ 280              	.L25:
+ 281 001c 00ED00E0 		.word	-536810240
+ 282              		.cfi_endproc
+ 283              	.LFE38:
+ 285              		.section	.text.PWR_EnterSTOPMode,"ax",%progbits
+ 286              		.align	1
+ 287              		.global	PWR_EnterSTOPMode
+ 288              		.code	16
+ 289              		.thumb_func
+ 291              	PWR_EnterSTOPMode:
+ 292              	.LFB39:
+ 396:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 397:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 398:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Enters STOP mode.
+ 399:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   In Stop mode, all I/O pins keep the same state as in Run mode.
+ 400:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   When exiting Stop mode by issuing an interrupt or a wakeup event, 
+ 401:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         the HSI RC oscillator is selected as system clock.
+ 402:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   When the voltage regulator operates in low power mode, an additional 
+ 403:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         startup delay is incurred when waking up from Stop mode. 
+ 404:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         By keeping the internal regulator ON during Stop mode, the consumption 
+ 405:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         is higher although the startup time is reduced.
+ 406:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_Regulator: specifies the regulator state in STOP mode.
+ 407:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         This parameter can be one of the following values:
+ 408:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_Regulator_ON: STOP mode with regulator ON
+ 409:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_Regulator_LowPower: STOP mode with regulator in low power mode
+ 410:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_STOPEntry: specifies if STOP mode in entered with WFI or WFE instruction.
+ 411:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *         This parameter can be one of the following values:
+ 412:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_STOPEntry_WFI: enter STOP mode with WFI instruction
+ 413:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_STOPEntry_WFE: enter STOP mode with WFE instruction
+ 414:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                 @arg PWR_STOPEntry_SLEEPONEXIT: enter STOP mode with SLEEPONEXIT instruction
+ 415:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 416:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 417:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_EnterSTOPMode(uint32_t PWR_Regulator, uint8_t PWR_STOPEntry)
+ 418:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 293              		.loc 1 418 0
+ 294              		.cfi_startproc
+ 295 0000 10B5     		push	{r4, lr}
+ 296              	.LCFI5:
+ 297              		.cfi_def_cfa_offset 8
+ 298              		.cfi_offset 4, -8
+ 299              		.cfi_offset 14, -4
+ 300              	.LVL11:
+ 419:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   uint32_t tmpreg = 0;
+ 420:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 421:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 422:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_REGULATOR(PWR_Regulator));
+ 423:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_STOP_ENTRY(PWR_STOPEntry));
+ 424:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 425:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Select the regulator state in STOP mode ---------------------------------*/
+ 426:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg = PWR->CR;
+ 301              		.loc 1 426 0
+ 302 0002 0D4B     		ldr	r3, .L33
+ 427:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Clear PDDS and LPDSR bits */
+ 428:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg &= CR_DS_MASK;
+ 303              		.loc 1 428 0
+ 304 0004 0324     		mov	r4, #3
+ 426:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg = PWR->CR;
+ 305              		.loc 1 426 0
+ 306 0006 1A68     		ldr	r2, [r3]
+ 307              	.LVL12:
+ 308              		.loc 1 428 0
+ 309 0008 A243     		bic	r2, r4
+ 310              	.LVL13:
+ 429:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 430:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Set LPDSR bit according to PWR_Regulator value */
+ 431:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   tmpreg |= PWR_Regulator;
+ 311              		.loc 1 431 0
+ 312 000a 1043     		orr	r0, r2
+ 313              	.LVL14:
+ 432:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 433:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Store the new value */
+ 434:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   PWR->CR = tmpreg;
+ 314              		.loc 1 434 0
+ 315 000c 1860     		str	r0, [r3]
+ 435:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 436:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Set SLEEPDEEP bit of Cortex-M0 System Control Register */
+ 437:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+ 316              		.loc 1 437 0
+ 317 000e 0B4B     		ldr	r3, .L33+4
+ 318 0010 0422     		mov	r2, #4
+ 319 0012 1869     		ldr	r0, [r3, #16]
+ 320              	.LVL15:
+ 321 0014 1043     		orr	r0, r2
+ 322 0016 1861     		str	r0, [r3, #16]
+ 438:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   
+ 439:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Select STOP mode entry --------------------------------------------------*/
+ 440:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if(PWR_STOPEntry == PWR_STOPEntry_WFI)
+ 323              		.loc 1 440 0
+ 324 0018 0129     		cmp	r1, #1
+ 325 001a 01D1     		bne	.L28
+ 326              	.LBB24:
+ 327              	.LBB25:
+ 338:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 328              		.loc 2 338 0
+ 329              	@ 338 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 330 001c 30BF     		wfi
+ 331              	@ 0 "" 2
+ 332              		.code	16
+ 333 001e 02E0     		b	.L32
+ 334              	.L28:
+ 335              	.LBE25:
+ 336              	.LBE24:
+ 441:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 442:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Request Wait For Interrupt */
+ 443:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     __WFI();
+ 444:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Reset SLEEPDEEP bit of Cortex System Control Register */
+ 445:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     SCB->SCR &= (uint32_t)~((uint32_t)SCB_SCR_SLEEPDEEP_Msk); 
+ 446:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 447:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else if (PWR_STOPEntry == PWR_STOPEntry_WFE)
+ 337              		.loc 1 447 0
+ 338 0020 0229     		cmp	r1, #2
+ 339 0022 04D1     		bne	.L30
+ 340              	.LBB26:
+ 341              	.LBB27:
+ 349:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfe");
+ 342              		.loc 2 349 0
+ 343              	@ 349 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 344 0024 20BF     		wfe
+ 345              	@ 0 "" 2
+ 346              		.code	16
+ 347              	.L32:
+ 348              	.LBE27:
+ 349              	.LBE26:
+ 448:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 449:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Request Wait For Event */
+ 450:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     __WFE();
+ 451:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Reset SLEEPDEEP bit of Cortex System Control Register */
+ 452:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     SCB->SCR &= (uint32_t)~((uint32_t)SCB_SCR_SLEEPDEEP_Msk);   
+ 350              		.loc 1 452 0
+ 351 0026 1969     		ldr	r1, [r3, #16]
+ 352              	.LVL16:
+ 353 0028 9143     		bic	r1, r2
+ 354 002a 0A1C     		mov	r2, r1
+ 355 002c 02E0     		b	.L31
+ 356              	.LVL17:
+ 357              	.L30:
+ 453:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 454:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else
+ 455:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 456:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     /* Set SLEEP on exit bit of Cortex-M0 System Control Register */
+ 457:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     SCB->SCR |= SCB_SCR_SLEEPONEXIT_Msk;
+ 358              		.loc 1 457 0
+ 359 002e 1A69     		ldr	r2, [r3, #16]
+ 360 0030 0220     		mov	r0, #2
+ 361 0032 0243     		orr	r2, r0
+ 362              	.LVL18:
+ 363              	.L31:
+ 364 0034 1A61     		str	r2, [r3, #16]
+ 365              		@ sp needed for prologue
+ 458:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 459:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 366              		.loc 1 459 0
+ 367 0036 10BD     		pop	{r4, pc}
+ 368              	.L34:
+ 369              		.align	2
+ 370              	.L33:
+ 371 0038 00700040 		.word	1073770496
+ 372 003c 00ED00E0 		.word	-536810240
+ 373              		.cfi_endproc
+ 374              	.LFE39:
+ 376              		.section	.text.PWR_EnterSTANDBYMode,"ax",%progbits
+ 377              		.align	1
+ 378              		.global	PWR_EnterSTANDBYMode
+ 379              		.code	16
+ 380              		.thumb_func
+ 382              	PWR_EnterSTANDBYMode:
+ 383              	.LFB40:
+ 460:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 461:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 462:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Enters STANDBY mode.
+ 463:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note   In Standby mode, all I/O pins are high impedance except for:
+ 464:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          - Reset pad (still available) 
+ 465:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          - RTC_AF1 pin (PC13) if configured for Wakeup pin 2 (WKUP2), tamper, 
+ 466:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             time-stamp, RTC Alarm out, or RTC clock calibration out.
+ 467:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          - WKUP pin 1 (PA0) if enabled.
+ 468:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @note The Wakeup flag (WUF) need to be cleared at application level before to call this functio
+ 469:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  None
+ 470:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 471:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 472:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_EnterSTANDBYMode(void)
+ 473:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 384              		.loc 1 473 0
+ 385              		.cfi_startproc
+ 474:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Select STANDBY mode */
+ 475:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   PWR->CR |= PWR_CR_PDDS;
+ 386              		.loc 1 475 0
+ 387 0000 054A     		ldr	r2, .L36
+ 388 0002 0223     		mov	r3, #2
+ 389 0004 1068     		ldr	r0, [r2]
+ 476:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 477:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Set SLEEPDEEP bit of Cortex-M0 System Control Register */
+ 478:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
+ 390              		.loc 1 478 0
+ 391 0006 0421     		mov	r1, #4
+ 475:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   PWR->CR |= PWR_CR_PDDS;
+ 392              		.loc 1 475 0
+ 393 0008 1843     		orr	r0, r3
+ 394              		.loc 1 478 0
+ 395 000a 044B     		ldr	r3, .L36+4
+ 475:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   PWR->CR |= PWR_CR_PDDS;
+ 396              		.loc 1 475 0
+ 397 000c 1060     		str	r0, [r2]
+ 398              		.loc 1 478 0
+ 399 000e 1A69     		ldr	r2, [r3, #16]
+ 400 0010 0A43     		orr	r2, r1
+ 401 0012 1A61     		str	r2, [r3, #16]
+ 402              	.LBB28:
+ 403              	.LBB29:
+ 338:C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Include\core_cmInstr.h ****   __ASM volatile ("wfi");
+ 404              		.loc 2 338 0
+ 405              	@ 338 "C:\Working\CURRENT_PROJECT\SKYBOX\skysoft_lls_stm32f030c8t6\main_code\Libraries\CMSIS\Includ
+ 406 0014 30BF     		wfi
+ 407              	@ 0 "" 2
+ 408              		.code	16
+ 409              	.LBE29:
+ 410              	.LBE28:
+ 411              		@ sp needed for prologue
+ 479:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 480:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Request Wait For Interrupt */
+ 481:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   __WFI();
+ 482:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 412              		.loc 1 482 0
+ 413 0016 7047     		bx	lr
+ 414              	.L37:
+ 415              		.align	2
+ 416              	.L36:
+ 417 0018 00700040 		.word	1073770496
+ 418 001c 00ED00E0 		.word	-536810240
+ 419              		.cfi_endproc
+ 420              	.LFE40:
+ 422              		.section	.text.PWR_GetFlagStatus,"ax",%progbits
+ 423              		.align	1
+ 424              		.global	PWR_GetFlagStatus
+ 425              		.code	16
+ 426              		.thumb_func
+ 428              	PWR_GetFlagStatus:
+ 429              	.LFB41:
+ 483:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 484:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 485:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @}
+ 486:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 487:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 488:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /** @defgroup PWR_Group5 Flags management functions
+ 489:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *  @brief   Flags management functions 
+ 490:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****  *
+ 491:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @verbatim
+ 492:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 493:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****                        ##### Flags management functions #####
+ 494:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   ==============================================================================
+ 495:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 496:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** @endverbatim
+ 497:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @{
+ 498:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 499:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 500:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 501:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Checks whether the specified PWR flag is set or not.
+ 502:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_FLAG: specifies the flag to check.
+ 503:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be one of the following values:
+ 504:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_FLAG_WU: Wake Up flag. This flag indicates that a wakeup
+ 505:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *                  event was received from the WKUP pin or from the RTC alarm 
+ 506:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *                  (Alarm A or Alarm B), RTC Tamper event or RTC TimeStamp event.
+ 507:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_FLAG_SB: StandBy flag. This flag indicates that the 
+ 508:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *                  system was resumed from StandBy mode.
+ 509:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_FLAG_PVDO: PVD Output. This flag is valid only if PVD 
+ 510:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *                  is enabled by the PWR_PVDCmd() function.
+ 511:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_FLAG_VREFINTRDY: Internal Voltage Reference Ready flag. 
+ 512:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *                  This flag indicates the state of the internal voltage 
+ 513:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *                  reference, VREFINT.
+ 514:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval The new state of PWR_FLAG (SET or RESET).
+ 515:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 516:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** FlagStatus PWR_GetFlagStatus(uint32_t PWR_FLAG)
+ 517:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 430              		.loc 1 517 0
+ 431              		.cfi_startproc
+ 432              	.LVL19:
+ 518:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   FlagStatus bitstatus = RESET;
+ 519:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 520:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_GET_FLAG(PWR_FLAG));
+ 521:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 522:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   if ((PWR->CSR & PWR_FLAG) != (uint32_t)RESET)
+ 433              		.loc 1 522 0
+ 434 0000 0249     		ldr	r1, .L39
+ 435              		@ sp needed for prologue
+ 436 0002 4B68     		ldr	r3, [r1, #4]
+ 437              	.LVL20:
+ 438 0004 1840     		and	r0, r3
+ 439              	.LVL21:
+ 523:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 524:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     bitstatus = SET;
+ 525:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 526:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   else
+ 527:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   {
+ 528:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****     bitstatus = RESET;
+ 529:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   }
+ 530:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Return the flag status */
+ 531:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   return bitstatus;
+ 440              		.loc 1 531 0
+ 441 0006 431E     		sub	r3, r0, #1
+ 442 0008 9841     		sbc	r0, r0, r3
+ 532:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 443              		.loc 1 532 0
+ 444 000a 7047     		bx	lr
+ 445              	.L40:
+ 446              		.align	2
+ 447              	.L39:
+ 448 000c 00700040 		.word	1073770496
+ 449              		.cfi_endproc
+ 450              	.LFE41:
+ 452              		.section	.text.PWR_ClearFlag,"ax",%progbits
+ 453              		.align	1
+ 454              		.global	PWR_ClearFlag
+ 455              		.code	16
+ 456              		.thumb_func
+ 458              	PWR_ClearFlag:
+ 459              	.LFB42:
+ 533:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 534:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** /**
+ 535:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @brief  Clears the PWR's pending flags.
+ 536:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @param  PWR_FLAG: specifies the flag to clear.
+ 537:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *          This parameter can be one of the following values:
+ 538:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_FLAG_WU: Wake Up flag
+ 539:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   *             @arg PWR_FLAG_SB: StandBy flag
+ 540:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   * @retval None
+ 541:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   */
+ 542:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** void PWR_ClearFlag(uint32_t PWR_FLAG)
+ 543:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** {
+ 460              		.loc 1 543 0
+ 461              		.cfi_startproc
+ 462              	.LVL22:
+ 544:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   /* Check the parameters */
+ 545:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   assert_param(IS_PWR_CLEAR_FLAG(PWR_FLAG));
+ 546:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** 
+ 547:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c ****   PWR->CR |=  PWR_FLAG << 2;
+ 463              		.loc 1 547 0
+ 464 0000 024B     		ldr	r3, .L42
+ 465 0002 8000     		lsl	r0, r0, #2
+ 466              	.LVL23:
+ 467 0004 1A68     		ldr	r2, [r3]
+ 468              		@ sp needed for prologue
+ 469 0006 1043     		orr	r0, r2
+ 470 0008 1860     		str	r0, [r3]
+ 548:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_pwr.c **** }
+ 471              		.loc 1 548 0
+ 472 000a 7047     		bx	lr
+ 473              	.L43:
+ 474              		.align	2
+ 475              	.L42:
+ 476 000c 00700040 		.word	1073770496
+ 477              		.cfi_endproc
+ 478              	.LFE42:
+ 480              		.text
+ 481              	.Letext0:
+ 482              		.file 3 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 483              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\CM
+ 484              		.file 5 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f0xx_pwr.c
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:18     .text.PWR_DeInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:23     .text.PWR_DeInit:00000000 PWR_DeInit
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:50     .text.PWR_BackupAccessCmd:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:55     .text.PWR_BackupAccessCmd:00000000 PWR_BackupAccessCmd
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:87     .text.PWR_BackupAccessCmd:0000001c $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:93     .text.PWR_PVDLevelConfig:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:98     .text.PWR_PVDLevelConfig:00000000 PWR_PVDLevelConfig
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:124    .text.PWR_PVDLevelConfig:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:129    .text.PWR_PVDCmd:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:134    .text.PWR_PVDCmd:00000000 PWR_PVDCmd
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:165    .text.PWR_PVDCmd:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:170    .text.PWR_WakeUpPinCmd:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:175    .text.PWR_WakeUpPinCmd:00000000 PWR_WakeUpPinCmd
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:208    .text.PWR_WakeUpPinCmd:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:213    .text.PWR_EnterSleepMode:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:218    .text.PWR_EnterSleepMode:00000000 PWR_EnterSleepMode
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:281    .text.PWR_EnterSleepMode:0000001c $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:286    .text.PWR_EnterSTOPMode:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:291    .text.PWR_EnterSTOPMode:00000000 PWR_EnterSTOPMode
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:371    .text.PWR_EnterSTOPMode:00000038 $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:377    .text.PWR_EnterSTANDBYMode:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:382    .text.PWR_EnterSTANDBYMode:00000000 PWR_EnterSTANDBYMode
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:417    .text.PWR_EnterSTANDBYMode:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:423    .text.PWR_GetFlagStatus:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:428    .text.PWR_GetFlagStatus:00000000 PWR_GetFlagStatus
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:448    .text.PWR_GetFlagStatus:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:453    .text.PWR_ClearFlag:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:458    .text.PWR_ClearFlag:00000000 PWR_ClearFlag
+C:\Users\khanh\AppData\Local\Temp\cceua0jk.s:476    .text.PWR_ClearFlag:0000000c $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB1PeriphResetCmd

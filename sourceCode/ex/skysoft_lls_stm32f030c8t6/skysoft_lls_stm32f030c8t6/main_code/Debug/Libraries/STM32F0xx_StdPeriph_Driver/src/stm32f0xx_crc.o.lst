@@ -1,0 +1,817 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"stm32f0xx_crc.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.CRC_DeInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	CRC_DeInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	CRC_DeInit:
+  24              	.LFB33:
+  25              		.file 1 "../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c"
+   1:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+   2:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   ******************************************************************************
+   3:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @file    stm32f0xx_crc.c
+   4:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @author  MCD Application Team
+   5:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @version V1.5.0
+   6:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @date    05-December-2014
+   7:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief   This file provides firmware functions to manage the following 
+   8:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          functionalities of CRC computation unit peripheral:
+   9:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            + Configuration of the CRC computation unit
+  10:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            + CRC computation of one/many 32-bit data
+  11:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            + CRC Independent register (IDR) access
+  12:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *
+  13:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *  @verbatim
+  14:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+  15:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****                      ##### How to use this driver #####
+  16:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+  17:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     [..]
+  18:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     
+  19:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****          (+) Enable CRC AHB clock using RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE)
+  20:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****              function
+  21:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****          (+) If required, select the reverse operation on input data 
+  22:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****              using CRC_ReverseInputDataSelect()  
+  23:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****          (+) If required, enable the reverse operation on output data
+  24:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****              using CRC_ReverseOutputDataCmd(Enable)
+  25:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****          (+) use CRC_CalcCRC() function to compute the CRC of a 32-bit data
+  26:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****              or use CRC_CalcBlockCRC() function to compute the CRC if a 32-bit 
+  27:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****              data buffer
+  28:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****             (@) To compute the CRC of a new data use CRC_ResetDR() to reset
+  29:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****                  the CRC computation unit before starting the computation
+  30:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****                  otherwise you can get wrong CRC values.
+  31:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****       
+  32:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****      @endverbatim
+  33:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *  
+  34:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   ******************************************************************************
+  35:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @attention
+  36:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *
+  37:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  38:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *
+  39:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  40:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * You may not use this file except in compliance with the License.
+  41:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * You may obtain a copy of the License at:
+  42:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *
+  43:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *        http://www.st.com/software_license_agreement_liberty_v2
+  44:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *
+  45:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * Unless required by applicable law or agreed to in writing, software 
+  46:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * distributed under the License is distributed on an "AS IS" BASIS, 
+  47:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  48:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * See the License for the specific language governing permissions and
+  49:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * limitations under the License.
+  50:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *
+  51:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   ******************************************************************************
+  52:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+  53:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  54:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Includes ------------------------------------------------------------------*/
+  55:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** #include "stm32f0xx_crc.h"
+  56:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  57:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /** @addtogroup STM32F0xx_StdPeriph_Driver
+  58:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @{
+  59:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+  60:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  61:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /** @defgroup CRC 
+  62:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief CRC driver modules
+  63:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @{
+  64:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+  65:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  66:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Private typedef -----------------------------------------------------------*/
+  67:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Private define ------------------------------------------------------------*/
+  68:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Private macro -------------------------------------------------------------*/
+  69:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Private variables ---------------------------------------------------------*/
+  70:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Private function prototypes -----------------------------------------------*/
+  71:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /* Private functions ---------------------------------------------------------*/
+  72:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  73:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /** @defgroup CRC_Private_Functions
+  74:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @{
+  75:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+  76:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  77:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /** @defgroup CRC_Group1 Configuration of the CRC computation unit functions
+  78:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  *  @brief   Configuration of the CRC computation unit functions 
+  79:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  *
+  80:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** @verbatim
+  81:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+  82:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****                      ##### CRC configuration functions #####
+  83:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+  84:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  85:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** @endverbatim
+  86:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @{
+  87:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+  88:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+  89:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+  90:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Deinitializes CRC peripheral registers to their default reset values.
+  91:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  None
+  92:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+  93:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+  94:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_DeInit(void)
+  95:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+  26              		.loc 1 95 0
+  27              		.cfi_startproc
+  96:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Set DR register to reset value */
+  97:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->DR = 0xFFFFFFFF;
+  28              		.loc 1 97 0
+  29 0000 054B     		ldr	r3, .L2
+  98:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+  99:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Set the POL register to the reset value: 0x04C11DB7 */
+ 100:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->POL = 0x04C11DB7;
+  30              		.loc 1 100 0
+  31 0002 064A     		ldr	r2, .L2+4
+  97:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->DR = 0xFFFFFFFF;
+  32              		.loc 1 97 0
+  33 0004 0120     		mov	r0, #1
+  34 0006 4042     		neg	r0, r0
+  35 0008 1860     		str	r0, [r3]
+ 101:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+ 102:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Reset IDR register */
+ 103:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->IDR = 0x00;
+  36              		.loc 1 103 0
+  37 000a 0021     		mov	r1, #0
+ 100:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->POL = 0x04C11DB7;
+  38              		.loc 1 100 0
+  39 000c 5A61     		str	r2, [r3, #20]
+ 104:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+ 105:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Set INIT register to reset value */
+ 106:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->INIT = 0xFFFFFFFF;
+ 107:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+ 108:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Reset the CRC calculation unit */
+ 109:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->CR = CRC_CR_RESET;
+  40              		.loc 1 109 0
+  41 000e 0122     		mov	r2, #1
+ 103:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->IDR = 0x00;
+  42              		.loc 1 103 0
+  43 0010 1971     		strb	r1, [r3, #4]
+  44              		@ sp needed for prologue
+ 106:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->INIT = 0xFFFFFFFF;
+  45              		.loc 1 106 0
+  46 0012 1861     		str	r0, [r3, #16]
+  47              		.loc 1 109 0
+  48 0014 9A60     		str	r2, [r3, #8]
+ 110:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+  49              		.loc 1 110 0
+  50 0016 7047     		bx	lr
+  51              	.L3:
+  52              		.align	2
+  53              	.L2:
+  54 0018 00300240 		.word	1073885184
+  55 001c B71DC104 		.word	79764919
+  56              		.cfi_endproc
+  57              	.LFE33:
+  59              		.section	.text.CRC_ResetDR,"ax",%progbits
+  60              		.align	1
+  61              		.global	CRC_ResetDR
+  62              		.code	16
+  63              		.thumb_func
+  65              	CRC_ResetDR:
+  66              	.LFB34:
+ 111:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 112:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 113:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Resets the CRC calculation unit and sets INIT register content in DR register.
+ 114:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  None
+ 115:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 116:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 117:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_ResetDR(void)
+ 118:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+  67              		.loc 1 118 0
+  68              		.cfi_startproc
+ 119:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Reset CRC generator */
+ 120:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->CR |= CRC_CR_RESET;
+  69              		.loc 1 120 0
+  70 0000 024B     		ldr	r3, .L5
+  71 0002 0121     		mov	r1, #1
+  72 0004 9A68     		ldr	r2, [r3, #8]
+  73              		@ sp needed for prologue
+  74 0006 0A43     		orr	r2, r1
+  75 0008 9A60     		str	r2, [r3, #8]
+ 121:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+  76              		.loc 1 121 0
+  77 000a 7047     		bx	lr
+  78              	.L6:
+  79              		.align	2
+  80              	.L5:
+  81 000c 00300240 		.word	1073885184
+  82              		.cfi_endproc
+  83              	.LFE34:
+  85              		.section	.text.CRC_PolynomialSizeSelect,"ax",%progbits
+  86              		.align	1
+  87              		.global	CRC_PolynomialSizeSelect
+  88              		.code	16
+  89              		.thumb_func
+  91              	CRC_PolynomialSizeSelect:
+  92              	.LFB35:
+ 122:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 123:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 124:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Selects the polynomial size. This function is only applicable for 
+ 125:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *         STM32F072 devices.
+ 126:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_PolSize: Specifies the polynomial size.
+ 127:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *         This parameter can be:
+ 128:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          @arg CRC_PolSize_7: 7-bit polynomial for CRC calculation
+ 129:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          @arg CRC_PolSize_8: 8-bit polynomial for CRC calculation
+ 130:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          @arg CRC_PolSize_16: 16-bit polynomial for CRC calculation
+ 131:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          @arg CRC_PolSize_32: 32-bit polynomial for CRC calculation
+ 132:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 133:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 134:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_PolynomialSizeSelect(uint32_t CRC_PolSize)
+ 135:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+  93              		.loc 1 135 0
+  94              		.cfi_startproc
+  95              	.LVL0:
+ 136:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   uint32_t tmpcr = 0;
+ 137:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 138:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Check the parameter */
+ 139:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   assert_param(IS_CRC_POL_SIZE(CRC_PolSize));
+ 140:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 141:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Get CR register value */
+ 142:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr = CRC->CR;
+  96              		.loc 1 142 0
+  97 0000 034B     		ldr	r3, .L8
+ 143:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 144:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Reset POL_SIZE bits */
+ 145:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr &= (uint32_t)~((uint32_t)CRC_CR_POLSIZE);
+  98              		.loc 1 145 0
+  99 0002 1821     		mov	r1, #24
+ 142:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr = CRC->CR;
+ 100              		.loc 1 142 0
+ 101 0004 9A68     		ldr	r2, [r3, #8]
+ 102              	.LVL1:
+ 103              		@ sp needed for prologue
+ 104              		.loc 1 145 0
+ 105 0006 8A43     		bic	r2, r1
+ 106              	.LVL2:
+ 146:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Set the polynomial size */
+ 147:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr |= (uint32_t)CRC_PolSize;
+ 107              		.loc 1 147 0
+ 108 0008 1043     		orr	r0, r2
+ 109              	.LVL3:
+ 148:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 149:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Write to CR register */
+ 150:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->CR = (uint32_t)tmpcr;
+ 110              		.loc 1 150 0
+ 111 000a 9860     		str	r0, [r3, #8]
+ 151:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 112              		.loc 1 151 0
+ 113 000c 7047     		bx	lr
+ 114              	.L9:
+ 115 000e C046     		.align	2
+ 116              	.L8:
+ 117 0010 00300240 		.word	1073885184
+ 118              		.cfi_endproc
+ 119              	.LFE35:
+ 121              		.section	.text.CRC_ReverseInputDataSelect,"ax",%progbits
+ 122              		.align	1
+ 123              		.global	CRC_ReverseInputDataSelect
+ 124              		.code	16
+ 125              		.thumb_func
+ 127              	CRC_ReverseInputDataSelect:
+ 128              	.LFB36:
+ 152:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 153:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 154:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Selects the reverse operation to be performed on input data.
+ 155:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_ReverseInputData: Specifies the reverse operation on input data.
+ 156:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          This parameter can be:
+ 157:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            @arg CRC_ReverseInputData_No: No reverse operation is performed
+ 158:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            @arg CRC_ReverseInputData_8bits: reverse operation performed on 8 bits
+ 159:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            @arg CRC_ReverseInputData_16bits: reverse operation performed on 16 bits
+ 160:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *            @arg CRC_ReverseInputData_32bits: reverse operation performed on 32 bits
+ 161:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 162:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 163:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_ReverseInputDataSelect(uint32_t CRC_ReverseInputData)
+ 164:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 129              		.loc 1 164 0
+ 130              		.cfi_startproc
+ 131              	.LVL4:
+ 165:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   uint32_t tmpcr = 0;
+ 166:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 167:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Check the parameter */
+ 168:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   assert_param(IS_CRC_REVERSE_INPUT_DATA(CRC_ReverseInputData));
+ 169:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 170:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Get CR register value */
+ 171:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr = CRC->CR;
+ 132              		.loc 1 171 0
+ 133 0000 034B     		ldr	r3, .L11
+ 172:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 173:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Reset REV_IN bits */
+ 174:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr &= (uint32_t)~((uint32_t)CRC_CR_REV_IN);
+ 134              		.loc 1 174 0
+ 135 0002 6021     		mov	r1, #96
+ 171:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr = CRC->CR;
+ 136              		.loc 1 171 0
+ 137 0004 9A68     		ldr	r2, [r3, #8]
+ 138              	.LVL5:
+ 139              		@ sp needed for prologue
+ 140              		.loc 1 174 0
+ 141 0006 8A43     		bic	r2, r1
+ 142              	.LVL6:
+ 175:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Set the reverse operation */
+ 176:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   tmpcr |= (uint32_t)CRC_ReverseInputData;
+ 143              		.loc 1 176 0
+ 144 0008 1043     		orr	r0, r2
+ 145              	.LVL7:
+ 177:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 178:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Write to CR register */
+ 179:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->CR = (uint32_t)tmpcr;
+ 146              		.loc 1 179 0
+ 147 000a 9860     		str	r0, [r3, #8]
+ 180:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 148              		.loc 1 180 0
+ 149 000c 7047     		bx	lr
+ 150              	.L12:
+ 151 000e C046     		.align	2
+ 152              	.L11:
+ 153 0010 00300240 		.word	1073885184
+ 154              		.cfi_endproc
+ 155              	.LFE36:
+ 157              		.section	.text.CRC_ReverseOutputDataCmd,"ax",%progbits
+ 158              		.align	1
+ 159              		.global	CRC_ReverseOutputDataCmd
+ 160              		.code	16
+ 161              		.thumb_func
+ 163              	CRC_ReverseOutputDataCmd:
+ 164              	.LFB37:
+ 181:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 182:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 183:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Enables or disable the reverse operation on output data.
+ 184:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *         The reverse operation on output data is performed on 32-bit.
+ 185:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  NewState: new state of the reverse operation on output data.
+ 186:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *          This parameter can be: ENABLE or DISABLE.
+ 187:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 188:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 189:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_ReverseOutputDataCmd(FunctionalState NewState)
+ 190:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 165              		.loc 1 190 0
+ 166              		.cfi_startproc
+ 167 0000 00B5     		push	{lr}
+ 168              	.LCFI0:
+ 169              		.cfi_def_cfa_offset 4
+ 170              		.cfi_offset 14, -4
+ 171              	.LVL8:
+ 172 0002 054B     		ldr	r3, .L17
+ 173 0004 8022     		mov	r2, #128
+ 191:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   /* Check the parameters */
+ 192:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   assert_param(IS_FUNCTIONAL_STATE(NewState));
+ 193:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 194:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   if (NewState != DISABLE)
+ 195:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   {
+ 196:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     /* Enable reverse operation on output data */
+ 197:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     CRC->CR |= CRC_CR_REV_OUT;
+ 174              		.loc 1 197 0
+ 175 0006 9968     		ldr	r1, [r3, #8]
+ 194:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   if (NewState != DISABLE)
+ 176              		.loc 1 194 0
+ 177 0008 0028     		cmp	r0, #0
+ 178 000a 01D0     		beq	.L14
+ 179              		.loc 1 197 0
+ 180 000c 0A43     		orr	r2, r1
+ 181 000e 01E0     		b	.L16
+ 182              	.L14:
+ 198:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   }
+ 199:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   else
+ 200:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   {
+ 201:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     /* Disable reverse operation on output data */
+ 202:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     CRC->CR &= (uint32_t)~((uint32_t)CRC_CR_REV_OUT);
+ 183              		.loc 1 202 0
+ 184 0010 9143     		bic	r1, r2
+ 185 0012 0A1C     		mov	r2, r1
+ 186              	.L16:
+ 187 0014 9A60     		str	r2, [r3, #8]
+ 188              		@ sp needed for prologue
+ 203:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   }
+ 204:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 189              		.loc 1 204 0
+ 190 0016 00BD     		pop	{pc}
+ 191              	.L18:
+ 192              		.align	2
+ 193              	.L17:
+ 194 0018 00300240 		.word	1073885184
+ 195              		.cfi_endproc
+ 196              	.LFE37:
+ 198              		.section	.text.CRC_SetInitRegister,"ax",%progbits
+ 199              		.align	1
+ 200              		.global	CRC_SetInitRegister
+ 201              		.code	16
+ 202              		.thumb_func
+ 204              	CRC_SetInitRegister:
+ 205              	.LFB38:
+ 205:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 206:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 207:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Initializes the INIT register.
+ 208:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @note   After resetting CRC calculation unit, CRC_InitValue is stored in DR register
+ 209:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_InitValue: Programmable initial CRC value
+ 210:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 211:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 212:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_SetInitRegister(uint32_t CRC_InitValue)
+ 213:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 206              		.loc 1 213 0
+ 207              		.cfi_startproc
+ 208              	.LVL9:
+ 214:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->INIT = CRC_InitValue;
+ 209              		.loc 1 214 0
+ 210 0000 014B     		ldr	r3, .L20
+ 211              		@ sp needed for prologue
+ 212 0002 1861     		str	r0, [r3, #16]
+ 215:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 213              		.loc 1 215 0
+ 214 0004 7047     		bx	lr
+ 215              	.L21:
+ 216 0006 C046     		.align	2
+ 217              	.L20:
+ 218 0008 00300240 		.word	1073885184
+ 219              		.cfi_endproc
+ 220              	.LFE38:
+ 222              		.section	.text.CRC_SetPolynomial,"ax",%progbits
+ 223              		.align	1
+ 224              		.global	CRC_SetPolynomial
+ 225              		.code	16
+ 226              		.thumb_func
+ 228              	CRC_SetPolynomial:
+ 229              	.LFB39:
+ 216:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 217:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 218:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Initializes the polynomail coefficients. This function is only 
+ 219:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *         applicable for STM32F072 devices.
+ 220:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_Pol: Polynomial to be used for CRC calculation.
+ 221:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 222:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 223:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_SetPolynomial(uint32_t CRC_Pol)
+ 224:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 230              		.loc 1 224 0
+ 231              		.cfi_startproc
+ 232              	.LVL10:
+ 225:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->POL = CRC_Pol;
+ 233              		.loc 1 225 0
+ 234 0000 014B     		ldr	r3, .L23
+ 235              		@ sp needed for prologue
+ 236 0002 5861     		str	r0, [r3, #20]
+ 226:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 237              		.loc 1 226 0
+ 238 0004 7047     		bx	lr
+ 239              	.L24:
+ 240 0006 C046     		.align	2
+ 241              	.L23:
+ 242 0008 00300240 		.word	1073885184
+ 243              		.cfi_endproc
+ 244              	.LFE39:
+ 246              		.section	.text.CRC_CalcCRC,"ax",%progbits
+ 247              		.align	1
+ 248              		.global	CRC_CalcCRC
+ 249              		.code	16
+ 250              		.thumb_func
+ 252              	CRC_CalcCRC:
+ 253              	.LFB40:
+ 227:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 228:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 229:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @}
+ 230:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 231:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 232:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /** @defgroup CRC_Group2 CRC computation of one/many 32-bit data functions
+ 233:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  *  @brief   CRC computation of one/many 32-bit data functions
+ 234:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  *
+ 235:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** @verbatim
+ 236:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+ 237:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****                      ##### CRC computation functions #####
+ 238:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+ 239:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 240:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** @endverbatim
+ 241:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @{
+ 242:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 243:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 244:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 245:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Computes the 32-bit CRC of a given data word(32-bit).
+ 246:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_Data: data word(32-bit) to compute its CRC
+ 247:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval 32-bit CRC
+ 248:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 249:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** uint32_t CRC_CalcCRC(uint32_t CRC_Data)
+ 250:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 254              		.loc 1 250 0
+ 255              		.cfi_startproc
+ 256              	.LVL11:
+ 251:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->DR = CRC_Data;
+ 257              		.loc 1 251 0
+ 258 0000 014B     		ldr	r3, .L26
+ 259              		@ sp needed for prologue
+ 260 0002 1860     		str	r0, [r3]
+ 252:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+ 253:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   return (CRC->DR);
+ 261              		.loc 1 253 0
+ 262 0004 1868     		ldr	r0, [r3]
+ 263              	.LVL12:
+ 254:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 264              		.loc 1 254 0
+ 265 0006 7047     		bx	lr
+ 266              	.L27:
+ 267              		.align	2
+ 268              	.L26:
+ 269 0008 00300240 		.word	1073885184
+ 270              		.cfi_endproc
+ 271              	.LFE40:
+ 273              		.section	.text.CRC_CalcCRC16bits,"ax",%progbits
+ 274              		.align	1
+ 275              		.global	CRC_CalcCRC16bits
+ 276              		.code	16
+ 277              		.thumb_func
+ 279              	CRC_CalcCRC16bits:
+ 280              	.LFB41:
+ 255:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 256:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 257:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Computes the 16-bit CRC of a given 16-bit data. This function is only 
+ 258:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *         applicable for STM32F072 devices.
+ 259:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_Data: data half-word(16-bit) to compute its CRC
+ 260:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval 16-bit CRC
+ 261:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 262:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** uint32_t CRC_CalcCRC16bits(uint16_t CRC_Data)
+ 263:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 281              		.loc 1 263 0
+ 282              		.cfi_startproc
+ 283              	.LVL13:
+ 264:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *(uint16_t*)(CRC_BASE) = (uint16_t) CRC_Data;
+ 284              		.loc 1 264 0
+ 285 0000 014B     		ldr	r3, .L29
+ 286              		@ sp needed for prologue
+ 287 0002 1880     		strh	r0, [r3]
+ 265:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+ 266:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   return (CRC->DR);
+ 288              		.loc 1 266 0
+ 289 0004 1868     		ldr	r0, [r3]
+ 290              	.LVL14:
+ 267:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 291              		.loc 1 267 0
+ 292 0006 7047     		bx	lr
+ 293              	.L30:
+ 294              		.align	2
+ 295              	.L29:
+ 296 0008 00300240 		.word	1073885184
+ 297              		.cfi_endproc
+ 298              	.LFE41:
+ 300              		.section	.text.CRC_CalcCRC8bits,"ax",%progbits
+ 301              		.align	1
+ 302              		.global	CRC_CalcCRC8bits
+ 303              		.code	16
+ 304              		.thumb_func
+ 306              	CRC_CalcCRC8bits:
+ 307              	.LFB42:
+ 268:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 269:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 270:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Computes the 8-bit CRC of a given 8-bit data. This function is only 
+ 271:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *         applicable for STM32F072 devices.
+ 272:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_Data: 8-bit data to compute its CRC
+ 273:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval 8-bit CRC
+ 274:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 275:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** uint32_t CRC_CalcCRC8bits(uint8_t CRC_Data)
+ 276:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 308              		.loc 1 276 0
+ 309              		.cfi_startproc
+ 310              	.LVL15:
+ 277:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   *(uint8_t*)(CRC_BASE) = (uint8_t) CRC_Data;
+ 311              		.loc 1 277 0
+ 312 0000 014B     		ldr	r3, .L32
+ 313              		@ sp needed for prologue
+ 314 0002 1870     		strb	r0, [r3]
+ 278:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 279:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   return (CRC->DR);
+ 315              		.loc 1 279 0
+ 316 0004 1868     		ldr	r0, [r3]
+ 317              	.LVL16:
+ 280:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 318              		.loc 1 280 0
+ 319 0006 7047     		bx	lr
+ 320              	.L33:
+ 321              		.align	2
+ 322              	.L32:
+ 323 0008 00300240 		.word	1073885184
+ 324              		.cfi_endproc
+ 325              	.LFE42:
+ 327              		.section	.text.CRC_CalcBlockCRC,"ax",%progbits
+ 328              		.align	1
+ 329              		.global	CRC_CalcBlockCRC
+ 330              		.code	16
+ 331              		.thumb_func
+ 333              	CRC_CalcBlockCRC:
+ 334              	.LFB43:
+ 281:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 282:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 283:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Computes the 32-bit CRC of a given buffer of data word(32-bit).
+ 284:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  pBuffer: pointer to the buffer containing the data to be computed
+ 285:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  BufferLength: length of the buffer to be computed
+ 286:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval 32-bit CRC
+ 287:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 288:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** uint32_t CRC_CalcBlockCRC(uint32_t pBuffer[], uint32_t BufferLength)
+ 289:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 335              		.loc 1 289 0
+ 336              		.cfi_startproc
+ 337 0000 10B5     		push	{r4, lr}
+ 338              	.LCFI1:
+ 339              		.cfi_def_cfa_offset 8
+ 340              		.cfi_offset 4, -8
+ 341              		.cfi_offset 14, -4
+ 342              	.LVL17:
+ 290:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   uint32_t index = 0;
+ 291:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   
+ 292:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   for(index = 0; index < BufferLength; index++)
+ 343              		.loc 1 292 0
+ 344 0002 0023     		mov	r3, #0
+ 345 0004 02E0     		b	.L35
+ 346              	.LVL18:
+ 347              	.L36:
+ 293:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   {
+ 294:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****     CRC->DR = pBuffer[index];
+ 348              		.loc 1 294 0 discriminator 2
+ 349 0006 10C8     		ldmia	r0!, {r4}
+ 292:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   for(index = 0; index < BufferLength; index++)
+ 350              		.loc 1 292 0 discriminator 2
+ 351 0008 0133     		add	r3, r3, #1
+ 352              	.LVL19:
+ 353              		.loc 1 294 0 discriminator 2
+ 354 000a 1460     		str	r4, [r2]
+ 355              	.LVL20:
+ 356              	.L35:
+ 357 000c 024A     		ldr	r2, .L37
+ 292:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   for(index = 0; index < BufferLength; index++)
+ 358              		.loc 1 292 0 discriminator 1
+ 359 000e 8B42     		cmp	r3, r1
+ 360 0010 F9D1     		bne	.L36
+ 295:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   }
+ 296:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   return (CRC->DR);
+ 361              		.loc 1 296 0
+ 362 0012 1068     		ldr	r0, [r2]
+ 363              		@ sp needed for prologue
+ 297:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 364              		.loc 1 297 0
+ 365 0014 10BD     		pop	{r4, pc}
+ 366              	.L38:
+ 367 0016 C046     		.align	2
+ 368              	.L37:
+ 369 0018 00300240 		.word	1073885184
+ 370              		.cfi_endproc
+ 371              	.LFE43:
+ 373              		.section	.text.CRC_GetCRC,"ax",%progbits
+ 374              		.align	1
+ 375              		.global	CRC_GetCRC
+ 376              		.code	16
+ 377              		.thumb_func
+ 379              	CRC_GetCRC:
+ 380              	.LFB44:
+ 298:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 299:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 300:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Returns the current CRC value.
+ 301:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  None
+ 302:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval 32-bit CRC
+ 303:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 304:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** uint32_t CRC_GetCRC(void)
+ 305:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 381              		.loc 1 305 0
+ 382              		.cfi_startproc
+ 306:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   return (CRC->DR);
+ 383              		.loc 1 306 0
+ 384 0000 014B     		ldr	r3, .L40
+ 385              		@ sp needed for prologue
+ 386 0002 1868     		ldr	r0, [r3]
+ 307:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 387              		.loc 1 307 0
+ 388 0004 7047     		bx	lr
+ 389              	.L41:
+ 390 0006 C046     		.align	2
+ 391              	.L40:
+ 392 0008 00300240 		.word	1073885184
+ 393              		.cfi_endproc
+ 394              	.LFE44:
+ 396              		.section	.text.CRC_SetIDRegister,"ax",%progbits
+ 397              		.align	1
+ 398              		.global	CRC_SetIDRegister
+ 399              		.code	16
+ 400              		.thumb_func
+ 402              	CRC_SetIDRegister:
+ 403              	.LFB45:
+ 308:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 309:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 310:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @}
+ 311:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 312:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 313:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /** @defgroup CRC_Group3 CRC Independent Register (IDR) access functions
+ 314:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  *  @brief   CRC Independent Register (IDR) access (write/read) functions
+ 315:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  *
+ 316:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** @verbatim
+ 317:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+ 318:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****            ##### CRC Independent Register (IDR) access functions #####
+ 319:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****  ===============================================================================
+ 320:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 321:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** @endverbatim
+ 322:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @{
+ 323:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 324:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 325:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 326:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Stores an 8-bit data in the Independent Data(ID) register.
+ 327:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  CRC_IDValue: 8-bit value to be stored in the ID register 					
+ 328:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval None
+ 329:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 330:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** void CRC_SetIDRegister(uint8_t CRC_IDValue)
+ 331:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 404              		.loc 1 331 0
+ 405              		.cfi_startproc
+ 406              	.LVL21:
+ 332:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   CRC->IDR = CRC_IDValue;
+ 407              		.loc 1 332 0
+ 408 0000 014B     		ldr	r3, .L43
+ 409              		@ sp needed for prologue
+ 410 0002 1871     		strb	r0, [r3, #4]
+ 333:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 411              		.loc 1 333 0
+ 412 0004 7047     		bx	lr
+ 413              	.L44:
+ 414 0006 C046     		.align	2
+ 415              	.L43:
+ 416 0008 00300240 		.word	1073885184
+ 417              		.cfi_endproc
+ 418              	.LFE45:
+ 420              		.section	.text.CRC_GetIDRegister,"ax",%progbits
+ 421              		.align	1
+ 422              		.global	CRC_GetIDRegister
+ 423              		.code	16
+ 424              		.thumb_func
+ 426              	CRC_GetIDRegister:
+ 427              	.LFB46:
+ 334:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** 
+ 335:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** /**
+ 336:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @brief  Returns the 8-bit data stored in the Independent Data(ID) register
+ 337:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @param  None
+ 338:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   * @retval 8-bit value of the ID register 
+ 339:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   */
+ 340:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** uint8_t CRC_GetIDRegister(void)
+ 341:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** {
+ 428              		.loc 1 341 0
+ 429              		.cfi_startproc
+ 342:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c ****   return (CRC->IDR);
+ 430              		.loc 1 342 0
+ 431 0000 014B     		ldr	r3, .L46
+ 432              		@ sp needed for prologue
+ 433 0002 1879     		ldrb	r0, [r3, #4]
+ 343:../Libraries/STM32F0xx_StdPeriph_Driver/src/stm32f0xx_crc.c **** }
+ 434              		.loc 1 343 0
+ 435 0004 7047     		bx	lr
+ 436              	.L47:
+ 437 0006 C046     		.align	2
+ 438              	.L46:
+ 439 0008 00300240 		.word	1073885184
+ 440              		.cfi_endproc
+ 441              	.LFE46:
+ 443              		.text
+ 444              	.Letext0:
+ 445              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 446              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f0xx_crc.c
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:18     .text.CRC_DeInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:23     .text.CRC_DeInit:00000000 CRC_DeInit
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:54     .text.CRC_DeInit:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:60     .text.CRC_ResetDR:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:65     .text.CRC_ResetDR:00000000 CRC_ResetDR
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:81     .text.CRC_ResetDR:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:86     .text.CRC_PolynomialSizeSelect:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:91     .text.CRC_PolynomialSizeSelect:00000000 CRC_PolynomialSizeSelect
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:117    .text.CRC_PolynomialSizeSelect:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:122    .text.CRC_ReverseInputDataSelect:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:127    .text.CRC_ReverseInputDataSelect:00000000 CRC_ReverseInputDataSelect
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:153    .text.CRC_ReverseInputDataSelect:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:158    .text.CRC_ReverseOutputDataCmd:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:163    .text.CRC_ReverseOutputDataCmd:00000000 CRC_ReverseOutputDataCmd
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:194    .text.CRC_ReverseOutputDataCmd:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:199    .text.CRC_SetInitRegister:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:204    .text.CRC_SetInitRegister:00000000 CRC_SetInitRegister
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:218    .text.CRC_SetInitRegister:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:223    .text.CRC_SetPolynomial:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:228    .text.CRC_SetPolynomial:00000000 CRC_SetPolynomial
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:242    .text.CRC_SetPolynomial:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:247    .text.CRC_CalcCRC:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:252    .text.CRC_CalcCRC:00000000 CRC_CalcCRC
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:269    .text.CRC_CalcCRC:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:274    .text.CRC_CalcCRC16bits:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:279    .text.CRC_CalcCRC16bits:00000000 CRC_CalcCRC16bits
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:296    .text.CRC_CalcCRC16bits:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:301    .text.CRC_CalcCRC8bits:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:306    .text.CRC_CalcCRC8bits:00000000 CRC_CalcCRC8bits
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:323    .text.CRC_CalcCRC8bits:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:328    .text.CRC_CalcBlockCRC:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:333    .text.CRC_CalcBlockCRC:00000000 CRC_CalcBlockCRC
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:369    .text.CRC_CalcBlockCRC:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:374    .text.CRC_GetCRC:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:379    .text.CRC_GetCRC:00000000 CRC_GetCRC
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:392    .text.CRC_GetCRC:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:397    .text.CRC_SetIDRegister:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:402    .text.CRC_SetIDRegister:00000000 CRC_SetIDRegister
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:416    .text.CRC_SetIDRegister:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:421    .text.CRC_GetIDRegister:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:426    .text.CRC_GetIDRegister:00000000 CRC_GetIDRegister
+C:\Users\khanh\AppData\Local\Temp\ccBdnamd.s:439    .text.CRC_GetIDRegister:00000008 $d
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

@@ -1,0 +1,460 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"gpio.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.gpio_conf,"ax",%progbits
+  18              		.align	1
+  19              		.global	gpio_conf
+  20              		.code	16
+  21              		.thumb_func
+  23              	gpio_conf:
+  24              	.LFB33:
+  25              		.file 1 "../Source/gpio.c"
+   1:../Source/gpio.c **** 
+   2:../Source/gpio.c **** #include "gpio.h"
+   3:../Source/gpio.c **** #include "stm32f0xx.h"
+   4:../Source/gpio.c **** #include "stm32f0xx_gpio.h"
+   5:../Source/gpio.c **** 
+   6:../Source/gpio.c **** #define LED_RED_PIN				GPIO_Pin_7
+   7:../Source/gpio.c **** #define LED_RED_PORT			GPIOB
+   8:../Source/gpio.c **** #define LED_RED_RCC				RCC_AHBPeriph_GPIOA
+   9:../Source/gpio.c **** 
+  10:../Source/gpio.c **** 
+  11:../Source/gpio.c **** #define BUZZ_PIN				GPIO_Pin_15
+  12:../Source/gpio.c **** #define BUZZ_PORT				GPIOB
+  13:../Source/gpio.c **** #define BUZZ_RCC				RCC_AHBPeriph_GPIOA
+  14:../Source/gpio.c **** 
+  15:../Source/gpio.c **** #define CR95HF_EN_PIN			GPIO_Pin_12
+  16:../Source/gpio.c **** #define CR95HF_EN_PORT			GPIOB
+  17:../Source/gpio.c **** #define CR95HF_EN_RCC			RCC_AHBPeriph_GPIOA
+  18:../Source/gpio.c **** 
+  19:../Source/gpio.c **** #define LED_RED_ON()			GPIO_ResetBits(LED_RED_PORT,LED_RED_PIN)
+  20:../Source/gpio.c **** #define LED_RED_OFF()			GPIO_SetBits(LED_RED_PORT,LED_RED_PIN)
+  21:../Source/gpio.c **** #define LED_RED_TOOGLE() 		GPIO_WriteBit(LED_RED_PORT,LED_RED_PIN,!GPIO_ReadInputDataBit(LED_RED_PO
+  22:../Source/gpio.c **** 
+  23:../Source/gpio.c **** #define BUZZ_ON()				GPIO_ResetBits(LED_RED_PORT,LED_RED_PIN)
+  24:../Source/gpio.c **** #define BUZZ_OFF()				GPIO_SetBits(LED_RED_PORT,LED_RED_PIN)
+  25:../Source/gpio.c **** 
+  26:../Source/gpio.c **** #define CR95HF_EN()				GPIO_SetBits(CR95HF_EN_PORT,CR95HF_EN_PIN)
+  27:../Source/gpio.c **** #define CR95HF_DIS()			GPIO_ResetBits(CR95HF_EN_PORT,CR95HF_EN_PIN)
+  28:../Source/gpio.c **** 
+  29:../Source/gpio.c **** void static ledRedInit(void);
+  30:../Source/gpio.c **** void static buzzInit(void);
+  31:../Source/gpio.c **** void static Cr65hfEnInit(void);
+  32:../Source/gpio.c **** 
+  33:../Source/gpio.c **** void gpio_conf(void){
+  26              		.loc 1 33 0
+  27              		.cfi_startproc
+  28 0000 37B5     		push	{r0, r1, r2, r4, r5, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 24
+  31              		.cfi_offset 0, -24
+  32              		.cfi_offset 1, -20
+  33              		.cfi_offset 2, -16
+  34              		.cfi_offset 4, -12
+  35              		.cfi_offset 5, -8
+  36              		.cfi_offset 14, -4
+  37              	.LBB8:
+  38              	.LBB9:
+  34:../Source/gpio.c **** 	ledRedInit();
+  35:../Source/gpio.c **** 	buzzInit();
+  36:../Source/gpio.c **** 	Cr65hfEnInit();
+  37:../Source/gpio.c **** }
+  38:../Source/gpio.c **** 
+  39:../Source/gpio.c **** void BuzzOff(void) {
+  40:../Source/gpio.c **** 	BUZZ_OFF();
+  41:../Source/gpio.c **** }
+  42:../Source/gpio.c **** 
+  43:../Source/gpio.c **** void BuzzOn(void) {
+  44:../Source/gpio.c **** 	BUZZ_ON();
+  45:../Source/gpio.c **** }
+  46:../Source/gpio.c **** 
+  47:../Source/gpio.c **** void RedLedOn(void) {
+  48:../Source/gpio.c **** 	LED_RED_ON();
+  49:../Source/gpio.c **** }
+  50:../Source/gpio.c **** 
+  51:../Source/gpio.c **** void RedLedOff(void) {
+  52:../Source/gpio.c **** 	LED_RED_OFF();
+  53:../Source/gpio.c **** }
+  54:../Source/gpio.c **** 
+  55:../Source/gpio.c **** void cr95hfEn(void) {
+  56:../Source/gpio.c **** 	CR95HF_EN();
+  57:../Source/gpio.c **** }
+  58:../Source/gpio.c **** 
+  59:../Source/gpio.c **** void cr95hfDis(void) {
+  60:../Source/gpio.c **** 	CR95HF_DIS();
+  61:../Source/gpio.c **** }
+  62:../Source/gpio.c **** 
+  63:../Source/gpio.c **** void static ledRedInit(void){
+  64:../Source/gpio.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  65:../Source/gpio.c **** 
+  66:../Source/gpio.c **** 	RCC_AHBPeriphClockCmd(LED_RED_RCC, ENABLE);
+  39              		.loc 1 66 0
+  40 0002 8025     		mov	r5, #128
+  41 0004 A802     		lsl	r0, r5, #10
+  42 0006 0121     		mov	r1, #1
+  67:../Source/gpio.c **** 
+  68:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = LED_RED_PIN;
+  43              		.loc 1 68 0
+  44 0008 8024     		mov	r4, #128
+  66:../Source/gpio.c **** 	RCC_AHBPeriphClockCmd(LED_RED_RCC, ENABLE);
+  45              		.loc 1 66 0
+  46 000a FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  69:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  70:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+  47              		.loc 1 70 0
+  48 000e 0325     		mov	r5, #3
+  69:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  49              		.loc 1 69 0
+  50 0010 6B46     		mov	r3, sp
+  68:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = LED_RED_PIN;
+  51              		.loc 1 68 0
+  52 0012 0094     		str	r4, [sp]
+  69:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  53              		.loc 1 69 0
+  54 0014 0124     		mov	r4, #1
+  55              		.loc 1 70 0
+  56 0016 5D71     		strb	r5, [r3, #5]
+  69:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  57              		.loc 1 69 0
+  58 0018 1C71     		strb	r4, [r3, #4]
+  71:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  59              		.loc 1 71 0
+  60 001a 9C71     		strb	r4, [r3, #6]
+  72:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+  61              		.loc 1 72 0
+  62 001c DC71     		strb	r4, [r3, #7]
+  73:../Source/gpio.c **** 	GPIO_Init(LED_RED_PORT, &GPIO_InitStructure);
+  63              		.loc 1 73 0
+  64 001e 6946     		mov	r1, sp
+  65 0020 1248     		ldr	r0, .L2
+  66 0022 FFF7FEFF 		bl	GPIO_Init
+  67              	.LBE9:
+  68              	.LBE8:
+  69              	.LBB10:
+  70              	.LBB11:
+  74:../Source/gpio.c **** 
+  75:../Source/gpio.c **** }
+  76:../Source/gpio.c **** void static buzzInit(void){
+  77:../Source/gpio.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  78:../Source/gpio.c **** 
+  79:../Source/gpio.c **** 	RCC_AHBPeriphClockCmd(BUZZ_RCC, ENABLE);
+  71              		.loc 1 79 0
+  72 0026 8022     		mov	r2, #128
+  73 0028 9002     		lsl	r0, r2, #10
+  74 002a 211C     		mov	r1, r4
+  75 002c FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  80:../Source/gpio.c **** 
+  81:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  76              		.loc 1 81 0
+  77 0030 8021     		mov	r1, #128
+  82:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  78              		.loc 1 82 0
+  79 0032 6B46     		mov	r3, sp
+  81:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  80              		.loc 1 81 0
+  81 0034 0802     		lsl	r0, r1, #8
+  83:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+  82              		.loc 1 83 0
+  83 0036 5D71     		strb	r5, [r3, #5]
+  82:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+  84              		.loc 1 82 0
+  85 0038 1C71     		strb	r4, [r3, #4]
+  84:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+  86              		.loc 1 84 0
+  87 003a 9C71     		strb	r4, [r3, #6]
+  85:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+  88              		.loc 1 85 0
+  89 003c DC71     		strb	r4, [r3, #7]
+  81:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = BUZZ_PIN;
+  90              		.loc 1 81 0
+  91 003e 0090     		str	r0, [sp]
+  86:../Source/gpio.c **** 	GPIO_Init(BUZZ_PORT, &GPIO_InitStructure);
+  92              		.loc 1 86 0
+  93 0040 6946     		mov	r1, sp
+  94 0042 0A48     		ldr	r0, .L2
+  95 0044 FFF7FEFF 		bl	GPIO_Init
+  96              	.LBE11:
+  97              	.LBE10:
+  98              	.LBB12:
+  99              	.LBB13:
+  87:../Source/gpio.c **** 
+  88:../Source/gpio.c **** }
+  89:../Source/gpio.c **** void static Cr65hfEnInit(void){
+  90:../Source/gpio.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  91:../Source/gpio.c **** 
+  92:../Source/gpio.c **** 	RCC_AHBPeriphClockCmd(CR95HF_EN_RCC, ENABLE);
+ 100              		.loc 1 92 0
+ 101 0048 8022     		mov	r2, #128
+ 102 004a 9002     		lsl	r0, r2, #10
+ 103 004c 211C     		mov	r1, r4
+ 104 004e FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  93:../Source/gpio.c **** 
+  94:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = CR95HF_EN_PIN;
+ 105              		.loc 1 94 0
+ 106 0052 8021     		mov	r1, #128
+  95:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 107              		.loc 1 95 0
+ 108 0054 6B46     		mov	r3, sp
+  94:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Pin = CR95HF_EN_PIN;
+ 109              		.loc 1 94 0
+ 110 0056 4801     		lsl	r0, r1, #5
+ 111 0058 0090     		str	r0, [sp]
+  96:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 112              		.loc 1 96 0
+ 113 005a 5D71     		strb	r5, [r3, #5]
+  95:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+ 114              		.loc 1 95 0
+ 115 005c 1C71     		strb	r4, [r3, #4]
+  97:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+ 116              		.loc 1 97 0
+ 117 005e 9C71     		strb	r4, [r3, #6]
+  98:../Source/gpio.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 118              		.loc 1 98 0
+ 119 0060 DC71     		strb	r4, [r3, #7]
+  99:../Source/gpio.c **** 	GPIO_Init(CR95HF_EN_PORT, &GPIO_InitStructure);
+ 120              		.loc 1 99 0
+ 121 0062 0248     		ldr	r0, .L2
+ 122 0064 6946     		mov	r1, sp
+ 123 0066 FFF7FEFF 		bl	GPIO_Init
+ 124              	.LBE13:
+ 125              	.LBE12:
+ 126              		@ sp needed for prologue
+  37:../Source/gpio.c **** }
+ 127              		.loc 1 37 0
+ 128 006a 37BD     		pop	{r0, r1, r2, r4, r5, pc}
+ 129              	.L3:
+ 130              		.align	2
+ 131              	.L2:
+ 132 006c 00040048 		.word	1207960576
+ 133              		.cfi_endproc
+ 134              	.LFE33:
+ 136              		.section	.text.BuzzOff,"ax",%progbits
+ 137              		.align	1
+ 138              		.global	BuzzOff
+ 139              		.code	16
+ 140              		.thumb_func
+ 142              	BuzzOff:
+ 143              	.LFB34:
+  39:../Source/gpio.c **** void BuzzOff(void) {
+ 144              		.loc 1 39 0
+ 145              		.cfi_startproc
+ 146 0000 08B5     		push	{r3, lr}
+ 147              	.LCFI1:
+ 148              		.cfi_def_cfa_offset 8
+ 149              		.cfi_offset 3, -8
+ 150              		.cfi_offset 14, -4
+  40:../Source/gpio.c **** 	BUZZ_OFF();
+ 151              		.loc 1 40 0
+ 152 0002 0248     		ldr	r0, .L5
+ 153 0004 8021     		mov	r1, #128
+ 154 0006 FFF7FEFF 		bl	GPIO_SetBits
+ 155              		@ sp needed for prologue
+  41:../Source/gpio.c **** }
+ 156              		.loc 1 41 0
+ 157 000a 08BD     		pop	{r3, pc}
+ 158              	.L6:
+ 159              		.align	2
+ 160              	.L5:
+ 161 000c 00040048 		.word	1207960576
+ 162              		.cfi_endproc
+ 163              	.LFE34:
+ 165              		.section	.text.BuzzOn,"ax",%progbits
+ 166              		.align	1
+ 167              		.global	BuzzOn
+ 168              		.code	16
+ 169              		.thumb_func
+ 171              	BuzzOn:
+ 172              	.LFB35:
+  43:../Source/gpio.c **** void BuzzOn(void) {
+ 173              		.loc 1 43 0
+ 174              		.cfi_startproc
+ 175 0000 08B5     		push	{r3, lr}
+ 176              	.LCFI2:
+ 177              		.cfi_def_cfa_offset 8
+ 178              		.cfi_offset 3, -8
+ 179              		.cfi_offset 14, -4
+  44:../Source/gpio.c **** 	BUZZ_ON();
+ 180              		.loc 1 44 0
+ 181 0002 0248     		ldr	r0, .L8
+ 182 0004 8021     		mov	r1, #128
+ 183 0006 FFF7FEFF 		bl	GPIO_ResetBits
+ 184              		@ sp needed for prologue
+  45:../Source/gpio.c **** }
+ 185              		.loc 1 45 0
+ 186 000a 08BD     		pop	{r3, pc}
+ 187              	.L9:
+ 188              		.align	2
+ 189              	.L8:
+ 190 000c 00040048 		.word	1207960576
+ 191              		.cfi_endproc
+ 192              	.LFE35:
+ 194              		.section	.text.RedLedOn,"ax",%progbits
+ 195              		.align	1
+ 196              		.global	RedLedOn
+ 197              		.code	16
+ 198              		.thumb_func
+ 200              	RedLedOn:
+ 201              	.LFB36:
+  47:../Source/gpio.c **** void RedLedOn(void) {
+ 202              		.loc 1 47 0
+ 203              		.cfi_startproc
+ 204 0000 08B5     		push	{r3, lr}
+ 205              	.LCFI3:
+ 206              		.cfi_def_cfa_offset 8
+ 207              		.cfi_offset 3, -8
+ 208              		.cfi_offset 14, -4
+  48:../Source/gpio.c **** 	LED_RED_ON();
+ 209              		.loc 1 48 0
+ 210 0002 0248     		ldr	r0, .L11
+ 211 0004 8021     		mov	r1, #128
+ 212 0006 FFF7FEFF 		bl	GPIO_ResetBits
+ 213              		@ sp needed for prologue
+  49:../Source/gpio.c **** }
+ 214              		.loc 1 49 0
+ 215 000a 08BD     		pop	{r3, pc}
+ 216              	.L12:
+ 217              		.align	2
+ 218              	.L11:
+ 219 000c 00040048 		.word	1207960576
+ 220              		.cfi_endproc
+ 221              	.LFE36:
+ 223              		.section	.text.RedLedOff,"ax",%progbits
+ 224              		.align	1
+ 225              		.global	RedLedOff
+ 226              		.code	16
+ 227              		.thumb_func
+ 229              	RedLedOff:
+ 230              	.LFB37:
+  51:../Source/gpio.c **** void RedLedOff(void) {
+ 231              		.loc 1 51 0
+ 232              		.cfi_startproc
+ 233 0000 08B5     		push	{r3, lr}
+ 234              	.LCFI4:
+ 235              		.cfi_def_cfa_offset 8
+ 236              		.cfi_offset 3, -8
+ 237              		.cfi_offset 14, -4
+  52:../Source/gpio.c **** 	LED_RED_OFF();
+ 238              		.loc 1 52 0
+ 239 0002 0248     		ldr	r0, .L14
+ 240 0004 8021     		mov	r1, #128
+ 241 0006 FFF7FEFF 		bl	GPIO_SetBits
+ 242              		@ sp needed for prologue
+  53:../Source/gpio.c **** }
+ 243              		.loc 1 53 0
+ 244 000a 08BD     		pop	{r3, pc}
+ 245              	.L15:
+ 246              		.align	2
+ 247              	.L14:
+ 248 000c 00040048 		.word	1207960576
+ 249              		.cfi_endproc
+ 250              	.LFE37:
+ 252              		.section	.text.cr95hfEn,"ax",%progbits
+ 253              		.align	1
+ 254              		.global	cr95hfEn
+ 255              		.code	16
+ 256              		.thumb_func
+ 258              	cr95hfEn:
+ 259              	.LFB38:
+  55:../Source/gpio.c **** void cr95hfEn(void) {
+ 260              		.loc 1 55 0
+ 261              		.cfi_startproc
+ 262 0000 08B5     		push	{r3, lr}
+ 263              	.LCFI5:
+ 264              		.cfi_def_cfa_offset 8
+ 265              		.cfi_offset 3, -8
+ 266              		.cfi_offset 14, -4
+  56:../Source/gpio.c **** 	CR95HF_EN();
+ 267              		.loc 1 56 0
+ 268 0002 8021     		mov	r1, #128
+ 269 0004 0248     		ldr	r0, .L17
+ 270 0006 4901     		lsl	r1, r1, #5
+ 271 0008 FFF7FEFF 		bl	GPIO_SetBits
+ 272              		@ sp needed for prologue
+  57:../Source/gpio.c **** }
+ 273              		.loc 1 57 0
+ 274 000c 08BD     		pop	{r3, pc}
+ 275              	.L18:
+ 276 000e C046     		.align	2
+ 277              	.L17:
+ 278 0010 00040048 		.word	1207960576
+ 279              		.cfi_endproc
+ 280              	.LFE38:
+ 282              		.section	.text.cr95hfDis,"ax",%progbits
+ 283              		.align	1
+ 284              		.global	cr95hfDis
+ 285              		.code	16
+ 286              		.thumb_func
+ 288              	cr95hfDis:
+ 289              	.LFB39:
+  59:../Source/gpio.c **** void cr95hfDis(void) {
+ 290              		.loc 1 59 0
+ 291              		.cfi_startproc
+ 292 0000 08B5     		push	{r3, lr}
+ 293              	.LCFI6:
+ 294              		.cfi_def_cfa_offset 8
+ 295              		.cfi_offset 3, -8
+ 296              		.cfi_offset 14, -4
+  60:../Source/gpio.c **** 	CR95HF_DIS();
+ 297              		.loc 1 60 0
+ 298 0002 8021     		mov	r1, #128
+ 299 0004 0248     		ldr	r0, .L20
+ 300 0006 4901     		lsl	r1, r1, #5
+ 301 0008 FFF7FEFF 		bl	GPIO_ResetBits
+ 302              		@ sp needed for prologue
+  61:../Source/gpio.c **** }
+ 303              		.loc 1 61 0
+ 304 000c 08BD     		pop	{r3, pc}
+ 305              	.L21:
+ 306 000e C046     		.align	2
+ 307              	.L20:
+ 308 0010 00040048 		.word	1207960576
+ 309              		.cfi_endproc
+ 310              	.LFE39:
+ 312              		.text
+ 313              	.Letext0:
+ 314              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 315              		.file 3 "../Source/stm32f0xx.h"
+ 316              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+DEFINED SYMBOLS
+                            *ABS*:00000000 gpio.c
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:18     .text.gpio_conf:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:23     .text.gpio_conf:00000000 gpio_conf
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:132    .text.gpio_conf:0000006c $d
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:137    .text.BuzzOff:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:142    .text.BuzzOff:00000000 BuzzOff
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:161    .text.BuzzOff:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:166    .text.BuzzOn:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:171    .text.BuzzOn:00000000 BuzzOn
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:190    .text.BuzzOn:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:195    .text.RedLedOn:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:200    .text.RedLedOn:00000000 RedLedOn
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:219    .text.RedLedOn:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:224    .text.RedLedOff:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:229    .text.RedLedOff:00000000 RedLedOff
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:248    .text.RedLedOff:0000000c $d
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:253    .text.cr95hfEn:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:258    .text.cr95hfEn:00000000 cr95hfEn
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:278    .text.cr95hfEn:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:283    .text.cr95hfDis:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:288    .text.cr95hfDis:00000000 cr95hfDis
+C:\Users\khanh\AppData\Local\Temp\ccR2HKJq.s:308    .text.cr95hfDis:00000010 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_AHBPeriphClockCmd
+GPIO_Init
+GPIO_SetBits
+GPIO_ResetBits

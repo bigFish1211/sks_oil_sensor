@@ -1,0 +1,1742 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"mainboot.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.SerialPutChar,"ax",%progbits
+  18              		.align	1
+  19              		.global	SerialPutChar
+  20              		.code	16
+  21              		.thumb_func
+  23              	SerialPutChar:
+  24              	.LFB33:
+  25              		.file 1 "../Source/mainboot.c"
+   1:../Source/mainboot.c **** /*
+   2:../Source/mainboot.c ****  * mainboot.c
+   3:../Source/mainboot.c ****  *
+   4:../Source/mainboot.c ****  *  Created on: Aug 15, 2012
+   5:../Source/mainboot.c ****  *      Author: Admin
+   6:../Source/mainboot.c ****  */
+   7:../Source/mainboot.c **** 
+   8:../Source/mainboot.c **** 
+   9:../Source/mainboot.c **** /* Includes ------------------------------------------------------------------*/
+  10:../Source/mainboot.c **** #include "stm32f0xx_crc.h"
+  11:../Source/mainboot.c **** #include "alarm.h"
+  12:../Source/mainboot.c **** #include "command.h"
+  13:../Source/mainboot.c **** #include "xprintf.h"
+  14:../Source/mainboot.c **** #include "config.h"
+  15:../Source/mainboot.c **** #include "stm32f0xx.h"
+  16:../Source/mainboot.c **** #include "string.h"
+  17:../Source/mainboot.c **** /* Private typedef -----------------------------------------------------------*/
+  18:../Source/mainboot.c **** /* Private define ------------------------------------------------------------*/
+  19:../Source/mainboot.c **** /* Private macro -------------------------------------------------------------*/
+  20:../Source/mainboot.c **** /* Private variables ---------------------------------------------------------*/
+  21:../Source/mainboot.c **** uint32_t BlockNbr = 0, UserMemoryMask1 = 0;
+  22:../Source/mainboot.c **** __IO uint32_t FlashProtection = 0;
+  23:../Source/mainboot.c **** 
+  24:../Source/mainboot.c **** volatile extern uint32_t ulSecCount;
+  25:../Source/mainboot.c **** volatile extern uint32_t ulTickCount;
+  26:../Source/mainboot.c **** volatile extern uint32_t ulMiliCount;
+  27:../Source/mainboot.c **** 
+  28:../Source/mainboot.c **** unsigned long lastSentToTracker = 0;
+  29:../Source/mainboot.c **** 
+  30:../Source/mainboot.c **** char buff_cmd[256] = {0};
+  31:../Source/mainboot.c **** char rfid_buff[256] = {0};
+  32:../Source/mainboot.c **** int buff_idx;
+  33:../Source/mainboot.c **** int rfid_idx;
+  34:../Source/mainboot.c **** 
+  35:../Source/mainboot.c **** void SerialPutChar(uint8_t c) {
+  26              		.loc 1 35 0
+  27              		.cfi_startproc
+  28 0000 10B5     		push	{r4, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 8
+  31              		.cfi_offset 4, -8
+  32              		.cfi_offset 14, -4
+  33              	.LVL0:
+  34 0002 041C     		mov	r4, r0
+  35              	.LVL1:
+  36              	.L2:
+  36:../Source/mainboot.c **** 	while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
+  37              		.loc 1 36 0 discriminator 1
+  38 0004 0548     		ldr	r0, .L4
+  39 0006 8021     		mov	r1, #128
+  40 0008 FFF7FEFF 		bl	USART_GetFlagStatus
+  41 000c 0028     		cmp	r0, #0
+  42 000e F9D0     		beq	.L2
+  37:../Source/mainboot.c **** 	}
+  38:../Source/mainboot.c **** 	USART_SendData(USART1, c);
+  43              		.loc 1 38 0
+  44 0010 0248     		ldr	r0, .L4
+  45 0012 211C     		mov	r1, r4
+  46 0014 FFF7FEFF 		bl	USART_SendData
+  47              		@ sp needed for prologue
+  39:../Source/mainboot.c **** }
+  48              		.loc 1 39 0
+  49 0018 10BD     		pop	{r4, pc}
+  50              	.L5:
+  51 001a C046     		.align	2
+  52              	.L4:
+  53 001c 00380140 		.word	1073821696
+  54              		.cfi_endproc
+  55              	.LFE33:
+  57              		.section	.text.X3SerialPutChar,"ax",%progbits
+  58              		.align	1
+  59              		.global	X3SerialPutChar
+  60              		.code	16
+  61              		.thumb_func
+  63              	X3SerialPutChar:
+  64              	.LFB34:
+  40:../Source/mainboot.c **** 
+  41:../Source/mainboot.c **** void X3SerialPutChar(uint8_t c) {
+  65              		.loc 1 41 0
+  66              		.cfi_startproc
+  67 0000 10B5     		push	{r4, lr}
+  68              	.LCFI1:
+  69              		.cfi_def_cfa_offset 8
+  70              		.cfi_offset 4, -8
+  71              		.cfi_offset 14, -4
+  72              	.LVL2:
+  73 0002 041C     		mov	r4, r0
+  74              	.LVL3:
+  75              	.L7:
+  42:../Source/mainboot.c **** 	while (USART_GetFlagStatus(USART3, USART_FLAG_TXE) == RESET) {
+  76              		.loc 1 42 0 discriminator 1
+  77 0004 0548     		ldr	r0, .L9
+  78 0006 8021     		mov	r1, #128
+  79 0008 FFF7FEFF 		bl	USART_GetFlagStatus
+  80 000c 0028     		cmp	r0, #0
+  81 000e F9D0     		beq	.L7
+  43:../Source/mainboot.c **** 	}
+  44:../Source/mainboot.c **** 	USART_SendData(USART3, c);
+  82              		.loc 1 44 0
+  83 0010 0248     		ldr	r0, .L9
+  84 0012 211C     		mov	r1, r4
+  85 0014 FFF7FEFF 		bl	USART_SendData
+  86              		@ sp needed for prologue
+  45:../Source/mainboot.c **** }
+  87              		.loc 1 45 0
+  88 0018 10BD     		pop	{r4, pc}
+  89              	.L10:
+  90 001a C046     		.align	2
+  91              	.L9:
+  92 001c 00480040 		.word	1073760256
+  93              		.cfi_endproc
+  94              	.LFE34:
+  96              		.section	.text.Serial_PutString,"ax",%progbits
+  97              		.align	1
+  98              		.global	Serial_PutString
+  99              		.code	16
+ 100              		.thumb_func
+ 102              	Serial_PutString:
+ 103              	.LFB35:
+  46:../Source/mainboot.c **** 
+  47:../Source/mainboot.c **** /**
+  48:../Source/mainboot.c ****   * @brief  Print a string on the HyperTerminal
+  49:../Source/mainboot.c ****   * @param  s: The string to be printed
+  50:../Source/mainboot.c ****   * @retval None
+  51:../Source/mainboot.c ****   */
+  52:../Source/mainboot.c **** void Serial_PutString(unsigned char *s) {
+ 104              		.loc 1 52 0
+ 105              		.cfi_startproc
+ 106 0000 10B5     		push	{r4, lr}
+ 107              	.LCFI2:
+ 108              		.cfi_def_cfa_offset 8
+ 109              		.cfi_offset 4, -8
+ 110              		.cfi_offset 14, -4
+ 111              	.LVL4:
+ 112              		.loc 1 52 0
+ 113 0002 041C     		mov	r4, r0
+  53:../Source/mainboot.c **** 	while (*s != '\0') {
+ 114              		.loc 1 53 0
+ 115 0004 02E0     		b	.L12
+ 116              	.LVL5:
+ 117              	.L13:
+  54:../Source/mainboot.c **** 		SerialPutChar(*s);
+ 118              		.loc 1 54 0
+ 119 0006 FFF7FEFF 		bl	SerialPutChar
+  55:../Source/mainboot.c **** 		s++;
+ 120              		.loc 1 55 0
+ 121 000a 0134     		add	r4, r4, #1
+ 122              	.LVL6:
+ 123              	.L12:
+  53:../Source/mainboot.c **** 	while (*s != '\0') {
+ 124              		.loc 1 53 0 discriminator 1
+ 125 000c 2078     		ldrb	r0, [r4]
+ 126 000e 0028     		cmp	r0, #0
+ 127 0010 F9D1     		bne	.L13
+ 128              		@ sp needed for prologue
+ 129              	.LVL7:
+  56:../Source/mainboot.c **** 	}
+  57:../Source/mainboot.c **** }
+ 130              		.loc 1 57 0
+ 131 0012 10BD     		pop	{r4, pc}
+ 132              		.cfi_endproc
+ 133              	.LFE35:
+ 135              		.section	.text.SerialPutString,"ax",%progbits
+ 136              		.align	1
+ 137              		.global	SerialPutString
+ 138              		.code	16
+ 139              		.thumb_func
+ 141              	SerialPutString:
+ 142              	.LFB36:
+  58:../Source/mainboot.c **** void SerialPutString( unsigned char *s) {
+ 143              		.loc 1 58 0
+ 144              		.cfi_startproc
+ 145 0000 10B5     		push	{r4, lr}
+ 146              	.LCFI3:
+ 147              		.cfi_def_cfa_offset 8
+ 148              		.cfi_offset 4, -8
+ 149              		.cfi_offset 14, -4
+ 150              	.LVL8:
+ 151              		.loc 1 58 0
+ 152 0002 041C     		mov	r4, r0
+  59:../Source/mainboot.c **** 	while (*s != '\0') {
+ 153              		.loc 1 59 0
+ 154 0004 02E0     		b	.L15
+ 155              	.LVL9:
+ 156              	.L16:
+  60:../Source/mainboot.c **** 		SerialPutChar(*s);
+ 157              		.loc 1 60 0
+ 158 0006 FFF7FEFF 		bl	SerialPutChar
+  61:../Source/mainboot.c **** 		s++;
+ 159              		.loc 1 61 0
+ 160 000a 0134     		add	r4, r4, #1
+ 161              	.LVL10:
+ 162              	.L15:
+  59:../Source/mainboot.c **** 	while (*s != '\0') {
+ 163              		.loc 1 59 0 discriminator 1
+ 164 000c 2078     		ldrb	r0, [r4]
+ 165 000e 0028     		cmp	r0, #0
+ 166 0010 F9D1     		bne	.L16
+ 167              		@ sp needed for prologue
+ 168              	.LVL11:
+  62:../Source/mainboot.c **** 	}
+  63:../Source/mainboot.c **** }
+ 169              		.loc 1 63 0
+ 170 0012 10BD     		pop	{r4, pc}
+ 171              		.cfi_endproc
+ 172              	.LFE36:
+ 174              		.section	.text.X3Serial_PutString,"ax",%progbits
+ 175              		.align	1
+ 176              		.global	X3Serial_PutString
+ 177              		.code	16
+ 178              		.thumb_func
+ 180              	X3Serial_PutString:
+ 181              	.LFB37:
+  64:../Source/mainboot.c **** void X3Serial_PutString(uint8_t *s) {
+ 182              		.loc 1 64 0
+ 183              		.cfi_startproc
+ 184 0000 10B5     		push	{r4, lr}
+ 185              	.LCFI4:
+ 186              		.cfi_def_cfa_offset 8
+ 187              		.cfi_offset 4, -8
+ 188              		.cfi_offset 14, -4
+ 189              	.LVL12:
+ 190              		.loc 1 64 0
+ 191 0002 041C     		mov	r4, r0
+  65:../Source/mainboot.c **** 	while (*s != '\0') {
+ 192              		.loc 1 65 0
+ 193 0004 02E0     		b	.L18
+ 194              	.LVL13:
+ 195              	.L19:
+  66:../Source/mainboot.c **** 		X3SerialPutChar(*s);
+ 196              		.loc 1 66 0
+ 197 0006 FFF7FEFF 		bl	X3SerialPutChar
+  67:../Source/mainboot.c **** 		s++;
+ 198              		.loc 1 67 0
+ 199 000a 0134     		add	r4, r4, #1
+ 200              	.LVL14:
+ 201              	.L18:
+  65:../Source/mainboot.c **** 	while (*s != '\0') {
+ 202              		.loc 1 65 0 discriminator 1
+ 203 000c 2078     		ldrb	r0, [r4]
+ 204 000e 0028     		cmp	r0, #0
+ 205 0010 F9D1     		bne	.L19
+ 206              		@ sp needed for prologue
+ 207              	.LVL15:
+  68:../Source/mainboot.c **** 	}
+  69:../Source/mainboot.c **** }
+ 208              		.loc 1 69 0
+ 209 0012 10BD     		pop	{r4, pc}
+ 210              		.cfi_endproc
+ 211              	.LFE37:
+ 213              		.section	.text.ExtSerial_PutString,"ax",%progbits
+ 214              		.align	1
+ 215              		.global	ExtSerial_PutString
+ 216              		.code	16
+ 217              		.thumb_func
+ 219              	ExtSerial_PutString:
+ 220              	.LFB38:
+  70:../Source/mainboot.c **** 
+  71:../Source/mainboot.c **** void ExtSerial_PutString(uint8_t *s) {
+ 221              		.loc 1 71 0
+ 222              		.cfi_startproc
+ 223 0000 10B5     		push	{r4, lr}
+ 224              	.LCFI5:
+ 225              		.cfi_def_cfa_offset 8
+ 226              		.cfi_offset 4, -8
+ 227              		.cfi_offset 14, -4
+ 228              	.LVL16:
+ 229              		.loc 1 71 0
+ 230 0002 041C     		mov	r4, r0
+  72:../Source/mainboot.c **** 	while (*s != '\0') {
+ 231              		.loc 1 72 0
+ 232 0004 02E0     		b	.L21
+ 233              	.LVL17:
+ 234              	.L22:
+ 235              	.LBB2:
+  73:../Source/mainboot.c **** 		SerialPutChar2(*s);
+ 236              		.loc 1 73 0
+ 237 0006 FFF7FEFF 		bl	SerialPutChar2
+  74:../Source/mainboot.c **** 		s++;
+ 238              		.loc 1 74 0
+ 239 000a 0134     		add	r4, r4, #1
+ 240              	.LVL18:
+ 241              	.L21:
+ 242              	.LBE2:
+  72:../Source/mainboot.c **** 	while (*s != '\0') {
+ 243              		.loc 1 72 0 discriminator 1
+ 244 000c 2078     		ldrb	r0, [r4]
+ 245 000e 0028     		cmp	r0, #0
+ 246 0010 F9D1     		bne	.L22
+ 247              		@ sp needed for prologue
+ 248              	.LVL19:
+  75:../Source/mainboot.c **** 	}
+  76:../Source/mainboot.c **** }
+ 249              		.loc 1 76 0
+ 250 0012 10BD     		pop	{r4, pc}
+ 251              		.cfi_endproc
+ 252              	.LFE38:
+ 254              		.section	.text.Clear_USART2_Buffer,"ax",%progbits
+ 255              		.align	1
+ 256              		.global	Clear_USART2_Buffer
+ 257              		.code	16
+ 258              		.thumb_func
+ 260              	Clear_USART2_Buffer:
+ 261              	.LFB39:
+  77:../Source/mainboot.c **** void Clear_USART2_Buffer(void) {
+ 262              		.loc 1 77 0
+ 263              		.cfi_startproc
+ 264 0000 08B5     		push	{r3, lr}
+ 265              	.LCFI6:
+ 266              		.cfi_def_cfa_offset 8
+ 267              		.cfi_offset 3, -8
+ 268              		.cfi_offset 14, -4
+  78:../Source/mainboot.c **** 	rfid_idx = 0;
+ 269              		.loc 1 78 0
+ 270 0002 044B     		ldr	r3, .L24
+ 271 0004 0021     		mov	r1, #0
+  79:../Source/mainboot.c **** 	memset(rfid_buff, 0, sizeof(rfid_buff));
+ 272              		.loc 1 79 0
+ 273 0006 8022     		mov	r2, #128
+  78:../Source/mainboot.c **** 	rfid_idx = 0;
+ 274              		.loc 1 78 0
+ 275 0008 1960     		str	r1, [r3]
+ 276              		.loc 1 79 0
+ 277 000a 0348     		ldr	r0, .L24+4
+ 278 000c 5200     		lsl	r2, r2, #1
+ 279 000e FFF7FEFF 		bl	memset
+ 280              		@ sp needed for prologue
+  80:../Source/mainboot.c **** }
+ 281              		.loc 1 80 0
+ 282 0012 08BD     		pop	{r3, pc}
+ 283              	.L25:
+ 284              		.align	2
+ 285              	.L24:
+ 286 0014 00000000 		.word	rfid_idx
+ 287 0018 00000000 		.word	.LANCHOR0
+ 288              		.cfi_endproc
+ 289              	.LFE39:
+ 291              		.section	.text.SerialPutChar2,"ax",%progbits
+ 292              		.align	1
+ 293              		.global	SerialPutChar2
+ 294              		.code	16
+ 295              		.thumb_func
+ 297              	SerialPutChar2:
+ 298              	.LFB40:
+  81:../Source/mainboot.c **** void SerialPutChar2(uint8_t c) {
+ 299              		.loc 1 81 0
+ 300              		.cfi_startproc
+ 301 0000 10B5     		push	{r4, lr}
+ 302              	.LCFI7:
+ 303              		.cfi_def_cfa_offset 8
+ 304              		.cfi_offset 4, -8
+ 305              		.cfi_offset 14, -4
+ 306              	.LVL20:
+ 307              		.loc 1 81 0
+ 308 0002 041C     		mov	r4, r0
+  82:../Source/mainboot.c **** 	Clear_USART2_Buffer();
+ 309              		.loc 1 82 0
+ 310 0004 FFF7FEFF 		bl	Clear_USART2_Buffer
+ 311              	.LVL21:
+  83:../Source/mainboot.c **** 	USART_SendData(USART2, c);
+ 312              		.loc 1 83 0
+ 313 0008 0548     		ldr	r0, .L29
+ 314 000a 211C     		mov	r1, r4
+ 315 000c FFF7FEFF 		bl	USART_SendData
+ 316              	.L27:
+  84:../Source/mainboot.c **** 	while (USART_GetFlagStatus(USART2, USART_FLAG_TXE) == RESET) {
+ 317              		.loc 1 84 0 discriminator 1
+ 318 0010 0348     		ldr	r0, .L29
+ 319 0012 8021     		mov	r1, #128
+ 320 0014 FFF7FEFF 		bl	USART_GetFlagStatus
+ 321 0018 0028     		cmp	r0, #0
+ 322 001a F9D0     		beq	.L27
+ 323              		@ sp needed for prologue
+  85:../Source/mainboot.c **** 	}
+  86:../Source/mainboot.c **** }
+ 324              		.loc 1 86 0
+ 325 001c 10BD     		pop	{r4, pc}
+ 326              	.L30:
+ 327 001e C046     		.align	2
+ 328              	.L29:
+ 329 0020 00440040 		.word	1073759232
+ 330              		.cfi_endproc
+ 331              	.LFE40:
+ 333              		.section	.text.SerialPutString2,"ax",%progbits
+ 334              		.align	1
+ 335              		.global	SerialPutString2
+ 336              		.code	16
+ 337              		.thumb_func
+ 339              	SerialPutString2:
+ 340              	.LFB41:
+  87:../Source/mainboot.c **** 
+  88:../Source/mainboot.c **** /**
+  89:../Source/mainboot.c ****   * @brief  Print a string on the HyperTerminal
+  90:../Source/mainboot.c ****   * @param  s: The string to be printed
+  91:../Source/mainboot.c ****   * @retval None
+  92:../Source/mainboot.c ****   */
+  93:../Source/mainboot.c **** void SerialPutString2(uint8_t *s) {
+ 341              		.loc 1 93 0
+ 342              		.cfi_startproc
+ 343 0000 10B5     		push	{r4, lr}
+ 344              	.LCFI8:
+ 345              		.cfi_def_cfa_offset 8
+ 346              		.cfi_offset 4, -8
+ 347              		.cfi_offset 14, -4
+ 348              	.LVL22:
+ 349              		.loc 1 93 0
+ 350 0002 041C     		mov	r4, r0
+  94:../Source/mainboot.c **** 	while (*s != '\0') {
+ 351              		.loc 1 94 0
+ 352 0004 02E0     		b	.L32
+ 353              	.LVL23:
+ 354              	.L33:
+  95:../Source/mainboot.c **** 		SerialPutChar2(*s);
+ 355              		.loc 1 95 0
+ 356 0006 FFF7FEFF 		bl	SerialPutChar2
+  96:../Source/mainboot.c **** 		s++;
+ 357              		.loc 1 96 0
+ 358 000a 0134     		add	r4, r4, #1
+ 359              	.LVL24:
+ 360              	.L32:
+  94:../Source/mainboot.c **** 	while (*s != '\0') {
+ 361              		.loc 1 94 0 discriminator 1
+ 362 000c 2078     		ldrb	r0, [r4]
+ 363 000e 0028     		cmp	r0, #0
+ 364 0010 F9D1     		bne	.L33
+ 365              		@ sp needed for prologue
+ 366              	.LVL25:
+  97:../Source/mainboot.c **** 	}
+  98:../Source/mainboot.c **** }
+ 367              		.loc 1 98 0
+ 368 0012 10BD     		pop	{r4, pc}
+ 369              		.cfi_endproc
+ 370              	.LFE41:
+ 372              		.section	.text.do_config,"ax",%progbits
+ 373              		.align	1
+ 374              		.global	do_config
+ 375              		.code	16
+ 376              		.thumb_func
+ 378              	do_config:
+ 379              	.LFB42:
+  99:../Source/mainboot.c **** 
+ 100:../Source/mainboot.c **** uint32_t do_config()
+ 101:../Source/mainboot.c **** {
+ 380              		.loc 1 101 0
+ 381              		.cfi_startproc
+ 382 0000 08B5     		push	{r3, lr}
+ 383              	.LCFI9:
+ 384              		.cfi_def_cfa_offset 8
+ 385              		.cfi_offset 3, -8
+ 386              		.cfi_offset 14, -4
+ 102:../Source/mainboot.c **** 	SerialPutString("Execute CONFIG\r\n");
+ 387              		.loc 1 102 0
+ 388 0002 0248     		ldr	r0, .L35
+ 389 0004 FFF7FEFF 		bl	SerialPutString
+ 390              		@ sp needed for prologue
+ 103:../Source/mainboot.c **** 	return 0;
+ 104:../Source/mainboot.c **** }
+ 391              		.loc 1 104 0
+ 392 0008 0020     		mov	r0, #0
+ 393 000a 08BD     		pop	{r3, pc}
+ 394              	.L36:
+ 395              		.align	2
+ 396              	.L35:
+ 397 000c 00000000 		.word	.LC4
+ 398              		.cfi_endproc
+ 399              	.LFE42:
+ 401              		.section	.text.writeTag,"ax",%progbits
+ 402              		.align	1
+ 403              		.global	writeTag
+ 404              		.code	16
+ 405              		.thumb_func
+ 407              	writeTag:
+ 408              	.LFB44:
+ 105:../Source/mainboot.c **** static void process_command_from_pc(void) {
+ 106:../Source/mainboot.c ****     if(buff_cmd[0] == '*') {
+ 107:../Source/mainboot.c **** 		server_on_command(SKS_CMD_SOURCE_COM1, buff_cmd, sizeof(buff_cmd));
+ 108:../Source/mainboot.c **** 		buff_cmd[0] = 0;
+ 109:../Source/mainboot.c ****     }
+ 110:../Source/mainboot.c **** }
+ 111:../Source/mainboot.c **** unsigned long lastScanRFID = 0;
+ 112:../Source/mainboot.c **** typedef enum
+ 113:../Source/mainboot.c **** {
+ 114:../Source/mainboot.c **** 	RFID_ST_START=0,
+ 115:../Source/mainboot.c **** 	RFID_ST_WAKUP_RFID,
+ 116:../Source/mainboot.c **** 	RFID_ST_READ_DEVICE_INFO,
+ 117:../Source/mainboot.c **** 	RFID_ST_SELECT_PROTOCOL,
+ 118:../Source/mainboot.c **** 	RFID_ST_READ_THE_TAG,
+ 119:../Source/mainboot.c **** 	RFID_ST_PROCESS_DATA
+ 120:../Source/mainboot.c **** }	RFIDScanState_t;
+ 121:../Source/mainboot.c **** 
+ 122:../Source/mainboot.c **** RFIDScanState_t rfidStep;
+ 123:../Source/mainboot.c **** long nextStepSchedule = 0;
+ 124:../Source/mainboot.c **** int countWakup = 0;
+ 125:../Source/mainboot.c **** int onReadingTag = 0;
+ 126:../Source/mainboot.c **** extern unsigned long ulTick100;
+ 127:../Source/mainboot.c **** extern int rfid_idx;
+ 128:../Source/mainboot.c **** extern char rfid_buff[256];
+ 129:../Source/mainboot.c **** 
+ 130:../Source/mainboot.c **** int blockIdx = 0;
+ 131:../Source/mainboot.c **** int writeNow = 0;
+ 132:../Source/mainboot.c **** char tagData[68] = {0};
+ 133:../Source/mainboot.c **** int writeTag(char* data, int size) {
+ 409              		.loc 1 133 0
+ 410              		.cfi_startproc
+ 411 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 412              	.LCFI10:
+ 413              		.cfi_def_cfa_offset 24
+ 414              		.cfi_offset 3, -24
+ 415              		.cfi_offset 4, -20
+ 416              		.cfi_offset 5, -16
+ 417              		.cfi_offset 6, -12
+ 418              		.cfi_offset 7, -8
+ 419              		.cfi_offset 14, -4
+ 420              	.LVL26:
+ 421              		.loc 1 133 0
+ 422 0002 0D1C     		mov	r5, r1
+ 134:../Source/mainboot.c **** 	//02211D 11223344 //write single block
+ 135:../Source/mainboot.c **** 
+ 136:../Source/mainboot.c **** 	int nb = (size/4);
+ 423              		.loc 1 136 0
+ 424 0004 C917     		asr	r1, r1, #31
+ 425              	.LVL27:
+ 133:../Source/mainboot.c **** int writeTag(char* data, int size) {
+ 426              		.loc 1 133 0
+ 427 0006 071C     		mov	r7, r0
+ 137:../Source/mainboot.c **** 	if(size%4 > 0) {
+ 428              		.loc 1 137 0
+ 429 0008 204B     		ldr	r3, .L50
+ 136:../Source/mainboot.c **** 	int nb = (size/4);
+ 430              		.loc 1 136 0
+ 431 000a 880F     		lsr	r0, r1, #30
+ 432              	.LVL28:
+ 433 000c 4219     		add	r2, r0, r5
+ 434 000e 9210     		asr	r2, r2, #2
+ 435              	.LVL29:
+ 436              		.loc 1 137 0
+ 437 0010 2B40     		and	r3, r5
+ 438 0012 04D5     		bpl	.L39
+ 439 0014 0426     		mov	r6, #4
+ 440 0016 013B     		sub	r3, r3, #1
+ 441 0018 7442     		neg	r4, r6
+ 442 001a 2343     		orr	r3, r4
+ 443 001c 0133     		add	r3, r3, #1
+ 444              	.L39:
+ 138:../Source/mainboot.c **** 		nb++;
+ 445              		.loc 1 138 0
+ 446 001e DC17     		asr	r4, r3, #31
+ 447 0020 E11A     		sub	r1, r4, r3
+ 139:../Source/mainboot.c **** 	}
+ 140:../Source/mainboot.c **** 
+ 141:../Source/mainboot.c **** 	if(blockIdx < nb) {
+ 448              		.loc 1 141 0
+ 449 0022 1B4C     		ldr	r4, .L50+4
+ 138:../Source/mainboot.c **** 		nb++;
+ 450              		.loc 1 138 0
+ 451 0024 C80F     		lsr	r0, r1, #31
+ 452              		.loc 1 141 0
+ 453 0026 2668     		ldr	r6, [r4]
+ 138:../Source/mainboot.c **** 		nb++;
+ 454              		.loc 1 138 0
+ 455 0028 1318     		add	r3, r2, r0
+ 456              		.loc 1 141 0
+ 457 002a 9E42     		cmp	r6, r3
+ 458 002c 28DA     		bge	.L40
+ 459              	.LBB3:
+ 142:../Source/mainboot.c **** 		int idx = (blockIdx*4);
+ 143:../Source/mainboot.c **** 
+ 144:../Source/mainboot.c **** 		SerialPutChar2(0x04);
+ 460              		.loc 1 144 0
+ 461 002e 0420     		mov	r0, #4
+ 462 0030 FFF7FEFF 		bl	SerialPutChar2
+ 463              	.LVL30:
+ 145:../Source/mainboot.c **** 		SerialPutChar2(0x07);
+ 464              		.loc 1 145 0
+ 465 0034 0720     		mov	r0, #7
+ 466 0036 FFF7FEFF 		bl	SerialPutChar2
+ 146:../Source/mainboot.c **** 		SerialPutChar2(0x02);
+ 467              		.loc 1 146 0
+ 468 003a 0220     		mov	r0, #2
+ 469 003c FFF7FEFF 		bl	SerialPutChar2
+ 147:../Source/mainboot.c **** 		SerialPutChar2(0x21);
+ 470              		.loc 1 147 0
+ 471 0040 2120     		mov	r0, #33
+ 472 0042 FFF7FEFF 		bl	SerialPutChar2
+ 148:../Source/mainboot.c **** 		SerialPutChar2(blockIdx); //block number
+ 473              		.loc 1 148 0
+ 474 0046 2078     		ldrb	r0, [r4]
+ 475 0048 FFF7FEFF 		bl	SerialPutChar2
+ 149:../Source/mainboot.c **** 
+ 150:../Source/mainboot.c **** 		if(blockIdx == 0) {
+ 476              		.loc 1 150 0
+ 477 004c 2268     		ldr	r2, [r4]
+ 142:../Source/mainboot.c **** 		int idx = (blockIdx*4);
+ 478              		.loc 1 142 0
+ 479 004e B600     		lsl	r6, r6, #2
+ 480              	.LVL31:
+ 481              		.loc 1 150 0
+ 482 0050 002A     		cmp	r2, #0
+ 483 0052 01D1     		bne	.L41
+ 151:../Source/mainboot.c **** 			//xprintf("write Block: %d\r\n", blockIdx);
+ 152:../Source/mainboot.c **** 			xprintf("Writing..");
+ 484              		.loc 1 152 0
+ 485 0054 0F48     		ldr	r0, .L50+8
+ 486 0056 00E0     		b	.L48
+ 487              	.L41:
+ 153:../Source/mainboot.c **** 		} else {
+ 154:../Source/mainboot.c **** 			xprintf("..");
+ 488              		.loc 1 154 0
+ 489 0058 0F48     		ldr	r0, .L50+12
+ 490              	.L48:
+ 491 005a FFF7FEFF 		bl	xprintf
+ 492              	.LVL32:
+ 493              	.LBE3:
+ 133:../Source/mainboot.c **** int writeTag(char* data, int size) {
+ 494              		.loc 1 133 0
+ 495 005e 0024     		mov	r4, #0
+ 496              	.LVL33:
+ 497              	.L45:
+ 498              	.LBB5:
+ 499              	.LBB4:
+ 155:../Source/mainboot.c **** 		}
+ 156:../Source/mainboot.c **** 
+ 157:../Source/mainboot.c **** 		for(int j=0; j<4; j++) {
+ 158:../Source/mainboot.c **** 			if(idx < size) {
+ 159:../Source/mainboot.c **** 				SerialPutChar2(data[idx]);
+ 160:../Source/mainboot.c **** 			} else {
+ 161:../Source/mainboot.c **** 				SerialPutChar2(0x00);
+ 500              		.loc 1 161 0
+ 501 0060 0020     		mov	r0, #0
+ 158:../Source/mainboot.c **** 			if(idx < size) {
+ 502              		.loc 1 158 0
+ 503 0062 AE42     		cmp	r6, r5
+ 504 0064 00DA     		bge	.L49
+ 159:../Source/mainboot.c **** 				SerialPutChar2(data[idx]);
+ 505              		.loc 1 159 0
+ 506 0066 B85D     		ldrb	r0, [r7, r6]
+ 507              	.L49:
+ 157:../Source/mainboot.c **** 		for(int j=0; j<4; j++) {
+ 508              		.loc 1 157 0
+ 509 0068 0134     		add	r4, r4, #1
+ 510              		.loc 1 161 0
+ 511 006a FFF7FEFF 		bl	SerialPutChar2
+ 162:../Source/mainboot.c **** 			}
+ 163:../Source/mainboot.c **** 			idx++;
+ 512              		.loc 1 163 0
+ 513 006e 0136     		add	r6, r6, #1
+ 514              	.LVL34:
+ 157:../Source/mainboot.c **** 		for(int j=0; j<4; j++) {
+ 515              		.loc 1 157 0
+ 516 0070 042C     		cmp	r4, #4
+ 517 0072 F5D1     		bne	.L45
+ 518              	.LBE4:
+ 164:../Source/mainboot.c **** 		}
+ 165:../Source/mainboot.c **** 
+ 166:../Source/mainboot.c **** 		blockIdx++;
+ 519              		.loc 1 166 0
+ 520 0074 064F     		ldr	r7, .L50+4
+ 521              	.LVL35:
+ 167:../Source/mainboot.c **** 		return 1;
+ 522              		.loc 1 167 0
+ 523 0076 0120     		mov	r0, #1
+ 166:../Source/mainboot.c **** 		blockIdx++;
+ 524              		.loc 1 166 0
+ 525 0078 3D68     		ldr	r5, [r7]
+ 526              	.LVL36:
+ 527 007a 0135     		add	r5, r5, #1
+ 528 007c 3D60     		str	r5, [r7]
+ 529              		.loc 1 167 0
+ 530 007e 03E0     		b	.L46
+ 531              	.LVL37:
+ 532              	.L40:
+ 533              	.LBE5:
+ 168:../Source/mainboot.c **** 	}
+ 169:../Source/mainboot.c **** 
+ 170:../Source/mainboot.c **** 	xprintf("done.\r\n");
+ 534              		.loc 1 170 0
+ 535 0080 0648     		ldr	r0, .L50+16
+ 536 0082 FFF7FEFF 		bl	xprintf
+ 537              	.LVL38:
+ 171:../Source/mainboot.c **** 
+ 172:../Source/mainboot.c **** 	return 0;
+ 538              		.loc 1 172 0
+ 539 0086 0020     		mov	r0, #0
+ 540              	.LVL39:
+ 541              	.L46:
+ 542              		@ sp needed for prologue
+ 173:../Source/mainboot.c **** }
+ 543              		.loc 1 173 0
+ 544 0088 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 545              	.L51:
+ 546 008a C046     		.align	2
+ 547              	.L50:
+ 548 008c 03000080 		.word	-2147483645
+ 549 0090 00000000 		.word	.LANCHOR1
+ 550 0094 11000000 		.word	.LC7
+ 551 0098 1B000000 		.word	.LC9
+ 552 009c 1E000000 		.word	.LC11
+ 553              		.cfi_endproc
+ 554              	.LFE44:
+ 556              		.section	.text.processTagData,"ax",%progbits
+ 557              		.align	1
+ 558              		.global	processTagData
+ 559              		.code	16
+ 560              		.thumb_func
+ 562              	processTagData:
+ 563              	.LFB45:
+ 174:../Source/mainboot.c **** 
+ 175:../Source/mainboot.c **** int processTagData() {
+ 564              		.loc 1 175 0
+ 565              		.cfi_startproc
+ 566 0000 10B5     		push	{r4, lr}
+ 567              	.LCFI11:
+ 568              		.cfi_def_cfa_offset 8
+ 569              		.cfi_offset 4, -8
+ 570              		.cfi_offset 14, -4
+ 176:../Source/mainboot.c **** 	if(onReadingTag) {
+ 571              		.loc 1 176 0
+ 572 0002 334B     		ldr	r3, .L68
+ 175:../Source/mainboot.c **** int processTagData() {
+ 573              		.loc 1 175 0
+ 574 0004 94B0     		sub	sp, sp, #80
+ 575              	.LCFI12:
+ 576              		.cfi_def_cfa_offset 88
+ 577              		.loc 1 176 0
+ 578 0006 1C68     		ldr	r4, [r3]
+ 579 0008 002C     		cmp	r4, #0
+ 580 000a 5ED0     		beq	.L53
+ 177:../Source/mainboot.c **** 		if(rfid_idx >= 1) {
+ 581              		.loc 1 177 0
+ 582 000c 3148     		ldr	r0, .L68+4
+ 178:../Source/mainboot.c **** 			if(rfid_buff[0] == 0x87 && rfid_buff[1] == 0x00) {
+ 179:../Source/mainboot.c **** 				//no tag found
+ 180:../Source/mainboot.c **** 			} else if(rfid_buff[0] == 0x80) {
+ 181:../Source/mainboot.c **** 				//xprintf("data: %s\r\n", rfid_buff);
+ 182:../Source/mainboot.c **** 
+ 183:../Source/mainboot.c **** 				int len = rfid_buff[1];
+ 184:../Source/mainboot.c **** 
+ 185:../Source/mainboot.c **** 				//xprintf("RFID index: %d, %d\r\n", rfid_idx, len);
+ 186:../Source/mainboot.c **** 
+ 187:../Source/mainboot.c **** 				if((rfid_idx - 2) == len && rfid_buff[63] == 'S' && rfid_buff[64] == 'S') { //full data
+ 188:../Source/mainboot.c **** 					blink_red_led_once();
+ 189:../Source/mainboot.c **** 					char licenseNo[15] = {0};
+ 190:../Source/mainboot.c **** 					char name[43] = {0};
+ 191:../Source/mainboot.c **** 					char driverID[5] = {0};
+ 192:../Source/mainboot.c **** 
+ 193:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(licenseNo); i++) {
+ 194:../Source/mainboot.c **** 						char c = rfid_buff[i+3]; //ignore first 3 bytes: header, len, extra
+ 195:../Source/mainboot.c **** 						if(c == 0x00) {
+ 196:../Source/mainboot.c **** 							break;
+ 197:../Source/mainboot.c **** 						} else {
+ 198:../Source/mainboot.c **** 							licenseNo[i] = c;
+ 199:../Source/mainboot.c **** 						}
+ 200:../Source/mainboot.c **** 					}
+ 201:../Source/mainboot.c **** 
+ 202:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(name); i++) {
+ 203:../Source/mainboot.c **** 						char c = rfid_buff[i+19];
+ 204:../Source/mainboot.c **** 						if(c == 0x00) {
+ 205:../Source/mainboot.c **** 							break;
+ 206:../Source/mainboot.c **** 						} else {
+ 207:../Source/mainboot.c **** 							name[i] = c;
+ 208:../Source/mainboot.c **** 						}
+ 209:../Source/mainboot.c **** 					}
+ 210:../Source/mainboot.c **** 
+ 211:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(driverID) - 1; i++) {
+ 212:../Source/mainboot.c **** 						char c = rfid_buff[i+66];
+ 213:../Source/mainboot.c **** 						if(c == 0x00) {
+ 214:../Source/mainboot.c **** 							break;
+ 215:../Source/mainboot.c **** 						} else {
+ 216:../Source/mainboot.c **** 							driverID[i] = c;
+ 217:../Source/mainboot.c **** 						}
+ 218:../Source/mainboot.c **** 					}
+ 219:../Source/mainboot.c **** 
+ 220:../Source/mainboot.c **** 					xprintf("*SS,0000000001,RFID,123123,1,%s,%s,%s,%d#\r\n", licenseNo, name, driverID, rfid_buff[
+ 221:../Source/mainboot.c **** 
+ 222:../Source/mainboot.c **** 					onReadingTag = 0;
+ 223:../Source/mainboot.c **** 
+ 224:../Source/mainboot.c **** 					lastSentToTracker = ulSecCount;
+ 225:../Source/mainboot.c **** 
+ 226:../Source/mainboot.c **** 					return 1;
+ 227:../Source/mainboot.c **** 				} else {
+ 228:../Source/mainboot.c **** 					xprintf("Unknown data: %s\r\n", rfid_buff);
+ 229:../Source/mainboot.c **** 				}
+ 230:../Source/mainboot.c **** 			}
+ 231:../Source/mainboot.c **** 		}
+ 232:../Source/mainboot.c **** 	}
+ 233:../Source/mainboot.c **** 
+ 234:../Source/mainboot.c **** 	return 0;
+ 583              		.loc 1 234 0
+ 584 000e 0024     		mov	r4, #0
+ 177:../Source/mainboot.c **** 		if(rfid_idx >= 1) {
+ 585              		.loc 1 177 0
+ 586 0010 0268     		ldr	r2, [r0]
+ 587 0012 A242     		cmp	r2, r4
+ 588 0014 59DD     		ble	.L53
+ 178:../Source/mainboot.c **** 			if(rfid_buff[0] == 0x87 && rfid_buff[1] == 0x00) {
+ 589              		.loc 1 178 0
+ 590 0016 304B     		ldr	r3, .L68+8
+ 591 0018 1878     		ldrb	r0, [r3]
+ 592 001a 191C     		mov	r1, r3
+ 593 001c 8728     		cmp	r0, #135
+ 594 001e 54D0     		beq	.L53
+ 180:../Source/mainboot.c **** 			} else if(rfid_buff[0] == 0x80) {
+ 595              		.loc 1 180 0
+ 596 0020 8028     		cmp	r0, #128
+ 597 0022 52D1     		bne	.L53
+ 598              	.LVL40:
+ 599              	.LBB6:
+ 183:../Source/mainboot.c **** 				int len = rfid_buff[1];
+ 600              		.loc 1 183 0
+ 601 0024 5878     		ldrb	r0, [r3, #1]
+ 187:../Source/mainboot.c **** 				if((rfid_idx - 2) == len && rfid_buff[63] == 'S' && rfid_buff[64] == 'S') { //full data
+ 602              		.loc 1 187 0
+ 603 0026 023A     		sub	r2, r2, #2
+ 604 0028 8242     		cmp	r2, r0
+ 605 002a 4AD1     		bne	.L54
+ 187:../Source/mainboot.c **** 				if((rfid_idx - 2) == len && rfid_buff[63] == 'S' && rfid_buff[64] == 'S') { //full data
+ 606              		.loc 1 187 0 is_stmt 0 discriminator 1
+ 607 002c 181C     		mov	r0, r3
+ 608 002e 3F30     		add	r0, r0, #63
+ 609 0030 0278     		ldrb	r2, [r0]
+ 610 0032 532A     		cmp	r2, #83
+ 611 0034 45D1     		bne	.L54
+ 612 0036 4033     		add	r3, r3, #64
+ 613 0038 1B78     		ldrb	r3, [r3]
+ 614 003a 532B     		cmp	r3, #83
+ 615 003c 41D1     		bne	.L54
+ 616              	.LBB7:
+ 188:../Source/mainboot.c **** 					blink_red_led_once();
+ 617              		.loc 1 188 0 is_stmt 1
+ 618 003e FFF7FEFF 		bl	blink_red_led_once
+ 619              	.LVL41:
+ 189:../Source/mainboot.c **** 					char licenseNo[15] = {0};
+ 620              		.loc 1 189 0
+ 621 0042 211C     		mov	r1, r4
+ 622 0044 0F22     		mov	r2, #15
+ 623 0046 0EA8     		add	r0, sp, #56
+ 624 0048 FFF7FEFF 		bl	memset
+ 190:../Source/mainboot.c **** 					char name[43] = {0};
+ 625              		.loc 1 190 0
+ 626 004c 211C     		mov	r1, r4
+ 627 004e 03A8     		add	r0, sp, #12
+ 628 0050 2B22     		mov	r2, #43
+ 629 0052 FFF7FEFF 		bl	memset
+ 191:../Source/mainboot.c **** 					char driverID[5] = {0};
+ 630              		.loc 1 191 0
+ 631 0056 12A9     		add	r1, sp, #72
+ 632 0058 1294     		str	r4, [sp, #72]
+ 633 005a 0C71     		strb	r4, [r1, #4]
+ 634              	.LVL42:
+ 635              	.L56:
+ 636              	.LBB8:
+ 637              	.LBB9:
+ 175:../Source/mainboot.c **** int processTagData() {
+ 638              		.loc 1 175 0
+ 639 005c 1E48     		ldr	r0, .L68+8
+ 640 005e 0219     		add	r2, r0, r4
+ 194:../Source/mainboot.c **** 						char c = rfid_buff[i+3]; //ignore first 3 bytes: header, len, extra
+ 641              		.loc 1 194 0
+ 642 0060 D378     		ldrb	r3, [r2, #3]
+ 643              	.LVL43:
+ 195:../Source/mainboot.c **** 						if(c == 0x00) {
+ 644              		.loc 1 195 0
+ 645 0062 002B     		cmp	r3, #0
+ 646 0064 04D0     		beq	.L55
+ 198:../Source/mainboot.c **** 							licenseNo[i] = c;
+ 647              		.loc 1 198 0
+ 648 0066 0EA9     		add	r1, sp, #56
+ 649 0068 6354     		strb	r3, [r4, r1]
+ 650              	.LBE9:
+ 193:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(licenseNo); i++) {
+ 651              		.loc 1 193 0
+ 652 006a 0134     		add	r4, r4, #1
+ 653              	.LVL44:
+ 654 006c 0F2C     		cmp	r4, #15
+ 655 006e F5D1     		bne	.L56
+ 656              	.LVL45:
+ 657              	.L55:
+ 658              	.LBE8:
+ 193:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(licenseNo); i++) {
+ 659              		.loc 1 193 0 is_stmt 0 discriminator 1
+ 660 0070 0023     		mov	r3, #0
+ 661              	.LVL46:
+ 662              	.L58:
+ 663              	.LBB10:
+ 664              	.LBB11:
+ 175:../Source/mainboot.c **** int processTagData() {
+ 665              		.loc 1 175 0 is_stmt 1
+ 666 0072 194A     		ldr	r2, .L68+8
+ 667 0074 D418     		add	r4, r2, r3
+ 203:../Source/mainboot.c **** 						char c = rfid_buff[i+19];
+ 668              		.loc 1 203 0
+ 669 0076 E27C     		ldrb	r2, [r4, #19]
+ 670              	.LVL47:
+ 204:../Source/mainboot.c **** 						if(c == 0x00) {
+ 671              		.loc 1 204 0
+ 672 0078 002A     		cmp	r2, #0
+ 673 007a 04D0     		beq	.L57
+ 207:../Source/mainboot.c **** 							name[i] = c;
+ 674              		.loc 1 207 0
+ 675 007c 03A8     		add	r0, sp, #12
+ 676 007e 1A54     		strb	r2, [r3, r0]
+ 677              	.LBE11:
+ 202:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(name); i++) {
+ 678              		.loc 1 202 0
+ 679 0080 0133     		add	r3, r3, #1
+ 680              	.LVL48:
+ 681 0082 2B2B     		cmp	r3, #43
+ 682 0084 F5D1     		bne	.L58
+ 683              	.LVL49:
+ 684              	.L57:
+ 685              	.LBE10:
+ 193:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(licenseNo); i++) {
+ 686              		.loc 1 193 0 discriminator 1
+ 687 0086 0023     		mov	r3, #0
+ 688              	.LVL50:
+ 689              	.L60:
+ 690              	.LBB12:
+ 691              	.LBB13:
+ 175:../Source/mainboot.c **** int processTagData() {
+ 692              		.loc 1 175 0
+ 693 0088 1349     		ldr	r1, .L68+8
+ 694 008a CC18     		add	r4, r1, r3
+ 695 008c 4234     		add	r4, r4, #66
+ 212:../Source/mainboot.c **** 						char c = rfid_buff[i+66];
+ 696              		.loc 1 212 0
+ 697 008e 2278     		ldrb	r2, [r4]
+ 698              	.LVL51:
+ 213:../Source/mainboot.c **** 						if(c == 0x00) {
+ 699              		.loc 1 213 0
+ 700 0090 002A     		cmp	r2, #0
+ 701 0092 04D0     		beq	.L59
+ 216:../Source/mainboot.c **** 							driverID[i] = c;
+ 702              		.loc 1 216 0
+ 703 0094 12A8     		add	r0, sp, #72
+ 704 0096 1A54     		strb	r2, [r3, r0]
+ 705              	.LBE13:
+ 211:../Source/mainboot.c **** 					for(int i = 0; i < sizeof(driverID) - 1; i++) {
+ 706              		.loc 1 211 0
+ 707 0098 0133     		add	r3, r3, #1
+ 708              	.LVL52:
+ 709 009a 042B     		cmp	r3, #4
+ 710 009c F4D1     		bne	.L60
+ 711              	.LVL53:
+ 712              	.L59:
+ 713              	.LBE12:
+ 220:../Source/mainboot.c **** 					xprintf("*SS,0000000001,RFID,123123,1,%s,%s,%s,%d#\r\n", licenseNo, name, driverID, rfid_buff[
+ 714              		.loc 1 220 0
+ 715 009e 4131     		add	r1, r1, #65
+ 716 00a0 0978     		ldrb	r1, [r1]
+ 717 00a2 0E48     		ldr	r0, .L68+12
+ 718 00a4 0091     		str	r1, [sp]
+ 719 00a6 03AA     		add	r2, sp, #12
+ 720              	.LVL54:
+ 721 00a8 0EA9     		add	r1, sp, #56
+ 722 00aa 12AB     		add	r3, sp, #72
+ 723 00ac FFF7FEFF 		bl	xprintf
+ 224:../Source/mainboot.c **** 					lastSentToTracker = ulSecCount;
+ 724              		.loc 1 224 0
+ 725 00b0 0B4A     		ldr	r2, .L68+16
+ 222:../Source/mainboot.c **** 					onReadingTag = 0;
+ 726              		.loc 1 222 0
+ 727 00b2 0748     		ldr	r0, .L68
+ 224:../Source/mainboot.c **** 					lastSentToTracker = ulSecCount;
+ 728              		.loc 1 224 0
+ 729 00b4 1168     		ldr	r1, [r2]
+ 730 00b6 0B4B     		ldr	r3, .L68+20
+ 222:../Source/mainboot.c **** 					onReadingTag = 0;
+ 731              		.loc 1 222 0
+ 732 00b8 0024     		mov	r4, #0
+ 733 00ba 0460     		str	r4, [r0]
+ 224:../Source/mainboot.c **** 					lastSentToTracker = ulSecCount;
+ 734              		.loc 1 224 0
+ 735 00bc 1960     		str	r1, [r3]
+ 226:../Source/mainboot.c **** 					return 1;
+ 736              		.loc 1 226 0
+ 737 00be 0124     		mov	r4, #1
+ 738 00c0 03E0     		b	.L53
+ 739              	.LVL55:
+ 740              	.L54:
+ 741              	.LBE7:
+ 228:../Source/mainboot.c **** 					xprintf("Unknown data: %s\r\n", rfid_buff);
+ 742              		.loc 1 228 0
+ 743 00c2 0948     		ldr	r0, .L68+24
+ 744 00c4 FFF7FEFF 		bl	xprintf
+ 745              	.LVL56:
+ 746              		.loc 1 234 0
+ 747 00c8 0024     		mov	r4, #0
+ 748              	.L53:
+ 749              	.LBE6:
+ 235:../Source/mainboot.c **** }
+ 750              		.loc 1 235 0
+ 751 00ca 201C     		mov	r0, r4
+ 752 00cc 14B0     		add	sp, sp, #80
+ 753              		@ sp needed for prologue
+ 754 00ce 10BD     		pop	{r4, pc}
+ 755              	.L69:
+ 756              		.align	2
+ 757              	.L68:
+ 758 00d0 00000000 		.word	.LANCHOR2
+ 759 00d4 00000000 		.word	rfid_idx
+ 760 00d8 00000000 		.word	.LANCHOR0
+ 761 00dc 26000000 		.word	.LC16
+ 762 00e0 00000000 		.word	ulSecCount
+ 763 00e4 00000000 		.word	.LANCHOR3
+ 764 00e8 52000000 		.word	.LC20
+ 765              		.cfi_endproc
+ 766              	.LFE45:
+ 768              		.section	.text.scan_RFID_15693,"ax",%progbits
+ 769              		.align	1
+ 770              		.global	scan_RFID_15693
+ 771              		.code	16
+ 772              		.thumb_func
+ 774              	scan_RFID_15693:
+ 775              	.LFB46:
+ 236:../Source/mainboot.c **** 
+ 237:../Source/mainboot.c **** void scan_RFID_15693() {
+ 776              		.loc 1 237 0
+ 777              		.cfi_startproc
+ 778 0000 70B5     		push	{r4, r5, r6, lr}
+ 779              	.LCFI13:
+ 780              		.cfi_def_cfa_offset 16
+ 781              		.cfi_offset 4, -16
+ 782              		.cfi_offset 5, -12
+ 783              		.cfi_offset 6, -8
+ 784              		.cfi_offset 14, -4
+ 238:../Source/mainboot.c **** 	if(ulTick100 < nextStepSchedule) {
+ 785              		.loc 1 238 0
+ 786 0002 5349     		ldr	r1, .L90
+ 787 0004 534C     		ldr	r4, .L90+4
+ 788 0006 0A68     		ldr	r2, [r1]
+ 789 0008 2368     		ldr	r3, [r4]
+ 790 000a 0D1C     		mov	r5, r1
+ 791 000c 9342     		cmp	r3, r2
+ 792 000e 00D2     		bcs	.LCB605
+ 793 0010 9DE0     		b	.L70	@long jump
+ 794              	.LCB605:
+ 239:../Source/mainboot.c **** 		return;
+ 240:../Source/mainboot.c **** 	}
+ 241:../Source/mainboot.c **** 
+ 242:../Source/mainboot.c **** 	switch(rfidStep) {
+ 795              		.loc 1 242 0
+ 796 0012 514E     		ldr	r6, .L90+8
+ 797 0014 3078     		ldrb	r0, [r6]
+ 798 0016 0528     		cmp	r0, #5
+ 799 0018 00D9     		bls	.LCB609
+ 800 001a 91E0     		b	.L72	@long jump
+ 801              	.LCB609:
+ 802 001c FFF7FEFF 		bl	__gnu_thumb1_case_uqi
+ 803              	.L79:
+ 804 0020 03       		.byte	(.L73-.L79)/2
+ 805 0021 0B       		.byte	(.L74-.L79)/2
+ 806 0022 2C       		.byte	(.L75-.L79)/2
+ 807 0023 39       		.byte	(.L76-.L79)/2
+ 808 0024 4D       		.byte	(.L77-.L79)/2
+ 809 0025 81       		.byte	(.L78-.L79)/2
+ 810              		.align	1
+ 811              	.L73:
+ 243:../Source/mainboot.c **** 		case RFID_ST_START:
+ 244:../Source/mainboot.c **** 			countWakup = 0;
+ 245:../Source/mainboot.c **** 			//ExtGSMOff();
+ 246:../Source/mainboot.c **** 			nextStepSchedule = ulTick100 + 10;
+ 812              		.loc 1 246 0
+ 813 0026 0A33     		add	r3, r3, #10
+ 244:../Source/mainboot.c **** 			countWakup = 0;
+ 814              		.loc 1 244 0
+ 815 0028 4C49     		ldr	r1, .L90+12
+ 816 002a 0020     		mov	r0, #0
+ 817              		.loc 1 246 0
+ 818 002c 2B60     		str	r3, [r5]
+ 247:../Source/mainboot.c **** 			rfidStep++;
+ 819              		.loc 1 247 0
+ 820 002e 0123     		mov	r3, #1
+ 244:../Source/mainboot.c **** 			countWakup = 0;
+ 821              		.loc 1 244 0
+ 822 0030 0860     		str	r0, [r1]
+ 823              		.loc 1 247 0
+ 824 0032 3370     		strb	r3, [r6]
+ 248:../Source/mainboot.c **** 			break;
+ 825              		.loc 1 248 0
+ 826 0034 8BE0     		b	.L70
+ 827              	.L74:
+ 249:../Source/mainboot.c **** 		case RFID_ST_WAKUP_RFID: //weakup here
+ 250:../Source/mainboot.c **** 			xprintf("Wakup here\r\n");
+ 828              		.loc 1 250 0
+ 829 0036 4A48     		ldr	r0, .L90+16
+ 830 0038 FFF7FEFF 		bl	xprintf
+ 251:../Source/mainboot.c **** 			if(countWakup > 0 && rfid_idx > 0 && rfid_buff[0] == 0x55) {
+ 831              		.loc 1 251 0
+ 832 003c 474C     		ldr	r4, .L90+12
+ 833 003e 2568     		ldr	r5, [r4]
+ 834 0040 002D     		cmp	r5, #0
+ 835 0042 07DD     		ble	.L80
+ 836              		.loc 1 251 0 is_stmt 0 discriminator 1
+ 837 0044 474A     		ldr	r2, .L90+20
+ 838 0046 1668     		ldr	r6, [r2]
+ 839 0048 002E     		cmp	r6, #0
+ 840 004a 03DD     		ble	.L80
+ 841 004c 4648     		ldr	r0, .L90+24
+ 842 004e 0378     		ldrb	r3, [r0]
+ 843 0050 552B     		cmp	r3, #85
+ 844 0052 70D0     		beq	.L86
+ 845              	.L80:
+ 252:../Source/mainboot.c **** 				rfidStep++;
+ 253:../Source/mainboot.c **** 			} else {
+ 254:../Source/mainboot.c **** 				SerialPutChar2(0x55);
+ 846              		.loc 1 254 0 is_stmt 1
+ 847 0054 5520     		mov	r0, #85
+ 848 0056 FFF7FEFF 		bl	SerialPutChar2
+ 255:../Source/mainboot.c **** 				if(countWakup >= 10) {
+ 849              		.loc 1 255 0
+ 850 005a 2368     		ldr	r3, [r4]
+ 851 005c 3D49     		ldr	r1, .L90+4
+ 852 005e 3C4A     		ldr	r2, .L90
+ 853 0060 092B     		cmp	r3, #9
+ 854 0062 03DD     		ble	.L81
+ 256:../Source/mainboot.c **** 					nextStepSchedule = ulTick100 + 10; //1 second after scan, then scan again
+ 855              		.loc 1 256 0
+ 856 0064 0C68     		ldr	r4, [r1]
+ 857 0066 0A34     		add	r4, r4, #10
+ 858 0068 1460     		str	r4, [r2]
+ 859 006a 64E0     		b	.L86
+ 860              	.L81:
+ 257:../Source/mainboot.c **** 					rfidStep++;
+ 258:../Source/mainboot.c **** 				} else {
+ 259:../Source/mainboot.c **** 					nextStepSchedule = ulTick100 + 5; //1 second after scan, then scan again
+ 861              		.loc 1 259 0
+ 862 006c 0968     		ldr	r1, [r1]
+ 260:../Source/mainboot.c **** 					countWakup++;
+ 863              		.loc 1 260 0
+ 864 006e 0133     		add	r3, r3, #1
+ 259:../Source/mainboot.c **** 					nextStepSchedule = ulTick100 + 5; //1 second after scan, then scan again
+ 865              		.loc 1 259 0
+ 866 0070 0531     		add	r1, r1, #5
+ 867 0072 1160     		str	r1, [r2]
+ 868              		.loc 1 260 0
+ 869 0074 2360     		str	r3, [r4]
+ 870 0076 6AE0     		b	.L70
+ 871              	.L75:
+ 261:../Source/mainboot.c **** 				}
+ 262:../Source/mainboot.c **** 			}
+ 263:../Source/mainboot.c **** 			break;
+ 264:../Source/mainboot.c **** 		case RFID_ST_READ_DEVICE_INFO: //change baud rate
+ 265:../Source/mainboot.c **** 			xprintf("Reading device\r\n");
+ 872              		.loc 1 265 0
+ 873 0078 3C48     		ldr	r0, .L90+28
+ 874 007a FFF7FEFF 		bl	xprintf
+ 266:../Source/mainboot.c **** 			SerialPutChar2(0x01);
+ 875              		.loc 1 266 0
+ 876 007e 0120     		mov	r0, #1
+ 877 0080 FFF7FEFF 		bl	SerialPutChar2
+ 267:../Source/mainboot.c **** 			SerialPutChar2(0x00);
+ 878              		.loc 1 267 0
+ 879 0084 0020     		mov	r0, #0
+ 880 0086 FFF7FEFF 		bl	SerialPutChar2
+ 268:../Source/mainboot.c **** 			nextStepSchedule = ulTick100 + 3; //1 second after scan, then scan again
+ 881              		.loc 1 268 0
+ 882 008a 324D     		ldr	r5, .L90+4
+ 883 008c 2A68     		ldr	r2, [r5]
+ 884 008e 0332     		add	r2, r2, #3
+ 885 0090 11E0     		b	.L89
+ 886              	.L76:
+ 269:../Source/mainboot.c **** 			rfidStep++;
+ 270:../Source/mainboot.c **** 			break;
+ 271:../Source/mainboot.c **** 		case RFID_ST_SELECT_PROTOCOL: //select protocol
+ 272:../Source/mainboot.c **** 			xprintf("Select protocol\r\n");
+ 887              		.loc 1 272 0
+ 888 0092 3748     		ldr	r0, .L90+32
+ 889 0094 FFF7FEFF 		bl	xprintf
+ 273:../Source/mainboot.c **** 			SerialPutChar2(0x02);
+ 890              		.loc 1 273 0
+ 891 0098 0220     		mov	r0, #2
+ 892 009a FFF7FEFF 		bl	SerialPutChar2
+ 274:../Source/mainboot.c **** 			SerialPutChar2(0x02);
+ 893              		.loc 1 274 0
+ 894 009e 0220     		mov	r0, #2
+ 895 00a0 FFF7FEFF 		bl	SerialPutChar2
+ 275:../Source/mainboot.c **** 			SerialPutChar2(0x01);
+ 896              		.loc 1 275 0
+ 897 00a4 0120     		mov	r0, #1
+ 898 00a6 FFF7FEFF 		bl	SerialPutChar2
+ 276:../Source/mainboot.c **** 			SerialPutChar2(0x05);
+ 899              		.loc 1 276 0
+ 900 00aa 0520     		mov	r0, #5
+ 901 00ac FFF7FEFF 		bl	SerialPutChar2
+ 277:../Source/mainboot.c **** 			nextStepSchedule = ulTick100 + 2; //1 second after scan, then scan again
+ 902              		.loc 1 277 0
+ 903 00b0 284E     		ldr	r6, .L90+4
+ 904 00b2 3268     		ldr	r2, [r6]
+ 905 00b4 0232     		add	r2, r2, #2
+ 906              	.L89:
+ 907 00b6 264B     		ldr	r3, .L90
+ 908 00b8 3CE0     		b	.L88
+ 909              	.L77:
+ 278:../Source/mainboot.c **** 			rfidStep++;
+ 279:../Source/mainboot.c **** 			break;
+ 280:../Source/mainboot.c **** 		case RFID_ST_READ_THE_TAG: //reading tag here
+ 281:../Source/mainboot.c **** 			if(writeNow) {
+ 910              		.loc 1 281 0
+ 911 00ba 2E4C     		ldr	r4, .L90+36
+ 912 00bc 2568     		ldr	r5, [r4]
+ 913 00be 002D     		cmp	r5, #0
+ 914 00c0 0DD0     		beq	.L82
+ 282:../Source/mainboot.c **** 				if(!writeTag(tagData, sizeof(tagData))) {
+ 915              		.loc 1 282 0
+ 916 00c2 2D48     		ldr	r0, .L90+40
+ 917 00c4 4421     		mov	r1, #68
+ 918 00c6 FFF7FEFF 		bl	writeTag
+ 919 00ca 0028     		cmp	r0, #0
+ 920 00cc 02D1     		bne	.L83
+ 283:../Source/mainboot.c **** 					blockIdx = 0;
+ 921              		.loc 1 283 0
+ 922 00ce 2B4A     		ldr	r2, .L90+44
+ 284:../Source/mainboot.c **** 					writeNow = 0;
+ 923              		.loc 1 284 0
+ 924 00d0 2060     		str	r0, [r4]
+ 283:../Source/mainboot.c **** 					blockIdx = 0;
+ 925              		.loc 1 283 0
+ 926 00d2 1060     		str	r0, [r2]
+ 927              	.L83:
+ 285:../Source/mainboot.c **** 				}
+ 286:../Source/mainboot.c **** 				nextStepSchedule = ulTick100 + 1; //1 second after scan, then scan again
+ 928              		.loc 1 286 0
+ 929 00d4 1F4B     		ldr	r3, .L90+4
+ 930 00d6 1A68     		ldr	r2, [r3]
+ 931 00d8 1D4B     		ldr	r3, .L90
+ 932 00da 0132     		add	r2, r2, #1
+ 933 00dc 36E0     		b	.L87
+ 934              	.L82:
+ 287:../Source/mainboot.c **** 			} else {
+ 288:../Source/mainboot.c **** 				memset(rfid_buff, 0, sizeof(rfid_buff));
+ 935              		.loc 1 288 0
+ 936 00de 8022     		mov	r2, #128
+ 937 00e0 291C     		mov	r1, r5
+ 938 00e2 5200     		lsl	r2, r2, #1
+ 939 00e4 2048     		ldr	r0, .L90+24
+ 940 00e6 FFF7FEFF 		bl	memset
+ 289:../Source/mainboot.c **** 				onReadingTag = 0;
+ 941              		.loc 1 289 0
+ 942 00ea 254C     		ldr	r4, .L90+48
+ 290:../Source/mainboot.c **** 
+ 291:../Source/mainboot.c **** 				SerialPutChar2(0x04);
+ 943              		.loc 1 291 0
+ 944 00ec 0420     		mov	r0, #4
+ 289:../Source/mainboot.c **** 				onReadingTag = 0;
+ 945              		.loc 1 289 0
+ 946 00ee 2560     		str	r5, [r4]
+ 947              		.loc 1 291 0
+ 948 00f0 FFF7FEFF 		bl	SerialPutChar2
+ 292:../Source/mainboot.c **** 				SerialPutChar2(0x04);
+ 949              		.loc 1 292 0
+ 950 00f4 0420     		mov	r0, #4
+ 951 00f6 FFF7FEFF 		bl	SerialPutChar2
+ 293:../Source/mainboot.c **** 				SerialPutChar2(0x02);
+ 952              		.loc 1 293 0
+ 953 00fa 0220     		mov	r0, #2
+ 954 00fc FFF7FEFF 		bl	SerialPutChar2
+ 294:../Source/mainboot.c **** 				SerialPutChar2(0x23);
+ 955              		.loc 1 294 0
+ 956 0100 2320     		mov	r0, #35
+ 957 0102 FFF7FEFF 		bl	SerialPutChar2
+ 295:../Source/mainboot.c **** 				SerialPutChar2(0x00);
+ 958              		.loc 1 295 0
+ 959 0106 281C     		mov	r0, r5
+ 960 0108 FFF7FEFF 		bl	SerialPutChar2
+ 296:../Source/mainboot.c **** 				SerialPutChar2(0x10);
+ 961              		.loc 1 296 0
+ 962 010c 1020     		mov	r0, #16
+ 963 010e FFF7FEFF 		bl	SerialPutChar2
+ 297:../Source/mainboot.c **** 				nextStepSchedule = ulTick100 + 3; //1 second after scan, then scan again
+ 964              		.loc 1 297 0
+ 965 0112 104E     		ldr	r6, .L90+4
+ 966 0114 0E4D     		ldr	r5, .L90
+ 967 0116 3168     		ldr	r1, [r6]
+ 298:../Source/mainboot.c **** 				onReadingTag = 1;
+ 968              		.loc 1 298 0
+ 969 0118 0120     		mov	r0, #1
+ 297:../Source/mainboot.c **** 				nextStepSchedule = ulTick100 + 3; //1 second after scan, then scan again
+ 970              		.loc 1 297 0
+ 971 011a 0331     		add	r1, r1, #3
+ 972 011c 2960     		str	r1, [r5]
+ 973              		.loc 1 298 0
+ 974 011e 2060     		str	r0, [r4]
+ 975 0120 09E0     		b	.L86
+ 976              	.L78:
+ 299:../Source/mainboot.c **** 				rfidStep++;
+ 300:../Source/mainboot.c **** 			}
+ 301:../Source/mainboot.c **** 			break;
+ 302:../Source/mainboot.c **** 		case RFID_ST_PROCESS_DATA: //reading tag here
+ 303:../Source/mainboot.c **** 			if(processTagData()) {
+ 977              		.loc 1 303 0
+ 978 0122 FFF7FEFF 		bl	processTagData
+ 304:../Source/mainboot.c **** 				nextStepSchedule = ulTick100 + 20; //1 second after scan, then scan again
+ 979              		.loc 1 304 0
+ 980 0126 2368     		ldr	r3, [r4]
+ 303:../Source/mainboot.c **** 			if(processTagData()) {
+ 981              		.loc 1 303 0
+ 982 0128 0028     		cmp	r0, #0
+ 983 012a 00D0     		beq	.L84
+ 984              		.loc 1 304 0
+ 985 012c 1433     		add	r3, r3, #20
+ 986              	.L84:
+ 305:../Source/mainboot.c **** 			} else {
+ 306:../Source/mainboot.c **** 				nextStepSchedule = ulTick100; //1 second after scan, then scan again
+ 987              		.loc 1 306 0
+ 988 012e 2B60     		str	r3, [r5]
+ 307:../Source/mainboot.c **** 			}
+ 308:../Source/mainboot.c **** 			onReadingTag = 0;
+ 989              		.loc 1 308 0
+ 990 0130 134B     		ldr	r3, .L90+48
+ 991 0132 0022     		mov	r2, #0
+ 992              	.L88:
+ 993 0134 1A60     		str	r2, [r3]
+ 994              	.L86:
+ 309:../Source/mainboot.c **** 			rfidStep++;
+ 995              		.loc 1 309 0
+ 996 0136 084B     		ldr	r3, .L90+8
+ 997 0138 1878     		ldrb	r0, [r3]
+ 998 013a 0130     		add	r0, r0, #1
+ 999 013c 1870     		strb	r0, [r3]
+ 310:../Source/mainboot.c **** 			//rfidStep=0;
+ 311:../Source/mainboot.c **** 			break;
+ 1000              		.loc 1 311 0
+ 1001 013e 06E0     		b	.L70
+ 1002              	.L72:
+ 312:../Source/mainboot.c **** 		default:
+ 313:../Source/mainboot.c **** 			rfidStep = RFID_ST_READ_THE_TAG;
+ 314:../Source/mainboot.c **** 			nextStepSchedule = ulTick100 + 2;
+ 1003              		.loc 1 314 0
+ 1004 0140 0233     		add	r3, r3, #2
+ 313:../Source/mainboot.c **** 			rfidStep = RFID_ST_READ_THE_TAG;
+ 1005              		.loc 1 313 0
+ 1006 0142 0424     		mov	r4, #4
+ 1007              		.loc 1 314 0
+ 1008 0144 0B60     		str	r3, [r1]
+ 315:../Source/mainboot.c **** 			countWakup = 0;
+ 1009              		.loc 1 315 0
+ 1010 0146 054B     		ldr	r3, .L90+12
+ 313:../Source/mainboot.c **** 			rfidStep = RFID_ST_READ_THE_TAG;
+ 1011              		.loc 1 313 0
+ 1012 0148 3470     		strb	r4, [r6]
+ 1013              		.loc 1 315 0
+ 1014 014a 0022     		mov	r2, #0
+ 1015              	.L87:
+ 1016 014c 1A60     		str	r2, [r3]
+ 1017              	.L70:
+ 1018              		@ sp needed for prologue
+ 316:../Source/mainboot.c **** 			break;
+ 317:../Source/mainboot.c **** 	}
+ 318:../Source/mainboot.c **** }
+ 1019              		.loc 1 318 0
+ 1020 014e 70BD     		pop	{r4, r5, r6, pc}
+ 1021              	.L91:
+ 1022              		.align	2
+ 1023              	.L90:
+ 1024 0150 00000000 		.word	.LANCHOR4
+ 1025 0154 00000000 		.word	ulTick100
+ 1026 0158 00000000 		.word	rfidStep
+ 1027 015c 00000000 		.word	.LANCHOR5
+ 1028 0160 65000000 		.word	.LC29
+ 1029 0164 00000000 		.word	rfid_idx
+ 1030 0168 00000000 		.word	.LANCHOR0
+ 1031 016c 72000000 		.word	.LC33
+ 1032 0170 83000000 		.word	.LC35
+ 1033 0174 00000000 		.word	.LANCHOR6
+ 1034 0178 00000000 		.word	.LANCHOR7
+ 1035 017c 00000000 		.word	.LANCHOR1
+ 1036 0180 00000000 		.word	.LANCHOR2
+ 1037              		.cfi_endproc
+ 1038              	.LFE46:
+ 1040              		.section	.text.keep_alive_tracker,"ax",%progbits
+ 1041              		.align	1
+ 1042              		.global	keep_alive_tracker
+ 1043              		.code	16
+ 1044              		.thumb_func
+ 1046              	keep_alive_tracker:
+ 1047              	.LFB47:
+ 319:../Source/mainboot.c **** 
+ 320:../Source/mainboot.c **** void keep_alive_tracker() {
+ 1048              		.loc 1 320 0
+ 1049              		.cfi_startproc
+ 1050 0000 08B5     		push	{r3, lr}
+ 1051              	.LCFI14:
+ 1052              		.cfi_def_cfa_offset 8
+ 1053              		.cfi_offset 3, -8
+ 1054              		.cfi_offset 14, -4
+ 321:../Source/mainboot.c **** 	if(ulSecCount - lastSentToTracker > 10 && !onReadingTag) { //10 seconds, then send again
+ 1055              		.loc 1 321 0
+ 1056 0002 084A     		ldr	r2, .L94
+ 1057 0004 084B     		ldr	r3, .L94+4
+ 1058 0006 1068     		ldr	r0, [r2]
+ 1059 0008 1968     		ldr	r1, [r3]
+ 1060 000a 411A     		sub	r1, r0, r1
+ 1061 000c 0A29     		cmp	r1, #10
+ 1062 000e 08D9     		bls	.L92
+ 1063              		.loc 1 321 0 is_stmt 0 discriminator 1
+ 1064 0010 0648     		ldr	r0, .L94+8
+ 1065 0012 0168     		ldr	r1, [r0]
+ 1066 0014 0029     		cmp	r1, #0
+ 1067 0016 04D1     		bne	.L92
+ 322:../Source/mainboot.c **** 		lastSentToTracker = ulSecCount;
+ 1068              		.loc 1 322 0 is_stmt 1
+ 1069 0018 1268     		ldr	r2, [r2]
+ 323:../Source/mainboot.c **** 		xprintf("*SS,0000000001,KA,123123,1#\r\n");
+ 1070              		.loc 1 323 0
+ 1071 001a 0548     		ldr	r0, .L94+12
+ 322:../Source/mainboot.c **** 		lastSentToTracker = ulSecCount;
+ 1072              		.loc 1 322 0
+ 1073 001c 1A60     		str	r2, [r3]
+ 1074              		.loc 1 323 0
+ 1075 001e FFF7FEFF 		bl	xprintf
+ 1076              	.L92:
+ 1077              		@ sp needed for prologue
+ 324:../Source/mainboot.c **** 	}
+ 325:../Source/mainboot.c **** }
+ 1078              		.loc 1 325 0
+ 1079 0022 08BD     		pop	{r3, pc}
+ 1080              	.L95:
+ 1081              		.align	2
+ 1082              	.L94:
+ 1083 0024 00000000 		.word	ulSecCount
+ 1084 0028 00000000 		.word	.LANCHOR3
+ 1085 002c 00000000 		.word	.LANCHOR2
+ 1086 0030 95000000 		.word	.LC44
+ 1087              		.cfi_endproc
+ 1088              	.LFE47:
+ 1090              		.section	.text.Main_Menu,"ax",%progbits
+ 1091              		.align	1
+ 1092              		.global	Main_Menu
+ 1093              		.code	16
+ 1094              		.thumb_func
+ 1096              	Main_Menu:
+ 1097              	.LFB48:
+ 326:../Source/mainboot.c **** 
+ 327:../Source/mainboot.c **** void Main_Menu(void)
+ 328:../Source/mainboot.c **** {
+ 1098              		.loc 1 328 0
+ 1099              		.cfi_startproc
+ 1100 0000 10B5     		push	{r4, lr}
+ 1101              	.LCFI15:
+ 1102              		.cfi_def_cfa_offset 8
+ 1103              		.cfi_offset 4, -8
+ 1104              		.cfi_offset 14, -4
+ 329:../Source/mainboot.c **** 	turn_off_red_led();
+ 1105              		.loc 1 329 0
+ 1106 0002 FFF7FEFF 		bl	turn_off_red_led
+ 1107              	.L98:
+ 1108              	.LBB16:
+ 1109              	.LBB17:
+ 106:../Source/mainboot.c ****     if(buff_cmd[0] == '*') {
+ 1110              		.loc 1 106 0 discriminator 1
+ 1111 0006 094C     		ldr	r4, .L99
+ 1112 0008 2378     		ldrb	r3, [r4]
+ 1113 000a 2A2B     		cmp	r3, #42
+ 1114 000c 07D1     		bne	.L97
+ 107:../Source/mainboot.c **** 		server_on_command(SKS_CMD_SOURCE_COM1, buff_cmd, sizeof(buff_cmd));
+ 1115              		.loc 1 107 0
+ 1116 000e 0120     		mov	r0, #1
+ 1117 0010 8022     		mov	r2, #128
+ 1118 0012 211C     		mov	r1, r4
+ 1119 0014 8240     		lsl	r2, r2, r0
+ 1120 0016 FFF7FEFF 		bl	server_on_command
+ 108:../Source/mainboot.c **** 		buff_cmd[0] = 0;
+ 1121              		.loc 1 108 0
+ 1122 001a 0020     		mov	r0, #0
+ 1123 001c 2070     		strb	r0, [r4]
+ 1124              	.L97:
+ 1125              	.LBE17:
+ 1126              	.LBE16:
+ 330:../Source/mainboot.c **** 
+ 331:../Source/mainboot.c **** 	while (1)
+ 332:../Source/mainboot.c **** 	{
+ 333:../Source/mainboot.c **** 		process_command_from_pc();
+ 334:../Source/mainboot.c **** 		scan_RFID_15693();
+ 1127              		.loc 1 334 0 discriminator 1
+ 1128 001e FFF7FEFF 		bl	scan_RFID_15693
+ 335:../Source/mainboot.c **** 	   process_alarm_and_led();
+ 1129              		.loc 1 335 0 discriminator 1
+ 1130 0022 FFF7FEFF 		bl	process_alarm_and_led
+ 336:../Source/mainboot.c **** 	    keep_alive_tracker();
+ 1131              		.loc 1 336 0 discriminator 1
+ 1132 0026 FFF7FEFF 		bl	keep_alive_tracker
+ 337:../Source/mainboot.c **** 	}
+ 1133              		.loc 1 337 0 discriminator 1
+ 1134 002a ECE7     		b	.L98
+ 1135              	.L100:
+ 1136              		.align	2
+ 1137              	.L99:
+ 1138 002c 00000000 		.word	.LANCHOR8
+ 1139              		.cfi_endproc
+ 1140              	.LFE48:
+ 1142              		.global	tagData
+ 1143              		.global	writeNow
+ 1144              		.global	blockIdx
+ 1145              		.global	onReadingTag
+ 1146              		.global	countWakup
+ 1147              		.global	nextStepSchedule
+ 1148              		.comm	rfidStep,1,1
+ 1149              		.global	lastScanRFID
+ 1150              		.comm	rfid_idx,4,4
+ 1151              		.comm	buff_idx,4,4
+ 1152              		.global	rfid_buff
+ 1153              		.global	buff_cmd
+ 1154              		.global	lastSentToTracker
+ 1155              		.global	FlashProtection
+ 1156              		.global	UserMemoryMask1
+ 1157              		.global	BlockNbr
+ 1158              		.section	.bss.FlashProtection,"aw",%nobits
+ 1159              		.align	2
+ 1162              	FlashProtection:
+ 1163 0000 00000000 		.space	4
+ 1164              		.section	.bss.UserMemoryMask1,"aw",%nobits
+ 1165              		.align	2
+ 1168              	UserMemoryMask1:
+ 1169 0000 00000000 		.space	4
+ 1170              		.section	.bss.lastScanRFID,"aw",%nobits
+ 1171              		.align	2
+ 1174              	lastScanRFID:
+ 1175 0000 00000000 		.space	4
+ 1176              		.section	.bss.countWakup,"aw",%nobits
+ 1177              		.align	2
+ 1178              		.set	.LANCHOR5,. + 0
+ 1181              	countWakup:
+ 1182 0000 00000000 		.space	4
+ 1183              		.section	.bss.onReadingTag,"aw",%nobits
+ 1184              		.align	2
+ 1185              		.set	.LANCHOR2,. + 0
+ 1188              	onReadingTag:
+ 1189 0000 00000000 		.space	4
+ 1190              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 1191              	.LC4:
+ 1192 0000 45786563 		.ascii	"Execute CONFIG\015\012\000"
+ 1192      75746520 
+ 1192      434F4E46 
+ 1192      49470D0A 
+ 1192      00
+ 1193              	.LC7:
+ 1194 0011 57726974 		.ascii	"Writing..\000"
+ 1194      696E672E 
+ 1194      2E00
+ 1195              	.LC9:
+ 1196 001b 2E2E00   		.ascii	"..\000"
+ 1197              	.LC11:
+ 1198 001e 646F6E65 		.ascii	"done.\015\012\000"
+ 1198      2E0D0A00 
+ 1199              	.LC16:
+ 1200 0026 2A53532C 		.ascii	"*SS,0000000001,RFID,123123,1,%s,%s,%s,%d#\015\012\000"
+ 1200      30303030 
+ 1200      30303030 
+ 1200      30312C52 
+ 1200      4649442C 
+ 1201              	.LC20:
+ 1202 0052 556E6B6E 		.ascii	"Unknown data: %s\015\012\000"
+ 1202      6F776E20 
+ 1202      64617461 
+ 1202      3A202573 
+ 1202      0D0A00
+ 1203              	.LC29:
+ 1204 0065 57616B75 		.ascii	"Wakup here\015\012\000"
+ 1204      70206865 
+ 1204      72650D0A 
+ 1204      00
+ 1205              	.LC33:
+ 1206 0072 52656164 		.ascii	"Reading device\015\012\000"
+ 1206      696E6720 
+ 1206      64657669 
+ 1206      63650D0A 
+ 1206      00
+ 1207              	.LC35:
+ 1208 0083 53656C65 		.ascii	"Select protocol\015\012\000"
+ 1208      63742070 
+ 1208      726F746F 
+ 1208      636F6C0D 
+ 1208      0A00
+ 1209              	.LC44:
+ 1210 0095 2A53532C 		.ascii	"*SS,0000000001,KA,123123,1#\015\012\000"
+ 1210      30303030 
+ 1210      30303030 
+ 1210      30312C4B 
+ 1210      412C3132 
+ 1211              		.section	.bss.BlockNbr,"aw",%nobits
+ 1212              		.align	2
+ 1215              	BlockNbr:
+ 1216 0000 00000000 		.space	4
+ 1217              		.section	.bss.blockIdx,"aw",%nobits
+ 1218              		.align	2
+ 1219              		.set	.LANCHOR1,. + 0
+ 1222              	blockIdx:
+ 1223 0000 00000000 		.space	4
+ 1224              		.section	.bss.tagData,"aw",%nobits
+ 1225              		.set	.LANCHOR7,. + 0
+ 1228              	tagData:
+ 1229 0000 00000000 		.space	68
+ 1229      00000000 
+ 1229      00000000 
+ 1229      00000000 
+ 1229      00000000 
+ 1230              		.section	.bss.nextStepSchedule,"aw",%nobits
+ 1231              		.align	2
+ 1232              		.set	.LANCHOR4,. + 0
+ 1235              	nextStepSchedule:
+ 1236 0000 00000000 		.space	4
+ 1237              		.section	.bss.rfid_buff,"aw",%nobits
+ 1238              		.set	.LANCHOR0,. + 0
+ 1241              	rfid_buff:
+ 1242 0000 00000000 		.space	256
+ 1242      00000000 
+ 1242      00000000 
+ 1242      00000000 
+ 1242      00000000 
+ 1243              		.section	.bss.buff_cmd,"aw",%nobits
+ 1244              		.set	.LANCHOR8,. + 0
+ 1247              	buff_cmd:
+ 1248 0000 00000000 		.space	256
+ 1248      00000000 
+ 1248      00000000 
+ 1248      00000000 
+ 1248      00000000 
+ 1249              		.section	.bss.lastSentToTracker,"aw",%nobits
+ 1250              		.align	2
+ 1251              		.set	.LANCHOR3,. + 0
+ 1254              	lastSentToTracker:
+ 1255 0000 00000000 		.space	4
+ 1256              		.section	.bss.writeNow,"aw",%nobits
+ 1257              		.align	2
+ 1258              		.set	.LANCHOR6,. + 0
+ 1261              	writeNow:
+ 1262 0000 00000000 		.space	4
+ 1263              		.text
+ 1264              	.Letext0:
+ 1265              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1266              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+DEFINED SYMBOLS
+                            *ABS*:00000000 mainboot.c
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:18     .text.SerialPutChar:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:23     .text.SerialPutChar:00000000 SerialPutChar
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:53     .text.SerialPutChar:0000001c $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:58     .text.X3SerialPutChar:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:63     .text.X3SerialPutChar:00000000 X3SerialPutChar
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:92     .text.X3SerialPutChar:0000001c $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:97     .text.Serial_PutString:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:102    .text.Serial_PutString:00000000 Serial_PutString
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:136    .text.SerialPutString:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:141    .text.SerialPutString:00000000 SerialPutString
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:175    .text.X3Serial_PutString:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:180    .text.X3Serial_PutString:00000000 X3Serial_PutString
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:214    .text.ExtSerial_PutString:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:219    .text.ExtSerial_PutString:00000000 ExtSerial_PutString
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:297    .text.SerialPutChar2:00000000 SerialPutChar2
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:255    .text.Clear_USART2_Buffer:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:260    .text.Clear_USART2_Buffer:00000000 Clear_USART2_Buffer
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:286    .text.Clear_USART2_Buffer:00000014 $d
+                            *COM*:00000004 rfid_idx
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:292    .text.SerialPutChar2:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:329    .text.SerialPutChar2:00000020 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:334    .text.SerialPutString2:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:339    .text.SerialPutString2:00000000 SerialPutString2
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:373    .text.do_config:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:378    .text.do_config:00000000 do_config
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:397    .text.do_config:0000000c $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:402    .text.writeTag:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:407    .text.writeTag:00000000 writeTag
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:548    .text.writeTag:0000008c $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:557    .text.processTagData:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:562    .text.processTagData:00000000 processTagData
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:758    .text.processTagData:000000d0 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:769    .text.scan_RFID_15693:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:774    .text.scan_RFID_15693:00000000 scan_RFID_15693
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:804    .text.scan_RFID_15693:00000020 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:810    .text.scan_RFID_15693:00000026 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1024   .text.scan_RFID_15693:00000150 $d
+                            *COM*:00000001 rfidStep
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1041   .text.keep_alive_tracker:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1046   .text.keep_alive_tracker:00000000 keep_alive_tracker
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1083   .text.keep_alive_tracker:00000024 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1091   .text.Main_Menu:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1096   .text.Main_Menu:00000000 Main_Menu
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1138   .text.Main_Menu:0000002c $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1228   .bss.tagData:00000000 tagData
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1261   .bss.writeNow:00000000 writeNow
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1222   .bss.blockIdx:00000000 blockIdx
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1188   .bss.onReadingTag:00000000 onReadingTag
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1181   .bss.countWakup:00000000 countWakup
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1235   .bss.nextStepSchedule:00000000 nextStepSchedule
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1174   .bss.lastScanRFID:00000000 lastScanRFID
+                            *COM*:00000004 buff_idx
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1241   .bss.rfid_buff:00000000 rfid_buff
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1247   .bss.buff_cmd:00000000 buff_cmd
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1254   .bss.lastSentToTracker:00000000 lastSentToTracker
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1162   .bss.FlashProtection:00000000 FlashProtection
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1168   .bss.UserMemoryMask1:00000000 UserMemoryMask1
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1215   .bss.BlockNbr:00000000 BlockNbr
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1159   .bss.FlashProtection:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1165   .bss.UserMemoryMask1:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1171   .bss.lastScanRFID:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1177   .bss.countWakup:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1184   .bss.onReadingTag:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1212   .bss.BlockNbr:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1218   .bss.blockIdx:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1229   .bss.tagData:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1231   .bss.nextStepSchedule:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1242   .bss.rfid_buff:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1248   .bss.buff_cmd:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1250   .bss.lastSentToTracker:00000000 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\ccehTkuh.s:1257   .bss.writeNow:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+USART_GetFlagStatus
+USART_SendData
+memset
+xprintf
+blink_red_led_once
+ulSecCount
+__gnu_thumb1_case_uqi
+ulTick100
+turn_off_red_led
+server_on_command
+process_alarm_and_led

@@ -1,0 +1,108 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"download.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.comm	x3buffer,5560,4
+  18              		.comm	g_pointer,12,4
+  19              		.comm	g_config,92,4
+  20              		.comm	boot_inf,64,4
+  21              		.global	tab_1024
+  22              		.bss
+  23              		.align	2
+  26              	tab_1024:
+  27 0000 00000000 		.space	1024
+  27      00000000 
+  27      00000000 
+  27      00000000 
+  27      00000000 
+  28              		.text
+  29              	.Letext0:
+  30              		.file 1 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\mach
+  31              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\sys\
+  32              		.file 3 "../scr/DataUtil.h"
+  33              		.file 4 "../scr/common.h"
+  34              		.file 5 "../scr/download.c"
+DEFINED SYMBOLS
+                            *ABS*:00000000 download.c
+                            *COM*:000015b8 x3buffer
+                            *COM*:0000000c g_pointer
+                            *COM*:0000005c g_config
+                            *COM*:00000040 boot_inf
+C:\Users\ADMINI~1\AppData\Local\Temp\ccEfaaIH.s:26     .bss:00000000 tab_1024
+C:\Users\ADMINI~1\AppData\Local\Temp\ccEfaaIH.s:23     .bss:00000000 $d
+                           .group:00000000 wm4.0.38f3ce5416ddc4c94340ac14f0421ae0
+                           .group:00000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:00000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:00000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:00000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4._default_types.h.6.35ee9e747940367bf2a634907d1c2382
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.cdefs.h.47.3052445825803de6c3a3b68ec8193866
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:00000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:00000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:00000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:00000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.68.ff6d7571d3ad75c55f15e26dbaa81e35
+                           .group:00000000 wm4.string.h.8.c4b8571ce60dff2817f43fec8b86aecd
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.stm32f0xx.h.54.4683aa1e9aded801990d6fc5c3cd79d1
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:00000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.490.3021eb906afe162bf2c4c3f84017f2b7
+                           .group:00000000 wm4.stm32f0xx_adc.h.85.55aeb589c2c2703602e5f964c35b0c48
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.3e9f83248098cae82aee4fdd1dde590d
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.b7995c183c4864b04eda399c410c0e53
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.time.h.8.2930fe070f4a8096b07db9159698c8e3
+                           .group:00000000 wm4.time.h.2.4581ce0ffb6627cfc02162c94bf846c9
+                           .group:00000000 wm4.time.h.24.3660bbb2d0a4c7457ff52ba3ada4c166
+                           .group:00000000 wm4.timespec.h.41.d855182eb0e690443ab8651bcedca6e1
+                           .group:00000000 wm4.time.h.217.2f437ac2cf06537c84703833b0977905
+                           .group:00000000 wm4.DataUtil.h.6.7244789e324a04765de5b008e99af49c
+                           .group:00000000 wm4.common.h.36.396870489cb68de4c1415185500a1a4d
+                           .group:00000000 wm4.ymodem.h.24.613d258bf183758042d94dca54a83ab9
+                           .group:00000000 wm4.main.h.9.8fed31912a3afae9ed9fd363e0d308ab
+
+NO UNDEFINED SYMBOLS

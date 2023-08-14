@@ -1,0 +1,448 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"uart.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.PC_uartInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	PC_uartInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	PC_uartInit:
+  24              	.LFB33:
+  25              		.file 1 "../Source/uart.c"
+   1:../Source/uart.c **** /*
+   2:../Source/uart.c ****  * uart.c
+   3:../Source/uart.c ****  *
+   4:../Source/uart.c ****  *  Created on: Jan 21, 2021
+   5:../Source/uart.c ****  *      Author: Thangnguyen
+   6:../Source/uart.c ****  */
+   7:../Source/uart.c **** #include <stdbool.h>
+   8:../Source/uart.c **** 
+   9:../Source/uart.c **** #include "uart.h"
+  10:../Source/uart.c **** #include "stm32f0xx_usart.h"
+  11:../Source/uart.c **** 
+  12:../Source/uart.c **** #define USART1_RCC					RCC_APB2Periph_USART1
+  13:../Source/uart.c **** #define USART2_RCC					RCC_APB1Periph_USART2
+  14:../Source/uart.c **** 
+  15:../Source/uart.c **** #define USART1_TX_PORT				GPIOA
+  16:../Source/uart.c **** #define USART1_TX_PIN				GPIO_Pin_9
+  17:../Source/uart.c **** #define USART1_TX_PIN_SOURCE		GPIO_PinSource9
+  18:../Source/uart.c **** #define USART1_TX_RCC				RCC_AHBPeriph_GPIOA
+  19:../Source/uart.c **** 
+  20:../Source/uart.c **** #define USART1_RX_PORT				GPIOA
+  21:../Source/uart.c **** #define USART1_RX_PIN				GPIO_Pin_10
+  22:../Source/uart.c **** #define USART1_RX_PIN_SOURCE		GPIO_PinSource10
+  23:../Source/uart.c **** #define USART1_RX_RCC				RCC_AHBPeriph_GPIOA
+  24:../Source/uart.c **** 
+  25:../Source/uart.c **** #define USART2_TX_PORT				GPIOA
+  26:../Source/uart.c **** #define USART2_TX_PIN				GPIO_Pin_2
+  27:../Source/uart.c **** #define USART2_TX_PIN_SOURCE		GPIO_PinSource2
+  28:../Source/uart.c **** #define USART2_TX_RCC				RCC_AHBPeriph_GPIOA
+  29:../Source/uart.c **** 
+  30:../Source/uart.c **** #define USART2_RX_PORT				GPIOA
+  31:../Source/uart.c **** #define USART2_RX_PIN				GPIO_Pin_3
+  32:../Source/uart.c **** #define USART2_RX_PIN_SOURCE		GPIO_PinSource3
+  33:../Source/uart.c **** #define USART2_RX_RCC				RCC_AHBPeriph_GPIOA
+  34:../Source/uart.c **** 
+  35:../Source/uart.c **** static void uart1_init(uint32_t baud);
+  36:../Source/uart.c **** static void uart2_init(uint32_t baud);
+  37:../Source/uart.c **** 
+  38:../Source/uart.c **** 
+  39:../Source/uart.c **** static void uart1_putChar(uint8_t data) ;
+  40:../Source/uart.c **** static uint8_t uart1_getChar(void) ;
+  41:../Source/uart.c **** static void uart1_putString(uint8_t *ptr);
+  42:../Source/uart.c **** static void uart1_putArr(uint8_t *ptr, uint16_t len);
+  43:../Source/uart.c **** 
+  44:../Source/uart.c **** static void uart2_putChar(uint8_t data);
+  45:../Source/uart.c **** static uint8_t uart2_getChar(void);
+  46:../Source/uart.c **** static void uart2_putString(uint8_t *ptr);
+  47:../Source/uart.c **** static void uart2_putArr(uint8_t *ptr, uint16_t len);
+  48:../Source/uart.c **** 
+  49:../Source/uart.c **** void PC_uartInit(uint32_t baud){
+  26              		.loc 1 49 0
+  27              		.cfi_startproc
+  28 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 20
+  31              		.cfi_offset 4, -20
+  32              		.cfi_offset 5, -16
+  33              		.cfi_offset 6, -12
+  34              		.cfi_offset 7, -8
+  35              		.cfi_offset 14, -4
+  36              	.LVL0:
+  37 0002 8DB0     		sub	sp, sp, #52
+  38              	.LCFI1:
+  39              		.cfi_def_cfa_offset 72
+  40              	.LVL1:
+  41              	.LBB4:
+  42              	.LBB5:
+  50:../Source/uart.c **** 	uart1_init(baud);
+  51:../Source/uart.c **** }
+  52:../Source/uart.c **** 
+  53:../Source/uart.c **** void PC_uart_putChar(uint8_t data){
+  54:../Source/uart.c **** 	uart1_putChar(data);
+  55:../Source/uart.c **** }
+  56:../Source/uart.c **** 
+  57:../Source/uart.c **** static void uart1_init(uint32_t baud) {
+  58:../Source/uart.c **** 
+  59:../Source/uart.c **** 	USART_InitTypeDef USART_InitStructure;
+  60:../Source/uart.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+  61:../Source/uart.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+  62:../Source/uart.c **** 
+  63:../Source/uart.c **** 	RCC_APB2PeriphClockCmd(USART1_RCC,ENABLE);
+  43              		.loc 1 63 0
+  44 0004 8021     		mov	r1, #128
+  45              	.LBE5:
+  46              	.LBE4:
+  49:../Source/uart.c **** void PC_uartInit(uint32_t baud){
+  47              		.loc 1 49 0
+  48 0006 0190     		str	r0, [sp, #4]
+  49              	.LBB7:
+  50              	.LBB6:
+  51              		.loc 1 63 0
+  52 0008 C801     		lsl	r0, r1, #7
+  53              	.LVL2:
+  54 000a 0121     		mov	r1, #1
+  55 000c FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  64:../Source/uart.c **** 	RCC_AHBPeriphClockCmd(USART1_TX_RCC,ENABLE);
+  56              		.loc 1 64 0
+  57 0010 8020     		mov	r0, #128
+  58 0012 8002     		lsl	r0, r0, #10
+  59 0014 0121     		mov	r1, #1
+  60 0016 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  65:../Source/uart.c **** 	RCC_AHBPeriphClockCmd(USART1_RX_RCC,ENABLE);
+  61              		.loc 1 65 0
+  62 001a 8023     		mov	r3, #128
+  63 001c 9802     		lsl	r0, r3, #10
+  64 001e 0121     		mov	r1, #1
+  66:../Source/uart.c **** 
+  67:../Source/uart.c **** 	GPIO_PinAFConfig(USART1_TX_PORT, USART1_TX_PIN_SOURCE, GPIO_AF_1);
+  65              		.loc 1 67 0
+  66 0020 9024     		mov	r4, #144
+  68:../Source/uart.c **** 
+  69:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_TX_PIN;
+  67              		.loc 1 69 0
+  68 0022 8027     		mov	r7, #128
+  65:../Source/uart.c **** 	RCC_AHBPeriphClockCmd(USART1_RX_RCC,ENABLE);
+  69              		.loc 1 65 0
+  70 0024 FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+  71              		.loc 1 69 0
+  72 0028 BD00     		lsl	r5, r7, #2
+  67:../Source/uart.c **** 	GPIO_PinAFConfig(USART1_TX_PORT, USART1_TX_PIN_SOURCE, GPIO_AF_1);
+  73              		.loc 1 67 0
+  74 002a E005     		lsl	r0, r4, #23
+  75 002c 0921     		mov	r1, #9
+  76              		.loc 1 69 0
+  77 002e 09AC     		add	r4, sp, #36
+  67:../Source/uart.c **** 	GPIO_PinAFConfig(USART1_TX_PORT, USART1_TX_PIN_SOURCE, GPIO_AF_1);
+  78              		.loc 1 67 0
+  79 0030 0122     		mov	r2, #1
+  70:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  71:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+  80              		.loc 1 71 0
+  81 0032 0326     		mov	r6, #3
+  67:../Source/uart.c **** 	GPIO_PinAFConfig(USART1_TX_PORT, USART1_TX_PIN_SOURCE, GPIO_AF_1);
+  82              		.loc 1 67 0
+  83 0034 FFF7FEFF 		bl	GPIO_PinAFConfig
+  70:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  84              		.loc 1 70 0
+  85 0038 0227     		mov	r7, #2
+  69:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_TX_PIN;
+  86              		.loc 1 69 0
+  87 003a 0995     		str	r5, [sp, #36]
+  88              		.loc 1 71 0
+  89 003c 6671     		strb	r6, [r4, #5]
+  72:../Source/uart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  90              		.loc 1 72 0
+  91 003e 0025     		mov	r5, #0
+  73:../Source/uart.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+  92              		.loc 1 73 0
+  93 0040 0126     		mov	r6, #1
+  74:../Source/uart.c **** 	GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
+  94              		.loc 1 74 0
+  95 0042 9022     		mov	r2, #144
+  70:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  96              		.loc 1 70 0
+  97 0044 2771     		strb	r7, [r4, #4]
+  98              		.loc 1 74 0
+  99 0046 D005     		lsl	r0, r2, #23
+ 100 0048 211C     		mov	r1, r4
+  72:../Source/uart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 101              		.loc 1 72 0
+ 102 004a A571     		strb	r5, [r4, #6]
+  73:../Source/uart.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 103              		.loc 1 73 0
+ 104 004c E671     		strb	r6, [r4, #7]
+ 105              		.loc 1 74 0
+ 106 004e FFF7FEFF 		bl	GPIO_Init
+  75:../Source/uart.c **** 	GPIO_PinAFConfig(USART1_RX_PORT, USART1_RX_PIN_SOURCE, GPIO_AF_1);
+ 107              		.loc 1 75 0
+ 108 0052 9021     		mov	r1, #144
+ 109 0054 C805     		lsl	r0, r1, #23
+ 110 0056 321C     		mov	r2, r6
+ 111 0058 0A21     		mov	r1, #10
+ 112 005a FFF7FEFF 		bl	GPIO_PinAFConfig
+  76:../Source/uart.c **** 
+  77:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;
+  78:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+  79:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+  80:../Source/uart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+  81:../Source/uart.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+  82:../Source/uart.c **** 	GPIO_Init(USART1_TX_PORT, &GPIO_InitStructure);
+ 113              		.loc 1 82 0
+ 114 005e 9022     		mov	r2, #144
+  78:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 115              		.loc 1 78 0
+ 116 0060 2771     		strb	r7, [r4, #4]
+  77:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;
+ 117              		.loc 1 77 0
+ 118 0062 8020     		mov	r0, #128
+  79:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 119              		.loc 1 79 0
+ 120 0064 0327     		mov	r7, #3
+  77:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;
+ 121              		.loc 1 77 0
+ 122 0066 C300     		lsl	r3, r0, #3
+ 123              		.loc 1 82 0
+ 124 0068 211C     		mov	r1, r4
+ 125 006a D005     		lsl	r0, r2, #23
+  79:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 126              		.loc 1 79 0
+ 127 006c 6771     		strb	r7, [r4, #5]
+  80:../Source/uart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 128              		.loc 1 80 0
+ 129 006e A571     		strb	r5, [r4, #6]
+  81:../Source/uart.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 130              		.loc 1 81 0
+ 131 0070 E671     		strb	r6, [r4, #7]
+  77:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART1_RX_PIN;
+ 132              		.loc 1 77 0
+ 133 0072 0993     		str	r3, [sp, #36]
+ 134              		.loc 1 82 0
+ 135 0074 FFF7FEFF 		bl	GPIO_Init
+  83:../Source/uart.c **** 
+  84:../Source/uart.c **** 	USART_InitStructure.USART_BaudRate = baud;
+ 136              		.loc 1 84 0
+ 137 0078 0199     		ldr	r1, [sp, #4]
+  85:../Source/uart.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+  86:../Source/uart.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+  87:../Source/uart.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+  88:../Source/uart.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+  89:../Source/uart.c **** 	USART_HardwareFlowControl_None;
+  90:../Source/uart.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 138              		.loc 1 90 0
+ 139 007a 0C20     		mov	r0, #12
+  84:../Source/uart.c **** 	USART_InitStructure.USART_BaudRate = baud;
+ 140              		.loc 1 84 0
+ 141 007c 0391     		str	r1, [sp, #12]
+ 142              		.loc 1 90 0
+ 143 007e 0790     		str	r0, [sp, #28]
+  91:../Source/uart.c **** 	/* Configure the USART1 */
+  92:../Source/uart.c **** 	USART_Init(USART1, &USART_InitStructure);
+ 144              		.loc 1 92 0
+ 145 0080 03A9     		add	r1, sp, #12
+ 146 0082 0F48     		ldr	r0, .L2
+  85:../Source/uart.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 147              		.loc 1 85 0
+ 148 0084 0495     		str	r5, [sp, #16]
+  86:../Source/uart.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 149              		.loc 1 86 0
+ 150 0086 0595     		str	r5, [sp, #20]
+  87:../Source/uart.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 151              		.loc 1 87 0
+ 152 0088 0695     		str	r5, [sp, #24]
+  88:../Source/uart.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 153              		.loc 1 88 0
+ 154 008a 0895     		str	r5, [sp, #32]
+ 155              		.loc 1 92 0
+ 156 008c FFF7FEFF 		bl	USART_Init
+  93:../Source/uart.c **** 	/* Enable USART1 interrupt */
+  94:../Source/uart.c **** 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+ 157              		.loc 1 94 0
+ 158 0090 321C     		mov	r2, r6
+ 159 0092 0B48     		ldr	r0, .L2
+ 160 0094 0B49     		ldr	r1, .L2+4
+ 161 0096 FFF7FEFF 		bl	USART_ITConfig
+  95:../Source/uart.c **** 	/* Enable the USART1 */
+  96:../Source/uart.c **** 	USART_Cmd(USART1, ENABLE);
+ 162              		.loc 1 96 0
+ 163 009a 311C     		mov	r1, r6
+ 164 009c 0848     		ldr	r0, .L2
+ 165 009e FFF7FEFF 		bl	USART_Cmd
+  97:../Source/uart.c **** 
+  98:../Source/uart.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+ 166              		.loc 1 98 0
+ 167 00a2 0BA8     		add	r0, sp, #44
+ 168 00a4 1B23     		mov	r3, #27
+ 169 00a6 0370     		strb	r3, [r0]
+  99:../Source/uart.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 0;
+ 170              		.loc 1 99 0
+ 171 00a8 4570     		strb	r5, [r0, #1]
+ 100:../Source/uart.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 172              		.loc 1 100 0
+ 173 00aa 8670     		strb	r6, [r0, #2]
+ 101:../Source/uart.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 174              		.loc 1 101 0
+ 175 00ac FFF7FEFF 		bl	NVIC_Init
+ 102:../Source/uart.c **** 	USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
+ 176              		.loc 1 102 0
+ 177 00b0 0348     		ldr	r0, .L2
+ 178 00b2 0449     		ldr	r1, .L2+4
+ 179 00b4 321C     		mov	r2, r6
+ 180 00b6 FFF7FEFF 		bl	USART_ITConfig
+ 181              	.LBE6:
+ 182              	.LBE7:
+  51:../Source/uart.c **** }
+ 183              		.loc 1 51 0
+ 184 00ba 0DB0     		add	sp, sp, #52
+ 185              		@ sp needed for prologue
+ 186 00bc F0BD     		pop	{r4, r5, r6, r7, pc}
+ 187              	.L3:
+ 188 00be C046     		.align	2
+ 189              	.L2:
+ 190 00c0 00380140 		.word	1073821696
+ 191 00c4 05010500 		.word	327941
+ 192              		.cfi_endproc
+ 193              	.LFE33:
+ 195              		.section	.text.PC_uart_putChar,"ax",%progbits
+ 196              		.align	1
+ 197              		.global	PC_uart_putChar
+ 198              		.code	16
+ 199              		.thumb_func
+ 201              	PC_uart_putChar:
+ 202              	.LFB34:
+  53:../Source/uart.c **** void PC_uart_putChar(uint8_t data){
+ 203              		.loc 1 53 0
+ 204              		.cfi_startproc
+ 205 0000 10B5     		push	{r4, lr}
+ 206              	.LCFI2:
+ 207              		.cfi_def_cfa_offset 8
+ 208              		.cfi_offset 4, -8
+ 209              		.cfi_offset 14, -4
+ 210              	.LVL3:
+ 211 0002 041C     		mov	r4, r0
+ 212              	.LVL4:
+ 213              	.L5:
+ 214              	.LBB10:
+ 215              	.LBB11:
+ 103:../Source/uart.c **** 
+ 104:../Source/uart.c **** }
+ 105:../Source/uart.c **** 
+ 106:../Source/uart.c **** static void uart2_init(uint32_t baud) {
+ 107:../Source/uart.c **** 
+ 108:../Source/uart.c **** 	USART_InitTypeDef USART_InitStructure;
+ 109:../Source/uart.c **** 	GPIO_InitTypeDef GPIO_InitStructure;
+ 110:../Source/uart.c **** 	NVIC_InitTypeDef NVIC_InitStructure;
+ 111:../Source/uart.c **** 
+ 112:../Source/uart.c **** 	RCC_APB1PeriphClockCmd(USART2_RCC,ENABLE);
+ 113:../Source/uart.c **** 	RCC_AHBPeriphClockCmd(USART2_TX_RCC,ENABLE);
+ 114:../Source/uart.c **** 	RCC_AHBPeriphClockCmd(USART2_RX_RCC,ENABLE);
+ 115:../Source/uart.c **** 
+ 116:../Source/uart.c **** 	GPIO_PinAFConfig(USART2_TX_PORT, USART2_TX_PIN_SOURCE, GPIO_AF_1);
+ 117:../Source/uart.c **** 
+ 118:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART2_TX_PIN;
+ 119:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 120:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 121:../Source/uart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 122:../Source/uart.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 123:../Source/uart.c **** 	GPIO_Init(USART2_TX_PORT, &GPIO_InitStructure);
+ 124:../Source/uart.c **** 
+ 125:../Source/uart.c **** 	GPIO_PinAFConfig(USART2_RX_PORT, USART2_RX_PIN_SOURCE, GPIO_AF_1);
+ 126:../Source/uart.c **** 
+ 127:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Pin = USART2_RX_PIN;
+ 128:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+ 129:../Source/uart.c **** 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+ 130:../Source/uart.c **** 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+ 131:../Source/uart.c **** 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+ 132:../Source/uart.c **** 	GPIO_Init(USART2_TX_PORT, &GPIO_InitStructure);
+ 133:../Source/uart.c **** 
+ 134:../Source/uart.c **** 	USART_InitStructure.USART_BaudRate = baud;
+ 135:../Source/uart.c **** 	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
+ 136:../Source/uart.c **** 	USART_InitStructure.USART_StopBits = USART_StopBits_1;
+ 137:../Source/uart.c **** 	USART_InitStructure.USART_Parity = USART_Parity_No;
+ 138:../Source/uart.c **** 	USART_InitStructure.USART_HardwareFlowControl =
+ 139:../Source/uart.c **** 	USART_HardwareFlowControl_None;
+ 140:../Source/uart.c **** 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+ 141:../Source/uart.c **** 	/* Configure the USART2 */
+ 142:../Source/uart.c **** 	USART_Init(USART2, &USART_InitStructure);
+ 143:../Source/uart.c **** 	/* Enable USART2 interrupt */
+ 144:../Source/uart.c **** 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+ 145:../Source/uart.c **** 	/* Enable the USART2 */
+ 146:../Source/uart.c **** 	USART_Cmd(USART2, ENABLE);
+ 147:../Source/uart.c **** 
+ 148:../Source/uart.c **** 	NVIC_InitStructure.NVIC_IRQChannel = USART2_IRQn;
+ 149:../Source/uart.c **** 	NVIC_InitStructure.NVIC_IRQChannelPriority = 1;
+ 150:../Source/uart.c **** 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+ 151:../Source/uart.c **** 	NVIC_Init(&NVIC_InitStructure);
+ 152:../Source/uart.c **** 	USART_ITConfig(USART2, USART_IT_RXNE, ENABLE);
+ 153:../Source/uart.c **** 
+ 154:../Source/uart.c **** }
+ 155:../Source/uart.c **** 
+ 156:../Source/uart.c **** 
+ 157:../Source/uart.c **** static void uart1_putChar(uint8_t data) {
+ 158:../Source/uart.c **** 	while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET) {
+ 216              		.loc 1 158 0
+ 217 0004 0548     		ldr	r0, .L7
+ 218 0006 8021     		mov	r1, #128
+ 219 0008 FFF7FEFF 		bl	USART_GetFlagStatus
+ 220 000c 0028     		cmp	r0, #0
+ 221 000e F9D0     		beq	.L5
+ 159:../Source/uart.c **** 	}
+ 160:../Source/uart.c **** 	USART_SendData(USART1, data);
+ 222              		.loc 1 160 0
+ 223 0010 0248     		ldr	r0, .L7
+ 224 0012 211C     		mov	r1, r4
+ 225 0014 FFF7FEFF 		bl	USART_SendData
+ 226              	.LBE11:
+ 227              	.LBE10:
+ 228              		@ sp needed for prologue
+ 229              	.LVL5:
+  55:../Source/uart.c **** }
+ 230              		.loc 1 55 0
+ 231 0018 10BD     		pop	{r4, pc}
+ 232              	.L8:
+ 233 001a C046     		.align	2
+ 234              	.L7:
+ 235 001c 00380140 		.word	1073821696
+ 236              		.cfi_endproc
+ 237              	.LFE34:
+ 239              		.text
+ 240              	.Letext0:
+ 241              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 242              		.file 3 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/stm32f
+ 243              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 244              		.file 5 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 245              		.file 6 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+DEFINED SYMBOLS
+                            *ABS*:00000000 uart.c
+C:\Users\khanh\AppData\Local\Temp\cc8v7550.s:18     .text.PC_uartInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc8v7550.s:23     .text.PC_uartInit:00000000 PC_uartInit
+C:\Users\khanh\AppData\Local\Temp\cc8v7550.s:190    .text.PC_uartInit:000000c0 $d
+C:\Users\khanh\AppData\Local\Temp\cc8v7550.s:196    .text.PC_uart_putChar:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc8v7550.s:201    .text.PC_uart_putChar:00000000 PC_uart_putChar
+C:\Users\khanh\AppData\Local\Temp\cc8v7550.s:235    .text.PC_uart_putChar:0000001c $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+RCC_APB2PeriphClockCmd
+RCC_AHBPeriphClockCmd
+GPIO_PinAFConfig
+GPIO_Init
+USART_Init
+USART_ITConfig
+USART_Cmd
+NVIC_Init
+USART_GetFlagStatus
+USART_SendData

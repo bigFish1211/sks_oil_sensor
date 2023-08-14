@@ -1,0 +1,417 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"distance.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_dmul
+  18              		.global	__aeabi_ddiv
+  19              		.global	__aeabi_dsub
+  20              		.global	__aeabi_dadd
+  21              		.section	.text.distance,"ax",%progbits
+  22              		.align	1
+  23              		.global	distance
+  24              		.code	16
+  25              		.thumb_func
+  27              	distance:
+  28              	.LFB0:
+  29              		.file 1 "../scr/distance.c"
+   1:../scr/distance.c **** /*
+   2:../scr/distance.c ****  * distance.C
+   3:../scr/distance.c ****  *
+   4:../scr/distance.c ****  *  Created on: Jan 25, 2016
+   5:../scr/distance.c ****  *      Author: Administrator
+   6:../scr/distance.c ****  */
+   7:../scr/distance.c **** 
+   8:../scr/distance.c **** 
+   9:../scr/distance.c **** 
+  10:../scr/distance.c **** 
+  11:../scr/distance.c **** #include <math.h>
+  12:../scr/distance.c **** 
+  13:../scr/distance.c **** #define pi 3.14159265358979323846
+  14:../scr/distance.c **** 
+  15:../scr/distance.c **** /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+  16:../scr/distance.c **** /*::  Function prototypes                                           :*/
+  17:../scr/distance.c **** /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+  18:../scr/distance.c **** double deg2rad(double);
+  19:../scr/distance.c **** double rad2deg(double);
+  20:../scr/distance.c **** 
+  21:../scr/distance.c **** double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
+  30              		.loc 1 21 0
+  31              		.cfi_startproc
+  32              	.LVL0:
+  33 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 20
+  36              		.cfi_offset 4, -20
+  37              		.cfi_offset 5, -16
+  38              		.cfi_offset 6, -12
+  39              		.cfi_offset 7, -8
+  40              		.cfi_offset 14, -4
+  41 0002 8DB0     		sub	sp, sp, #52
+  42              	.LCFI1:
+  43              		.cfi_def_cfa_offset 72
+  44              		.loc 1 21 0
+  45 0004 0A92     		str	r2, [sp, #40]
+  46 0006 0B93     		str	r3, [sp, #44]
+  47              	.LVL1:
+  48 0008 16AB     		add	r3, sp, #88
+  49              	.LVL2:
+  50 000a 1B78     		ldrb	r3, [r3]
+  51              	.LVL3:
+  52              	.LBB14:
+  53              	.LBB15:
+  22:../scr/distance.c ****   double theta, dist;
+  23:../scr/distance.c ****   theta = lon1 - lon2;
+  24:../scr/distance.c ****   dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(de
+  25:../scr/distance.c ****   dist = acos(dist);
+  26:../scr/distance.c ****   dist = rad2deg(dist);
+  27:../scr/distance.c ****   dist = dist * 60 * 1.1515;
+  28:../scr/distance.c ****   switch(unit) {
+  29:../scr/distance.c ****     case 'M':
+  30:../scr/distance.c ****       break;
+  31:../scr/distance.c ****     case 'K':
+  32:../scr/distance.c ****       dist = dist * 1.609344;
+  33:../scr/distance.c ****       break;
+  34:../scr/distance.c ****     case 'N':
+  35:../scr/distance.c ****       dist = dist * 0.8684;
+  36:../scr/distance.c ****       break;
+  37:../scr/distance.c ****   }
+  38:../scr/distance.c ****   return (dist);
+  39:../scr/distance.c **** }
+  40:../scr/distance.c **** 
+  41:../scr/distance.c **** /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+  42:../scr/distance.c **** /*::  This function converts decimal degrees to radians             :*/
+  43:../scr/distance.c **** /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+  44:../scr/distance.c **** double deg2rad(double deg) {
+  45:../scr/distance.c ****   return (deg * pi / 180);
+  54              		.loc 1 45 0
+  55 000c 3A4A     		ldr	r2, .L7
+  56              	.LVL4:
+  57              	.LBE15:
+  58              	.LBE14:
+  21:../scr/distance.c ****   double theta, dist;
+  59              		.loc 1 21 0
+  60 000e 0193     		str	r3, [sp, #4]
+  61              	.LBB17:
+  62              	.LBB16:
+  63              		.loc 1 45 0
+  64 0010 3A4B     		ldr	r3, .L7+4
+  65 0012 FFF7FEFF 		bl	__aeabi_dmul
+  66              	.LVL5:
+  67 0016 0022     		mov	r2, #0
+  68 0018 394B     		ldr	r3, .L7+8
+  69 001a FFF7FEFF 		bl	__aeabi_ddiv
+  70              	.LVL6:
+  71 001e 041C     		mov	r4, r0
+  72 0020 0D1C     		mov	r5, r1
+  73              	.LBE16:
+  74              	.LBE17:
+  24:../scr/distance.c ****   dist = acos(dist);
+  75              		.loc 1 24 0
+  76 0022 FFF7FEFF 		bl	sin
+  77              	.LVL7:
+  78              	.LBB18:
+  79              	.LBB19:
+  80              		.loc 1 45 0
+  81 0026 344A     		ldr	r2, .L7
+  82              	.LBE19:
+  83              	.LBE18:
+  24:../scr/distance.c ****   dist = acos(dist);
+  84              		.loc 1 24 0
+  85 0028 0290     		str	r0, [sp, #8]
+  86 002a 0391     		str	r1, [sp, #12]
+  87              	.LVL8:
+  88              	.LBB21:
+  89              	.LBB20:
+  90              		.loc 1 45 0
+  91 002c 1298     		ldr	r0, [sp, #72]
+  92 002e 1399     		ldr	r1, [sp, #76]
+  93 0030 324B     		ldr	r3, .L7+4
+  94 0032 FFF7FEFF 		bl	__aeabi_dmul
+  95              	.LVL9:
+  96 0036 0022     		mov	r2, #0
+  97 0038 314B     		ldr	r3, .L7+8
+  98 003a FFF7FEFF 		bl	__aeabi_ddiv
+  99              	.LVL10:
+ 100 003e 061C     		mov	r6, r0
+ 101 0040 0F1C     		mov	r7, r1
+ 102              	.LBE20:
+ 103              	.LBE21:
+  24:../scr/distance.c ****   dist = acos(dist);
+ 104              		.loc 1 24 0
+ 105 0042 FFF7FEFF 		bl	sin
+ 106              	.LVL11:
+ 107 0046 0490     		str	r0, [sp, #16]
+ 108 0048 0591     		str	r1, [sp, #20]
+ 109              	.LVL12:
+ 110 004a 201C     		mov	r0, r4
+ 111 004c 291C     		mov	r1, r5
+ 112 004e FFF7FEFF 		bl	cos
+ 113              	.LVL13:
+ 114 0052 0690     		str	r0, [sp, #24]
+ 115 0054 0791     		str	r1, [sp, #28]
+ 116              	.LVL14:
+ 117 0056 301C     		mov	r0, r6
+ 118 0058 391C     		mov	r1, r7
+ 119 005a FFF7FEFF 		bl	cos
+ 120              	.LVL15:
+  23:../scr/distance.c ****   dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(de
+ 121              		.loc 1 23 0
+ 122 005e 149A     		ldr	r2, [sp, #80]
+ 123 0060 159B     		ldr	r3, [sp, #84]
+  24:../scr/distance.c ****   dist = acos(dist);
+ 124              		.loc 1 24 0
+ 125 0062 0890     		str	r0, [sp, #32]
+ 126 0064 0991     		str	r1, [sp, #36]
+ 127              	.LVL16:
+  23:../scr/distance.c ****   dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(de
+ 128              		.loc 1 23 0
+ 129 0066 0A98     		ldr	r0, [sp, #40]
+ 130 0068 0B99     		ldr	r1, [sp, #44]
+ 131 006a FFF7FEFF 		bl	__aeabi_dsub
+ 132              	.LVL17:
+ 133              	.LBB22:
+ 134              	.LBB23:
+ 135              		.loc 1 45 0
+ 136 006e 224A     		ldr	r2, .L7
+ 137 0070 224B     		ldr	r3, .L7+4
+ 138 0072 FFF7FEFF 		bl	__aeabi_dmul
+ 139              	.LVL18:
+ 140 0076 0022     		mov	r2, #0
+ 141 0078 214B     		ldr	r3, .L7+8
+ 142 007a FFF7FEFF 		bl	__aeabi_ddiv
+ 143              	.LVL19:
+ 144              	.LBE23:
+ 145              	.LBE22:
+  24:../scr/distance.c ****   dist = acos(dist);
+ 146              		.loc 1 24 0
+ 147 007e FFF7FEFF 		bl	cos
+ 148              	.LVL20:
+ 149 0082 049A     		ldr	r2, [sp, #16]
+ 150 0084 059B     		ldr	r3, [sp, #20]
+ 151 0086 061C     		mov	r6, r0
+ 152 0088 0F1C     		mov	r7, r1
+ 153 008a 0298     		ldr	r0, [sp, #8]
+ 154 008c 0399     		ldr	r1, [sp, #12]
+ 155 008e FFF7FEFF 		bl	__aeabi_dmul
+ 156              	.LVL21:
+ 157 0092 089A     		ldr	r2, [sp, #32]
+ 158 0094 099B     		ldr	r3, [sp, #36]
+ 159 0096 041C     		mov	r4, r0
+ 160 0098 0D1C     		mov	r5, r1
+ 161 009a 0698     		ldr	r0, [sp, #24]
+ 162 009c 0799     		ldr	r1, [sp, #28]
+ 163 009e FFF7FEFF 		bl	__aeabi_dmul
+ 164              	.LVL22:
+ 165 00a2 321C     		mov	r2, r6
+ 166 00a4 3B1C     		mov	r3, r7
+ 167 00a6 FFF7FEFF 		bl	__aeabi_dmul
+ 168              	.LVL23:
+ 169 00aa 021C     		mov	r2, r0
+ 170 00ac 0B1C     		mov	r3, r1
+ 171 00ae 201C     		mov	r0, r4
+ 172 00b0 291C     		mov	r1, r5
+ 173 00b2 FFF7FEFF 		bl	__aeabi_dadd
+ 174              	.LVL24:
+  25:../scr/distance.c ****   dist = rad2deg(dist);
+ 175              		.loc 1 25 0
+ 176 00b6 FFF7FEFF 		bl	acos
+ 177              	.LVL25:
+ 178              	.LBB24:
+ 179              	.LBB25:
+  46:../scr/distance.c **** }
+  47:../scr/distance.c **** 
+  48:../scr/distance.c **** /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+  49:../scr/distance.c **** /*::  This function converts radians to decimal degrees             :*/
+  50:../scr/distance.c **** /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/
+  51:../scr/distance.c **** double rad2deg(double rad) {
+  52:../scr/distance.c ****   return (rad * 180 / pi);
+ 180              		.loc 1 52 0
+ 181 00ba 0022     		mov	r2, #0
+ 182 00bc 104B     		ldr	r3, .L7+8
+ 183 00be FFF7FEFF 		bl	__aeabi_dmul
+ 184              	.LVL26:
+ 185 00c2 0D4A     		ldr	r2, .L7
+ 186 00c4 0D4B     		ldr	r3, .L7+4
+ 187 00c6 FFF7FEFF 		bl	__aeabi_ddiv
+ 188              	.LVL27:
+ 189              	.LBE25:
+ 190              	.LBE24:
+  27:../scr/distance.c ****   switch(unit) {
+ 191              		.loc 1 27 0
+ 192 00ca 0022     		mov	r2, #0
+ 193 00cc 0D4B     		ldr	r3, .L7+12
+ 194 00ce FFF7FEFF 		bl	__aeabi_dmul
+ 195              	.LVL28:
+ 196 00d2 0D4B     		ldr	r3, .L7+16
+ 197 00d4 0D4A     		ldr	r2, .L7+20
+ 198 00d6 FFF7FEFF 		bl	__aeabi_dmul
+ 199              	.LVL29:
+  28:../scr/distance.c ****     case 'M':
+ 200              		.loc 1 28 0
+ 201 00da 019B     		ldr	r3, [sp, #4]
+ 202 00dc 4B2B     		cmp	r3, #75
+ 203 00de 04D0     		beq	.L3
+ 204 00e0 4E2B     		cmp	r3, #78
+ 205 00e2 06D1     		bne	.L2
+  35:../scr/distance.c ****       break;
+ 206              		.loc 1 35 0
+ 207 00e4 0A4A     		ldr	r2, .L7+24
+ 208 00e6 0B4B     		ldr	r3, .L7+28
+ 209 00e8 01E0     		b	.L5
+ 210              	.L3:
+  32:../scr/distance.c ****       break;
+ 211              		.loc 1 32 0
+ 212 00ea 0B4A     		ldr	r2, .L7+32
+ 213 00ec 0B4B     		ldr	r3, .L7+36
+ 214              	.L5:
+  35:../scr/distance.c ****       break;
+ 215              		.loc 1 35 0
+ 216 00ee FFF7FEFF 		bl	__aeabi_dmul
+ 217              	.LVL30:
+ 218              	.L2:
+  39:../scr/distance.c **** 
+ 219              		.loc 1 39 0
+ 220 00f2 0DB0     		add	sp, sp, #52
+ 221              		@ sp needed
+ 222 00f4 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 223              	.L8:
+ 224 00f6 C046     		.align	2
+ 225              	.L7:
+ 226 00f8 182D4454 		.word	1413754136
+ 227 00fc FB210940 		.word	1074340347
+ 228 0100 00806640 		.word	1080459264
+ 229 0104 00004E40 		.word	1078853632
+ 230 0108 8B6CF23F 		.word	1072852107
+ 231 010c 06819543 		.word	1133871366
+ 232 0110 B515FBCB 		.word	-872737355
+ 233 0114 EEC9EB3F 		.word	1072417262
+ 234 0118 A038807E 		.word	2122332320
+ 235 011c DFBFF93F 		.word	1073332191
+ 236              		.cfi_endproc
+ 237              	.LFE0:
+ 239              		.section	.text.deg2rad,"ax",%progbits
+ 240              		.align	1
+ 241              		.global	deg2rad
+ 242              		.code	16
+ 243              		.thumb_func
+ 245              	deg2rad:
+ 246              	.LFB1:
+  44:../scr/distance.c ****   return (deg * pi / 180);
+ 247              		.loc 1 44 0
+ 248              		.cfi_startproc
+ 249              	.LVL31:
+ 250 0000 08B5     		push	{r3, lr}
+ 251              	.LCFI2:
+ 252              		.cfi_def_cfa_offset 8
+ 253              		.cfi_offset 3, -8
+ 254              		.cfi_offset 14, -4
+  45:../scr/distance.c **** }
+ 255              		.loc 1 45 0
+ 256 0002 044A     		ldr	r2, .L10
+ 257 0004 044B     		ldr	r3, .L10+4
+ 258 0006 FFF7FEFF 		bl	__aeabi_dmul
+ 259              	.LVL32:
+ 260 000a 0022     		mov	r2, #0
+ 261 000c 034B     		ldr	r3, .L10+8
+ 262 000e FFF7FEFF 		bl	__aeabi_ddiv
+ 263              	.LVL33:
+  46:../scr/distance.c **** 
+ 264              		.loc 1 46 0
+ 265              		@ sp needed
+ 266 0012 08BD     		pop	{r3, pc}
+ 267              	.L11:
+ 268              		.align	2
+ 269              	.L10:
+ 270 0014 182D4454 		.word	1413754136
+ 271 0018 FB210940 		.word	1074340347
+ 272 001c 00806640 		.word	1080459264
+ 273              		.cfi_endproc
+ 274              	.LFE1:
+ 276              		.section	.text.rad2deg,"ax",%progbits
+ 277              		.align	1
+ 278              		.global	rad2deg
+ 279              		.code	16
+ 280              		.thumb_func
+ 282              	rad2deg:
+ 283              	.LFB2:
+  51:../scr/distance.c ****   return (rad * 180 / pi);
+ 284              		.loc 1 51 0
+ 285              		.cfi_startproc
+ 286              	.LVL34:
+ 287 0000 08B5     		push	{r3, lr}
+ 288              	.LCFI3:
+ 289              		.cfi_def_cfa_offset 8
+ 290              		.cfi_offset 3, -8
+ 291              		.cfi_offset 14, -4
+ 292              		.loc 1 52 0
+ 293 0002 0022     		mov	r2, #0
+ 294 0004 034B     		ldr	r3, .L13
+ 295 0006 FFF7FEFF 		bl	__aeabi_dmul
+ 296              	.LVL35:
+ 297 000a 034A     		ldr	r2, .L13+4
+ 298 000c 034B     		ldr	r3, .L13+8
+ 299 000e FFF7FEFF 		bl	__aeabi_ddiv
+ 300              	.LVL36:
+  53:../scr/distance.c **** }
+ 301              		.loc 1 53 0
+ 302              		@ sp needed
+ 303 0012 08BD     		pop	{r3, pc}
+ 304              	.L14:
+ 305              		.align	2
+ 306              	.L13:
+ 307 0014 00806640 		.word	1080459264
+ 308 0018 182D4454 		.word	1413754136
+ 309 001c FB210940 		.word	1074340347
+ 310              		.cfi_endproc
+ 311              	.LFE2:
+ 313              		.text
+ 314              	.Letext0:
+ 315              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\math
+DEFINED SYMBOLS
+                            *ABS*:00000000 distance.c
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:22     .text.distance:00000000 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:27     .text.distance:00000000 distance
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:226    .text.distance:000000f8 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:240    .text.deg2rad:00000000 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:245    .text.deg2rad:00000000 deg2rad
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:270    .text.deg2rad:00000014 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:277    .text.rad2deg:00000000 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:282    .text.rad2deg:00000000 rad2deg
+C:\Users\ADMINI~1\AppData\Local\Temp\ccDe1X4E.s:307    .text.rad2deg:00000014 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.069906bc89a72a28bbac25205a3f74a9
+                           .group:00000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:00000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:00000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:00000000 wm4._ansi.h.23.a1bcdbcf61ef55ef82058332a2519a07
+                           .group:00000000 wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8
+                           .group:00000000 wm4._default_types.h.6.55e6e8a70a3d5dd899d7db63a32173ce
+                           .group:00000000 wm4.limits.h.2.46107d1ce5c86b5f36d870e147954fbe
+                           .group:00000000 wm4.limits.h.60.56a1ae353e2028a24298ec6463b8b593
+                           .group:00000000 wm4._default_types.h.33.26364e4eca5f1f73f9ee36847a68bf10
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:00000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:00000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:00000000 wm4.math.h.35.5224f6d5b3bf2717afee75d5d962fdec
+
+UNDEFINED SYMBOLS
+__aeabi_dmul
+__aeabi_ddiv
+__aeabi_dsub
+__aeabi_dadd
+sin
+cos
+acos

@@ -4,6 +4,7 @@
 #include "ymodem.h"
 #include "global.h"
 #include "system_g031.h"
+#include "download.h"
 
 #define ENABLE_PROTECT_CODE			0
 
@@ -58,8 +59,6 @@ void mainTask(void) {
 			} else if ((key == 0x33) || (key == 'b') || (key == 'B')) {
 				boot = 1;
 			} else if ((key == 0x34) && (FlashProtection == 1)) {
-				/* Disable the write protection of desired pages */
-				//FLASH_DisableWriteProtectionPages(UserMemoryMask1);
 			} else if ((key == SOH) || (key == STX)) {
 				/* Download user application in the Flash */
 				SerialDownload();

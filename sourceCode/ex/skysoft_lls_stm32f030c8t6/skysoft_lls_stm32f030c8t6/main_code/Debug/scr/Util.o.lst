@@ -1,0 +1,842 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"Util.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_uidivmod
+  18              		.global	__aeabi_uidiv
+  19              		.section	.text.i_to_a,"ax",%progbits
+  20              		.align	1
+  21              		.global	i_to_a
+  22              		.code	16
+  23              		.thumb_func
+  25              	i_to_a:
+  26              	.LFB0:
+  27              		.file 1 "../scr/Util.c"
+   1:../scr/Util.c **** #include <stdio.h>
+   2:../scr/Util.c **** #include <string.h>
+   3:../scr/Util.c **** 
+   4:../scr/Util.c **** void i_to_a(unsigned long n, char *s, int b) {
+  28              		.loc 1 4 0
+  29              		.cfi_startproc
+  30 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 20
+  33              		.cfi_offset 4, -20
+  34              		.cfi_offset 5, -16
+  35              		.cfi_offset 6, -12
+  36              		.cfi_offset 7, -8
+  37              		.cfi_offset 14, -4
+  38              	.LVL0:
+  39 0002 87B0     		sub	sp, sp, #28
+  40              	.LCFI1:
+  41              		.cfi_def_cfa_offset 48
+  42              		.loc 1 4 0
+  43 0004 0090     		str	r0, [sp]
+  44 0006 0191     		str	r1, [sp, #4]
+  45 0008 171C     		mov	r7, r2
+   5:../scr/Util.c **** 	char tmp_val[15] = {0};
+  46              		.loc 1 5 0
+  47 000a 0021     		mov	r1, #0
+  48              	.LVL1:
+  49 000c 0F22     		mov	r2, #15
+  50              	.LVL2:
+  51 000e 02A8     		add	r0, sp, #8
+  52              	.LVL3:
+  53 0010 FFF7FEFF 		bl	memset
+  54              	.LVL4:
+   6:../scr/Util.c **** 	static char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+   7:../scr/Util.c **** 	int i=0, sign;
+   8:../scr/Util.c **** 
+   9:../scr/Util.c **** 	if ((sign = n) < 0)
+  10:../scr/Util.c **** 		n = -n;
+  55              		.loc 1 10 0
+  56 0014 0099     		ldr	r1, [sp]
+   4:../scr/Util.c **** void i_to_a(unsigned long n, char *s, int b) {
+  57              		.loc 1 4 0
+  58 0016 0026     		mov	r6, #0
+  59              		.loc 1 10 0
+  60 0018 CA17     		asr	r2, r1, #31
+  61 001a 8D18     		add	r5, r1, r2
+  62 001c 5540     		eor	r5, r2
+  63 001e 00E0     		b	.L3
+  64              	.LVL5:
+  65              	.L6:
+  11:../scr/Util.c **** 	do {
+  12:../scr/Util.c **** 		tmp_val[i++] = digits[n % b];
+  66              		.loc 1 12 0
+  67 0020 261C     		mov	r6, r4
+  68              	.LVL6:
+  69              	.L3:
+  70              		.loc 1 12 0 is_stmt 0 discriminator 1
+  71 0022 281C     		mov	r0, r5
+  72 0024 391C     		mov	r1, r7
+  73 0026 FFF7FEFF 		bl	__aeabi_uidivmod
+  74 002a 1148     		ldr	r0, .L8
+  75 002c 0822     		mov	r2, #8
+  76 002e 435C     		ldrb	r3, [r0, r1]
+  77 0030 6C46     		mov	r4, sp
+  78 0032 9019     		add	r0, r2, r6
+  79 0034 0355     		strb	r3, [r0, r4]
+  13:../scr/Util.c **** 	} while ((n /= b) > 0);
+  80              		.loc 1 13 0 is_stmt 1 discriminator 1
+  81 0036 391C     		mov	r1, r7
+  82 0038 281C     		mov	r0, r5
+  83 003a FFF7FEFF 		bl	__aeabi_uidiv
+  12:../scr/Util.c **** 		tmp_val[i++] = digits[n % b];
+  84              		.loc 1 12 0 discriminator 1
+  85 003e 741C     		add	r4, r6, #1
+  86              	.LVL7:
+  87              		.loc 1 13 0 discriminator 1
+  88 0040 051E     		sub	r5, r0, #0
+  89 0042 EDD1     		bne	.L6
+  14:../scr/Util.c **** 
+  15:../scr/Util.c **** 	if (sign < 0)
+  90              		.loc 1 15 0
+  91 0044 009D     		ldr	r5, [sp]
+  92 0046 002D     		cmp	r5, #0
+  93 0048 03DA     		bge	.L4
+  16:../scr/Util.c **** 		tmp_val[i++] = '-';
+  94              		.loc 1 16 0
+  95 004a 2D21     		mov	r1, #45
+  96 004c 02AF     		add	r7, sp, #8
+  97              	.LVL8:
+  98 004e 3955     		strb	r1, [r7, r4]
+  99 0050 B41C     		add	r4, r6, #2
+ 100              	.LVL9:
+ 101              	.L4:
+  17:../scr/Util.c **** 
+  18:../scr/Util.c **** 	//revert data
+  19:../scr/Util.c **** 	int idx=0;
+ 102              		.loc 1 19 0
+ 103 0052 0023     		mov	r3, #0
+ 104              	.LVL10:
+ 105              	.L5:
+ 106              	.LBB2:
+   4:../scr/Util.c **** void i_to_a(unsigned long n, char *s, int b) {
+ 107              		.loc 1 4 0 discriminator 2
+ 108 0054 02AD     		add	r5, sp, #8
+ 109 0056 D843     		mvn	r0, r3
+ 110 0058 2A19     		add	r2, r5, r4
+  20:../scr/Util.c **** 	for(int j=i-1; j>=0; j--) {
+  21:../scr/Util.c **** 		s[idx] = tmp_val[j];
+ 111              		.loc 1 21 0 discriminator 2
+ 112 005a 865C     		ldrb	r6, [r0, r2]
+ 113 005c 0199     		ldr	r1, [sp, #4]
+ 114 005e CE54     		strb	r6, [r1, r3]
+  22:../scr/Util.c **** 		idx++;
+ 115              		.loc 1 22 0 discriminator 2
+ 116 0060 0133     		add	r3, r3, #1
+ 117              	.LVL11:
+  20:../scr/Util.c **** 	for(int j=i-1; j>=0; j--) {
+ 118              		.loc 1 20 0 discriminator 2
+ 119 0062 A342     		cmp	r3, r4
+ 120 0064 F6D1     		bne	.L5
+ 121              	.LBE2:
+  23:../scr/Util.c **** 	}
+  24:../scr/Util.c **** 	s[idx] = '\0';
+ 122              		.loc 1 24 0
+ 123 0066 0024     		mov	r4, #0
+ 124              	.LVL12:
+ 125 0068 CC54     		strb	r4, [r1, r3]
+  25:../scr/Util.c **** }
+ 126              		.loc 1 25 0
+ 127 006a 07B0     		add	sp, sp, #28
+ 128              	.LVL13:
+ 129              		@ sp needed for prologue
+ 130 006c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 131              	.L9:
+ 132 006e C046     		.align	2
+ 133              	.L8:
+ 134 0070 00000000 		.word	.LANCHOR0
+ 135              		.cfi_endproc
+ 136              	.LFE0:
+ 138              		.section	.text.append_number,"ax",%progbits
+ 139              		.align	1
+ 140              		.global	append_number
+ 141              		.code	16
+ 142              		.thumb_func
+ 144              	append_number:
+ 145              	.LFB1:
+  26:../scr/Util.c **** 
+  27:../scr/Util.c **** void append_number(char* dest, unsigned long n) {
+ 146              		.loc 1 27 0
+ 147              		.cfi_startproc
+ 148 0000 1FB5     		push	{r0, r1, r2, r3, r4, lr}
+ 149              	.LCFI2:
+ 150              		.cfi_def_cfa_offset 24
+ 151              		.cfi_offset 0, -24
+ 152              		.cfi_offset 1, -20
+ 153              		.cfi_offset 2, -16
+ 154              		.cfi_offset 3, -12
+ 155              		.cfi_offset 4, -8
+ 156              		.cfi_offset 14, -4
+ 157              	.LVL14:
+ 158              		.loc 1 27 0
+ 159 0002 041C     		mov	r4, r0
+  28:../scr/Util.c **** 	char val[15];
+  29:../scr/Util.c **** 	i_to_a(n,val,10);
+ 160              		.loc 1 29 0
+ 161 0004 0A22     		mov	r2, #10
+ 162 0006 081C     		mov	r0, r1
+ 163              	.LVL15:
+ 164 0008 6946     		mov	r1, sp
+ 165              	.LVL16:
+ 166 000a FFF7FEFF 		bl	i_to_a
+ 167              	.LVL17:
+  30:../scr/Util.c **** 	strcat(dest, val);
+ 168              		.loc 1 30 0
+ 169 000e 201C     		mov	r0, r4
+ 170 0010 6946     		mov	r1, sp
+ 171 0012 FFF7FEFF 		bl	strcat
+ 172              		@ sp needed for prologue
+ 173              	.LVL18:
+  31:../scr/Util.c **** }
+ 174              		.loc 1 31 0
+ 175 0016 1FBD     		pop	{r0, r1, r2, r3, r4, pc}
+ 176              		.cfi_endproc
+ 177              	.LFE1:
+ 179              		.section	.text.append_hexa,"ax",%progbits
+ 180              		.align	1
+ 181              		.global	append_hexa
+ 182              		.code	16
+ 183              		.thumb_func
+ 185              	append_hexa:
+ 186              	.LFB2:
+  32:../scr/Util.c **** 
+  33:../scr/Util.c **** static char val[15];
+  34:../scr/Util.c **** void append_hexa(char* dest, unsigned long n) {
+ 187              		.loc 1 34 0
+ 188              		.cfi_startproc
+ 189 0000 70B5     		push	{r4, r5, r6, lr}
+ 190              	.LCFI3:
+ 191              		.cfi_def_cfa_offset 16
+ 192              		.cfi_offset 4, -16
+ 193              		.cfi_offset 5, -12
+ 194              		.cfi_offset 6, -8
+ 195              		.cfi_offset 14, -4
+ 196              	.LVL19:
+  35:../scr/Util.c **** 	i_to_a(n,val,16);
+ 197              		.loc 1 35 0
+ 198 0002 094C     		ldr	r4, .L13
+  34:../scr/Util.c **** void append_hexa(char* dest, unsigned long n) {
+ 199              		.loc 1 34 0
+ 200 0004 0D1C     		mov	r5, r1
+ 201 0006 061C     		mov	r6, r0
+ 202              		.loc 1 35 0
+ 203 0008 1022     		mov	r2, #16
+ 204 000a 081C     		mov	r0, r1
+ 205              	.LVL20:
+ 206 000c 211C     		mov	r1, r4
+ 207              	.LVL21:
+ 208 000e FFF7FEFF 		bl	i_to_a
+ 209              	.LVL22:
+  36:../scr/Util.c **** 	if(n<16) {
+ 210              		.loc 1 36 0
+ 211 0012 0F2D     		cmp	r5, #15
+ 212 0014 03D8     		bhi	.L12
+  37:../scr/Util.c **** 		strcat(dest, "0");
+ 213              		.loc 1 37 0
+ 214 0016 301C     		mov	r0, r6
+ 215 0018 0449     		ldr	r1, .L13+4
+ 216 001a FFF7FEFF 		bl	strcat
+ 217              	.L12:
+  38:../scr/Util.c **** 	}
+  39:../scr/Util.c **** 	strcat(dest, val);
+ 218              		.loc 1 39 0
+ 219 001e 301C     		mov	r0, r6
+ 220 0020 211C     		mov	r1, r4
+ 221 0022 FFF7FEFF 		bl	strcat
+ 222              		@ sp needed for prologue
+ 223              	.LVL23:
+ 224              	.LVL24:
+  40:../scr/Util.c **** }
+ 225              		.loc 1 40 0
+ 226 0026 70BD     		pop	{r4, r5, r6, pc}
+ 227              	.L14:
+ 228              		.align	2
+ 229              	.L13:
+ 230 0028 00000000 		.word	.LANCHOR1
+ 231 002c 00000000 		.word	.LC4
+ 232              		.cfi_endproc
+ 233              	.LFE2:
+ 235              		.section	.text.left_pad,"ax",%progbits
+ 236              		.align	1
+ 237              		.global	left_pad
+ 238              		.code	16
+ 239              		.thumb_func
+ 241              	left_pad:
+ 242              	.LFB3:
+  41:../scr/Util.c **** 
+  42:../scr/Util.c **** void left_pad(unsigned long n, char* s, int size) {
+ 243              		.loc 1 42 0
+ 244              		.cfi_startproc
+ 245 0000 70B5     		push	{r4, r5, r6, lr}
+ 246              	.LCFI4:
+ 247              		.cfi_def_cfa_offset 16
+ 248              		.cfi_offset 4, -16
+ 249              		.cfi_offset 5, -12
+ 250              		.cfi_offset 6, -8
+ 251              		.cfi_offset 14, -4
+ 252              	.LVL25:
+ 253 0002 88B0     		sub	sp, sp, #32
+ 254              	.LCFI5:
+ 255              		.cfi_def_cfa_offset 48
+ 256              		.loc 1 42 0
+ 257 0004 041C     		mov	r4, r0
+ 258 0006 0E1C     		mov	r6, r1
+ 259 0008 151C     		mov	r5, r2
+  43:../scr/Util.c **** 	char tmp_val[15] = {0};
+ 260              		.loc 1 43 0
+ 261 000a 0021     		mov	r1, #0
+ 262              	.LVL26:
+ 263 000c 0F22     		mov	r2, #15
+ 264              	.LVL27:
+ 265 000e 6846     		mov	r0, sp
+ 266              	.LVL28:
+ 267 0010 FFF7FEFF 		bl	memset
+  44:../scr/Util.c **** 	char val[15];
+  45:../scr/Util.c **** 	i_to_a(n,val,10);
+ 268              		.loc 1 45 0
+ 269 0014 201C     		mov	r0, r4
+ 270 0016 04A9     		add	r1, sp, #16
+ 271 0018 0A22     		mov	r2, #10
+ 272 001a FFF7FEFF 		bl	i_to_a
+ 273              	.LVL29:
+  46:../scr/Util.c **** 	int pad = 0;
+  47:../scr/Util.c **** 
+  48:../scr/Util.c **** 	unsigned long tmp = n;
+ 274              		.loc 1 48 0
+ 275 001e 201C     		mov	r0, r4
+  46:../scr/Util.c **** 	int pad = 0;
+ 276              		.loc 1 46 0
+ 277 0020 0024     		mov	r4, #0
+ 278              	.LVL30:
+ 279              	.L16:
+  49:../scr/Util.c **** 	do {
+  50:../scr/Util.c **** 		pad++;
+  51:../scr/Util.c **** 	} while ((tmp /= 10) > 0);
+ 280              		.loc 1 51 0 discriminator 1
+ 281 0022 0A21     		mov	r1, #10
+  50:../scr/Util.c **** 		pad++;
+ 282              		.loc 1 50 0 discriminator 1
+ 283 0024 0134     		add	r4, r4, #1
+ 284              	.LVL31:
+ 285              		.loc 1 51 0 discriminator 1
+ 286 0026 FFF7FEFF 		bl	__aeabi_uidiv
+ 287              	.LVL32:
+ 288 002a 0028     		cmp	r0, #0
+ 289 002c F9D1     		bne	.L16
+  52:../scr/Util.c **** 
+  53:../scr/Util.c **** 	pad = size - pad;
+ 290              		.loc 1 53 0
+ 291 002e 2C1B     		sub	r4, r5, r4
+ 292              	.LVL33:
+  54:../scr/Util.c **** 
+  55:../scr/Util.c **** 	int i=0;
+  56:../scr/Util.c **** 	for(i=0; i<pad; i++) {
+ 293              		.loc 1 56 0
+ 294 0030 03E0     		b	.L17
+ 295              	.LVL34:
+ 296              	.L18:
+  57:../scr/Util.c **** 		tmp_val[i] = '0';
+ 297              		.loc 1 57 0 discriminator 2
+ 298 0032 3023     		mov	r3, #48
+ 299 0034 6A46     		mov	r2, sp
+ 300 0036 1354     		strb	r3, [r2, r0]
+  56:../scr/Util.c **** 	for(i=0; i<pad; i++) {
+ 301              		.loc 1 56 0 discriminator 2
+ 302 0038 0130     		add	r0, r0, #1
+ 303              	.LVL35:
+ 304              	.L17:
+  56:../scr/Util.c **** 	for(i=0; i<pad; i++) {
+ 305              		.loc 1 56 0 is_stmt 0 discriminator 1
+ 306 003a A042     		cmp	r0, r4
+ 307 003c F9DB     		blt	.L18
+  58:../scr/Util.c **** 	}
+  59:../scr/Util.c **** 	tmp_val[i] = '\0';
+ 308              		.loc 1 59 0 is_stmt 1
+ 309 003e E243     		mvn	r2, r4
+ 310 0040 D117     		asr	r1, r2, #31
+ 311 0042 0C40     		and	r4, r1
+ 312              	.LVL36:
+ 313 0044 6846     		mov	r0, sp
+ 314              	.LVL37:
+ 315 0046 0025     		mov	r5, #0
+ 316              	.LVL38:
+ 317 0048 0555     		strb	r5, [r0, r4]
+  60:../scr/Util.c **** 	strcat(tmp_val, val);
+ 318              		.loc 1 60 0
+ 319 004a 04A9     		add	r1, sp, #16
+ 320 004c 6846     		mov	r0, sp
+ 321 004e FFF7FEFF 		bl	strcat
+ 322              	.LVL39:
+ 323              	.L20:
+ 324              	.LBB3:
+  61:../scr/Util.c **** 
+  62:../scr/Util.c **** 	int idx=0;
+  63:../scr/Util.c **** 	for(int i=0; i<6; i++) {
+  64:../scr/Util.c **** 		s[idx] = tmp_val[i];
+ 325              		.loc 1 64 0 discriminator 2
+ 326 0052 6B46     		mov	r3, sp
+ 327 0054 EC5C     		ldrb	r4, [r5, r3]
+ 328 0056 7455     		strb	r4, [r6, r5]
+  65:../scr/Util.c **** 		idx++;
+ 329              		.loc 1 65 0 discriminator 2
+ 330 0058 0135     		add	r5, r5, #1
+ 331              	.LVL40:
+  63:../scr/Util.c **** 	for(int i=0; i<6; i++) {
+ 332              		.loc 1 63 0 discriminator 2
+ 333 005a 062D     		cmp	r5, #6
+ 334 005c F9D1     		bne	.L20
+ 335              	.LBE3:
+  66:../scr/Util.c **** 	}
+  67:../scr/Util.c **** 	s[idx] = '\0';
+ 336              		.loc 1 67 0
+ 337 005e 0025     		mov	r5, #0
+ 338              	.LVL41:
+ 339 0060 B571     		strb	r5, [r6, #6]
+  68:../scr/Util.c **** }
+ 340              		.loc 1 68 0
+ 341 0062 08B0     		add	sp, sp, #32
+ 342              		@ sp needed for prologue
+ 343              	.LVL42:
+ 344 0064 70BD     		pop	{r4, r5, r6, pc}
+ 345              		.cfi_endproc
+ 346              	.LFE3:
+ 348              		.section	.text.a_to_i,"ax",%progbits
+ 349              		.align	1
+ 350              		.global	a_to_i
+ 351              		.code	16
+ 352              		.thumb_func
+ 354              	a_to_i:
+ 355              	.LFB4:
+  69:../scr/Util.c **** 
+  70:../scr/Util.c **** /* atoi:  convert s to integer */
+  71:../scr/Util.c **** int a_to_i(char s[], unsigned char size)
+  72:../scr/Util.c **** {
+ 356              		.loc 1 72 0
+ 357              		.cfi_startproc
+ 358 0000 30B5     		push	{r4, r5, lr}
+ 359              	.LCFI6:
+ 360              		.cfi_def_cfa_offset 12
+ 361              		.cfi_offset 4, -12
+ 362              		.cfi_offset 5, -8
+ 363              		.cfi_offset 14, -4
+ 364              	.LVL43:
+ 365              		.loc 1 72 0
+ 366 0002 031C     		mov	r3, r0
+  73:../scr/Util.c **** 	int i, n;
+  74:../scr/Util.c **** 
+  75:../scr/Util.c ****     n = 0;
+ 367              		.loc 1 75 0
+ 368 0004 0020     		mov	r0, #0
+ 369              	.LVL44:
+  76:../scr/Util.c **** 
+  77:../scr/Util.c ****     for (i = 0; i < size; ++i) {
+ 370              		.loc 1 77 0
+ 371 0006 021C     		mov	r2, r0
+ 372 0008 08E0     		b	.L24
+ 373              	.LVL45:
+ 374              	.L26:
+  78:../scr/Util.c **** 		if(s[i] >= '0' && s[i] <= '9') {
+ 375              		.loc 1 78 0
+ 376 000a 9C5C     		ldrb	r4, [r3, r2]
+ 377 000c 303C     		sub	r4, r4, #48
+ 378 000e E5B2     		uxtb	r5, r4
+ 379 0010 092D     		cmp	r5, #9
+ 380 0012 02D8     		bhi	.L25
+  79:../scr/Util.c ****         	n = 10 * n + (s[i] - '0');
+ 381              		.loc 1 79 0
+ 382 0014 0A25     		mov	r5, #10
+ 383 0016 6843     		mul	r0, r5
+ 384              	.LVL46:
+ 385 0018 0019     		add	r0, r0, r4
+ 386              	.LVL47:
+ 387              	.L25:
+  77:../scr/Util.c ****     for (i = 0; i < size; ++i) {
+ 388              		.loc 1 77 0
+ 389 001a 0132     		add	r2, r2, #1
+ 390              	.LVL48:
+ 391              	.L24:
+  77:../scr/Util.c ****     for (i = 0; i < size; ++i) {
+ 392              		.loc 1 77 0 is_stmt 0 discriminator 1
+ 393 001c 8A42     		cmp	r2, r1
+ 394 001e F4DB     		blt	.L26
+ 395              		@ sp needed for prologue
+  80:../scr/Util.c **** 		}
+  81:../scr/Util.c **** 	}
+  82:../scr/Util.c ****     return n;
+  83:../scr/Util.c **** }
+ 396              		.loc 1 83 0 is_stmt 1
+ 397 0020 30BD     		pop	{r4, r5, pc}
+ 398              		.cfi_endproc
+ 399              	.LFE4:
+ 401              		.section	.text.toHex,"ax",%progbits
+ 402              		.align	1
+ 403              		.global	toHex
+ 404              		.code	16
+ 405              		.thumb_func
+ 407              	toHex:
+ 408              	.LFB5:
+  84:../scr/Util.c **** 
+  85:../scr/Util.c **** char toHex(unsigned char i) {
+ 409              		.loc 1 85 0
+ 410              		.cfi_startproc
+ 411 0000 00B5     		push	{lr}
+ 412              	.LCFI7:
+ 413              		.cfi_def_cfa_offset 4
+ 414              		.cfi_offset 14, -4
+ 415              	.LVL49:
+ 416              		.loc 1 85 0
+ 417 0002 031C     		mov	r3, r0
+  86:../scr/Util.c **** 	if(i <= 9) {
+  87:../scr/Util.c **** 		return '0' + i;
+  88:../scr/Util.c **** 	} else {
+  89:../scr/Util.c **** 		return 'a' - 10 + i;
+ 418              		.loc 1 89 0
+ 419 0004 5730     		add	r0, r0, #87
+ 420              	.LVL50:
+ 421 0006 C0B2     		uxtb	r0, r0
+  86:../scr/Util.c **** 	if(i <= 9) {
+ 422              		.loc 1 86 0
+ 423 0008 092B     		cmp	r3, #9
+ 424 000a 01D8     		bhi	.L29
+  87:../scr/Util.c **** 		return '0' + i;
+ 425              		.loc 1 87 0
+ 426 000c 3033     		add	r3, r3, #48
+ 427 000e D8B2     		uxtb	r0, r3
+ 428              	.L29:
+ 429              		@ sp needed for prologue
+  90:../scr/Util.c **** 	}
+  91:../scr/Util.c **** }
+ 430              		.loc 1 91 0
+ 431 0010 00BD     		pop	{pc}
+ 432              		.cfi_endproc
+ 433              	.LFE5:
+ 435              		.section	.text.isNumber,"ax",%progbits
+ 436              		.align	1
+ 437              		.global	isNumber
+ 438              		.code	16
+ 439              		.thumb_func
+ 441              	isNumber:
+ 442              	.LFB6:
+  92:../scr/Util.c **** 
+  93:../scr/Util.c **** char isNumber(char val) {
+ 443              		.loc 1 93 0
+ 444              		.cfi_startproc
+ 445              	.LVL51:
+  94:../scr/Util.c **** 	if(val >= '0' && val <= '9') {
+ 446              		.loc 1 94 0
+ 447 0000 3038     		sub	r0, r0, #48
+ 448              	.LVL52:
+  95:../scr/Util.c **** 		return 1;
+ 449              		.loc 1 95 0
+ 450 0002 C3B2     		uxtb	r3, r0
+ 451 0004 0922     		mov	r2, #9
+ 452 0006 0020     		mov	r0, #0
+ 453 0008 9A42     		cmp	r2, r3
+ 454 000a 4041     		adc	r0, r0, r0
+ 455              		@ sp needed for prologue
+  96:../scr/Util.c **** 	}
+  97:../scr/Util.c **** 	return 0;
+  98:../scr/Util.c **** }
+ 456              		.loc 1 98 0
+ 457 000c 7047     		bx	lr
+ 458              		.cfi_endproc
+ 459              	.LFE6:
+ 461              		.section	.text.charToNumber,"ax",%progbits
+ 462              		.align	1
+ 463              		.global	charToNumber
+ 464              		.code	16
+ 465              		.thumb_func
+ 467              	charToNumber:
+ 468              	.LFB7:
+  99:../scr/Util.c **** 
+ 100:../scr/Util.c **** char charToNumber(char val) {
+ 469              		.loc 1 100 0
+ 470              		.cfi_startproc
+ 471              	.LVL53:
+ 101:../scr/Util.c **** 	if(val >= '0' && val <= '9') {
+ 472              		.loc 1 101 0
+ 473 0000 3038     		sub	r0, r0, #48
+ 474              	.LVL54:
+ 475 0002 C0B2     		uxtb	r0, r0
+ 102:../scr/Util.c **** 		return val - '0';
+ 103:../scr/Util.c **** 	}
+ 104:../scr/Util.c **** 	return 0;
+ 476              		.loc 1 104 0
+ 477 0004 0922     		mov	r2, #9
+ 478 0006 0021     		mov	r1, #0
+ 479 0008 8242     		cmp	r2, r0
+ 480 000a 4941     		adc	r1, r1, r1
+ 481 000c 4B42     		neg	r3, r1
+ 482 000e 1840     		and	r0, r3
+ 483              		@ sp needed for prologue
+ 105:../scr/Util.c **** }
+ 484              		.loc 1 105 0
+ 485 0010 7047     		bx	lr
+ 486              		.cfi_endproc
+ 487              	.LFE7:
+ 489              		.section	.text.hexToi,"ax",%progbits
+ 490              		.align	1
+ 491              		.global	hexToi
+ 492              		.code	16
+ 493              		.thumb_func
+ 495              	hexToi:
+ 496              	.LFB8:
+ 106:../scr/Util.c **** 
+ 107:../scr/Util.c **** char hexToi(char c) {
+ 497              		.loc 1 107 0
+ 498              		.cfi_startproc
+ 499 0000 10B5     		push	{r4, lr}
+ 500              	.LCFI8:
+ 501              		.cfi_def_cfa_offset 8
+ 502              		.cfi_offset 4, -8
+ 503              		.cfi_offset 14, -4
+ 504              	.LVL55:
+ 505 0002 86B0     		sub	sp, sp, #24
+ 506              	.LCFI9:
+ 507              		.cfi_def_cfa_offset 32
+ 508              		.loc 1 107 0
+ 509 0004 041C     		mov	r4, r0
+ 108:../scr/Util.c **** 	char arr[17] = "0123456789abcdef\0"; //hex string
+ 510              		.loc 1 108 0
+ 511 0006 0949     		ldr	r1, .L39
+ 512 0008 01A8     		add	r0, sp, #4
+ 513              	.LVL56:
+ 514 000a 1122     		mov	r2, #17
+ 515 000c FFF7FEFF 		bl	memcpy
+ 516              	.LVL57:
+ 109:../scr/Util.c **** 	for(int i=0; i<16; i++) {
+ 517              		.loc 1 109 0
+ 518 0010 0020     		mov	r0, #0
+ 519              	.LVL58:
+ 520              	.L37:
+ 521              	.LBB4:
+ 110:../scr/Util.c **** 		if(arr[i] == c) {
+ 522              		.loc 1 110 0
+ 523 0012 01A9     		add	r1, sp, #4
+ 524 0014 435C     		ldrb	r3, [r0, r1]
+ 525 0016 A342     		cmp	r3, r4
+ 526 0018 01D1     		bne	.L35
+ 111:../scr/Util.c **** 			return i;
+ 527              		.loc 1 111 0
+ 528 001a C0B2     		uxtb	r0, r0
+ 529 001c 03E0     		b	.L36
+ 530              	.L35:
+ 109:../scr/Util.c **** 	for(int i=0; i<16; i++) {
+ 531              		.loc 1 109 0
+ 532 001e 0130     		add	r0, r0, #1
+ 533              	.LVL59:
+ 534 0020 1028     		cmp	r0, #16
+ 535 0022 F6D1     		bne	.L37
+ 112:../scr/Util.c **** 		}
+ 113:../scr/Util.c **** 	}
+ 114:../scr/Util.c **** 	return 0;
+ 536              		.loc 1 114 0
+ 537 0024 0020     		mov	r0, #0
+ 538              	.LVL60:
+ 539              	.L36:
+ 540              	.LBE4:
+ 115:../scr/Util.c **** }
+ 541              		.loc 1 115 0
+ 542 0026 06B0     		add	sp, sp, #24
+ 543              		@ sp needed for prologue
+ 544 0028 10BD     		pop	{r4, pc}
+ 545              	.L40:
+ 546 002a C046     		.align	2
+ 547              	.L39:
+ 548 002c 02000000 		.word	.LC6
+ 549              		.cfi_endproc
+ 550              	.LFE8:
+ 552              		.section	.text.charToHexString,"ax",%progbits
+ 553              		.align	1
+ 554              		.global	charToHexString
+ 555              		.code	16
+ 556              		.thumb_func
+ 558              	charToHexString:
+ 559              	.LFB9:
+ 116:../scr/Util.c **** 
+ 117:../scr/Util.c **** void charToHexString(char* input, char* output, int size) {
+ 560              		.loc 1 117 0
+ 561              		.cfi_startproc
+ 562              	.LVL61:
+ 563              		@ sp needed for prologue
+ 118:../scr/Util.c **** 
+ 119:../scr/Util.c **** }
+ 564              		.loc 1 119 0
+ 565 0000 7047     		bx	lr
+ 566              		.cfi_endproc
+ 567              	.LFE9:
+ 569              		.section	.text.charToHex,"ax",%progbits
+ 570              		.align	1
+ 571              		.global	charToHex
+ 572              		.code	16
+ 573              		.thumb_func
+ 575              	charToHex:
+ 576              	.LFB10:
+ 120:../scr/Util.c **** 
+ 121:../scr/Util.c **** char charToHex(const unsigned char c) {
+ 577              		.loc 1 121 0
+ 578              		.cfi_startproc
+ 579              	.LVL62:
+ 122:../scr/Util.c **** 	return (c/16 * 10) + (c%16);
+ 580              		.loc 1 122 0
+ 581 0000 0309     		lsr	r3, r0, #4
+ 582 0002 0A21     		mov	r1, #10
+ 583 0004 4B43     		mul	r3, r1
+ 584 0006 0F22     		mov	r2, #15
+ 585 0008 1040     		and	r0, r2
+ 586              	.LVL63:
+ 587 000a 1818     		add	r0, r3, r0
+ 588 000c C0B2     		uxtb	r0, r0
+ 589              		@ sp needed for prologue
+ 123:../scr/Util.c **** }
+ 590              		.loc 1 123 0
+ 591 000e 7047     		bx	lr
+ 592              		.cfi_endproc
+ 593              	.LFE10:
+ 595              		.section	.text.convertToSecond,"ax",%progbits
+ 596              		.align	1
+ 597              		.global	convertToSecond
+ 598              		.code	16
+ 599              		.thumb_func
+ 601              	convertToSecond:
+ 602              	.LFB11:
+ 124:../scr/Util.c **** 
+ 125:../scr/Util.c **** unsigned long convertToSecond(char tm_hour, char tm_min, char tm_sec) {
+ 603              		.loc 1 125 0
+ 604              		.cfi_startproc
+ 605              	.LVL64:
+ 126:../scr/Util.c **** 	return (unsigned long)(((unsigned long)tm_hour * 3600) + ((unsigned long)tm_min * 60) + (unsigned 
+ 606              		.loc 1 126 0
+ 607 0000 3C23     		mov	r3, #60
+ 608 0002 5943     		mul	r1, r3
+ 609              	.LVL65:
+ 610 0004 8918     		add	r1, r1, r2
+ 611 0006 E122     		mov	r2, #225
+ 612              	.LVL66:
+ 613 0008 1301     		lsl	r3, r2, #4
+ 614 000a 5843     		mul	r0, r3
+ 615              	.LVL67:
+ 616              		@ sp needed for prologue
+ 617 000c 0818     		add	r0, r1, r0
+ 127:../scr/Util.c **** }
+ 618              		.loc 1 127 0
+ 619 000e 7047     		bx	lr
+ 620              		.cfi_endproc
+ 621              	.LFE11:
+ 623              		.section	.text.convertToDate,"ax",%progbits
+ 624              		.align	1
+ 625              		.global	convertToDate
+ 626              		.code	16
+ 627              		.thumb_func
+ 629              	convertToDate:
+ 630              	.LFB12:
+ 128:../scr/Util.c **** 
+ 129:../scr/Util.c **** unsigned long convertToDate(int tm_day, int tm_mon, int tm_year) {
+ 631              		.loc 1 129 0
+ 632              		.cfi_startproc
+ 633              	.LVL68:
+ 130:../scr/Util.c **** 	return (unsigned long)((tm_year  * 10000l) + (tm_mon * 100) + (int)tm_day);
+ 634              		.loc 1 130 0
+ 635 0000 034B     		ldr	r3, .L45
+ 636              		@ sp needed for prologue
+ 637 0002 5A43     		mul	r2, r3
+ 638              	.LVL69:
+ 639 0004 6423     		mov	r3, #100
+ 640 0006 5943     		mul	r1, r3
+ 641              	.LVL70:
+ 642 0008 5118     		add	r1, r2, r1
+ 643 000a 0818     		add	r0, r1, r0
+ 644              	.LVL71:
+ 131:../scr/Util.c **** }
+ 645              		.loc 1 131 0
+ 646 000c 7047     		bx	lr
+ 647              	.L46:
+ 648 000e C046     		.align	2
+ 649              	.L45:
+ 650 0010 10270000 		.word	10000
+ 651              		.cfi_endproc
+ 652              	.LFE12:
+ 654              		.section	.rodata.digits.4987,"a",%progbits
+ 655              		.set	.LANCHOR0,. + 0
+ 658              	digits.4987:
+ 659 0000 30313233 		.ascii	"0123456789abcdefghijklmnopqrstuvwxyz\000"
+ 659      34353637 
+ 659      38396162 
+ 659      63646566 
+ 659      6768696A 
+ 660              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 661              	.LC4:
+ 662 0000 3000     		.ascii	"0\000"
+ 663              	.LC6:
+ 664 0002 30313233 		.ascii	"0123456789abcdef\000\000"
+ 664      34353637 
+ 664      38396162 
+ 664      63646566 
+ 664      0000
+ 665              		.section	.bss.val,"aw",%nobits
+ 666              		.set	.LANCHOR1,. + 0
+ 669              	val:
+ 670 0000 00000000 		.space	15
+ 670      00000000 
+ 670      00000000 
+ 670      000000
+ 671              		.text
+ 672              	.Letext0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 Util.c
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:20     .text.i_to_a:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:25     .text.i_to_a:00000000 i_to_a
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:134    .text.i_to_a:00000070 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:139    .text.append_number:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:144    .text.append_number:00000000 append_number
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:180    .text.append_hexa:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:185    .text.append_hexa:00000000 append_hexa
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:230    .text.append_hexa:00000028 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:236    .text.left_pad:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:241    .text.left_pad:00000000 left_pad
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:349    .text.a_to_i:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:354    .text.a_to_i:00000000 a_to_i
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:402    .text.toHex:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:407    .text.toHex:00000000 toHex
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:436    .text.isNumber:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:441    .text.isNumber:00000000 isNumber
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:462    .text.charToNumber:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:467    .text.charToNumber:00000000 charToNumber
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:490    .text.hexToi:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:495    .text.hexToi:00000000 hexToi
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:548    .text.hexToi:0000002c $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:553    .text.charToHexString:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:558    .text.charToHexString:00000000 charToHexString
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:570    .text.charToHex:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:575    .text.charToHex:00000000 charToHex
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:596    .text.convertToSecond:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:601    .text.convertToSecond:00000000 convertToSecond
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:624    .text.convertToDate:00000000 $t
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:629    .text.convertToDate:00000000 convertToDate
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:650    .text.convertToDate:00000010 $d
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:658    .rodata.digits.4987:00000000 digits.4987
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:669    .bss.val:00000000 val
+C:\Users\NGUYEN~1\AppData\Local\Temp\cc2R2por.s:670    .bss.val:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uidivmod
+__aeabi_uidiv
+memset
+strcat
+memcpy

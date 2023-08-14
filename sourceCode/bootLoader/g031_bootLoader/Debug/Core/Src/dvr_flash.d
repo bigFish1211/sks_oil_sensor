@@ -7,7 +7,8 @@ Core/Src/dvr_flash.o: ../Core/Src/dvr_flash.c ../Core/Inc/dvr_flash.h \
  ../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/system_stm32g0xx.h \
- ../Core/Inc/common.h
+ ../Core/Inc/common.h \
+ ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g031xx.h
 ../Core/Inc/dvr_flash.h:
 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g0xx.h:
 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g031xx.h:
@@ -18,3 +19,4 @@ Core/Src/dvr_flash.o: ../Core/Src/dvr_flash.c ../Core/Inc/dvr_flash.h \
 ../Drivers/CMSIS/Include/mpu_armv7.h:
 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/system_stm32g0xx.h:
 ../Core/Inc/common.h:
+../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g031xx.h:

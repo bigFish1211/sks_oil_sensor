@@ -1,0 +1,752 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 6
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"DataUtil.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.comm	x3buffer,5560,4
+  18              		.comm	g_pointer,12,4
+  19              		.comm	g_config,92,4
+  20              		.global	checkTripIdx
+  21              		.bss
+  22              		.align	2
+  25              	checkTripIdx:
+  26 0000 00000000 		.space	4
+  27              		.text
+  28              		.align	2
+  29              		.global	read_pointer_info
+  30              		.code	16
+  31              		.thumb_func
+  33              	read_pointer_info:
+  34              	.LFB33:
+  35              		.file 1 "../scr/DataUtil.c"
+   1:../scr/DataUtil.c **** #include "stdio.h"
+   2:../scr/DataUtil.c **** #include "time.h"
+   3:../scr/DataUtil.c **** #include "config.h"
+   4:../scr/DataUtil.c **** #include "DataUtil.h"
+   5:../scr/DataUtil.c **** #include "Util.h"
+   6:../scr/DataUtil.c **** #include "main.h"
+   7:../scr/DataUtil.c **** #include "common.h"
+   8:../scr/DataUtil.c **** #include "xprintf.h"
+   9:../scr/DataUtil.c **** 
+  10:../scr/DataUtil.c **** extern struct tm c_date_time;
+  11:../scr/DataUtil.c **** extern char sendCounter;
+  12:../scr/DataUtil.c **** extern char speedIdx;
+  13:../scr/DataUtil.c **** extern char openDoorIdx;
+  14:../scr/DataUtil.c **** extern uint32_t speedId;
+  15:../scr/DataUtil.c **** extern uint32_t openDoorId;
+  16:../scr/DataUtil.c **** extern char deviceCodeMajor;
+  17:../scr/DataUtil.c **** extern volatile uint32_t ulLastReceivedX3Data;
+  18:../scr/DataUtil.c **** extern volatile uint32_t ulSecCount;
+  19:../scr/DataUtil.c **** 
+  20:../scr/DataUtil.c **** unsigned int checkTripIdx = 0;
+  21:../scr/DataUtil.c **** extern char buffer32[BUFFER_32];
+  22:../scr/DataUtil.c **** 
+  23:../scr/DataUtil.c **** void read_pointer_info() {
+  36              		.loc 1 23 0
+  37              		.cfi_startproc
+  38 0000 80B5     		push	{r7, lr}
+  39              	.LCFI0:
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+  43 0002 00AF     		add	r7, sp, #0
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_register 7
+  24:../scr/DataUtil.c **** 	flash_read_pointer_info(&g_pointer);
+  46              		.loc 1 24 0
+  47 0004 024B     		ldr	r3, .L2
+  48 0006 181C     		mov	r0, r3
+  49 0008 FFF7FEFF 		bl	flash_read_pointer_info
+  25:../scr/DataUtil.c **** }
+  50              		.loc 1 25 0
+  51 000c BD46     		mov	sp, r7
+  52              		@ sp needed
+  53 000e 80BD     		pop	{r7, pc}
+  54              	.L3:
+  55              		.align	2
+  56              	.L2:
+  57 0010 00000000 		.word	g_pointer
+  58              		.cfi_endproc
+  59              	.LFE33:
+  61              		.align	2
+  62              		.global	write_pointer_info
+  63              		.code	16
+  64              		.thumb_func
+  66              	write_pointer_info:
+  67              	.LFB34:
+  26:../scr/DataUtil.c **** 
+  27:../scr/DataUtil.c **** void write_pointer_info() {
+  68              		.loc 1 27 0
+  69              		.cfi_startproc
+  70 0014 80B5     		push	{r7, lr}
+  71              	.LCFI2:
+  72              		.cfi_def_cfa_offset 8
+  73              		.cfi_offset 7, -8
+  74              		.cfi_offset 14, -4
+  75 0016 00AF     		add	r7, sp, #0
+  76              	.LCFI3:
+  77              		.cfi_def_cfa_register 7
+  28:../scr/DataUtil.c **** 	flash_write_pointer_info(&g_pointer);
+  78              		.loc 1 28 0
+  79 0018 024B     		ldr	r3, .L5
+  80 001a 181C     		mov	r0, r3
+  81 001c FFF7FEFF 		bl	flash_write_pointer_info
+  29:../scr/DataUtil.c **** }
+  82              		.loc 1 29 0
+  83 0020 BD46     		mov	sp, r7
+  84              		@ sp needed
+  85 0022 80BD     		pop	{r7, pc}
+  86              	.L6:
+  87              		.align	2
+  88              	.L5:
+  89 0024 00000000 		.word	g_pointer
+  90              		.cfi_endproc
+  91              	.LFE34:
+  93              		.align	2
+  94              		.global	read_device_config
+  95              		.code	16
+  96              		.thumb_func
+  98              	read_device_config:
+  99              	.LFB35:
+  30:../scr/DataUtil.c **** 
+  31:../scr/DataUtil.c **** /*
+  32:../scr/DataUtil.c **** Read general configuration
+  33:../scr/DataUtil.c **** */
+  34:../scr/DataUtil.c **** void read_device_config() {
+ 100              		.loc 1 34 0
+ 101              		.cfi_startproc
+ 102 0028 80B5     		push	{r7, lr}
+ 103              	.LCFI4:
+ 104              		.cfi_def_cfa_offset 8
+ 105              		.cfi_offset 7, -8
+ 106              		.cfi_offset 14, -4
+ 107 002a 00AF     		add	r7, sp, #0
+ 108              	.LCFI5:
+ 109              		.cfi_def_cfa_register 7
+  35:../scr/DataUtil.c **** 	flash_read_config_info(&g_config);
+ 110              		.loc 1 35 0
+ 111 002c 024B     		ldr	r3, .L8
+ 112 002e 181C     		mov	r0, r3
+ 113 0030 FFF7FEFF 		bl	flash_read_config_info
+  36:../scr/DataUtil.c **** }
+ 114              		.loc 1 36 0
+ 115 0034 BD46     		mov	sp, r7
+ 116              		@ sp needed
+ 117 0036 80BD     		pop	{r7, pc}
+ 118              	.L9:
+ 119              		.align	2
+ 120              	.L8:
+ 121 0038 00000000 		.word	g_config
+ 122              		.cfi_endproc
+ 123              	.LFE35:
+ 125              		.align	2
+ 126              		.global	write_device_config
+ 127              		.code	16
+ 128              		.thumb_func
+ 130              	write_device_config:
+ 131              	.LFB36:
+  37:../scr/DataUtil.c **** 
+  38:../scr/DataUtil.c **** /*
+  39:../scr/DataUtil.c **** Write general configuration to ROM
+  40:../scr/DataUtil.c **** */
+  41:../scr/DataUtil.c **** void write_device_config() {
+ 132              		.loc 1 41 0
+ 133              		.cfi_startproc
+ 134 003c 80B5     		push	{r7, lr}
+ 135              	.LCFI6:
+ 136              		.cfi_def_cfa_offset 8
+ 137              		.cfi_offset 7, -8
+ 138              		.cfi_offset 14, -4
+ 139 003e 00AF     		add	r7, sp, #0
+ 140              	.LCFI7:
+ 141              		.cfi_def_cfa_register 7
+  42:../scr/DataUtil.c **** 	flash_write_config_info(&g_config);
+ 142              		.loc 1 42 0
+ 143 0040 024B     		ldr	r3, .L11
+ 144 0042 181C     		mov	r0, r3
+ 145 0044 FFF7FEFF 		bl	flash_write_config_info
+  43:../scr/DataUtil.c **** }
+ 146              		.loc 1 43 0
+ 147 0048 BD46     		mov	sp, r7
+ 148              		@ sp needed
+ 149 004a 80BD     		pop	{r7, pc}
+ 150              	.L12:
+ 151              		.align	2
+ 152              	.L11:
+ 153 004c 00000000 		.word	g_config
+ 154              		.cfi_endproc
+ 155              	.LFE36:
+ 157              		.align	2
+ 158              		.global	init_config
+ 159              		.code	16
+ 160              		.thumb_func
+ 162              	init_config:
+ 163              	.LFB37:
+  44:../scr/DataUtil.c **** 
+  45:../scr/DataUtil.c **** void init_config() {
+ 164              		.loc 1 45 0
+ 165              		.cfi_startproc
+ 166 0050 80B5     		push	{r7, lr}
+ 167              	.LCFI8:
+ 168              		.cfi_def_cfa_offset 8
+ 169              		.cfi_offset 7, -8
+ 170              		.cfi_offset 14, -4
+ 171 0052 00AF     		add	r7, sp, #0
+ 172              	.LCFI9:
+ 173              		.cfi_def_cfa_register 7
+  46:../scr/DataUtil.c **** 	read_device_config(); //read config from ROM
+ 174              		.loc 1 46 0
+ 175 0054 FFF7FEFF 		bl	read_device_config
+  47:../scr/DataUtil.c **** 	write_default_config(); //write default config if not configured yet
+ 176              		.loc 1 47 0
+ 177 0058 FFF7FEFF 		bl	write_default_config
+  48:../scr/DataUtil.c **** }
+ 178              		.loc 1 48 0
+ 179 005c BD46     		mov	sp, r7
+ 180              		@ sp needed
+ 181 005e 80BD     		pop	{r7, pc}
+ 182              		.cfi_endproc
+ 183              	.LFE37:
+ 185              		.section	.rodata
+ 186              		.align	2
+ 187              	.LC5:
+ 188 0000 30313233 		.ascii	"0123456789\000"
+ 188      34353637 
+ 188      383900
+ 189 000b 00       		.align	2
+ 190              	.LC8:
+ 191 000c 31323334 		.ascii	"1234567890\000"
+ 191      35363738 
+ 191      393000
+ 192 0017 00       		.align	2
+ 193              	.LC11:
+ 194 0018 4E415649 		.ascii	"NAVIBOX-X3\000"
+ 194      424F582D 
+ 194      583300
+ 195 0023 00       		.align	2
+ 196              	.LC14:
+ 197 0024 30312F30 		.ascii	"01/04/2013\000"
+ 197      342F3230 
+ 197      313300
+ 198 002f 00       		.align	2
+ 199              	.LC17:
+ 200 0030 0D0A5772 		.ascii	"\015\012Write default config.\015\012\015\012\000"
+ 200      69746520 
+ 200      64656661 
+ 200      756C7420 
+ 200      636F6E66 
+ 201              		.align	2
+ 202              	.LC19:
+ 203 004c 0D0A4C6F 		.ascii	"\015\012Loaded config.\015\012\015\012\000"
+ 203      61646564 
+ 203      20636F6E 
+ 203      6669672E 
+ 203      0D0A0D0A 
+ 204              		.text
+ 205              		.align	2
+ 206              		.global	write_default_config
+ 207              		.code	16
+ 208              		.thumb_func
+ 210              	write_default_config:
+ 211              	.LFB38:
+  49:../scr/DataUtil.c **** 
+  50:../scr/DataUtil.c **** void write_default_config() {
+ 212              		.loc 1 50 0
+ 213              		.cfi_startproc
+ 214 0060 80B5     		push	{r7, lr}
+ 215              	.LCFI10:
+ 216              		.cfi_def_cfa_offset 8
+ 217              		.cfi_offset 7, -8
+ 218              		.cfi_offset 14, -4
+ 219 0062 00AF     		add	r7, sp, #0
+ 220              	.LCFI11:
+ 221              		.cfi_def_cfa_register 7
+  51:../scr/DataUtil.c **** 	//set default
+  52:../scr/DataUtil.c **** 	if(g_config.configState != 1) {
+ 222              		.loc 1 52 0
+ 223 0064 334B     		ldr	r3, .L17
+ 224 0066 3622     		mov	r2, #54
+ 225 0068 9B5C     		ldrb	r3, [r3, r2]
+ 226 006a 012B     		cmp	r3, #1
+ 227 006c 5CD0     		beq	.L15
+  53:../scr/DataUtil.c **** 		g_config.alarmSpeed = 80; //toc do phat canh bao
+ 228              		.loc 1 53 0
+ 229 006e 314B     		ldr	r3, .L17
+ 230 0070 3422     		mov	r2, #52
+ 231 0072 5021     		mov	r1, #80
+ 232 0074 9954     		strb	r1, [r3, r2]
+  54:../scr/DataUtil.c **** 		g_config.limitSpeed = 80;  //max speed is 80km/h
+ 233              		.loc 1 54 0
+ 234 0076 2F4B     		ldr	r3, .L17
+ 235 0078 2D22     		mov	r2, #45
+ 236 007a 5021     		mov	r1, #80
+ 237 007c 9954     		strb	r1, [r3, r2]
+  55:../scr/DataUtil.c **** 		g_config.keepOverSpeed = 30;  //mark over speed if running over speed for 30 seconds
+ 238              		.loc 1 55 0
+ 239 007e 2D4B     		ldr	r3, .L17
+ 240 0080 2C22     		mov	r2, #44
+ 241 0082 1E21     		mov	r1, #30
+ 242 0084 9954     		strb	r1, [r3, r2]
+  56:../scr/DataUtil.c **** 		g_config.limitDuration = 240; //limit driving duration for 4hours
+ 243              		.loc 1 56 0
+ 244 0086 2B4B     		ldr	r3, .L17
+ 245 0088 2E22     		mov	r2, #46
+ 246 008a F021     		mov	r1, #240
+ 247 008c 9954     		strb	r1, [r3, r2]
+  57:../scr/DataUtil.c **** 		g_config.relaxDuration = 15;  //require relax duration for 15 minutes
+ 248              		.loc 1 57 0
+ 249 008e 294B     		ldr	r3, .L17
+ 250 0090 2F22     		mov	r2, #47
+ 251 0092 0F21     		mov	r1, #15
+ 252 0094 9954     		strb	r1, [r3, r2]
+  58:../scr/DataUtil.c **** 		g_config.limitDailyDriving = 480; //8 hours
+ 253              		.loc 1 58 0
+ 254 0096 274B     		ldr	r3, .L17
+ 255 0098 F022     		mov	r2, #240
+ 256 009a 5200     		lsl	r2, r2, #1
+ 257 009c 1A63     		str	r2, [r3, #48]
+  59:../scr/DataUtil.c **** 
+  60:../scr/DataUtil.c **** 		//g_config.vinNo[0] = 0;
+  61:../scr/DataUtil.c **** 		//strcat((char*)&g_config.vinNo, "0123456789");
+  62:../scr/DataUtil.c **** 		xsprintf((char*)g_config.vinNo, "0123456789");
+ 258              		.loc 1 62 0
+ 259 009e 254A     		ldr	r2, .L17
+ 260 00a0 254B     		ldr	r3, .L17+4
+ 261 00a2 101C     		mov	r0, r2
+ 262 00a4 191C     		mov	r1, r3
+ 263 00a6 FFF7FEFF 		bl	xsprintf
+  63:../scr/DataUtil.c **** 
+  64:../scr/DataUtil.c **** 		//g_config.deviceCode[0] = 0;
+  65:../scr/DataUtil.c **** 		//strcat((char*)&g_config.deviceCode, "1234567890");
+  66:../scr/DataUtil.c **** 		xprintf((char*)g_config.deviceCode, "1234567890");
+ 264              		.loc 1 66 0
+ 265 00aa 244A     		ldr	r2, .L17+8
+ 266 00ac 244B     		ldr	r3, .L17+12
+ 267 00ae 101C     		mov	r0, r2
+ 268 00b0 191C     		mov	r1, r3
+ 269 00b2 FFF7FEFF 		bl	xprintf
+  67:../scr/DataUtil.c **** 
+  68:../scr/DataUtil.c **** 		xsprintf((char*)g_config.registerNo, "NAVIBOX-X3");
+ 270              		.loc 1 68 0
+ 271 00b6 234A     		ldr	r2, .L17+16
+ 272 00b8 234B     		ldr	r3, .L17+20
+ 273 00ba 101C     		mov	r0, r2
+ 274 00bc 191C     		mov	r1, r3
+ 275 00be FFF7FEFF 		bl	xsprintf
+  69:../scr/DataUtil.c **** //		g_config.registerNo[0] = 0;
+  70:../scr/DataUtil.c **** //		strcat((char*)&g_config.registerNo, "NAVIBOX-X3");
+  71:../scr/DataUtil.c **** 
+  72:../scr/DataUtil.c **** 		//g_config.updateDate[0] = 0;
+  73:../scr/DataUtil.c **** 		//strcat((char*)&g_config.updateDate, "01/04/2013");
+  74:../scr/DataUtil.c **** 		xsprintf((char*)g_config.updateDate, "01/04/2013");
+ 276              		.loc 1 74 0
+ 277 00c2 224A     		ldr	r2, .L17+24
+ 278 00c4 224B     		ldr	r3, .L17+28
+ 279 00c6 101C     		mov	r0, r2
+ 280 00c8 191C     		mov	r1, r3
+ 281 00ca FFF7FEFF 		bl	xsprintf
+  75:../scr/DataUtil.c **** 
+  76:../scr/DataUtil.c **** 		g_config.nightSilent = 1;
+ 282              		.loc 1 76 0
+ 283 00ce 194B     		ldr	r3, .L17
+ 284 00d0 3522     		mov	r2, #53
+ 285 00d2 0121     		mov	r1, #1
+ 286 00d4 9954     		strb	r1, [r3, r2]
+  77:../scr/DataUtil.c **** 		g_config.configState = 1;
+ 287              		.loc 1 77 0
+ 288 00d6 174B     		ldr	r3, .L17
+ 289 00d8 3622     		mov	r2, #54
+ 290 00da 0121     		mov	r1, #1
+ 291 00dc 9954     		strb	r1, [r3, r2]
+  78:../scr/DataUtil.c **** 
+  79:../scr/DataUtil.c **** 		g_config.sleepSpeed = 0;
+ 292              		.loc 1 79 0
+ 293 00de 154B     		ldr	r3, .L17
+ 294 00e0 0022     		mov	r2, #0
+ 295 00e2 DA63     		str	r2, [r3, #60]
+  80:../scr/DataUtil.c **** 		g_config.sleepInterval = 0;
+ 296              		.loc 1 80 0
+ 297 00e4 134B     		ldr	r3, .L17
+ 298 00e6 0022     		mov	r2, #0
+ 299 00e8 9A63     		str	r2, [r3, #56]
+  81:../scr/DataUtil.c **** 		g_config.doorOpenMask = 0;
+ 300              		.loc 1 81 0
+ 301 00ea 124B     		ldr	r3, .L17
+ 302 00ec 4022     		mov	r2, #64
+ 303 00ee 0021     		mov	r1, #0
+ 304 00f0 9954     		strb	r1, [r3, r2]
+  82:../scr/DataUtil.c **** 		g_config.cutFromHour = 4;
+ 305              		.loc 1 82 0
+ 306 00f2 104B     		ldr	r3, .L17
+ 307 00f4 5322     		mov	r2, #83
+ 308 00f6 0421     		mov	r1, #4
+ 309 00f8 9954     		strb	r1, [r3, r2]
+  83:../scr/DataUtil.c **** 		g_config.doorChecker = 0;
+ 310              		.loc 1 83 0
+ 311 00fa 0E4B     		ldr	r3, .L17
+ 312 00fc 5422     		mov	r2, #84
+ 313 00fe 0021     		mov	r1, #0
+ 314 0100 9954     		strb	r1, [r3, r2]
+  84:../scr/DataUtil.c **** 
+  85:../scr/DataUtil.c **** 		write_device_config();
+ 315              		.loc 1 85 0
+ 316 0102 FFF7FEFF 		bl	write_device_config
+  86:../scr/DataUtil.c **** 
+  87:../scr/DataUtil.c **** 		//default value for pointer
+  88:../scr/DataUtil.c **** 		g_pointer.ulWriteTripIdx = 0;
+ 317              		.loc 1 88 0
+ 318 0106 134B     		ldr	r3, .L17+32
+ 319 0108 0022     		mov	r2, #0
+ 320 010a 1A71     		strb	r2, [r3, #4]
+  89:../scr/DataUtil.c **** 		g_pointer.ulSendTripIdx = 0;
+ 321              		.loc 1 89 0
+ 322 010c 114B     		ldr	r3, .L17+32
+ 323 010e 0022     		mov	r2, #0
+ 324 0110 5A71     		strb	r2, [r3, #5]
+  90:../scr/DataUtil.c **** 		g_pointer.ulSendRFIDIdx = 0;
+ 325              		.loc 1 90 0
+ 326 0112 104B     		ldr	r3, .L17+32
+ 327 0114 0022     		mov	r2, #0
+ 328 0116 DA71     		strb	r2, [r3, #7]
+  91:../scr/DataUtil.c **** 		g_pointer.ulWriteRFIDIdx = 0;
+ 329              		.loc 1 91 0
+ 330 0118 0E4B     		ldr	r3, .L17+32
+ 331 011a 0022     		mov	r2, #0
+ 332 011c 9A71     		strb	r2, [r3, #6]
+  92:../scr/DataUtil.c **** 
+  93:../scr/DataUtil.c **** 		xprintf("\r\nWrite default config.\r\n\r\n");
+ 333              		.loc 1 93 0
+ 334 011e 0E4B     		ldr	r3, .L17+36
+ 335 0120 181C     		mov	r0, r3
+ 336 0122 FFF7FEFF 		bl	xprintf
+ 337 0126 03E0     		b	.L14
+ 338              	.L15:
+  94:../scr/DataUtil.c **** 	} else {
+  95:../scr/DataUtil.c **** 		xprintf("\r\nLoaded config.\r\n\r\n");
+ 339              		.loc 1 95 0
+ 340 0128 0C4B     		ldr	r3, .L17+40
+ 341 012a 181C     		mov	r0, r3
+ 342 012c FFF7FEFF 		bl	xprintf
+ 343              	.L14:
+  96:../scr/DataUtil.c **** 	}
+  97:../scr/DataUtil.c **** }
+ 344              		.loc 1 97 0
+ 345 0130 BD46     		mov	sp, r7
+ 346              		@ sp needed
+ 347 0132 80BD     		pop	{r7, pc}
+ 348              	.L18:
+ 349              		.align	2
+ 350              	.L17:
+ 351 0134 00000000 		.word	g_config
+ 352 0138 00000000 		.word	.LC5
+ 353 013c 41000000 		.word	g_config+65
+ 354 0140 0C000000 		.word	.LC8
+ 355 0144 12000000 		.word	g_config+18
+ 356 0148 18000000 		.word	.LC11
+ 357 014c 21000000 		.word	g_config+33
+ 358 0150 24000000 		.word	.LC14
+ 359 0154 00000000 		.word	g_pointer
+ 360 0158 30000000 		.word	.LC17
+ 361 015c 4C000000 		.word	.LC19
+ 362              		.cfi_endproc
+ 363              	.LFE38:
+ 365              		.global	__aeabi_idivmod
+ 366              		.align	2
+ 367              		.global	read_pending_x3buffer
+ 368              		.code	16
+ 369              		.thumb_func
+ 371              	read_pending_x3buffer:
+ 372              	.LFB39:
+  98:../scr/DataUtil.c **** 
+  99:../scr/DataUtil.c **** extern char printLine[BUFFER_MSG];
+ 100:../scr/DataUtil.c **** extern char debugMark;
+ 101:../scr/DataUtil.c **** 
+ 102:../scr/DataUtil.c **** #ifdef TEST_OUTPUT_SD
+ 103:../scr/DataUtil.c **** 	static char oneHex[3];
+ 104:../scr/DataUtil.c **** 	void append_hex(char* str, uint8_t val);
+ 105:../scr/DataUtil.c **** #endif
+ 106:../scr/DataUtil.c **** 
+ 107:../scr/DataUtil.c **** #ifdef PRINT_BUFFER_STATUS
+ 108:../scr/DataUtil.c **** void print_buffer_status() {
+ 109:../scr/DataUtil.c **** 	if(taskState != ST_NOTHING || !debugMark) {
+ 110:../scr/DataUtil.c **** 		return;
+ 111:../scr/DataUtil.c **** 	}
+ 112:../scr/DataUtil.c **** 	printLine[0] = 0;
+ 113:../scr/DataUtil.c **** 	strcat(printLine, "STATUS: xidx:");
+ 114:../scr/DataUtil.c **** 	append_number(printLine, x3buffidx);
+ 115:../scr/DataUtil.c **** 	strcat(printLine, ",count: ");
+ 116:../scr/DataUtil.c **** 	append_number(printLine, x3countBlock);
+ 117:../scr/DataUtil.c **** 	strcat(printLine, ",markblock: ");
+ 118:../scr/DataUtil.c **** 	append_number(printLine, x3markBlock);
+ 119:../scr/DataUtil.c **** 	strcat(printLine, ",markStar: ");
+ 120:../scr/DataUtil.c **** 	append_number(printLine, x3markStar);
+ 121:../scr/DataUtil.c **** 	strcat(printLine, ",mark7E: ");
+ 122:../scr/DataUtil.c **** 	append_number(printLine, x3mark7E);
+ 123:../scr/DataUtil.c **** 	strcat(printLine, ",markSD: ");
+ 124:../scr/DataUtil.c **** 	append_number(printLine, x3markSD);
+ 125:../scr/DataUtil.c **** 	strcat(printLine, ",pidx: ");
+ 126:../scr/DataUtil.c **** 	append_number(printLine, x3buffer.pendingIdx);
+ 127:../scr/DataUtil.c **** 	strcat(printLine, ",widx: ");
+ 128:../scr/DataUtil.c **** 	append_number(printLine, x3buffer.writeIdx);
+ 129:../scr/DataUtil.c **** 	strcat(printLine, ",cr: ");
+ 130:../scr/DataUtil.c **** 	append_number(printLine, x3buffer.countRecord);
+ 131:../scr/DataUtil.c **** 	strcat(printLine, "\r\n");
+ 132:../scr/DataUtil.c **** 	debug_log(printLine);
+ 133:../scr/DataUtil.c **** }
+ 134:../scr/DataUtil.c **** #endif
+ 135:../scr/DataUtil.c **** 
+ 136:../scr/DataUtil.c **** char read_pending_x3buffer() {
+ 373              		.loc 1 136 0
+ 374              		.cfi_startproc
+ 375 0160 80B5     		push	{r7, lr}
+ 376              	.LCFI12:
+ 377              		.cfi_def_cfa_offset 8
+ 378              		.cfi_offset 7, -8
+ 379              		.cfi_offset 14, -4
+ 380 0162 82B0     		sub	sp, sp, #8
+ 381              	.LCFI13:
+ 382              		.cfi_def_cfa_offset 16
+ 383 0164 00AF     		add	r7, sp, #0
+ 384              	.LCFI14:
+ 385              		.cfi_def_cfa_register 7
+ 137:../scr/DataUtil.c **** 	SKS_BUFFER *pTemp = &x3buffer.buffer[x3buffer.pendingIdx];
+ 386              		.loc 1 137 0
+ 387 0166 194B     		ldr	r3, .L22
+ 388 0168 194A     		ldr	r2, .L22+4
+ 389 016a 9A58     		ldr	r2, [r3, r2]
+ 390 016c 131C     		mov	r3, r2
+ 391 016e 5B01     		lsl	r3, r3, #5
+ 392 0170 9B18     		add	r3, r3, r2
+ 393 0172 DB00     		lsl	r3, r3, #3
+ 394 0174 154A     		ldr	r2, .L22
+ 395 0176 9B18     		add	r3, r3, r2
+ 396 0178 7B60     		str	r3, [r7, #4]
+ 138:../scr/DataUtil.c **** 	if(pTemp->pendingMark) {
+ 397              		.loc 1 138 0
+ 398 017a 7A68     		ldr	r2, [r7, #4]
+ 399 017c 8023     		mov	r3, #128
+ 400 017e 5B00     		lsl	r3, r3, #1
+ 401 0180 D35C     		ldrb	r3, [r2, r3]
+ 402 0182 002B     		cmp	r3, #0
+ 403 0184 1CD0     		beq	.L20
+ 139:../scr/DataUtil.c **** 		memcpy(&x3buffer.pPending, pTemp, sizeof(x3buffer.pPending));
+ 404              		.loc 1 139 0
+ 405 0186 1349     		ldr	r1, .L22+8
+ 406 0188 7A68     		ldr	r2, [r7, #4]
+ 407 018a 8423     		mov	r3, #132
+ 408 018c 5B00     		lsl	r3, r3, #1
+ 409 018e 081C     		mov	r0, r1
+ 410 0190 111C     		mov	r1, r2
+ 411 0192 1A1C     		mov	r2, r3
+ 412 0194 FFF7FEFF 		bl	memcpy
+ 140:../scr/DataUtil.c **** 		pTemp->pendingMark = 0;
+ 413              		.loc 1 140 0
+ 414 0198 7A68     		ldr	r2, [r7, #4]
+ 415 019a 8023     		mov	r3, #128
+ 416 019c 5B00     		lsl	r3, r3, #1
+ 417 019e 0021     		mov	r1, #0
+ 418 01a0 D154     		strb	r1, [r2, r3]
+ 141:../scr/DataUtil.c **** 		x3buffer.pendingIdx = (int)((x3buffer.pendingIdx + 1) % MAX_BUFFER_RECORD);
+ 419              		.loc 1 141 0
+ 420 01a2 0A4B     		ldr	r3, .L22
+ 421 01a4 0A4A     		ldr	r2, .L22+4
+ 422 01a6 9B58     		ldr	r3, [r3, r2]
+ 423 01a8 0133     		add	r3, r3, #1
+ 424 01aa 181C     		mov	r0, r3
+ 425 01ac 1421     		mov	r1, #20
+ 426 01ae FFF7FEFF 		bl	__aeabi_idivmod
+ 427 01b2 0B1C     		mov	r3, r1
+ 428 01b4 191C     		mov	r1, r3
+ 429 01b6 054B     		ldr	r3, .L22
+ 430 01b8 054A     		ldr	r2, .L22+4
+ 431 01ba 9950     		str	r1, [r3, r2]
+ 142:../scr/DataUtil.c **** 		return 1;
+ 432              		.loc 1 142 0
+ 433 01bc 0123     		mov	r3, #1
+ 434 01be 00E0     		b	.L21
+ 435              	.L20:
+ 143:../scr/DataUtil.c **** 	}
+ 144:../scr/DataUtil.c **** 	return 0;
+ 436              		.loc 1 144 0
+ 437 01c0 0023     		mov	r3, #0
+ 438              	.L21:
+ 145:../scr/DataUtil.c **** }
+ 439              		.loc 1 145 0
+ 440 01c2 181C     		mov	r0, r3
+ 441 01c4 BD46     		mov	sp, r7
+ 442 01c6 02B0     		add	sp, sp, #8
+ 443              		@ sp needed
+ 444 01c8 80BD     		pop	{r7, pc}
+ 445              	.L23:
+ 446 01ca C046     		.align	2
+ 447              	.L22:
+ 448 01cc 00000000 		.word	x3buffer
+ 449 01d0 AC150000 		.word	5548
+ 450 01d4 A4140000 		.word	x3buffer+5284
+ 451              		.cfi_endproc
+ 452              	.LFE39:
+ 454              		.align	2
+ 455              		.global	init_x3_buffer
+ 456              		.code	16
+ 457              		.thumb_func
+ 459              	init_x3_buffer:
+ 460              	.LFB40:
+ 146:../scr/DataUtil.c **** 
+ 147:../scr/DataUtil.c **** void init_x3_buffer() {
+ 461              		.loc 1 147 0
+ 462              		.cfi_startproc
+ 463 01d8 80B5     		push	{r7, lr}
+ 464              	.LCFI15:
+ 465              		.cfi_def_cfa_offset 8
+ 466              		.cfi_offset 7, -8
+ 467              		.cfi_offset 14, -4
+ 468 01da 00AF     		add	r7, sp, #0
+ 469              	.LCFI16:
+ 470              		.cfi_def_cfa_register 7
+ 148:../scr/DataUtil.c **** 	memset(&x3buffer, 0, sizeof(x3buffer));
+ 471              		.loc 1 148 0
+ 472 01dc 064B     		ldr	r3, .L25
+ 473 01de 074A     		ldr	r2, .L25+4
+ 474 01e0 181C     		mov	r0, r3
+ 475 01e2 0021     		mov	r1, #0
+ 476 01e4 FFF7FEFF 		bl	memset
+ 149:../scr/DataUtil.c **** 	x3buffer.pCurrent = &x3buffer.buffer[0];
+ 477              		.loc 1 149 0
+ 478 01e8 034A     		ldr	r2, .L25
+ 479 01ea A523     		mov	r3, #165
+ 480 01ec 5B01     		lsl	r3, r3, #5
+ 481 01ee 0249     		ldr	r1, .L25
+ 482 01f0 D150     		str	r1, [r2, r3]
+ 150:../scr/DataUtil.c **** }
+ 483              		.loc 1 150 0
+ 484 01f2 BD46     		mov	sp, r7
+ 485              		@ sp needed
+ 486 01f4 80BD     		pop	{r7, pc}
+ 487              	.L26:
+ 488 01f6 C046     		.align	2
+ 489              	.L25:
+ 490 01f8 00000000 		.word	x3buffer
+ 491 01fc B8150000 		.word	5560
+ 492              		.cfi_endproc
+ 493              	.LFE40:
+ 495              	.Letext0:
+ 496              		.file 2 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\mach
+ 497              		.file 3 "c:\\program files (x86)\\gnu tools arm embedded\\4.9 2015q3\\arm-none-eabi\\include\\sys\
+ 498              		.file 4 "../scr/DataUtil.h"
+ 499              		.file 5 "../scr/common.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 DataUtil.c
+                            *COM*:000015b8 x3buffer
+                            *COM*:0000000c g_pointer
+                            *COM*:0000005c g_config
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:25     .bss:00000000 checkTripIdx
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:22     .bss:00000000 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:28     .text:00000000 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:33     .text:00000000 read_pointer_info
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:57     .text:00000010 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:61     .text:00000014 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:66     .text:00000014 write_pointer_info
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:89     .text:00000024 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:93     .text:00000028 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:98     .text:00000028 read_device_config
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:121    .text:00000038 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:125    .text:0000003c $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:130    .text:0000003c write_device_config
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:153    .text:0000004c $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:157    .text:00000050 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:162    .text:00000050 init_config
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:210    .text:00000060 write_default_config
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:186    .rodata:00000000 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:351    .text:00000134 $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:366    .text:00000160 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:371    .text:00000160 read_pending_x3buffer
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:448    .text:000001cc $d
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:454    .text:000001d8 $t
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:459    .text:000001d8 init_x3_buffer
+C:\Users\ADMINI~1\AppData\Local\Temp\ccRLAHta.s:490    .text:000001f8 $d
+                     .debug_frame:00000010 $d
+                           .group:00000000 wm4.0.38f3ce5416ddc4c94340ac14f0421ae0
+                           .group:00000000 wm4.newlib.h.8.2702bca278809460f0af6fba1d84eb68
+                           .group:00000000 wm4.features.h.22.2e382148a0560adabf236cddd4e880f4
+                           .group:00000000 wm4.config.h.220.a09b0b0de3c25be3f39d71990e617bff
+                           .group:00000000 wm4._ansi.h.23.9f8fcfa20193763fcf364fb91705c94b
+                           .group:00000000 wm4.stdio.h.31.7c0e28c411445f3f9c5b11accf882760
+                           .group:00000000 wm4._default_types.h.6.35ee9e747940367bf2a634907d1c2382
+                           .group:00000000 wm4.stddef.h.184.159df79b4ca79c76561572a55985524c
+                           .group:00000000 wm4.cdefs.h.47.3052445825803de6c3a3b68ec8193866
+                           .group:00000000 wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5
+                           .group:00000000 wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6
+                           .group:00000000 wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea
+                           .group:00000000 wm4._types.h.54.d3d34a3b7f3cc230cd159baf022b4b08
+                           .group:00000000 wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6
+                           .group:00000000 wm4.reent.h.17.8bd9e4098e0428508c282cad794fae43
+                           .group:00000000 wm4.types.h.24.b2be5f53932a9c9d07787288b29b6d75
+                           .group:00000000 wm4._stdint.h.10.f76354baea1c7088202064e6f3d4f5e3
+                           .group:00000000 wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400
+                           .group:00000000 wm4.types.h.82.82b71f3f44c70e3a459d0f66642b05eb
+                           .group:00000000 wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a
+                           .group:00000000 wm4.stdio.h.68.ff6d7571d3ad75c55f15e26dbaa81e35
+                           .group:00000000 wm4.time.h.8.2930fe070f4a8096b07db9159698c8e3
+                           .group:00000000 wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c
+                           .group:00000000 wm4.time.h.2.4581ce0ffb6627cfc02162c94bf846c9
+                           .group:00000000 wm4.time.h.24.3660bbb2d0a4c7457ff52ba3ada4c166
+                           .group:00000000 wm4.timespec.h.41.d855182eb0e690443ab8651bcedca6e1
+                           .group:00000000 wm4.time.h.217.2f437ac2cf06537c84703833b0977905
+                           .group:00000000 wm4.config.h.3.0d63d2ebb3a9ab9baf69287178146586
+                           .group:00000000 wm4.string.h.8.c4b8571ce60dff2817f43fec8b86aecd
+                           .group:00000000 wm4._intsup.h.10.35a45952db64d30146faa63a55c20c1c
+                           .group:00000000 wm4.stdint.h.23.373a9d32a9e4c2e88fd347156532d281
+                           .group:00000000 wm4.DataUtil.h.6.7244789e324a04765de5b008e99af49c
+                           .group:00000000 wm4.stm32f0xx.h.54.4683aa1e9aded801990d6fc5c3cd79d1
+                           .group:00000000 wm4.core_cm0.h.47.022e66414e77714da7c4b30b3ad99fe8
+                           .group:00000000 wm4.core_cmInstr.h.39.b7b6650bdd2316848d940915272d75b8
+                           .group:00000000 wm4.core_cm0.h.135.ca70469f87e143609670bb393bfa6518
+                           .group:00000000 wm4.stm32f0xx.h.490.3021eb906afe162bf2c4c3f84017f2b7
+                           .group:00000000 wm4.stm32f0xx_adc.h.85.55aeb589c2c2703602e5f964c35b0c48
+                           .group:00000000 wm4.stm32f0xx_can.h.31.a43838c2d1a571e6bd63f34d4d38f77a
+                           .group:00000000 wm4.stm32f0xx_cec.h.31.cbead9587d6f5205735191e084956263
+                           .group:00000000 wm4.stm32f0xx_crc.h.31.657756bbefdf42347508251cbea9a2cc
+                           .group:00000000 wm4.stm32f0xx_crs.h.31.22b5372509752121d772a6317b79e691
+                           .group:00000000 wm4.stm32f0xx_comp.h.31.505a77c0cb787dfeca9e3c2b1da31ed9
+                           .group:00000000 wm4.stm32f0xx_dac.h.31.3d3aa9b22e91ba1b1cfddfa53a7af016
+                           .group:00000000 wm4.stm32f0xx_dbgmcu.h.31.43e4f2e77b6aa0d00808044a3e1d0d83
+                           .group:00000000 wm4.stm32f0xx_dma.h.31.d3df6d3d0192193cb53f5c34738fc5a2
+                           .group:00000000 wm4.stm32f0xx_exti.h.31.6d7f5d51fe1eff0809a232d0301b7244
+                           .group:00000000 wm4.stm32f0xx_flash.h.31.3e9f83248098cae82aee4fdd1dde590d
+                           .group:00000000 wm4.stm32f0xx_gpio.h.31.0378cd9a2c4cea0ca3c3e917acce56e1
+                           .group:00000000 wm4.stm32f0xx_syscfg.h.31.6e8ab03c61462545bc84446ab81da274
+                           .group:00000000 wm4.stm32f0xx_i2c.h.31.83969866ec38bbcc1bff9238f01a1954
+                           .group:00000000 wm4.stm32f0xx_iwdg.h.31.bb16f7e18e54df66bf9bd0e2b29bdc93
+                           .group:00000000 wm4.stm32f0xx_pwr.h.31.6dd56e642e4a5657857c16e695f196ff
+                           .group:00000000 wm4.stm32f0xx_rcc.h.31.b7995c183c4864b04eda399c410c0e53
+                           .group:00000000 wm4.stm32f0xx_rtc.h.31.bd5ec8997d6af4752bb55b75cb717765
+                           .group:00000000 wm4.stm32f0xx_spi.h.31.6c629d36cb6d36ac31583d2d427e887a
+                           .group:00000000 wm4.stm32f0xx_tim.h.31.265cfb150d9b3c280816e67e49205128
+                           .group:00000000 wm4.stm32f0xx_usart.h.31.81196cb2de47d9dd879446831830753a
+                           .group:00000000 wm4.stm32f0xx_wwdg.h.31.0cf1a9b3d89d147c688025fdd33d9c49
+                           .group:00000000 wm4.stm32f0xx_misc.h.31.d5c08c37e69b8a852dbb75e9252454c6
+                           .group:00000000 wm4.common.h.36.396870489cb68de4c1415185500a1a4d
+                           .group:00000000 wm4.ymodem.h.24.613d258bf183758042d94dca54a83ab9
+                           .group:00000000 wm4.xprintf.h.6.d201a07af5ece6e00f55504afb5b0533
+
+UNDEFINED SYMBOLS
+flash_read_pointer_info
+flash_write_pointer_info
+flash_read_config_info
+flash_write_config_info
+xsprintf
+xprintf
+__aeabi_idivmod
+memcpy
+memset

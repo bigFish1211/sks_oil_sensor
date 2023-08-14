@@ -1,0 +1,1887 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"KalmanFilter.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_i2d
+  18              		.global	__aeabi_dmul
+  19              		.global	__aeabi_dadd
+  20              		.global	__aeabi_ddiv
+  21              		.global	__aeabi_d2f
+  22              		.global	__aeabi_f2uiz
+  23              		.section	.text.Start_Kalman_Algorithm,"ax",%progbits
+  24              		.align	1
+  25              		.global	Start_Kalman_Algorithm
+  26              		.code	16
+  27              		.thumb_func
+  29              	Start_Kalman_Algorithm:
+  30              	.LFB33:
+  31              		.file 1 "../Source/KalmanFilter.c"
+   1:../Source/KalmanFilter.c **** /*
+   2:../Source/KalmanFilter.c ****   ******************************************************************************
+   3:../Source/KalmanFilter.c ****   * @file    KalmanFilter.c
+   4:../Source/KalmanFilter.c ****   * @author  Savvas Kokkinidis - sabbaskok@hotmail.com
+   5:../Source/KalmanFilter.c ****   * @version V1.0
+   6:../Source/KalmanFilter.c ****   * @date    31-July-2020
+   7:../Source/KalmanFilter.c ****   * @brief   This file contains the functions related to the
+   8:../Source/KalmanFilter.c ****   *          the Kalman Filter
+   9:../Source/KalmanFilter.c ****   ******************************************************************************
+  10:../Source/KalmanFilter.c ****  */
+  11:../Source/KalmanFilter.c **** 
+  12:../Source/KalmanFilter.c **** #include "KalmanFilter.h"
+  13:../Source/KalmanFilter.c **** #include "LSM6DS3.h"
+  14:../Source/KalmanFilter.c **** #include <math.h>
+  15:../Source/KalmanFilter.c **** #include <stdlib.h>
+  16:../Source/KalmanFilter.c **** #include "global.h"
+  17:../Source/KalmanFilter.c **** #include "delay.h"
+  18:../Source/KalmanFilter.c **** #include "global.h"
+  19:../Source/KalmanFilter.c **** #include "config.h"
+  20:../Source/KalmanFilter.c **** #include "xprintf.h"
+  21:../Source/KalmanFilter.c **** 
+  22:../Source/KalmanFilter.c **** #define RAD_TO_DEG  	57.295779f
+  23:../Source/KalmanFilter.c **** 
+  24:../Source/KalmanFilter.c **** #define RESTRICT_PITCH
+  25:../Source/KalmanFilter.c **** 
+  26:../Source/KalmanFilter.c **** static float KalmanX_getAngle(float newAngle, float newRate, float dt);
+  27:../Source/KalmanFilter.c **** static float KalmanY_getAngle(float newAngle, float newRate, float dt);
+  28:../Source/KalmanFilter.c **** 
+  29:../Source/KalmanFilter.c **** Kalman_struct KalmanX;
+  30:../Source/KalmanFilter.c **** Kalman_struct KalmanY;
+  31:../Source/KalmanFilter.c **** volatile double gyroZ_offset = 14;
+  32:../Source/KalmanFilter.c **** 
+  33:../Source/KalmanFilter.c **** double kalAngleZ=0;
+  34:../Source/KalmanFilter.c **** 
+  35:../Source/KalmanFilter.c **** __IO static uint32_t Kalman_Timer, ExecuteTicks , ExecuteMax;
+  36:../Source/KalmanFilter.c **** __IO static uint8_t KalmanFlag;
+  37:../Source/KalmanFilter.c **** static float Calculated_Pitch, Calculated_Roll, Calculated_yaw,Tick_frequency;
+  38:../Source/KalmanFilter.c **** 
+  39:../Source/KalmanFilter.c **** extern void IWDT_clear(void);
+  40:../Source/KalmanFilter.c **** 
+  41:../Source/KalmanFilter.c **** void Start_Kalman_Algorithm(float executeMaxTicks, float timebase)
+  42:../Source/KalmanFilter.c **** {
+  32              		.loc 1 42 0
+  33              		.cfi_startproc
+  34 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 20
+  37              		.cfi_offset 4, -20
+  38              		.cfi_offset 5, -16
+  39              		.cfi_offset 6, -12
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42              	.LVL0:
+  43 0002 89B0     		sub	sp, sp, #36
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 56
+  43:../Source/KalmanFilter.c ****     double accX, accY, accZ; 
+  44:../Source/KalmanFilter.c ****   
+  45:../Source/KalmanFilter.c ****     /* We will set the variables like so, these can also be tuned by the user */
+  46:../Source/KalmanFilter.c ****     KalmanX.Q_angle      = 0.001f;
+  46              		.loc 1 46 0
+  47 0004 3E4C     		ldr	r4, .L2+8
+  47:../Source/KalmanFilter.c ****     KalmanX.Q_bias       = 0.003f;
+  48:../Source/KalmanFilter.c ****     KalmanX.R_measure    = 0.03f;
+  49:../Source/KalmanFilter.c ****     KalmanX.angle        = 0.0f;     
+  50:../Source/KalmanFilter.c ****     KalmanX.bias         = 0.0f;
+  51:../Source/KalmanFilter.c ****     KalmanX.P[0][0]      = 0.0f; 
+  52:../Source/KalmanFilter.c ****     KalmanX.P[0][1]      = 0.0f;
+  53:../Source/KalmanFilter.c ****     KalmanX.P[1][0]      = 0.0f;
+  54:../Source/KalmanFilter.c ****     KalmanX.P[1][1]      = 0.0f;
+  55:../Source/KalmanFilter.c ****     
+  56:../Source/KalmanFilter.c ****     KalmanY.Q_angle      = 0.001f;
+  48              		.loc 1 56 0
+  49 0006 3F4D     		ldr	r5, .L2+12
+  48:../Source/KalmanFilter.c ****     KalmanX.R_measure    = 0.03f;
+  50              		.loc 1 48 0
+  51 0008 3F4A     		ldr	r2, .L2+16
+  42:../Source/KalmanFilter.c **** {
+  52              		.loc 1 42 0
+  53 000a 0590     		str	r0, [sp, #20]
+  54 000c 0691     		str	r1, [sp, #24]
+  46:../Source/KalmanFilter.c ****     KalmanX.Q_angle      = 0.001f;
+  55              		.loc 1 46 0
+  56 000e 3F48     		ldr	r0, .L2+20
+  57              	.LVL1:
+  47:../Source/KalmanFilter.c ****     KalmanX.Q_bias       = 0.003f;
+  58              		.loc 1 47 0
+  59 0010 3F49     		ldr	r1, .L2+24
+  60              	.LVL2:
+  49:../Source/KalmanFilter.c ****     KalmanX.angle        = 0.0f;     
+  61              		.loc 1 49 0
+  62 0012 0023     		mov	r3, #0
+  48:../Source/KalmanFilter.c ****     KalmanX.R_measure    = 0.03f;
+  63              		.loc 1 48 0
+  64 0014 A260     		str	r2, [r4, #8]
+  49:../Source/KalmanFilter.c ****     KalmanX.angle        = 0.0f;     
+  65              		.loc 1 49 0
+  66 0016 E360     		str	r3, [r4, #12]
+  50:../Source/KalmanFilter.c ****     KalmanX.bias         = 0.0f;
+  67              		.loc 1 50 0
+  68 0018 2361     		str	r3, [r4, #16]
+  51:../Source/KalmanFilter.c ****     KalmanX.P[0][0]      = 0.0f; 
+  69              		.loc 1 51 0
+  70 001a A361     		str	r3, [r4, #24]
+  52:../Source/KalmanFilter.c ****     KalmanX.P[0][1]      = 0.0f;
+  71              		.loc 1 52 0
+  72 001c E361     		str	r3, [r4, #28]
+  53:../Source/KalmanFilter.c ****     KalmanX.P[1][0]      = 0.0f;
+  73              		.loc 1 53 0
+  74 001e 2362     		str	r3, [r4, #32]
+  54:../Source/KalmanFilter.c ****     KalmanX.P[1][1]      = 0.0f;
+  75              		.loc 1 54 0
+  76 0020 6362     		str	r3, [r4, #36]
+  57:../Source/KalmanFilter.c ****     KalmanY.Q_bias       = 0.003f;
+  58:../Source/KalmanFilter.c ****     KalmanY.R_measure    = 0.03f;
+  77              		.loc 1 58 0
+  78 0022 AA60     		str	r2, [r5, #8]
+  59:../Source/KalmanFilter.c ****     KalmanY.angle        = 0.0f;     
+  79              		.loc 1 59 0
+  80 0024 EB60     		str	r3, [r5, #12]
+  60:../Source/KalmanFilter.c ****     KalmanY.bias         = 0.0f;
+  81              		.loc 1 60 0
+  82 0026 2B61     		str	r3, [r5, #16]
+  61:../Source/KalmanFilter.c ****     KalmanY.P[0][0]      = 0.0f; 
+  83              		.loc 1 61 0
+  84 0028 AB61     		str	r3, [r5, #24]
+  62:../Source/KalmanFilter.c ****     KalmanY.P[0][1]      = 0.0f;
+  85              		.loc 1 62 0
+  86 002a EB61     		str	r3, [r5, #28]
+  63:../Source/KalmanFilter.c ****     KalmanY.P[1][0]      = 0.0f;
+  87              		.loc 1 63 0
+  88 002c 2B62     		str	r3, [r5, #32]
+  64:../Source/KalmanFilter.c ****     KalmanY.P[1][1]      = 0.0f;
+  89              		.loc 1 64 0
+  90 002e 6B62     		str	r3, [r5, #36]
+  47:../Source/KalmanFilter.c ****     KalmanX.Q_bias       = 0.003f;
+  91              		.loc 1 47 0
+  92 0030 6160     		str	r1, [r4, #4]
+  57:../Source/KalmanFilter.c ****     KalmanY.Q_bias       = 0.003f;
+  93              		.loc 1 57 0
+  94 0032 6960     		str	r1, [r5, #4]
+  46:../Source/KalmanFilter.c ****     KalmanX.Q_angle      = 0.001f;
+  95              		.loc 1 46 0
+  96 0034 2060     		str	r0, [r4]
+  56:../Source/KalmanFilter.c ****     KalmanY.Q_angle      = 0.001f;
+  97              		.loc 1 56 0
+  98 0036 2860     		str	r0, [r5]
+  65:../Source/KalmanFilter.c ****     
+  66:../Source/KalmanFilter.c ****     
+  67:../Source/KalmanFilter.c ****     LSM6DS3_IMU_GetMeasurements();
+  99              		.loc 1 67 0
+ 100 0038 FFF7FEFF 		bl	LSM6DS3_IMU_GetMeasurements
+  68:../Source/KalmanFilter.c ****     accX =   LSM6DS3_GetXL_X_Int16();
+ 101              		.loc 1 68 0
+ 102 003c FFF7FEFF 		bl	LSM6DS3_GetXL_X_Int16
+ 103 0040 0790     		str	r0, [sp, #28]
+ 104              	.LVL3:
+  69:../Source/KalmanFilter.c ****     accY =   LSM6DS3_GetXL_Y_Int16();
+ 105              		.loc 1 69 0
+ 106 0042 FFF7FEFF 		bl	LSM6DS3_GetXL_Y_Int16
+ 107 0046 FFF7FEFF 		bl	__aeabi_i2d
+ 108 004a 0F1C     		mov	r7, r1
+ 109 004c 061C     		mov	r6, r0
+ 110              	.LVL4:
+  70:../Source/KalmanFilter.c ****     accZ =   LSM6DS3_GetXL_Z_Int16();
+ 111              		.loc 1 70 0
+ 112 004e FFF7FEFF 		bl	LSM6DS3_GetXL_Z_Int16
+ 113 0052 FFF7FEFF 		bl	__aeabi_i2d
+ 114 0056 0090     		str	r0, [sp]
+ 115 0058 0191     		str	r1, [sp, #4]
+ 116              	.LVL5:
+  71:../Source/KalmanFilter.c ****     
+  72:../Source/KalmanFilter.c ****     #ifdef RESTRICT_PITCH
+  73:../Source/KalmanFilter.c ****         double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 117              		.loc 1 73 0
+ 118 005a 009A     		ldr	r2, [sp]
+ 119 005c 019B     		ldr	r3, [sp, #4]
+ 120 005e 301C     		mov	r0, r6
+ 121              	.LVL6:
+ 122 0060 391C     		mov	r1, r7
+ 123 0062 FFF7FEFF 		bl	atan2
+ 124              	.LVL7:
+  74:../Source/KalmanFilter.c ****         double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 125              		.loc 1 74 0
+ 126 0066 321C     		mov	r2, r6
+  73:../Source/KalmanFilter.c ****         double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 127              		.loc 1 73 0
+ 128 0068 0290     		str	r0, [sp, #8]
+ 129 006a 0391     		str	r1, [sp, #12]
+ 130              	.LVL8:
+ 131              		.loc 1 74 0
+ 132 006c 3B1C     		mov	r3, r7
+ 133 006e 301C     		mov	r0, r6
+ 134              	.LVL9:
+ 135 0070 391C     		mov	r1, r7
+ 136 0072 FFF7FEFF 		bl	__aeabi_dmul
+ 137 0076 061C     		mov	r6, r0
+ 138              	.LVL10:
+ 139 0078 0F1C     		mov	r7, r1
+ 140 007a 0098     		ldr	r0, [sp]
+ 141 007c 0199     		ldr	r1, [sp, #4]
+ 142 007e 021C     		mov	r2, r0
+ 143 0080 0B1C     		mov	r3, r1
+ 144 0082 FFF7FEFF 		bl	__aeabi_dmul
+ 145 0086 021C     		mov	r2, r0
+ 146 0088 0B1C     		mov	r3, r1
+ 147 008a 301C     		mov	r0, r6
+ 148 008c 391C     		mov	r1, r7
+ 149 008e FFF7FEFF 		bl	__aeabi_dadd
+ 150 0092 FFF7FEFF 		bl	sqrt
+ 151 0096 061C     		mov	r6, r0
+  68:../Source/KalmanFilter.c ****     accX =   LSM6DS3_GetXL_X_Int16();
+ 152              		.loc 1 68 0
+ 153 0098 0798     		ldr	r0, [sp, #28]
+ 154              		.loc 1 74 0
+ 155 009a 0F1C     		mov	r7, r1
+  68:../Source/KalmanFilter.c ****     accX =   LSM6DS3_GetXL_X_Int16();
+ 156              		.loc 1 68 0
+ 157 009c FFF7FEFF 		bl	__aeabi_i2d
+ 158              		.loc 1 74 0
+ 159 00a0 8022     		mov	r2, #128
+ 160 00a2 1206     		lsl	r2, r2, #24
+ 161 00a4 3B1C     		mov	r3, r7
+ 162 00a6 8918     		add	r1, r1, r2
+ 163 00a8 321C     		mov	r2, r6
+ 164 00aa FFF7FEFF 		bl	__aeabi_ddiv
+ 165 00ae FFF7FEFF 		bl	atan
+  73:../Source/KalmanFilter.c ****         double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 166              		.loc 1 73 0
+ 167 00b2 124B     		ldr	r3, .L2+4
+ 168 00b4 104A     		ldr	r2, .L2
+ 169              		.loc 1 74 0
+ 170 00b6 061C     		mov	r6, r0
+ 171 00b8 0F1C     		mov	r7, r1
+ 172              	.LVL11:
+  73:../Source/KalmanFilter.c ****         double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 173              		.loc 1 73 0
+ 174 00ba 0298     		ldr	r0, [sp, #8]
+ 175 00bc 0399     		ldr	r1, [sp, #12]
+ 176 00be FFF7FEFF 		bl	__aeabi_dmul
+  75:../Source/KalmanFilter.c ****     #else 
+  76:../Source/KalmanFilter.c ****         double roll  = atan(accY / sqrt(accX * accX + accZ * accZ)) * RAD_TO_DEG;
+  77:../Source/KalmanFilter.c ****         double pitch = atan2(-accX, accZ) * RAD_TO_DEG;
+  78:../Source/KalmanFilter.c ****     #endif
+  79:../Source/KalmanFilter.c ****     
+  80:../Source/KalmanFilter.c ****    KalmanX.angle    = roll;
+ 177              		.loc 1 80 0
+ 178 00c2 FFF7FEFF 		bl	__aeabi_d2f
+  74:../Source/KalmanFilter.c ****         double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 179              		.loc 1 74 0
+ 180 00c6 0D4B     		ldr	r3, .L2+4
+ 181 00c8 0B4A     		ldr	r2, .L2
+ 182              		.loc 1 80 0
+ 183 00ca E060     		str	r0, [r4, #12]
+  74:../Source/KalmanFilter.c ****         double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 184              		.loc 1 74 0
+ 185 00cc 391C     		mov	r1, r7
+ 186 00ce 301C     		mov	r0, r6
+ 187 00d0 FFF7FEFF 		bl	__aeabi_dmul
+  81:../Source/KalmanFilter.c ****    KalmanY.angle 	= pitch;
+ 188              		.loc 1 81 0
+ 189 00d4 FFF7FEFF 		bl	__aeabi_d2f
+  82:../Source/KalmanFilter.c ****    Tick_frequency	= timebase;
+ 190              		.loc 1 82 0
+ 191 00d8 0E4B     		ldr	r3, .L2+28
+ 192 00da 069A     		ldr	r2, [sp, #24]
+  81:../Source/KalmanFilter.c ****    KalmanY.angle 	= pitch;
+ 193              		.loc 1 81 0
+ 194 00dc E860     		str	r0, [r5, #12]
+ 195              		.loc 1 82 0
+ 196 00de 1A60     		str	r2, [r3]
+  83:../Source/KalmanFilter.c ****    ExecuteMax	    = executeMaxTicks;
+ 197              		.loc 1 83 0
+ 198 00e0 0598     		ldr	r0, [sp, #20]
+ 199 00e2 FFF7FEFF 		bl	__aeabi_f2uiz
+ 200 00e6 0C4B     		ldr	r3, .L2+32
+  84:../Source/KalmanFilter.c ****    Kalman_Timer  	= 0;
+ 201              		.loc 1 84 0
+ 202 00e8 0022     		mov	r2, #0
+  83:../Source/KalmanFilter.c ****    ExecuteMax	    = executeMaxTicks;
+ 203              		.loc 1 83 0
+ 204 00ea 1860     		str	r0, [r3]
+ 205              		.loc 1 84 0
+ 206 00ec 0B4B     		ldr	r3, .L2+36
+ 207 00ee 1A60     		str	r2, [r3]
+  85:../Source/KalmanFilter.c **** }
+ 208              		.loc 1 85 0
+ 209 00f0 09B0     		add	sp, sp, #36
+ 210              	.LVL12:
+ 211              		@ sp needed for prologue
+ 212              	.LVL13:
+ 213 00f2 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 214              	.L3:
+ 215 00f4 C046C046 		.align	3
+ 216              	.L2:
+ 217 00f8 00000020 		.word	536870912
+ 218 00fc DCA54C40 		.word	1078765020
+ 219 0100 00000000 		.word	KalmanX
+ 220 0104 00000000 		.word	KalmanY
+ 221 0108 8FC2F53C 		.word	1022739087
+ 222 010c 6F12833A 		.word	981668463
+ 223 0110 A69B443B 		.word	994352038
+ 224 0114 00000000 		.word	.LANCHOR0
+ 225 0118 00000000 		.word	.LANCHOR1
+ 226 011c 00000000 		.word	.LANCHOR2
+ 227              		.cfi_endproc
+ 228              	.LFE33:
+ 230              		.section	.text.Kalman_GetPitch,"ax",%progbits
+ 231              		.align	1
+ 232              		.global	Kalman_GetPitch
+ 233              		.code	16
+ 234              		.thumb_func
+ 236              	Kalman_GetPitch:
+ 237              	.LFB35:
+  86:../Source/KalmanFilter.c ****    
+  87:../Source/KalmanFilter.c **** 	double accX, accY, accZ;
+  88:../Source/KalmanFilter.c **** 	double gyroX,gyroY,gyroZ;
+  89:../Source/KalmanFilter.c **** 
+  90:../Source/KalmanFilter.c **** void Execute_Kalman_Filter(void) 
+  91:../Source/KalmanFilter.c **** {
+  92:../Source/KalmanFilter.c ****   double timing_kalman;
+  93:../Source/KalmanFilter.c ****   double kalAngleX=0;
+  94:../Source/KalmanFilter.c ****   double kalAngleY=0;
+  95:../Source/KalmanFilter.c **** 	//double accX, accY, accZ;
+  96:../Source/KalmanFilter.c **** 	//double gyroX,gyroY,gyroZ;
+  97:../Source/KalmanFilter.c ****   static uint32_t current_time,last_time = 0;
+  98:../Source/KalmanFilter.c **** 
+  99:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 101:../Source/KalmanFilter.c ****   last_time = current_time;
+ 102:../Source/KalmanFilter.c **** 
+ 103:../Source/KalmanFilter.c ****   accX  = LSM6DS3_GetXL_X_Int16();
+ 104:../Source/KalmanFilter.c ****   accY  = LSM6DS3_GetXL_Y_Int16();
+ 105:../Source/KalmanFilter.c ****   accZ  = LSM6DS3_GetXL_Z_Int16();
+ 106:../Source/KalmanFilter.c ****   gyroX = LSM6DS3_GetGS_X_Int16();
+ 107:../Source/KalmanFilter.c ****   gyroY = LSM6DS3_GetGS_Y_Int16();
+ 108:../Source/KalmanFilter.c ****   gyroZ = LSM6DS3_GetGS_Z_Int16();
+ 109:../Source/KalmanFilter.c **** 
+ 110:../Source/KalmanFilter.c ****   #ifdef RESTRICT_PITCH
+ 111:../Source/KalmanFilter.c ****     double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 112:../Source/KalmanFilter.c ****     double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 113:../Source/KalmanFilter.c ****   #else // Eq. 28 and 29
+ 114:../Source/KalmanFilter.c ****     double roll  = atan(accY / sqrt(accX * accX + accZ * accZ)) * RAD_TO_DEG;
+ 115:../Source/KalmanFilter.c ****     double pitch = atan2(-accX, accZ) * RAD_TO_DEG;
+ 116:../Source/KalmanFilter.c ****   #endif
+ 117:../Source/KalmanFilter.c ****        
+ 118:../Source/KalmanFilter.c **** 	double gyroXrate = gyroX * 0.007f; /* Convert to deg/s */
+ 119:../Source/KalmanFilter.c **** 	double gyroYrate = gyroY * 0.007f; /* Convert to deg/s */
+ 120:../Source/KalmanFilter.c **** 	double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 121:../Source/KalmanFilter.c **** 	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 122:../Source/KalmanFilter.c **** 
+ 123:../Source/KalmanFilter.c **** 	if(kalAngleZ>360){
+ 124:../Source/KalmanFilter.c **** 		kalAngleZ-=360;
+ 125:../Source/KalmanFilter.c **** 	}
+ 126:../Source/KalmanFilter.c **** 	else if(kalAngleZ<-360){
+ 127:../Source/KalmanFilter.c **** 		kalAngleZ+=360;
+ 128:../Source/KalmanFilter.c **** 	}
+ 129:../Source/KalmanFilter.c **** 
+ 130:../Source/KalmanFilter.c ****   #ifdef RESTRICT_PITCH
+ 131:../Source/KalmanFilter.c ****   /* This fixes the transition problem when the accelerometer angle jumps between -180 and 180 degr
+ 132:../Source/KalmanFilter.c ****   if ((roll < -90 && kalAngleX > 90) || (roll > 90 && kalAngleX < -90)) 
+ 133:../Source/KalmanFilter.c ****   {
+ 134:../Source/KalmanFilter.c **** 	KalmanX.angle = roll;
+ 135:../Source/KalmanFilter.c ****     kalAngleX = roll;
+ 136:../Source/KalmanFilter.c ****   } 
+ 137:../Source/KalmanFilter.c ****   else
+ 138:../Source/KalmanFilter.c ****   {
+ 139:../Source/KalmanFilter.c ****     kalAngleX = KalmanX_getAngle(roll, gyroXrate, timing_kalman); /* Calculate the angle using a Ka
+ 140:../Source/KalmanFilter.c ****   } 
+ 141:../Source/KalmanFilter.c **** 
+ 142:../Source/KalmanFilter.c ****   if (abs(kalAngleX) > 90)
+ 143:../Source/KalmanFilter.c ****   {
+ 144:../Source/KalmanFilter.c ****     gyroYrate = - gyroYrate; /* Invert rate, so it fits the restricted accelerometer reading */
+ 145:../Source/KalmanFilter.c ****   }
+ 146:../Source/KalmanFilter.c ****   kalAngleY = KalmanY_getAngle(pitch, gyroYrate, timing_kalman);
+ 147:../Source/KalmanFilter.c ****   #else
+ 148:../Source/KalmanFilter.c ****     /* This fixes the transition problem when the accelerometer angle jumps between -180 and 180 de
+ 149:../Source/KalmanFilter.c ****     if ((pitch < -90 && kalAngleY > 90) || (pitch > 90 && kalAngleY < -90)) 
+ 150:../Source/KalmanFilter.c ****     {
+ 151:../Source/KalmanFilter.c ****       KalmanY.angle = pitch;
+ 152:../Source/KalmanFilter.c ****       kalAngleY = pitch;
+ 153:../Source/KalmanFilter.c ****     } 
+ 154:../Source/KalmanFilter.c ****     else
+ 155:../Source/KalmanFilter.c ****     {
+ 156:../Source/KalmanFilter.c ****       kalAngleY = KalmanY_getAngle(pitch, gyroYrate, timing_kalman); /* Calculate the angle using a
+ 157:../Source/KalmanFilter.c ****     }
+ 158:../Source/KalmanFilter.c **** 
+ 159:../Source/KalmanFilter.c ****     if (abs(kalAngleY) > 90)
+ 160:../Source/KalmanFilter.c ****     {
+ 161:../Source/KalmanFilter.c ****       gyroXrate = -gyroXrate; /* Invert rate, so it fits the restriced accelerometer reading */
+ 162:../Source/KalmanFilter.c ****     }
+ 163:../Source/KalmanFilter.c ****     kalAngleX = KalmanX_getAngle(roll, gyroXrate, timing_kalman);
+ 164:../Source/KalmanFilter.c ****   #endif
+ 165:../Source/KalmanFilter.c ****    Calculated_Roll  =  (float) (kalAngleX);
+ 166:../Source/KalmanFilter.c ****    Calculated_Pitch  = (float) (kalAngleY);
+ 167:../Source/KalmanFilter.c ****    Calculated_yaw  = (float) (kalAngleZ);
+ 168:../Source/KalmanFilter.c **** }
+ 169:../Source/KalmanFilter.c **** 
+ 170:../Source/KalmanFilter.c **** float Kalman_GetPitch(void) {
+ 238              		.loc 1 170 0
+ 239              		.cfi_startproc
+ 171:../Source/KalmanFilter.c ****   return Calculated_Pitch;
+ 240              		.loc 1 171 0
+ 241 0000 014B     		ldr	r3, .L5
+ 242              		@ sp needed for prologue
+ 243 0002 1868     		ldr	r0, [r3]
+ 172:../Source/KalmanFilter.c **** }
+ 244              		.loc 1 172 0
+ 245 0004 7047     		bx	lr
+ 246              	.L6:
+ 247 0006 C046     		.align	2
+ 248              	.L5:
+ 249 0008 00000000 		.word	.LANCHOR3
+ 250              		.cfi_endproc
+ 251              	.LFE35:
+ 253              		.section	.text.Kalman_GetRoll,"ax",%progbits
+ 254              		.align	1
+ 255              		.global	Kalman_GetRoll
+ 256              		.code	16
+ 257              		.thumb_func
+ 259              	Kalman_GetRoll:
+ 260              	.LFB36:
+ 173:../Source/KalmanFilter.c **** 
+ 174:../Source/KalmanFilter.c **** float Kalman_GetRoll(void) {
+ 261              		.loc 1 174 0
+ 262              		.cfi_startproc
+ 175:../Source/KalmanFilter.c ****   return Calculated_Roll;
+ 263              		.loc 1 175 0
+ 264 0000 014B     		ldr	r3, .L8
+ 265              		@ sp needed for prologue
+ 266 0002 1868     		ldr	r0, [r3]
+ 176:../Source/KalmanFilter.c **** }
+ 267              		.loc 1 176 0
+ 268 0004 7047     		bx	lr
+ 269              	.L9:
+ 270 0006 C046     		.align	2
+ 271              	.L8:
+ 272 0008 00000000 		.word	.LANCHOR4
+ 273              		.cfi_endproc
+ 274              	.LFE36:
+ 276              		.section	.text.Kalman_Getyaw,"ax",%progbits
+ 277              		.align	1
+ 278              		.global	Kalman_Getyaw
+ 279              		.code	16
+ 280              		.thumb_func
+ 282              	Kalman_Getyaw:
+ 283              	.LFB37:
+ 177:../Source/KalmanFilter.c **** 
+ 178:../Source/KalmanFilter.c **** float Kalman_Getyaw(void) {
+ 284              		.loc 1 178 0
+ 285              		.cfi_startproc
+ 179:../Source/KalmanFilter.c **** #if 1
+ 180:../Source/KalmanFilter.c ****   return Calculated_yaw;
+ 286              		.loc 1 180 0
+ 287 0000 014B     		ldr	r3, .L11
+ 288              		@ sp needed for prologue
+ 289 0002 1868     		ldr	r0, [r3]
+ 181:../Source/KalmanFilter.c **** #else
+ 182:../Source/KalmanFilter.c ****   static uint32_t current_time,last_time = 0;
+ 183:../Source/KalmanFilter.c ****   double timing_kalman;
+ 184:../Source/KalmanFilter.c **** 
+ 185:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 186:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 187:../Source/KalmanFilter.c ****   last_time = current_time;
+ 188:../Source/KalmanFilter.c **** 
+ 189:../Source/KalmanFilter.c ****   gyroZ = LSM6DS3_GetGS_Z_Int16();
+ 190:../Source/KalmanFilter.c **** 
+ 191:../Source/KalmanFilter.c ****   double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 192:../Source/KalmanFilter.c ****   	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 193:../Source/KalmanFilter.c ****   	return kalAngleZ;
+ 194:../Source/KalmanFilter.c **** #endif
+ 195:../Source/KalmanFilter.c **** }
+ 290              		.loc 1 195 0
+ 291 0004 7047     		bx	lr
+ 292              	.L12:
+ 293 0006 C046     		.align	2
+ 294              	.L11:
+ 295 0008 00000000 		.word	.LANCHOR5
+ 296              		.cfi_endproc
+ 297              	.LFE37:
+ 299              		.section	.text.Kalman_GetTick,"ax",%progbits
+ 300              		.align	1
+ 301              		.global	Kalman_GetTick
+ 302              		.code	16
+ 303              		.thumb_func
+ 305              	Kalman_GetTick:
+ 306              	.LFB40:
+ 196:../Source/KalmanFilter.c **** 
+ 197:../Source/KalmanFilter.c **** void Kalman_Getyaw_execute(void) {
+ 198:../Source/KalmanFilter.c **** #if 0
+ 199:../Source/KalmanFilter.c ****   return Calculated_yaw;
+ 200:../Source/KalmanFilter.c **** #else
+ 201:../Source/KalmanFilter.c ****   static uint32_t current_time,last_time = 0;
+ 202:../Source/KalmanFilter.c ****   double timing_kalman;
+ 203:../Source/KalmanFilter.c **** 
+ 204:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 205:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 206:../Source/KalmanFilter.c ****   last_time = current_time;
+ 207:../Source/KalmanFilter.c **** 
+ 208:../Source/KalmanFilter.c ****   gyroZ = LSM6DS3_GetGS_Z_Int16();
+ 209:../Source/KalmanFilter.c **** 
+ 210:../Source/KalmanFilter.c ****   double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 211:../Source/KalmanFilter.c ****   	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 212:../Source/KalmanFilter.c ****     Calculated_yaw  = (float) (kalAngleZ);
+ 213:../Source/KalmanFilter.c **** #endif
+ 214:../Source/KalmanFilter.c **** }
+ 215:../Source/KalmanFilter.c **** 
+ 216:../Source/KalmanFilter.c **** 
+ 217:../Source/KalmanFilter.c **** void Kalman_IncTick(void) {
+ 218:../Source/KalmanFilter.c **** 	Kalman_Timer++;
+ 219:../Source/KalmanFilter.c **** 	ExecuteTicks++;
+ 220:../Source/KalmanFilter.c **** 	if(ExecuteTicks >= ExecuteMax) {
+ 221:../Source/KalmanFilter.c **** 		Kalman_SetFlag();
+ 222:../Source/KalmanFilter.c **** 		ExecuteTicks = 0;
+ 223:../Source/KalmanFilter.c **** 	}
+ 224:../Source/KalmanFilter.c **** }
+ 225:../Source/KalmanFilter.c **** 
+ 226:../Source/KalmanFilter.c **** uint32_t Kalman_GetTick(void)
+ 227:../Source/KalmanFilter.c **** {
+ 307              		.loc 1 227 0
+ 308              		.cfi_startproc
+ 309 0000 08B5     		push	{r3, lr}
+ 310              	.LCFI2:
+ 311              		.cfi_def_cfa_offset 8
+ 312              		.cfi_offset 3, -8
+ 313              		.cfi_offset 14, -4
+ 228:../Source/KalmanFilter.c **** 	//return Kalman_Timer;
+ 229:../Source/KalmanFilter.c **** 	return getMicros();
+ 314              		.loc 1 229 0
+ 315 0002 FFF7FEFF 		bl	getMicros
+ 316              		@ sp needed for prologue
+ 230:../Source/KalmanFilter.c **** }
+ 317              		.loc 1 230 0
+ 318 0006 08BD     		pop	{r3, pc}
+ 319              		.cfi_endproc
+ 320              	.LFE40:
+ 322              		.global	__aeabi_ui2f
+ 323              		.global	__aeabi_fdiv
+ 324              		.global	__aeabi_f2d
+ 325              		.global	__aeabi_dsub
+ 326              		.section	.text.Kalman_Getyaw_execute,"ax",%progbits
+ 327              		.align	1
+ 328              		.global	Kalman_Getyaw_execute
+ 329              		.code	16
+ 330              		.thumb_func
+ 332              	Kalman_Getyaw_execute:
+ 333              	.LFB38:
+ 197:../Source/KalmanFilter.c **** void Kalman_Getyaw_execute(void) {
+ 334              		.loc 1 197 0
+ 335              		.cfi_startproc
+ 336 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 337              	.LCFI3:
+ 338              		.cfi_def_cfa_offset 24
+ 339              		.cfi_offset 3, -24
+ 340              		.cfi_offset 4, -20
+ 341              		.cfi_offset 5, -16
+ 342              		.cfi_offset 6, -12
+ 343              		.cfi_offset 7, -8
+ 344              		.cfi_offset 14, -4
+ 204:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 345              		.loc 1 204 0
+ 346 0002 FFF7FEFF 		bl	Kalman_GetTick
+ 347 0006 1A4B     		ldr	r3, .L15+8
+ 205:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 348              		.loc 1 205 0
+ 349 0008 1A4C     		ldr	r4, .L15+12
+ 204:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 350              		.loc 1 204 0
+ 351 000a 051C     		mov	r5, r0
+ 352 000c 1860     		str	r0, [r3]
+ 205:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 353              		.loc 1 205 0
+ 354 000e 2068     		ldr	r0, [r4]
+ 355              		@ sp needed for prologue
+ 356 0010 281A     		sub	r0, r5, r0
+ 357 0012 FFF7FEFF 		bl	__aeabi_ui2f
+ 358 0016 184B     		ldr	r3, .L15+16
+ 359 0018 1968     		ldr	r1, [r3]
+ 360 001a FFF7FEFF 		bl	__aeabi_fdiv
+ 361 001e FFF7FEFF 		bl	__aeabi_f2d
+ 206:../Source/KalmanFilter.c ****   last_time = current_time;
+ 362              		.loc 1 206 0
+ 363 0022 2560     		str	r5, [r4]
+ 205:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 364              		.loc 1 205 0
+ 365 0024 0F1C     		mov	r7, r1
+ 366 0026 061C     		mov	r6, r0
+ 367              	.LVL14:
+ 208:../Source/KalmanFilter.c ****   gyroZ = LSM6DS3_GetGS_Z_Int16();
+ 368              		.loc 1 208 0
+ 369 0028 FFF7FEFF 		bl	LSM6DS3_GetGS_Z_Int16
+ 370 002c FFF7FEFF 		bl	__aeabi_i2d
+ 371 0030 124B     		ldr	r3, .L15+20
+ 211:../Source/KalmanFilter.c ****   	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 372              		.loc 1 211 0
+ 373 0032 134C     		ldr	r4, .L15+24
+ 208:../Source/KalmanFilter.c ****   gyroZ = LSM6DS3_GetGS_Z_Int16();
+ 374              		.loc 1 208 0
+ 375 0034 1860     		str	r0, [r3]
+ 376 0036 5960     		str	r1, [r3, #4]
+ 210:../Source/KalmanFilter.c ****   double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 377              		.loc 1 210 0
+ 378 0038 124B     		ldr	r3, .L15+28
+ 379 003a 1A68     		ldr	r2, [r3]
+ 380 003c 5B68     		ldr	r3, [r3, #4]
+ 381              	.LVL15:
+ 382 003e FFF7FEFF 		bl	__aeabi_dsub
+ 383              	.LVL16:
+ 384 0042 0A4B     		ldr	r3, .L15+4
+ 385 0044 084A     		ldr	r2, .L15
+ 386 0046 FFF7FEFF 		bl	__aeabi_dmul
+ 211:../Source/KalmanFilter.c ****   	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 387              		.loc 1 211 0
+ 388 004a 321C     		mov	r2, r6
+ 389 004c 3B1C     		mov	r3, r7
+ 390 004e FFF7FEFF 		bl	__aeabi_dmul
+ 391 0052 2268     		ldr	r2, [r4]
+ 392 0054 6368     		ldr	r3, [r4, #4]
+ 393 0056 FFF7FEFF 		bl	__aeabi_dadd
+ 394 005a 2060     		str	r0, [r4]
+ 395 005c 6160     		str	r1, [r4, #4]
+ 212:../Source/KalmanFilter.c ****     Calculated_yaw  = (float) (kalAngleZ);
+ 396              		.loc 1 212 0
+ 397 005e FFF7FEFF 		bl	__aeabi_d2f
+ 398 0062 094B     		ldr	r3, .L15+32
+ 399 0064 1860     		str	r0, [r3]
+ 400              	.LVL17:
+ 214:../Source/KalmanFilter.c **** }
+ 401              		.loc 1 214 0
+ 402 0066 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 403              	.L16:
+ 404              		.align	3
+ 405              	.L15:
+ 406 0068 00000040 		.word	1073741824
+ 407 006c 08AC7C3F 		.word	1065135112
+ 408 0070 00000000 		.word	.LANCHOR6
+ 409 0074 00000000 		.word	.LANCHOR7
+ 410 0078 00000000 		.word	.LANCHOR0
+ 411 007c 00000000 		.word	gyroZ
+ 412 0080 00000000 		.word	.LANCHOR9
+ 413 0084 00000000 		.word	.LANCHOR8
+ 414 0088 00000000 		.word	.LANCHOR5
+ 415              		.cfi_endproc
+ 416              	.LFE38:
+ 418              		.global	__aeabi_dcmpgt
+ 419              		.global	__aeabi_dcmplt
+ 420              		.global	__aeabi_fsub
+ 421              		.global	__aeabi_fmul
+ 422              		.global	__aeabi_fadd
+ 423              		.global	__aeabi_d2iz
+ 424 008c C046C046 		.section	.text.Execute_Kalman_Filter,"ax",%progbits
+ 425              		.align	1
+ 426              		.global	Execute_Kalman_Filter
+ 427              		.code	16
+ 428              		.thumb_func
+ 430              	Execute_Kalman_Filter:
+ 431              	.LFB34:
+  91:../Source/KalmanFilter.c **** {
+ 432              		.loc 1 91 0
+ 433              		.cfi_startproc
+ 434 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 435              	.LCFI4:
+ 436              		.cfi_def_cfa_offset 20
+ 437              		.cfi_offset 4, -20
+ 438              		.cfi_offset 5, -16
+ 439              		.cfi_offset 6, -12
+ 440              		.cfi_offset 7, -8
+ 441              		.cfi_offset 14, -4
+ 442              	.LVL18:
+ 443 0002 8FB0     		sub	sp, sp, #60
+ 444              	.LCFI5:
+ 445              		.cfi_def_cfa_offset 80
+  99:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 446              		.loc 1 99 0
+ 447 0004 FFF7FEFF 		bl	Kalman_GetTick
+ 448 0008 5D4B     		ldr	r3, .L27+24
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 449              		.loc 1 100 0
+ 450 000a 5E4C     		ldr	r4, .L27+28
+  99:../Source/KalmanFilter.c ****   current_time = Kalman_GetTick();
+ 451              		.loc 1 99 0
+ 452 000c 051C     		mov	r5, r0
+ 453 000e 1860     		str	r0, [r3]
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 454              		.loc 1 100 0
+ 455 0010 2068     		ldr	r0, [r4]
+ 456 0012 281A     		sub	r0, r5, r0
+ 457 0014 FFF7FEFF 		bl	__aeabi_ui2f
+ 458 0018 5B4B     		ldr	r3, .L27+32
+ 459 001a 1968     		ldr	r1, [r3]
+ 460 001c FFF7FEFF 		bl	__aeabi_fdiv
+ 101:../Source/KalmanFilter.c ****   last_time = current_time;
+ 461              		.loc 1 101 0
+ 462 0020 2560     		str	r5, [r4]
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 463              		.loc 1 100 0
+ 464 0022 0090     		str	r0, [sp]
+ 465              	.LVL19:
+ 103:../Source/KalmanFilter.c ****   accX  = LSM6DS3_GetXL_X_Int16();
+ 466              		.loc 1 103 0
+ 467 0024 FFF7FEFF 		bl	LSM6DS3_GetXL_X_Int16
+ 468              	.LVL20:
+ 469 0028 FFF7FEFF 		bl	__aeabi_i2d
+ 470 002c 574C     		ldr	r4, .L27+36
+ 471 002e 2060     		str	r0, [r4]
+ 472 0030 6160     		str	r1, [r4, #4]
+ 104:../Source/KalmanFilter.c ****   accY  = LSM6DS3_GetXL_Y_Int16();
+ 473              		.loc 1 104 0
+ 474 0032 FFF7FEFF 		bl	LSM6DS3_GetXL_Y_Int16
+ 475 0036 FFF7FEFF 		bl	__aeabi_i2d
+ 476 003a 554D     		ldr	r5, .L27+40
+ 477 003c 2860     		str	r0, [r5]
+ 478 003e 6960     		str	r1, [r5, #4]
+ 105:../Source/KalmanFilter.c ****   accZ  = LSM6DS3_GetXL_Z_Int16();
+ 479              		.loc 1 105 0
+ 480 0040 FFF7FEFF 		bl	LSM6DS3_GetXL_Z_Int16
+ 481 0044 FFF7FEFF 		bl	__aeabi_i2d
+ 482 0048 524E     		ldr	r6, .L27+44
+ 483 004a 3060     		str	r0, [r6]
+ 484 004c 7160     		str	r1, [r6, #4]
+ 106:../Source/KalmanFilter.c ****   gyroX = LSM6DS3_GetGS_X_Int16();
+ 485              		.loc 1 106 0
+ 486 004e FFF7FEFF 		bl	LSM6DS3_GetGS_X_Int16
+ 487 0052 FFF7FEFF 		bl	__aeabi_i2d
+ 488 0056 504A     		ldr	r2, .L27+48
+ 489 0058 1060     		str	r0, [r2]
+ 490 005a 5160     		str	r1, [r2, #4]
+ 107:../Source/KalmanFilter.c ****   gyroY = LSM6DS3_GetGS_Y_Int16();
+ 491              		.loc 1 107 0
+ 492 005c FFF7FEFF 		bl	LSM6DS3_GetGS_Y_Int16
+ 493 0060 FFF7FEFF 		bl	__aeabi_i2d
+ 494 0064 4D4B     		ldr	r3, .L27+52
+ 495 0066 1860     		str	r0, [r3]
+ 496 0068 5960     		str	r1, [r3, #4]
+ 108:../Source/KalmanFilter.c ****   gyroZ = LSM6DS3_GetGS_Z_Int16();
+ 497              		.loc 1 108 0
+ 498 006a FFF7FEFF 		bl	LSM6DS3_GetGS_Z_Int16
+ 499 006e FFF7FEFF 		bl	__aeabi_i2d
+ 500 0072 4B4A     		ldr	r2, .L27+56
+ 501 0074 1060     		str	r0, [r2]
+ 502 0076 5160     		str	r1, [r2, #4]
+ 111:../Source/KalmanFilter.c ****     double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 503              		.loc 1 111 0
+ 504 0078 3268     		ldr	r2, [r6]
+ 505 007a 7368     		ldr	r3, [r6, #4]
+ 506 007c 2868     		ldr	r0, [r5]
+ 507 007e 6968     		ldr	r1, [r5, #4]
+ 508 0080 FFF7FEFF 		bl	atan2
+ 509 0084 394B     		ldr	r3, .L27+4
+ 510 0086 384A     		ldr	r2, .L27
+ 511 0088 FFF7FEFF 		bl	__aeabi_dmul
+ 112:../Source/KalmanFilter.c ****     double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 512              		.loc 1 112 0
+ 513 008c 2368     		ldr	r3, [r4]
+ 111:../Source/KalmanFilter.c ****     double roll  = atan2(accY, accZ) * RAD_TO_DEG;
+ 514              		.loc 1 111 0
+ 515 008e 0690     		str	r0, [sp, #24]
+ 516 0090 0791     		str	r1, [sp, #28]
+ 517              	.LVL21:
+ 112:../Source/KalmanFilter.c ****     double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 518              		.loc 1 112 0
+ 519 0092 0293     		str	r3, [sp, #8]
+ 520 0094 6368     		ldr	r3, [r4, #4]
+ 521 0096 8024     		mov	r4, #128
+ 522 0098 2406     		lsl	r4, r4, #24
+ 523 009a 1C19     		add	r4, r3, r4
+ 524 009c 2A68     		ldr	r2, [r5]
+ 525 009e 6B68     		ldr	r3, [r5, #4]
+ 526 00a0 101C     		mov	r0, r2
+ 527              	.LVL22:
+ 528 00a2 191C     		mov	r1, r3
+ 529 00a4 0494     		str	r4, [sp, #16]
+ 530 00a6 FFF7FEFF 		bl	__aeabi_dmul
+ 531 00aa 3468     		ldr	r4, [r6]
+ 532 00ac 7568     		ldr	r5, [r6, #4]
+ 533 00ae 0F1C     		mov	r7, r1
+ 534 00b0 061C     		mov	r6, r0
+ 535 00b2 221C     		mov	r2, r4
+ 536 00b4 2B1C     		mov	r3, r5
+ 537 00b6 201C     		mov	r0, r4
+ 538 00b8 291C     		mov	r1, r5
+ 539 00ba FFF7FEFF 		bl	__aeabi_dmul
+ 540 00be 021C     		mov	r2, r0
+ 541 00c0 0B1C     		mov	r3, r1
+ 542 00c2 301C     		mov	r0, r6
+ 543 00c4 391C     		mov	r1, r7
+ 544 00c6 FFF7FEFF 		bl	__aeabi_dadd
+ 545 00ca FFF7FEFF 		bl	sqrt
+ 546 00ce 021C     		mov	r2, r0
+ 547 00d0 0B1C     		mov	r3, r1
+ 548 00d2 0298     		ldr	r0, [sp, #8]
+ 549 00d4 0499     		ldr	r1, [sp, #16]
+ 550 00d6 FFF7FEFF 		bl	__aeabi_ddiv
+ 551 00da FFF7FEFF 		bl	atan
+ 552 00de 234B     		ldr	r3, .L27+4
+ 553 00e0 214A     		ldr	r2, .L27
+ 554 00e2 FFF7FEFF 		bl	__aeabi_dmul
+ 118:../Source/KalmanFilter.c **** 	double gyroXrate = gyroX * 0.007f; /* Convert to deg/s */
+ 555              		.loc 1 118 0
+ 556 00e6 224A     		ldr	r2, .L27+8
+ 557 00e8 224B     		ldr	r3, .L27+12
+ 558 00ea 2B4C     		ldr	r4, .L27+48
+ 112:../Source/KalmanFilter.c ****     double pitch = atan(-accX / sqrt(accY * accY + accZ * accZ)) * RAD_TO_DEG;
+ 559              		.loc 1 112 0
+ 560 00ec 0A90     		str	r0, [sp, #40]
+ 561 00ee 0B91     		str	r1, [sp, #44]
+ 562              	.LVL23:
+ 118:../Source/KalmanFilter.c **** 	double gyroXrate = gyroX * 0.007f; /* Convert to deg/s */
+ 563              		.loc 1 118 0
+ 564 00f0 2068     		ldr	r0, [r4]
+ 565 00f2 6168     		ldr	r1, [r4, #4]
+ 566              	.LVL24:
+ 567 00f4 FFF7FEFF 		bl	__aeabi_dmul
+ 119:../Source/KalmanFilter.c **** 	double gyroYrate = gyroY * 0.007f; /* Convert to deg/s */
+ 568              		.loc 1 119 0
+ 569 00f8 1D4A     		ldr	r2, .L27+8
+ 570 00fa 1E4B     		ldr	r3, .L27+12
+ 571 00fc 274C     		ldr	r4, .L27+52
+ 118:../Source/KalmanFilter.c **** 	double gyroXrate = gyroX * 0.007f; /* Convert to deg/s */
+ 572              		.loc 1 118 0
+ 573 00fe 0290     		str	r0, [sp, #8]
+ 574 0100 0391     		str	r1, [sp, #12]
+ 575              	.LVL25:
+ 119:../Source/KalmanFilter.c **** 	double gyroYrate = gyroY * 0.007f; /* Convert to deg/s */
+ 576              		.loc 1 119 0
+ 577 0102 2068     		ldr	r0, [r4]
+ 578 0104 6168     		ldr	r1, [r4, #4]
+ 579              	.LVL26:
+ 580 0106 FFF7FEFF 		bl	__aeabi_dmul
+ 120:../Source/KalmanFilter.c **** 	double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 581              		.loc 1 120 0
+ 582 010a 254C     		ldr	r4, .L27+56
+ 583 010c 254B     		ldr	r3, .L27+60
+ 119:../Source/KalmanFilter.c **** 	double gyroYrate = gyroY * 0.007f; /* Convert to deg/s */
+ 584              		.loc 1 119 0
+ 585 010e 0D90     		str	r0, [sp, #52]
+ 120:../Source/KalmanFilter.c **** 	double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 586              		.loc 1 120 0
+ 587 0110 1A68     		ldr	r2, [r3]
+ 588 0112 5B68     		ldr	r3, [r3, #4]
+ 119:../Source/KalmanFilter.c **** 	double gyroYrate = gyroY * 0.007f; /* Convert to deg/s */
+ 589              		.loc 1 119 0
+ 590 0114 0591     		str	r1, [sp, #20]
+ 591              	.LVL27:
+ 120:../Source/KalmanFilter.c **** 	double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 592              		.loc 1 120 0
+ 593 0116 2068     		ldr	r0, [r4]
+ 594 0118 6168     		ldr	r1, [r4, #4]
+ 595              	.LVL28:
+ 596 011a FFF7FEFF 		bl	__aeabi_dsub
+ 597              	.LVL29:
+ 598 011e 144A     		ldr	r2, .L27+8
+ 599 0120 144B     		ldr	r3, .L27+12
+ 600 0122 FFF7FEFF 		bl	__aeabi_dmul
+ 601 0126 041C     		mov	r4, r0
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 602              		.loc 1 100 0
+ 603 0128 0098     		ldr	r0, [sp]
+ 120:../Source/KalmanFilter.c **** 	double gyroZrate = (gyroZ-gyroZ_offset) * 0.007f; /* Convert to deg/s */
+ 604              		.loc 1 120 0
+ 605 012a 0D1C     		mov	r5, r1
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 606              		.loc 1 100 0
+ 607 012c FFF7FEFF 		bl	__aeabi_f2d
+ 121:../Source/KalmanFilter.c **** 	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 608              		.loc 1 121 0
+ 609 0130 1D4E     		ldr	r6, .L27+64
+ 100:../Source/KalmanFilter.c ****   timing_kalman = (double) (((uint32_t)(current_time - last_time)) / Tick_frequency);
+ 610              		.loc 1 100 0
+ 611 0132 021C     		mov	r2, r0
+ 612 0134 0B1C     		mov	r3, r1
+ 121:../Source/KalmanFilter.c **** 	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 613              		.loc 1 121 0
+ 614 0136 201C     		mov	r0, r4
+ 615 0138 291C     		mov	r1, r5
+ 616 013a FFF7FEFF 		bl	__aeabi_dmul
+ 617 013e 3268     		ldr	r2, [r6]
+ 618 0140 7368     		ldr	r3, [r6, #4]
+ 619 0142 FFF7FEFF 		bl	__aeabi_dadd
+ 123:../Source/KalmanFilter.c **** 	if(kalAngleZ>360){
+ 620              		.loc 1 123 0
+ 621 0146 0C4A     		ldr	r2, .L27+16
+ 622 0148 0C4B     		ldr	r3, .L27+20
+ 121:../Source/KalmanFilter.c **** 	kalAngleZ = kalAngleZ+gyroZrate*timing_kalman;
+ 623              		.loc 1 121 0
+ 624 014a 041C     		mov	r4, r0
+ 625 014c 0D1C     		mov	r5, r1
+ 626 014e 3460     		str	r4, [r6]
+ 627 0150 7560     		str	r5, [r6, #4]
+ 123:../Source/KalmanFilter.c **** 	if(kalAngleZ>360){
+ 628              		.loc 1 123 0
+ 629 0152 FFF7FEFF 		bl	__aeabi_dcmpgt
+ 630 0156 0028     		cmp	r0, #0
+ 631 0158 28D0     		beq	.L25
+ 124:../Source/KalmanFilter.c **** 		kalAngleZ-=360;
+ 632              		.loc 1 124 0
+ 633 015a 201C     		mov	r0, r4
+ 634 015c 291C     		mov	r1, r5
+ 635 015e 064A     		ldr	r2, .L27+16
+ 636 0160 064B     		ldr	r3, .L27+20
+ 637 0162 FFF7FEFF 		bl	__aeabi_dsub
+ 638 0166 2FE0     		b	.L26
+ 639              	.L28:
+ 640              		.align	3
+ 641              	.L27:
+ 642 0168 00000020 		.word	536870912
+ 643 016c DCA54C40 		.word	1078765020
+ 644 0170 00000040 		.word	1073741824
+ 645 0174 08AC7C3F 		.word	1065135112
+ 646 0178 00000000 		.word	0
+ 647 017c 00807640 		.word	1081507840
+ 648 0180 00000000 		.word	.LANCHOR10
+ 649 0184 00000000 		.word	.LANCHOR11
+ 650 0188 00000000 		.word	.LANCHOR0
+ 651 018c 00000000 		.word	accX
+ 652 0190 00000000 		.word	accY
+ 653 0194 00000000 		.word	accZ
+ 654 0198 00000000 		.word	gyroX
+ 655 019c 00000000 		.word	gyroY
+ 656 01a0 00000000 		.word	gyroZ
+ 657 01a4 00000000 		.word	.LANCHOR8
+ 658 01a8 00000000 		.word	.LANCHOR9
+ 659              	.L25:
+ 126:../Source/KalmanFilter.c **** 	else if(kalAngleZ<-360){
+ 660              		.loc 1 126 0
+ 661 01ac 201C     		mov	r0, r4
+ 662 01ae 291C     		mov	r1, r5
+ 663 01b0 A64B     		ldr	r3, .L29+4
+ 664 01b2 A54A     		ldr	r2, .L29
+ 665 01b4 FFF7FEFF 		bl	__aeabi_dcmplt
+ 666 01b8 0028     		cmp	r0, #0
+ 667 01ba 07D0     		beq	.L20
+ 127:../Source/KalmanFilter.c **** 		kalAngleZ+=360;
+ 668              		.loc 1 127 0
+ 669 01bc 201C     		mov	r0, r4
+ 670 01be 291C     		mov	r1, r5
+ 671 01c0 A34A     		ldr	r2, .L29+8
+ 672 01c2 A44B     		ldr	r3, .L29+12
+ 673 01c4 FFF7FEFF 		bl	__aeabi_dadd
+ 674              	.L26:
+ 675 01c8 3060     		str	r0, [r6]
+ 676 01ca 7160     		str	r1, [r6, #4]
+ 677              	.L20:
+ 678              	.LVL30:
+ 139:../Source/KalmanFilter.c ****     kalAngleX = KalmanX_getAngle(roll, gyroXrate, timing_kalman); /* Calculate the angle using a Ka
+ 679              		.loc 1 139 0
+ 680 01cc 0298     		ldr	r0, [sp, #8]
+ 681 01ce 0399     		ldr	r1, [sp, #12]
+ 682              	.LBB6:
+ 683              	.LBB7:
+ 231:../Source/KalmanFilter.c **** 
+ 232:../Source/KalmanFilter.c **** void Kalman_SetFlag(void) {
+ 233:../Source/KalmanFilter.c **** 	KalmanFlag = 1;
+ 234:../Source/KalmanFilter.c **** }
+ 235:../Source/KalmanFilter.c **** 
+ 236:../Source/KalmanFilter.c **** uint8_t Kalman_GetFlag(void) {
+ 237:../Source/KalmanFilter.c **** 	return KalmanFlag;
+ 238:../Source/KalmanFilter.c **** }
+ 239:../Source/KalmanFilter.c **** 
+ 240:../Source/KalmanFilter.c **** void Kalman_ClearFlag(void) {
+ 241:../Source/KalmanFilter.c **** 	KalmanFlag = 0;
+ 242:../Source/KalmanFilter.c **** }
+ 243:../Source/KalmanFilter.c **** 
+ 244:../Source/KalmanFilter.c **** static float KalmanX_getAngle(float newAngle, float newRate, float dt) {
+ 245:../Source/KalmanFilter.c ****     KalmanX.rate = newRate - KalmanX.bias;
+ 684              		.loc 1 245 0
+ 685 01d0 A14C     		ldr	r4, .L29+16
+ 686 01d2 2269     		ldr	r2, [r4, #16]
+ 687 01d4 0892     		str	r2, [sp, #32]
+ 688              	.LBE7:
+ 689              	.LBE6:
+ 139:../Source/KalmanFilter.c ****     kalAngleX = KalmanX_getAngle(roll, gyroXrate, timing_kalman); /* Calculate the angle using a Ka
+ 690              		.loc 1 139 0
+ 691 01d6 FFF7FEFF 		bl	__aeabi_d2f
+ 692              	.LBB10:
+ 693              	.LBB8:
+ 694              		.loc 1 245 0
+ 695 01da 0899     		ldr	r1, [sp, #32]
+ 696 01dc FFF7FEFF 		bl	__aeabi_fsub
+ 697 01e0 011C     		add	r1, r0, #0
+ 698 01e2 6061     		str	r0, [r4, #20]
+ 246:../Source/KalmanFilter.c ****     KalmanX.angle += dt * KalmanX.rate;
+ 699              		.loc 1 246 0
+ 700 01e4 0098     		ldr	r0, [sp]
+ 701 01e6 FFF7FEFF 		bl	__aeabi_fmul
+ 702 01ea E168     		ldr	r1, [r4, #12]
+ 703 01ec FFF7FEFF 		bl	__aeabi_fadd
+ 247:../Source/KalmanFilter.c **** 
+ 248:../Source/KalmanFilter.c ****     KalmanX.P[0][0] += dt * (dt*KalmanX.P[1][1] - KalmanX.P[0][1] - KalmanX.P[1][0] + KalmanX.Q_ang
+ 704              		.loc 1 248 0
+ 705 01f0 636A     		ldr	r3, [r4, #36]
+ 246:../Source/KalmanFilter.c ****     KalmanX.angle += dt * KalmanX.rate;
+ 706              		.loc 1 246 0
+ 707 01f2 0990     		str	r0, [sp, #36]
+ 708              		.loc 1 248 0
+ 709 01f4 191C     		add	r1, r3, #0
+ 710 01f6 0098     		ldr	r0, [sp]
+ 711 01f8 0293     		str	r3, [sp, #8]
+ 712 01fa FFF7FEFF 		bl	__aeabi_fmul
+ 713 01fe E769     		ldr	r7, [r4, #28]
+ 714 0200 226A     		ldr	r2, [r4, #32]
+ 715 0202 391C     		add	r1, r7, #0
+ 716 0204 0192     		str	r2, [sp, #4]
+ 717 0206 061C     		add	r6, r0, #0
+ 718 0208 FFF7FEFF 		bl	__aeabi_fsub
+ 719 020c 0199     		ldr	r1, [sp, #4]
+ 720 020e FFF7FEFF 		bl	__aeabi_fsub
+ 721 0212 2168     		ldr	r1, [r4]
+ 722 0214 FFF7FEFF 		bl	__aeabi_fadd
+ 723 0218 011C     		add	r1, r0, #0
+ 724 021a 0098     		ldr	r0, [sp]
+ 725 021c FFF7FEFF 		bl	__aeabi_fmul
+ 726 0220 A169     		ldr	r1, [r4, #24]
+ 727 0222 FFF7FEFF 		bl	__aeabi_fadd
+ 249:../Source/KalmanFilter.c ****     KalmanX.P[0][1] -= dt * KalmanX.P[1][1];
+ 728              		.loc 1 249 0
+ 729 0226 311C     		add	r1, r6, #0
+ 248:../Source/KalmanFilter.c ****     KalmanX.P[0][0] += dt * (dt*KalmanX.P[1][1] - KalmanX.P[0][1] - KalmanX.P[1][0] + KalmanX.Q_ang
+ 730              		.loc 1 248 0
+ 731 0228 051C     		add	r5, r0, #0
+ 732              		.loc 1 249 0
+ 733 022a 381C     		add	r0, r7, #0
+ 734 022c FFF7FEFF 		bl	__aeabi_fsub
+ 250:../Source/KalmanFilter.c ****     KalmanX.P[1][0] -= dt * KalmanX.P[1][1];
+ 735              		.loc 1 250 0
+ 736 0230 311C     		add	r1, r6, #0
+ 249:../Source/KalmanFilter.c ****     KalmanX.P[0][1] -= dt * KalmanX.P[1][1];
+ 737              		.loc 1 249 0
+ 738 0232 0490     		str	r0, [sp, #16]
+ 739              		.loc 1 250 0
+ 740 0234 0198     		ldr	r0, [sp, #4]
+ 741 0236 FFF7FEFF 		bl	__aeabi_fsub
+ 251:../Source/KalmanFilter.c ****     KalmanX.P[1][1] += KalmanX.Q_bias * dt;
+ 742              		.loc 1 251 0
+ 743 023a 6168     		ldr	r1, [r4, #4]
+ 250:../Source/KalmanFilter.c ****     KalmanX.P[1][0] -= dt * KalmanX.P[1][1];
+ 744              		.loc 1 250 0
+ 745 023c 0190     		str	r0, [sp, #4]
+ 746              		.loc 1 251 0
+ 747 023e 0098     		ldr	r0, [sp]
+ 748 0240 FFF7FEFF 		bl	__aeabi_fmul
+ 749 0244 011C     		add	r1, r0, #0
+ 750 0246 0298     		ldr	r0, [sp, #8]
+ 751 0248 FFF7FEFF 		bl	__aeabi_fadd
+ 252:../Source/KalmanFilter.c ****     
+ 253:../Source/KalmanFilter.c ****     float S = KalmanX.P[0][0] + KalmanX.R_measure;
+ 752              		.loc 1 253 0
+ 753 024c A168     		ldr	r1, [r4, #8]
+ 251:../Source/KalmanFilter.c ****     KalmanX.P[1][1] += KalmanX.Q_bias * dt;
+ 754              		.loc 1 251 0
+ 755 024e 0C90     		str	r0, [sp, #48]
+ 756              		.loc 1 253 0
+ 757 0250 281C     		add	r0, r5, #0
+ 758 0252 FFF7FEFF 		bl	__aeabi_fadd
+ 759 0256 071C     		add	r7, r0, #0
+ 760              	.LVL31:
+ 254:../Source/KalmanFilter.c ****     
+ 255:../Source/KalmanFilter.c ****     float K[2];
+ 256:../Source/KalmanFilter.c ****     K[0] = KalmanX.P[0][0] / S;
+ 761              		.loc 1 256 0
+ 762 0258 391C     		add	r1, r7, #0
+ 763 025a 281C     		add	r0, r5, #0
+ 764              	.LVL32:
+ 765 025c FFF7FEFF 		bl	__aeabi_fdiv
+ 766              	.LVL33:
+ 257:../Source/KalmanFilter.c ****     K[1] = KalmanX.P[1][0] / S;
+ 767              		.loc 1 257 0
+ 768 0260 391C     		add	r1, r7, #0
+ 256:../Source/KalmanFilter.c ****     K[0] = KalmanX.P[0][0] / S;
+ 769              		.loc 1 256 0
+ 770 0262 061C     		add	r6, r0, #0
+ 771              	.LVL34:
+ 772              		.loc 1 257 0
+ 773 0264 0198     		ldr	r0, [sp, #4]
+ 774              	.LVL35:
+ 775 0266 FFF7FEFF 		bl	__aeabi_fdiv
+ 776 026a 071C     		add	r7, r0, #0
+ 777              	.LVL36:
+ 778              	.LBE8:
+ 779              	.LBE10:
+ 139:../Source/KalmanFilter.c ****     kalAngleX = KalmanX_getAngle(roll, gyroXrate, timing_kalman); /* Calculate the angle using a Ka
+ 780              		.loc 1 139 0
+ 781 026c 0698     		ldr	r0, [sp, #24]
+ 782 026e 0799     		ldr	r1, [sp, #28]
+ 783              	.LVL37:
+ 784 0270 FFF7FEFF 		bl	__aeabi_d2f
+ 785              	.LBB11:
+ 786              	.LBB9:
+ 258:../Source/KalmanFilter.c **** 
+ 259:../Source/KalmanFilter.c ****     float y = newAngle - KalmanX.angle;
+ 787              		.loc 1 259 0
+ 788 0274 0999     		ldr	r1, [sp, #36]
+ 789 0276 FFF7FEFF 		bl	__aeabi_fsub
+ 790 027a 0690     		str	r0, [sp, #24]
+ 791              	.LVL38:
+ 260:../Source/KalmanFilter.c ****     KalmanX.angle += K[0] * y;
+ 792              		.loc 1 260 0
+ 793 027c 0699     		ldr	r1, [sp, #24]
+ 794 027e 301C     		add	r0, r6, #0
+ 795              	.LVL39:
+ 796 0280 FFF7FEFF 		bl	__aeabi_fmul
+ 797              	.LVL40:
+ 798 0284 011C     		add	r1, r0, #0
+ 799 0286 0998     		ldr	r0, [sp, #36]
+ 800 0288 FFF7FEFF 		bl	__aeabi_fadd
+ 261:../Source/KalmanFilter.c ****     KalmanX.bias += K[1] * y;
+ 801              		.loc 1 261 0
+ 802 028c 0699     		ldr	r1, [sp, #24]
+ 260:../Source/KalmanFilter.c ****     KalmanX.angle += K[0] * y;
+ 803              		.loc 1 260 0
+ 804 028e 0290     		str	r0, [sp, #8]
+ 805 0290 E060     		str	r0, [r4, #12]
+ 806              		.loc 1 261 0
+ 807 0292 381C     		add	r0, r7, #0
+ 808 0294 FFF7FEFF 		bl	__aeabi_fmul
+ 809 0298 011C     		add	r1, r0, #0
+ 810 029a 0898     		ldr	r0, [sp, #32]
+ 811 029c FFF7FEFF 		bl	__aeabi_fadd
+ 262:../Source/KalmanFilter.c **** 
+ 263:../Source/KalmanFilter.c ****     float P00_temp = KalmanX.P[0][0];
+ 264:../Source/KalmanFilter.c ****     float P01_temp = KalmanX.P[0][1];
+ 265:../Source/KalmanFilter.c **** 
+ 266:../Source/KalmanFilter.c ****     KalmanX.P[0][0] -= K[0] * P00_temp;
+ 812              		.loc 1 266 0
+ 813 02a0 291C     		add	r1, r5, #0
+ 261:../Source/KalmanFilter.c ****     KalmanX.bias += K[1] * y;
+ 814              		.loc 1 261 0
+ 815 02a2 2061     		str	r0, [r4, #16]
+ 816              	.LVL41:
+ 817              		.loc 1 266 0
+ 818 02a4 301C     		add	r0, r6, #0
+ 819 02a6 FFF7FEFF 		bl	__aeabi_fmul
+ 820 02aa 011C     		add	r1, r0, #0
+ 821 02ac 281C     		add	r0, r5, #0
+ 822 02ae FFF7FEFF 		bl	__aeabi_fsub
+ 267:../Source/KalmanFilter.c ****     KalmanX.P[0][1] -= K[0] * P01_temp;
+ 823              		.loc 1 267 0
+ 824 02b2 0499     		ldr	r1, [sp, #16]
+ 266:../Source/KalmanFilter.c ****     KalmanX.P[0][0] -= K[0] * P00_temp;
+ 825              		.loc 1 266 0
+ 826 02b4 A061     		str	r0, [r4, #24]
+ 827              		.loc 1 267 0
+ 828 02b6 301C     		add	r0, r6, #0
+ 829 02b8 FFF7FEFF 		bl	__aeabi_fmul
+ 830 02bc 011C     		add	r1, r0, #0
+ 831 02be 0498     		ldr	r0, [sp, #16]
+ 832 02c0 FFF7FEFF 		bl	__aeabi_fsub
+ 268:../Source/KalmanFilter.c ****     KalmanX.P[1][0] -= K[1] * P00_temp;
+ 833              		.loc 1 268 0
+ 834 02c4 291C     		add	r1, r5, #0
+ 267:../Source/KalmanFilter.c ****     KalmanX.P[0][1] -= K[0] * P01_temp;
+ 835              		.loc 1 267 0
+ 836 02c6 E061     		str	r0, [r4, #28]
+ 837              		.loc 1 268 0
+ 838 02c8 381C     		add	r0, r7, #0
+ 839 02ca FFF7FEFF 		bl	__aeabi_fmul
+ 840 02ce 011C     		add	r1, r0, #0
+ 841 02d0 0198     		ldr	r0, [sp, #4]
+ 842 02d2 FFF7FEFF 		bl	__aeabi_fsub
+ 269:../Source/KalmanFilter.c ****     KalmanX.P[1][1] -= K[1] * P01_temp;
+ 843              		.loc 1 269 0
+ 844 02d6 0499     		ldr	r1, [sp, #16]
+ 268:../Source/KalmanFilter.c ****     KalmanX.P[1][0] -= K[1] * P00_temp;
+ 845              		.loc 1 268 0
+ 846 02d8 2062     		str	r0, [r4, #32]
+ 847              		.loc 1 269 0
+ 848 02da 381C     		add	r0, r7, #0
+ 849 02dc FFF7FEFF 		bl	__aeabi_fmul
+ 850 02e0 011C     		add	r1, r0, #0
+ 851 02e2 0C98     		ldr	r0, [sp, #48]
+ 852 02e4 FFF7FEFF 		bl	__aeabi_fsub
+ 853 02e8 6062     		str	r0, [r4, #36]
+ 854              	.LVL42:
+ 855              	.LBE9:
+ 856              	.LBE11:
+ 139:../Source/KalmanFilter.c ****     kalAngleX = KalmanX_getAngle(roll, gyroXrate, timing_kalman); /* Calculate the angle using a Ka
+ 857              		.loc 1 139 0
+ 858 02ea 0298     		ldr	r0, [sp, #8]
+ 859 02ec FFF7FEFF 		bl	__aeabi_f2d
+ 142:../Source/KalmanFilter.c ****   if (abs(kalAngleX) > 90)
+ 860              		.loc 1 142 0
+ 861 02f0 FFF7FEFF 		bl	__aeabi_d2iz
+ 862 02f4 C317     		asr	r3, r0, #31
+ 863 02f6 C018     		add	r0, r0, r3
+ 864 02f8 5840     		eor	r0, r3
+ 865 02fa 5A28     		cmp	r0, #90
+ 866 02fc 04DD     		ble	.L22
+ 144:../Source/KalmanFilter.c ****     gyroYrate = - gyroYrate; /* Invert rate, so it fits the restricted accelerometer reading */
+ 867              		.loc 1 144 0
+ 868 02fe 0598     		ldr	r0, [sp, #20]
+ 869 0300 8021     		mov	r1, #128
+ 870 0302 0A06     		lsl	r2, r1, #24
+ 871 0304 8418     		add	r4, r0, r2
+ 872 0306 0594     		str	r4, [sp, #20]
+ 873              	.LVL43:
+ 874              	.L22:
+ 875              	.LBB12:
+ 876              	.LBB13:
+ 270:../Source/KalmanFilter.c **** 
+ 271:../Source/KalmanFilter.c ****     return KalmanX.angle;
+ 272:../Source/KalmanFilter.c **** }
+ 273:../Source/KalmanFilter.c **** 
+ 274:../Source/KalmanFilter.c **** static float KalmanY_getAngle(float newAngle, float newRate, float dt) {
+ 275:../Source/KalmanFilter.c ****     KalmanY.rate = newRate - KalmanY.bias;
+ 877              		.loc 1 275 0
+ 878 0308 544C     		ldr	r4, .L29+20
+ 879              	.LBE13:
+ 880              	.LBE12:
+ 146:../Source/KalmanFilter.c ****   kalAngleY = KalmanY_getAngle(pitch, gyroYrate, timing_kalman);
+ 881              		.loc 1 146 0
+ 882 030a 0599     		ldr	r1, [sp, #20]
+ 883              	.LBB19:
+ 884              	.LBB14:
+ 885              		.loc 1 275 0
+ 886 030c 2369     		ldr	r3, [r4, #16]
+ 887              	.LBE14:
+ 888              	.LBE19:
+ 146:../Source/KalmanFilter.c ****   kalAngleY = KalmanY_getAngle(pitch, gyroYrate, timing_kalman);
+ 889              		.loc 1 146 0
+ 890 030e 0D98     		ldr	r0, [sp, #52]
+ 891              	.LBB20:
+ 892              	.LBB15:
+ 893              		.loc 1 275 0
+ 894 0310 0893     		str	r3, [sp, #32]
+ 895              	.LBE15:
+ 896              	.LBE20:
+ 146:../Source/KalmanFilter.c ****   kalAngleY = KalmanY_getAngle(pitch, gyroYrate, timing_kalman);
+ 897              		.loc 1 146 0
+ 898 0312 FFF7FEFF 		bl	__aeabi_d2f
+ 899              	.LBB21:
+ 900              	.LBB16:
+ 901              		.loc 1 275 0
+ 902 0316 0899     		ldr	r1, [sp, #32]
+ 903 0318 FFF7FEFF 		bl	__aeabi_fsub
+ 904 031c 011C     		add	r1, r0, #0
+ 905 031e 6061     		str	r0, [r4, #20]
+ 276:../Source/KalmanFilter.c ****     KalmanY.angle += dt * KalmanY.rate;
+ 906              		.loc 1 276 0
+ 907 0320 0098     		ldr	r0, [sp]
+ 908 0322 FFF7FEFF 		bl	__aeabi_fmul
+ 909 0326 E168     		ldr	r1, [r4, #12]
+ 910 0328 FFF7FEFF 		bl	__aeabi_fadd
+ 277:../Source/KalmanFilter.c **** 
+ 278:../Source/KalmanFilter.c ****     KalmanY.P[0][0] += dt * (dt*KalmanY.P[1][1] - KalmanY.P[0][1] - KalmanY.P[1][0] + KalmanY.Q_ang
+ 911              		.loc 1 278 0
+ 912 032c 626A     		ldr	r2, [r4, #36]
+ 276:../Source/KalmanFilter.c ****     KalmanY.angle += dt * KalmanY.rate;
+ 913              		.loc 1 276 0
+ 914 032e 0990     		str	r0, [sp, #36]
+ 915              		.loc 1 278 0
+ 916 0330 111C     		add	r1, r2, #0
+ 917 0332 0098     		ldr	r0, [sp]
+ 918 0334 0592     		str	r2, [sp, #20]
+ 919 0336 FFF7FEFF 		bl	__aeabi_fmul
+ 920 033a E769     		ldr	r7, [r4, #28]
+ 921              	.LVL44:
+ 922 033c 236A     		ldr	r3, [r4, #32]
+ 923 033e 391C     		add	r1, r7, #0
+ 924 0340 0193     		str	r3, [sp, #4]
+ 925 0342 061C     		add	r6, r0, #0
+ 926              	.LVL45:
+ 927 0344 FFF7FEFF 		bl	__aeabi_fsub
+ 928 0348 0199     		ldr	r1, [sp, #4]
+ 929 034a FFF7FEFF 		bl	__aeabi_fsub
+ 930 034e 2168     		ldr	r1, [r4]
+ 931 0350 FFF7FEFF 		bl	__aeabi_fadd
+ 932 0354 011C     		add	r1, r0, #0
+ 933 0356 0098     		ldr	r0, [sp]
+ 934 0358 FFF7FEFF 		bl	__aeabi_fmul
+ 935 035c A169     		ldr	r1, [r4, #24]
+ 936 035e FFF7FEFF 		bl	__aeabi_fadd
+ 279:../Source/KalmanFilter.c ****     KalmanY.P[0][1] -= dt * KalmanY.P[1][1];
+ 937              		.loc 1 279 0
+ 938 0362 311C     		add	r1, r6, #0
+ 278:../Source/KalmanFilter.c ****     KalmanY.P[0][0] += dt * (dt*KalmanY.P[1][1] - KalmanY.P[0][1] - KalmanY.P[1][0] + KalmanY.Q_ang
+ 939              		.loc 1 278 0
+ 940 0364 051C     		add	r5, r0, #0
+ 941              	.LVL46:
+ 942              		.loc 1 279 0
+ 943 0366 381C     		add	r0, r7, #0
+ 944 0368 FFF7FEFF 		bl	__aeabi_fsub
+ 280:../Source/KalmanFilter.c ****     KalmanY.P[1][0] -= dt * KalmanY.P[1][1];
+ 945              		.loc 1 280 0
+ 946 036c 311C     		add	r1, r6, #0
+ 279:../Source/KalmanFilter.c ****     KalmanY.P[0][1] -= dt * KalmanY.P[1][1];
+ 947              		.loc 1 279 0
+ 948 036e 0490     		str	r0, [sp, #16]
+ 949              		.loc 1 280 0
+ 950 0370 0198     		ldr	r0, [sp, #4]
+ 951 0372 FFF7FEFF 		bl	__aeabi_fsub
+ 281:../Source/KalmanFilter.c ****     KalmanY.P[1][1] += KalmanY.Q_bias * dt;
+ 952              		.loc 1 281 0
+ 953 0376 6168     		ldr	r1, [r4, #4]
+ 280:../Source/KalmanFilter.c ****     KalmanY.P[1][0] -= dt * KalmanY.P[1][1];
+ 954              		.loc 1 280 0
+ 955 0378 0190     		str	r0, [sp, #4]
+ 956              		.loc 1 281 0
+ 957 037a 0098     		ldr	r0, [sp]
+ 958 037c FFF7FEFF 		bl	__aeabi_fmul
+ 959 0380 011C     		add	r1, r0, #0
+ 960 0382 0598     		ldr	r0, [sp, #20]
+ 961 0384 FFF7FEFF 		bl	__aeabi_fadd
+ 962 0388 0690     		str	r0, [sp, #24]
+ 282:../Source/KalmanFilter.c ****     
+ 283:../Source/KalmanFilter.c ****     float S = KalmanY.P[0][0] + KalmanY.R_measure;
+ 963              		.loc 1 283 0
+ 964 038a A168     		ldr	r1, [r4, #8]
+ 965 038c 281C     		add	r0, r5, #0
+ 966 038e FFF7FEFF 		bl	__aeabi_fadd
+ 967 0392 071C     		add	r7, r0, #0
+ 968              	.LVL47:
+ 284:../Source/KalmanFilter.c ****     
+ 285:../Source/KalmanFilter.c ****     float K[2];
+ 286:../Source/KalmanFilter.c ****     K[0] = KalmanY.P[0][0] / S;
+ 969              		.loc 1 286 0
+ 970 0394 391C     		add	r1, r7, #0
+ 971 0396 281C     		add	r0, r5, #0
+ 972              	.LVL48:
+ 973 0398 FFF7FEFF 		bl	__aeabi_fdiv
+ 974              	.LVL49:
+ 287:../Source/KalmanFilter.c ****     K[1] = KalmanY.P[1][0] / S;
+ 975              		.loc 1 287 0
+ 976 039c 391C     		add	r1, r7, #0
+ 286:../Source/KalmanFilter.c ****     K[0] = KalmanY.P[0][0] / S;
+ 977              		.loc 1 286 0
+ 978 039e 061C     		add	r6, r0, #0
+ 979              	.LVL50:
+ 980              		.loc 1 287 0
+ 981 03a0 0198     		ldr	r0, [sp, #4]
+ 982              	.LVL51:
+ 983 03a2 FFF7FEFF 		bl	__aeabi_fdiv
+ 984 03a6 071C     		add	r7, r0, #0
+ 985              	.LVL52:
+ 986              	.LBE16:
+ 987              	.LBE21:
+ 146:../Source/KalmanFilter.c ****   kalAngleY = KalmanY_getAngle(pitch, gyroYrate, timing_kalman);
+ 988              		.loc 1 146 0
+ 989 03a8 0A98     		ldr	r0, [sp, #40]
+ 990 03aa 0B99     		ldr	r1, [sp, #44]
+ 991              	.LVL53:
+ 992 03ac FFF7FEFF 		bl	__aeabi_d2f
+ 993              	.LBB22:
+ 994              	.LBB17:
+ 288:../Source/KalmanFilter.c **** 
+ 289:../Source/KalmanFilter.c **** 
+ 290:../Source/KalmanFilter.c ****     float y = newAngle - KalmanY.angle;
+ 995              		.loc 1 290 0
+ 996 03b0 0999     		ldr	r1, [sp, #36]
+ 997 03b2 FFF7FEFF 		bl	__aeabi_fsub
+ 998 03b6 0090     		str	r0, [sp]
+ 999              	.LVL54:
+ 291:../Source/KalmanFilter.c **** 
+ 292:../Source/KalmanFilter.c ****     KalmanY.angle += K[0] * y;
+ 1000              		.loc 1 292 0
+ 1001 03b8 0099     		ldr	r1, [sp]
+ 1002 03ba 301C     		add	r0, r6, #0
+ 1003              	.LVL55:
+ 1004 03bc FFF7FEFF 		bl	__aeabi_fmul
+ 1005              	.LVL56:
+ 1006 03c0 011C     		add	r1, r0, #0
+ 1007 03c2 0998     		ldr	r0, [sp, #36]
+ 1008 03c4 FFF7FEFF 		bl	__aeabi_fadd
+ 293:../Source/KalmanFilter.c ****     KalmanY.bias += K[1] * y;
+ 1009              		.loc 1 293 0
+ 1010 03c8 0099     		ldr	r1, [sp]
+ 292:../Source/KalmanFilter.c ****     KalmanY.angle += K[0] * y;
+ 1011              		.loc 1 292 0
+ 1012 03ca 0590     		str	r0, [sp, #20]
+ 1013 03cc E060     		str	r0, [r4, #12]
+ 1014              		.loc 1 293 0
+ 1015 03ce 381C     		add	r0, r7, #0
+ 1016 03d0 FFF7FEFF 		bl	__aeabi_fmul
+ 1017 03d4 011C     		add	r1, r0, #0
+ 1018 03d6 0898     		ldr	r0, [sp, #32]
+ 1019 03d8 FFF7FEFF 		bl	__aeabi_fadd
+ 294:../Source/KalmanFilter.c **** 
+ 295:../Source/KalmanFilter.c ****     float P00_temp = KalmanY.P[0][0];
+ 296:../Source/KalmanFilter.c ****     float P01_temp = KalmanY.P[0][1];
+ 297:../Source/KalmanFilter.c **** 
+ 298:../Source/KalmanFilter.c ****     KalmanY.P[0][0] -= K[0] * P00_temp;
+ 1020              		.loc 1 298 0
+ 1021 03dc 291C     		add	r1, r5, #0
+ 293:../Source/KalmanFilter.c ****     KalmanY.bias += K[1] * y;
+ 1022              		.loc 1 293 0
+ 1023 03de 2061     		str	r0, [r4, #16]
+ 1024              	.LVL57:
+ 1025              		.loc 1 298 0
+ 1026 03e0 301C     		add	r0, r6, #0
+ 1027 03e2 FFF7FEFF 		bl	__aeabi_fmul
+ 1028 03e6 011C     		add	r1, r0, #0
+ 1029 03e8 281C     		add	r0, r5, #0
+ 1030 03ea FFF7FEFF 		bl	__aeabi_fsub
+ 299:../Source/KalmanFilter.c ****     KalmanY.P[0][1] -= K[0] * P01_temp;
+ 1031              		.loc 1 299 0
+ 1032 03ee 0499     		ldr	r1, [sp, #16]
+ 298:../Source/KalmanFilter.c ****     KalmanY.P[0][0] -= K[0] * P00_temp;
+ 1033              		.loc 1 298 0
+ 1034 03f0 A061     		str	r0, [r4, #24]
+ 1035              		.loc 1 299 0
+ 1036 03f2 301C     		add	r0, r6, #0
+ 1037 03f4 FFF7FEFF 		bl	__aeabi_fmul
+ 1038 03f8 011C     		add	r1, r0, #0
+ 1039 03fa 0498     		ldr	r0, [sp, #16]
+ 1040 03fc FFF7FEFF 		bl	__aeabi_fsub
+ 300:../Source/KalmanFilter.c ****     KalmanY.P[1][0] -= K[1] * P00_temp;
+ 1041              		.loc 1 300 0
+ 1042 0400 291C     		add	r1, r5, #0
+ 299:../Source/KalmanFilter.c ****     KalmanY.P[0][1] -= K[0] * P01_temp;
+ 1043              		.loc 1 299 0
+ 1044 0402 E061     		str	r0, [r4, #28]
+ 1045              		.loc 1 300 0
+ 1046 0404 381C     		add	r0, r7, #0
+ 1047 0406 FFF7FEFF 		bl	__aeabi_fmul
+ 1048 040a 011C     		add	r1, r0, #0
+ 1049 040c 0198     		ldr	r0, [sp, #4]
+ 1050 040e FFF7FEFF 		bl	__aeabi_fsub
+ 301:../Source/KalmanFilter.c ****     KalmanY.P[1][1] -= K[1] * P01_temp;
+ 1051              		.loc 1 301 0
+ 1052 0412 0499     		ldr	r1, [sp, #16]
+ 300:../Source/KalmanFilter.c ****     KalmanY.P[1][0] -= K[1] * P00_temp;
+ 1053              		.loc 1 300 0
+ 1054 0414 2062     		str	r0, [r4, #32]
+ 1055              		.loc 1 301 0
+ 1056 0416 381C     		add	r0, r7, #0
+ 1057 0418 FFF7FEFF 		bl	__aeabi_fmul
+ 1058 041c 011C     		add	r1, r0, #0
+ 1059 041e 0698     		ldr	r0, [sp, #24]
+ 1060 0420 FFF7FEFF 		bl	__aeabi_fsub
+ 1061              	.LBE17:
+ 1062              	.LBE22:
+ 165:../Source/KalmanFilter.c ****    Calculated_Roll  =  (float) (kalAngleX);
+ 1063              		.loc 1 165 0
+ 1064 0424 0E4B     		ldr	r3, .L29+24
+ 1065              	.LBB23:
+ 1066              	.LBB18:
+ 1067              		.loc 1 301 0
+ 1068 0426 6062     		str	r0, [r4, #36]
+ 1069              	.LVL58:
+ 1070              	.LBE18:
+ 1071              	.LBE23:
+ 165:../Source/KalmanFilter.c ****    Calculated_Roll  =  (float) (kalAngleX);
+ 1072              		.loc 1 165 0
+ 1073 0428 029C     		ldr	r4, [sp, #8]
+ 1074 042a 1C60     		str	r4, [r3]
+ 166:../Source/KalmanFilter.c ****    Calculated_Pitch  = (float) (kalAngleY);
+ 1075              		.loc 1 166 0
+ 1076 042c 0D4B     		ldr	r3, .L29+28
+ 1077 042e 059C     		ldr	r4, [sp, #20]
+ 1078 0430 1C60     		str	r4, [r3]
+ 167:../Source/KalmanFilter.c ****    Calculated_yaw  = (float) (kalAngleZ);
+ 1079              		.loc 1 167 0
+ 1080 0432 0D4B     		ldr	r3, .L29+32
+ 1081 0434 1868     		ldr	r0, [r3]
+ 1082 0436 5968     		ldr	r1, [r3, #4]
+ 1083 0438 FFF7FEFF 		bl	__aeabi_d2f
+ 1084 043c 0B4B     		ldr	r3, .L29+36
+ 1085 043e 1860     		str	r0, [r3]
+ 168:../Source/KalmanFilter.c **** }
+ 1086              		.loc 1 168 0
+ 1087 0440 0FB0     		add	sp, sp, #60
+ 1088              	.LVL59:
+ 1089              		@ sp needed for prologue
+ 1090              	.LVL60:
+ 1091              	.LVL61:
+ 1092              	.LVL62:
+ 1093 0442 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1094              	.L30:
+ 1095 0444 C046C046 		.align	3
+ 1096              	.L29:
+ 1097 0448 00000000 		.word	0
+ 1098 044c 008076C0 		.word	-1065975808
+ 1099 0450 00000000 		.word	0
+ 1100 0454 00807640 		.word	1081507840
+ 1101 0458 00000000 		.word	KalmanX
+ 1102 045c 00000000 		.word	KalmanY
+ 1103 0460 00000000 		.word	.LANCHOR4
+ 1104 0464 00000000 		.word	.LANCHOR3
+ 1105 0468 00000000 		.word	.LANCHOR9
+ 1106 046c 00000000 		.word	.LANCHOR5
+ 1107              		.cfi_endproc
+ 1108              	.LFE34:
+ 1110              		.section	.text.Kalman_SetFlag,"ax",%progbits
+ 1111              		.align	1
+ 1112              		.global	Kalman_SetFlag
+ 1113              		.code	16
+ 1114              		.thumb_func
+ 1116              	Kalman_SetFlag:
+ 1117              	.LFB41:
+ 232:../Source/KalmanFilter.c **** void Kalman_SetFlag(void) {
+ 1118              		.loc 1 232 0
+ 1119              		.cfi_startproc
+ 233:../Source/KalmanFilter.c **** 	KalmanFlag = 1;
+ 1120              		.loc 1 233 0
+ 1121 0000 014B     		ldr	r3, .L32
+ 1122 0002 0122     		mov	r2, #1
+ 1123 0004 1A70     		strb	r2, [r3]
+ 1124              		@ sp needed for prologue
+ 234:../Source/KalmanFilter.c **** }
+ 1125              		.loc 1 234 0
+ 1126 0006 7047     		bx	lr
+ 1127              	.L33:
+ 1128              		.align	2
+ 1129              	.L32:
+ 1130 0008 00000000 		.word	.LANCHOR12
+ 1131              		.cfi_endproc
+ 1132              	.LFE41:
+ 1134              		.section	.text.Kalman_IncTick,"ax",%progbits
+ 1135              		.align	1
+ 1136              		.global	Kalman_IncTick
+ 1137              		.code	16
+ 1138              		.thumb_func
+ 1140              	Kalman_IncTick:
+ 1141              	.LFB39:
+ 217:../Source/KalmanFilter.c **** void Kalman_IncTick(void) {
+ 1142              		.loc 1 217 0
+ 1143              		.cfi_startproc
+ 1144 0000 10B5     		push	{r4, lr}
+ 1145              	.LCFI6:
+ 1146              		.cfi_def_cfa_offset 8
+ 1147              		.cfi_offset 4, -8
+ 1148              		.cfi_offset 14, -4
+ 218:../Source/KalmanFilter.c **** 	Kalman_Timer++;
+ 1149              		.loc 1 218 0
+ 1150 0002 094A     		ldr	r2, .L36
+ 220:../Source/KalmanFilter.c **** 	if(ExecuteTicks >= ExecuteMax) {
+ 1151              		.loc 1 220 0
+ 1152 0004 0948     		ldr	r0, .L36+4
+ 218:../Source/KalmanFilter.c **** 	Kalman_Timer++;
+ 1153              		.loc 1 218 0
+ 1154 0006 1468     		ldr	r4, [r2]
+ 1155 0008 0134     		add	r4, r4, #1
+ 1156 000a 1460     		str	r4, [r2]
+ 219:../Source/KalmanFilter.c **** 	ExecuteTicks++;
+ 1157              		.loc 1 219 0
+ 1158 000c 084C     		ldr	r4, .L36+8
+ 1159 000e 2168     		ldr	r1, [r4]
+ 1160 0010 0131     		add	r1, r1, #1
+ 1161 0012 2160     		str	r1, [r4]
+ 220:../Source/KalmanFilter.c **** 	if(ExecuteTicks >= ExecuteMax) {
+ 1162              		.loc 1 220 0
+ 1163 0014 2268     		ldr	r2, [r4]
+ 1164 0016 0368     		ldr	r3, [r0]
+ 1165 0018 9A42     		cmp	r2, r3
+ 1166 001a 03D3     		bcc	.L34
+ 221:../Source/KalmanFilter.c **** 		Kalman_SetFlag();
+ 1167              		.loc 1 221 0
+ 1168 001c FFF7FEFF 		bl	Kalman_SetFlag
+ 222:../Source/KalmanFilter.c **** 		ExecuteTicks = 0;
+ 1169              		.loc 1 222 0
+ 1170 0020 0023     		mov	r3, #0
+ 1171 0022 2360     		str	r3, [r4]
+ 1172              	.L34:
+ 1173              		@ sp needed for prologue
+ 224:../Source/KalmanFilter.c **** }
+ 1174              		.loc 1 224 0
+ 1175 0024 10BD     		pop	{r4, pc}
+ 1176              	.L37:
+ 1177 0026 C046     		.align	2
+ 1178              	.L36:
+ 1179 0028 00000000 		.word	.LANCHOR2
+ 1180 002c 00000000 		.word	.LANCHOR1
+ 1181 0030 00000000 		.word	.LANCHOR13
+ 1182              		.cfi_endproc
+ 1183              	.LFE39:
+ 1185              		.section	.text.Kalman_GetFlag,"ax",%progbits
+ 1186              		.align	1
+ 1187              		.global	Kalman_GetFlag
+ 1188              		.code	16
+ 1189              		.thumb_func
+ 1191              	Kalman_GetFlag:
+ 1192              	.LFB42:
+ 236:../Source/KalmanFilter.c **** uint8_t Kalman_GetFlag(void) {
+ 1193              		.loc 1 236 0
+ 1194              		.cfi_startproc
+ 237:../Source/KalmanFilter.c **** 	return KalmanFlag;
+ 1195              		.loc 1 237 0
+ 1196 0000 014B     		ldr	r3, .L39
+ 1197              		@ sp needed for prologue
+ 1198 0002 1878     		ldrb	r0, [r3]
+ 238:../Source/KalmanFilter.c **** }
+ 1199              		.loc 1 238 0
+ 1200 0004 7047     		bx	lr
+ 1201              	.L40:
+ 1202 0006 C046     		.align	2
+ 1203              	.L39:
+ 1204 0008 00000000 		.word	.LANCHOR12
+ 1205              		.cfi_endproc
+ 1206              	.LFE42:
+ 1208              		.section	.text.Kalman_ClearFlag,"ax",%progbits
+ 1209              		.align	1
+ 1210              		.global	Kalman_ClearFlag
+ 1211              		.code	16
+ 1212              		.thumb_func
+ 1214              	Kalman_ClearFlag:
+ 1215              	.LFB43:
+ 240:../Source/KalmanFilter.c **** void Kalman_ClearFlag(void) {
+ 1216              		.loc 1 240 0
+ 1217              		.cfi_startproc
+ 241:../Source/KalmanFilter.c **** 	KalmanFlag = 0;
+ 1218              		.loc 1 241 0
+ 1219 0000 014B     		ldr	r3, .L42
+ 1220 0002 0022     		mov	r2, #0
+ 1221 0004 1A70     		strb	r2, [r3]
+ 1222              		@ sp needed for prologue
+ 242:../Source/KalmanFilter.c **** }
+ 1223              		.loc 1 242 0
+ 1224 0006 7047     		bx	lr
+ 1225              	.L43:
+ 1226              		.align	2
+ 1227              	.L42:
+ 1228 0008 00000000 		.word	.LANCHOR12
+ 1229              		.cfi_endproc
+ 1230              	.LFE43:
+ 1232              		.section	.text.LSM6DS3_calibaration,"ax",%progbits
+ 1233              		.align	1
+ 1234              		.global	LSM6DS3_calibaration
+ 1235              		.code	16
+ 1236              		.thumb_func
+ 1238              	LSM6DS3_calibaration:
+ 1239              	.LFB46:
+ 302:../Source/KalmanFilter.c **** 
+ 303:../Source/KalmanFilter.c ****     return KalmanY.angle;
+ 304:../Source/KalmanFilter.c **** }
+ 305:../Source/KalmanFilter.c **** 
+ 306:../Source/KalmanFilter.c **** void LSM6DS3_calibaration(uint16_t time){
+ 1240              		.loc 1 306 0
+ 1241              		.cfi_startproc
+ 1242              	.LVL63:
+ 1243              		@ sp needed for prologue
+ 307:../Source/KalmanFilter.c **** #if 0
+ 308:../Source/KalmanFilter.c **** 	int32_t gyroX_total=0,gyroY_total=0,gytoZ_total=0;
+ 309:../Source/KalmanFilter.c **** 	xprintf("LSM6DS3 calibration start\r\n");
+ 310:../Source/KalmanFilter.c **** 	for(int i = 0;i<time;i++){
+ 311:../Source/KalmanFilter.c **** 	
+ 312:../Source/KalmanFilter.c **** 		gyroX_total += LSM6DS3_GetGS_X_Int16();
+ 313:../Source/KalmanFilter.c **** 		gyroY_total += LSM6DS3_GetGS_Y_Int16();
+ 314:../Source/KalmanFilter.c **** 		gytoZ_total += LSM6DS3_GetGS_Z_Int16();
+ 315:../Source/KalmanFilter.c **** 	
+ 316:../Source/KalmanFilter.c **** 		delay_ms(100);
+ 317:../Source/KalmanFilter.c **** 		xprintf(".");
+ 318:../Source/KalmanFilter.c **** 		IWDT_clear();
+ 319:../Source/KalmanFilter.c **** 	}
+ 320:../Source/KalmanFilter.c **** 	
+ 321:../Source/KalmanFilter.c **** 	g_config.lsm6ds3_offset.gyroX_offset = gyroX_total/time;
+ 322:../Source/KalmanFilter.c **** 	g_config.lsm6ds3_offset.gyroY_offset = gyroY_total/time;
+ 323:../Source/KalmanFilter.c **** 	g_config.lsm6ds3_offset.gyroZ_offset = gytoZ_total/time;
+ 324:../Source/KalmanFilter.c **** 	
+ 325:../Source/KalmanFilter.c **** 	g_config.lsm6ds3_offset.accX_offset=0;
+ 326:../Source/KalmanFilter.c **** 	g_config.lsm6ds3_offset.accY_offset=0;
+ 327:../Source/KalmanFilter.c **** 	g_config.lsm6ds3_offset.accZ_offset=0;
+ 328:../Source/KalmanFilter.c **** 		
+ 329:../Source/KalmanFilter.c **** 	
+ 330:../Source/KalmanFilter.c **** 	g_appStats.writeConfigNow = true;
+ 331:../Source/KalmanFilter.c **** 	
+ 332:../Source/KalmanFilter.c **** 	xprintf("\r\n");
+ 333:../Source/KalmanFilter.c **** 	xprintf("gyroX_offset=%d\r\n",g_config.lsm6ds3_offset.gyroX_offset);
+ 334:../Source/KalmanFilter.c **** 	xprintf("gyroY_offset=%d\r\n",g_config.lsm6ds3_offset.gyroY_offset);
+ 335:../Source/KalmanFilter.c **** 	xprintf("gyroZ_offset=%d\r\n",g_config.lsm6ds3_offset.gyroZ_offset);
+ 336:../Source/KalmanFilter.c **** 	
+ 337:../Source/KalmanFilter.c **** 	xprintf("LSM6DS3 calibration done \r\n");
+ 338:../Source/KalmanFilter.c **** 	
+ 339:../Source/KalmanFilter.c **** #endif
+ 340:../Source/KalmanFilter.c **** }
+ 1244              		.loc 1 340 0
+ 1245 0000 7047     		bx	lr
+ 1246              		.cfi_endproc
+ 1247              	.LFE46:
+ 1249              		.comm	gyroZ,8,8
+ 1250              		.comm	gyroY,8,8
+ 1251              		.comm	gyroX,8,8
+ 1252              		.comm	accZ,8,8
+ 1253              		.comm	accY,8,8
+ 1254              		.comm	accX,8,8
+ 1255              		.global	kalAngleZ
+ 1256              		.global	gyroZ_offset
+ 1257              		.comm	KalmanY,40,4
+ 1258              		.comm	KalmanX,40,4
+ 1259              		.section	.bss.current_time.7471,"aw",%nobits
+ 1260              		.align	2
+ 1261              		.set	.LANCHOR10,. + 0
+ 1264              	current_time.7471:
+ 1265 0000 00000000 		.space	4
+ 1266              		.section	.data.gyroZ_offset,"aw",%progbits
+ 1267              		.align	3
+ 1268              		.set	.LANCHOR8,. + 0
+ 1271              	gyroZ_offset:
+ 1272 0000 00000000 		.word	0
+ 1273 0004 00002C40 		.word	1076625408
+ 1274              		.section	.bss.Calculated_Pitch,"aw",%nobits
+ 1275              		.align	2
+ 1276              		.set	.LANCHOR3,. + 0
+ 1279              	Calculated_Pitch:
+ 1280 0000 00000000 		.space	4
+ 1281              		.section	.bss.Tick_frequency,"aw",%nobits
+ 1282              		.align	2
+ 1283              		.set	.LANCHOR0,. + 0
+ 1286              	Tick_frequency:
+ 1287 0000 00000000 		.space	4
+ 1288              		.section	.bss.ExecuteTicks,"aw",%nobits
+ 1289              		.align	2
+ 1290              		.set	.LANCHOR13,. + 0
+ 1293              	ExecuteTicks:
+ 1294 0000 00000000 		.space	4
+ 1295              		.section	.bss.current_time.7490,"aw",%nobits
+ 1296              		.align	2
+ 1297              		.set	.LANCHOR6,. + 0
+ 1300              	current_time.7490:
+ 1301 0000 00000000 		.space	4
+ 1302              		.section	.bss.Kalman_Timer,"aw",%nobits
+ 1303              		.align	2
+ 1304              		.set	.LANCHOR2,. + 0
+ 1307              	Kalman_Timer:
+ 1308 0000 00000000 		.space	4
+ 1309              		.section	.bss.kalAngleZ,"aw",%nobits
+ 1310              		.align	3
+ 1311              		.set	.LANCHOR9,. + 0
+ 1314              	kalAngleZ:
+ 1315 0000 00000000 		.space	8
+ 1315      00000000 
+ 1316              		.section	.bss.Calculated_Roll,"aw",%nobits
+ 1317              		.align	2
+ 1318              		.set	.LANCHOR4,. + 0
+ 1321              	Calculated_Roll:
+ 1322 0000 00000000 		.space	4
+ 1323              		.section	.bss.Calculated_yaw,"aw",%nobits
+ 1324              		.align	2
+ 1325              		.set	.LANCHOR5,. + 0
+ 1328              	Calculated_yaw:
+ 1329 0000 00000000 		.space	4
+ 1330              		.section	.bss.last_time.7491,"aw",%nobits
+ 1331              		.align	2
+ 1332              		.set	.LANCHOR7,. + 0
+ 1335              	last_time.7491:
+ 1336 0000 00000000 		.space	4
+ 1337              		.section	.bss.last_time.7472,"aw",%nobits
+ 1338              		.align	2
+ 1339              		.set	.LANCHOR11,. + 0
+ 1342              	last_time.7472:
+ 1343 0000 00000000 		.space	4
+ 1344              		.section	.bss.ExecuteMax,"aw",%nobits
+ 1345              		.align	2
+ 1346              		.set	.LANCHOR1,. + 0
+ 1349              	ExecuteMax:
+ 1350 0000 00000000 		.space	4
+ 1351              		.section	.bss.KalmanFlag,"aw",%nobits
+ 1352              		.set	.LANCHOR12,. + 0
+ 1355              	KalmanFlag:
+ 1356 0000 00       		.space	1
+ 1357              		.text
+ 1358              	.Letext0:
+ 1359              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1360              		.file 3 "../Source/KalmanFilter.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 KalmanFilter.c
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:24     .text.Start_Kalman_Algorithm:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:29     .text.Start_Kalman_Algorithm:00000000 Start_Kalman_Algorithm
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:217    .text.Start_Kalman_Algorithm:000000f8 $d
+                            *COM*:00000028 KalmanX
+                            *COM*:00000028 KalmanY
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:231    .text.Kalman_GetPitch:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:236    .text.Kalman_GetPitch:00000000 Kalman_GetPitch
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:249    .text.Kalman_GetPitch:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:254    .text.Kalman_GetRoll:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:259    .text.Kalman_GetRoll:00000000 Kalman_GetRoll
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:272    .text.Kalman_GetRoll:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:277    .text.Kalman_Getyaw:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:282    .text.Kalman_Getyaw:00000000 Kalman_Getyaw
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:295    .text.Kalman_Getyaw:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:300    .text.Kalman_GetTick:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:305    .text.Kalman_GetTick:00000000 Kalman_GetTick
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:327    .text.Kalman_Getyaw_execute:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:332    .text.Kalman_Getyaw_execute:00000000 Kalman_Getyaw_execute
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:406    .text.Kalman_Getyaw_execute:00000068 $d
+                            *COM*:00000008 gyroZ
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:425    .text.Execute_Kalman_Filter:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:430    .text.Execute_Kalman_Filter:00000000 Execute_Kalman_Filter
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:642    .text.Execute_Kalman_Filter:00000168 $d
+                            *COM*:00000008 accX
+                            *COM*:00000008 accY
+                            *COM*:00000008 accZ
+                            *COM*:00000008 gyroX
+                            *COM*:00000008 gyroY
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:661    .text.Execute_Kalman_Filter:000001ac $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1097   .text.Execute_Kalman_Filter:00000448 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1111   .text.Kalman_SetFlag:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1116   .text.Kalman_SetFlag:00000000 Kalman_SetFlag
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1130   .text.Kalman_SetFlag:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1135   .text.Kalman_IncTick:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1140   .text.Kalman_IncTick:00000000 Kalman_IncTick
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1179   .text.Kalman_IncTick:00000028 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1186   .text.Kalman_GetFlag:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1191   .text.Kalman_GetFlag:00000000 Kalman_GetFlag
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1204   .text.Kalman_GetFlag:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1209   .text.Kalman_ClearFlag:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1214   .text.Kalman_ClearFlag:00000000 Kalman_ClearFlag
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1228   .text.Kalman_ClearFlag:00000008 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1233   .text.LSM6DS3_calibaration:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1238   .text.LSM6DS3_calibaration:00000000 LSM6DS3_calibaration
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1314   .bss.kalAngleZ:00000000 kalAngleZ
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1271   .data.gyroZ_offset:00000000 gyroZ_offset
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1260   .bss.current_time.7471:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1264   .bss.current_time.7471:00000000 current_time.7471
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1267   .data.gyroZ_offset:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1275   .bss.Calculated_Pitch:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1279   .bss.Calculated_Pitch:00000000 Calculated_Pitch
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1282   .bss.Tick_frequency:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1286   .bss.Tick_frequency:00000000 Tick_frequency
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1289   .bss.ExecuteTicks:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1293   .bss.ExecuteTicks:00000000 ExecuteTicks
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1296   .bss.current_time.7490:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1300   .bss.current_time.7490:00000000 current_time.7490
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1303   .bss.Kalman_Timer:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1307   .bss.Kalman_Timer:00000000 Kalman_Timer
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1310   .bss.kalAngleZ:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1317   .bss.Calculated_Roll:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1321   .bss.Calculated_Roll:00000000 Calculated_Roll
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1324   .bss.Calculated_yaw:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1328   .bss.Calculated_yaw:00000000 Calculated_yaw
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1331   .bss.last_time.7491:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1335   .bss.last_time.7491:00000000 last_time.7491
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1338   .bss.last_time.7472:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1342   .bss.last_time.7472:00000000 last_time.7472
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1345   .bss.ExecuteMax:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1349   .bss.ExecuteMax:00000000 ExecuteMax
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1355   .bss.KalmanFlag:00000000 KalmanFlag
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:1356   .bss.KalmanFlag:00000000 $d
+                     .debug_frame:00000010 $d
+C:\Users\khanh\AppData\Local\Temp\cc86ZVq6.s:424    .text.Kalman_Getyaw_execute:0000008c $t
+
+UNDEFINED SYMBOLS
+__aeabi_i2d
+__aeabi_dmul
+__aeabi_dadd
+__aeabi_ddiv
+__aeabi_d2f
+__aeabi_f2uiz
+LSM6DS3_IMU_GetMeasurements
+LSM6DS3_GetXL_X_Int16
+LSM6DS3_GetXL_Y_Int16
+LSM6DS3_GetXL_Z_Int16
+atan2
+sqrt
+atan
+getMicros
+__aeabi_ui2f
+__aeabi_fdiv
+__aeabi_f2d
+__aeabi_dsub
+LSM6DS3_GetGS_Z_Int16
+__aeabi_dcmpgt
+__aeabi_dcmplt
+__aeabi_fsub
+__aeabi_fmul
+__aeabi_fadd
+__aeabi_d2iz
+LSM6DS3_GetGS_X_Int16
+LSM6DS3_GetGS_Y_Int16

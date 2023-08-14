@@ -1,0 +1,2730 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"command.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.global	__aeabi_uidivmod
+  18              		.global	__aeabi_uidiv
+  19              		.section	.text.append_int,"ax",%progbits
+  20              		.align	1
+  21              		.global	append_int
+  22              		.code	16
+  23              		.thumb_func
+  25              	append_int:
+  26              	.LFB33:
+  27              		.file 1 "../Source/command.c"
+   1:../Source/command.c **** /*
+   2:../Source/command.c ****  * report.c
+   3:../Source/command.c ****  *
+   4:../Source/command.c ****  *  Created on: Aug 29, 2012
+   5:../Source/command.c ****  *      Author: Admin
+   6:../Source/command.c ****  */
+   7:../Source/command.c **** 
+   8:../Source/command.c **** #include <stdio.h>
+   9:../Source/command.c **** #include <stdlib.h>
+  10:../Source/command.c **** #include <string.h>
+  11:../Source/command.c **** #include <stdarg.h>
+  12:../Source/command.c **** 
+  13:../Source/command.c **** #include "printf-stdarg.h"
+  14:../Source/command.c **** #include "xprintf.h"
+  15:../Source/command.c **** 
+  16:../Source/command.c **** #include <time.h>
+  17:../Source/command.c **** #include "DataUtil.h"
+  18:../Source/command.c **** #include "command.h"
+  19:../Source/command.c **** #include "main.h"
+  20:../Source/command.c **** #include "alarm.h"
+  21:../Source/command.c **** #include "config.h"
+  22:../Source/command.c **** #include "flash.h"
+  23:../Source/command.c **** #include "Util.h"
+  24:../Source/command.c **** 
+  25:../Source/command.c **** extern volatile uint32_t ulSecCount;
+  26:../Source/command.c **** 
+  27:../Source/command.c **** typedef int (*SKS_CMD_HANDLER)(int from, char* command, int argc, char** argv, int size, int total)
+  28:../Source/command.c **** 
+  29:../Source/command.c **** typedef struct _SKS_HANDLER {
+  30:../Source/command.c **** 	char* cmd;
+  31:../Source/command.c **** 	SKS_CMD_HANDLER handler;
+  32:../Source/command.c **** 	unsigned short dis_mask; //Disable handle from source mask
+  33:../Source/command.c **** 	unsigned short dis_pass; //This command can execute without pass
+  34:../Source/command.c **** } SKS_HANDLER;
+  35:../Source/command.c **** 
+  36:../Source/command.c **** char *HexChar = "1234567890ABCDEF";
+  37:../Source/command.c **** static int response = 0;
+  38:../Source/command.c **** 
+  39:../Source/command.c **** //void turn_debug(char mark);
+  40:../Source/command.c **** 
+  41:../Source/command.c **** void append_int(char* str, uint8_t len, uint32_t val) {
+  28              		.loc 1 41 0
+  29              		.cfi_startproc
+  30 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+  31              	.LCFI0:
+  32              		.cfi_def_cfa_offset 32
+  33              		.cfi_offset 0, -32
+  34              		.cfi_offset 1, -28
+  35              		.cfi_offset 2, -24
+  36              		.cfi_offset 4, -20
+  37              		.cfi_offset 5, -16
+  38              		.cfi_offset 6, -12
+  39              		.cfi_offset 7, -8
+  40              		.cfi_offset 14, -4
+  41              	.LVL0:
+  42              		.loc 1 41 0
+  43 0002 041C     		mov	r4, r0
+  44 0004 0F1C     		mov	r7, r1
+  45 0006 151C     		mov	r5, r2
+  42:../Source/command.c **** 	uint8_t i;
+  43:../Source/command.c **** 	char *ptr = str + strlen(str);
+  46              		.loc 1 43 0
+  47 0008 FFF7FEFF 		bl	strlen
+  48              	.LVL1:
+  49 000c 2618     		add	r6, r4, r0
+  50              	.LVL2:
+  44:../Source/command.c **** 	for (i = 1; i <= len; i++) {
+  51              		.loc 1 44 0
+  52 000e 0124     		mov	r4, #1
+  53              	.LVL3:
+  54 0010 0FE0     		b	.L2
+  55              	.LVL4:
+  56              	.L3:
+  45:../Source/command.c **** 		ptr[len - i] = (uint8_t) ((val % 10UL) + '0');
+  57              		.loc 1 45 0 discriminator 2
+  58 0012 381B     		sub	r0, r7, r4
+  59 0014 0190     		str	r0, [sp, #4]
+  60 0016 0A21     		mov	r1, #10
+  61 0018 281C     		mov	r0, r5
+  62 001a FFF7FEFF 		bl	__aeabi_uidivmod
+  63 001e 019B     		ldr	r3, [sp, #4]
+  64 0020 3031     		add	r1, r1, #48
+  65 0022 F154     		strb	r1, [r6, r3]
+  46:../Source/command.c **** 		val /= 10;
+  66              		.loc 1 46 0 discriminator 2
+  67 0024 281C     		mov	r0, r5
+  68 0026 0A21     		mov	r1, #10
+  69 0028 FFF7FEFF 		bl	__aeabi_uidiv
+  44:../Source/command.c **** 	for (i = 1; i <= len; i++) {
+  70              		.loc 1 44 0 discriminator 2
+  71 002c 0134     		add	r4, r4, #1
+  72              	.LVL5:
+  73              		.loc 1 46 0 discriminator 2
+  74 002e 051C     		mov	r5, r0
+  75              	.LVL6:
+  44:../Source/command.c **** 	for (i = 1; i <= len; i++) {
+  76              		.loc 1 44 0 discriminator 2
+  77 0030 E4B2     		uxtb	r4, r4
+  78              	.LVL7:
+  79              	.L2:
+  44:../Source/command.c **** 	for (i = 1; i <= len; i++) {
+  80              		.loc 1 44 0 is_stmt 0 discriminator 1
+  81 0032 BC42     		cmp	r4, r7
+  82 0034 EDD9     		bls	.L3
+  47:../Source/command.c **** 	}
+  48:../Source/command.c **** 	ptr[i - 1] = '\0';
+  83              		.loc 1 48 0 is_stmt 1
+  84 0036 3219     		add	r2, r6, r4
+  85 0038 013A     		sub	r2, r2, #1
+  86 003a 0021     		mov	r1, #0
+  87 003c 1170     		strb	r1, [r2]
+  88              		@ sp needed for prologue
+  89              	.LVL8:
+  90              	.LVL9:
+  91              	.LVL10:
+  49:../Source/command.c **** }
+  92              		.loc 1 49 0
+  93 003e F7BD     		pop	{r0, r1, r2, r4, r5, r6, r7, pc}
+  94              		.cfi_endproc
+  95              	.LFE33:
+  97              		.section	.text.append_hex,"ax",%progbits
+  98              		.align	1
+  99              		.global	append_hex
+ 100              		.code	16
+ 101              		.thumb_func
+ 103              	append_hex:
+ 104              	.LFB34:
+  50:../Source/command.c **** 
+  51:../Source/command.c **** void append_hex(char* str, uint8_t val) {
+ 105              		.loc 1 51 0
+ 106              		.cfi_startproc
+ 107 0000 38B5     		push	{r3, r4, r5, lr}
+ 108              	.LCFI1:
+ 109              		.cfi_def_cfa_offset 16
+ 110              		.cfi_offset 3, -16
+ 111              		.cfi_offset 4, -12
+ 112              		.cfi_offset 5, -8
+ 113              		.cfi_offset 14, -4
+ 114              	.LVL11:
+ 115              		.loc 1 51 0
+ 116 0002 0D1C     		mov	r5, r1
+ 117 0004 041C     		mov	r4, r0
+  52:../Source/command.c **** 	char *ptr = str + strlen(str);
+ 118              		.loc 1 52 0
+ 119 0006 FFF7FEFF 		bl	strlen
+ 120              	.LVL12:
+  53:../Source/command.c **** 	ptr[0] = HexChar[val >> 4];
+ 121              		.loc 1 53 0
+ 122 000a 074B     		ldr	r3, .L5
+ 123 000c 2A09     		lsr	r2, r5, #4
+ 124 000e 1968     		ldr	r1, [r3]
+  52:../Source/command.c **** 	char *ptr = str + strlen(str);
+ 125              		.loc 1 52 0
+ 126 0010 2418     		add	r4, r4, r0
+ 127              	.LVL13:
+ 128              		.loc 1 53 0
+ 129 0012 885C     		ldrb	r0, [r1, r2]
+  54:../Source/command.c **** 	ptr[1] = HexChar[val & 0xF];
+ 130              		.loc 1 54 0
+ 131 0014 0F22     		mov	r2, #15
+  53:../Source/command.c **** 	ptr[0] = HexChar[val >> 4];
+ 132              		.loc 1 53 0
+ 133 0016 2070     		strb	r0, [r4]
+ 134              		.loc 1 54 0
+ 135 0018 1968     		ldr	r1, [r3]
+ 136 001a 1540     		and	r5, r2
+ 137 001c 485D     		ldrb	r0, [r1, r5]
+  55:../Source/command.c **** 	ptr[2] = 0;
+ 138              		.loc 1 55 0
+ 139 001e 0023     		mov	r3, #0
+  54:../Source/command.c **** 	ptr[1] = HexChar[val & 0xF];
+ 140              		.loc 1 54 0
+ 141 0020 6070     		strb	r0, [r4, #1]
+ 142              		.loc 1 55 0
+ 143 0022 A370     		strb	r3, [r4, #2]
+ 144              		@ sp needed for prologue
+ 145              	.LVL14:
+  56:../Source/command.c **** }
+ 146              		.loc 1 56 0
+ 147 0024 38BD     		pop	{r3, r4, r5, pc}
+ 148              	.L6:
+ 149 0026 C046     		.align	2
+ 150              	.L5:
+ 151 0028 00000000 		.word	.LANCHOR0
+ 152              		.cfi_endproc
+ 153              	.LFE34:
+ 155              		.section	.text.append_hex_long,"ax",%progbits
+ 156              		.align	1
+ 157              		.global	append_hex_long
+ 158              		.code	16
+ 159              		.thumb_func
+ 161              	append_hex_long:
+ 162              	.LFB35:
+  57:../Source/command.c **** 
+  58:../Source/command.c **** void append_hex_long(char* str, long val) {
+ 163              		.loc 1 58 0
+ 164              		.cfi_startproc
+ 165 0000 38B5     		push	{r3, r4, r5, lr}
+ 166              	.LCFI2:
+ 167              		.cfi_def_cfa_offset 16
+ 168              		.cfi_offset 3, -16
+ 169              		.cfi_offset 4, -12
+ 170              		.cfi_offset 5, -8
+ 171              		.cfi_offset 14, -4
+ 172              	.LVL15:
+ 173              		.loc 1 58 0
+ 174 0002 0D1C     		mov	r5, r1
+ 175 0004 041C     		mov	r4, r0
+  59:../Source/command.c **** 	char *ptr = str + strlen(str);
+ 176              		.loc 1 59 0
+ 177 0006 FFF7FEFF 		bl	strlen
+ 178              	.LVL16:
+  60:../Source/command.c **** 	ptr[0] = HexChar[val >> 28];
+ 179              		.loc 1 60 0
+ 180 000a 144A     		ldr	r2, .L8
+  59:../Source/command.c **** 	char *ptr = str + strlen(str);
+ 181              		.loc 1 59 0
+ 182 000c 2418     		add	r4, r4, r0
+ 183              	.LVL17:
+ 184              		.loc 1 60 0
+ 185 000e 1168     		ldr	r1, [r2]
+ 186 0010 2817     		asr	r0, r5, #28
+ 187 0012 0B5C     		ldrb	r3, [r1, r0]
+  61:../Source/command.c **** 	ptr[1] = HexChar[(val >> 24) & 0xF];
+ 188              		.loc 1 61 0
+ 189 0014 2916     		asr	r1, r5, #24
+  60:../Source/command.c **** 	ptr[0] = HexChar[val >> 28];
+ 190              		.loc 1 60 0
+ 191 0016 2370     		strb	r3, [r4]
+ 192              		.loc 1 61 0
+ 193 0018 1068     		ldr	r0, [r2]
+ 194 001a 0F23     		mov	r3, #15
+ 195 001c 1940     		and	r1, r3
+ 196 001e 415C     		ldrb	r1, [r0, r1]
+ 197              		@ sp needed for prologue
+ 198 0020 6170     		strb	r1, [r4, #1]
+  62:../Source/command.c **** 	ptr[2] = HexChar[(val >> 20) & 0xF];
+ 199              		.loc 1 62 0
+ 200 0022 1068     		ldr	r0, [r2]
+ 201 0024 2915     		asr	r1, r5, #20
+ 202 0026 1940     		and	r1, r3
+ 203 0028 415C     		ldrb	r1, [r0, r1]
+ 204 002a A170     		strb	r1, [r4, #2]
+  63:../Source/command.c **** 	ptr[3] = HexChar[(val >> 16) & 0xF];
+ 205              		.loc 1 63 0
+ 206 002c 1068     		ldr	r0, [r2]
+ 207 002e 2914     		asr	r1, r5, #16
+ 208 0030 1940     		and	r1, r3
+ 209 0032 415C     		ldrb	r1, [r0, r1]
+  64:../Source/command.c **** 	ptr[4] = HexChar[(val >> 12) & 0xF];
+ 210              		.loc 1 64 0
+ 211 0034 2813     		asr	r0, r5, #12
+  63:../Source/command.c **** 	ptr[3] = HexChar[(val >> 16) & 0xF];
+ 212              		.loc 1 63 0
+ 213 0036 E170     		strb	r1, [r4, #3]
+ 214              		.loc 1 64 0
+ 215 0038 1268     		ldr	r2, [r2]
+ 216 003a 1840     		and	r0, r3
+ 217 003c 115C     		ldrb	r1, [r2, r0]
+  65:../Source/command.c **** 	ptr[5] = HexChar[(val >> 8) & 0xF];
+ 218              		.loc 1 65 0
+ 219 003e 2812     		asr	r0, r5, #8
+  64:../Source/command.c **** 	ptr[4] = HexChar[(val >> 12) & 0xF];
+ 220              		.loc 1 64 0
+ 221 0040 2171     		strb	r1, [r4, #4]
+ 222              		.loc 1 65 0
+ 223 0042 1840     		and	r0, r3
+ 224 0044 115C     		ldrb	r1, [r2, r0]
+  66:../Source/command.c **** 	ptr[6] = HexChar[(val >> 4) & 0xF];
+ 225              		.loc 1 66 0
+ 226 0046 2811     		asr	r0, r5, #4
+  65:../Source/command.c **** 	ptr[5] = HexChar[(val >> 8) & 0xF];
+ 227              		.loc 1 65 0
+ 228 0048 6171     		strb	r1, [r4, #5]
+ 229              		.loc 1 66 0
+ 230 004a 1840     		and	r0, r3
+ 231 004c 115C     		ldrb	r1, [r2, r0]
+  67:../Source/command.c **** 	ptr[7] = HexChar[val & 0xF];
+ 232              		.loc 1 67 0
+ 233 004e 1D40     		and	r5, r3
+ 234              	.LVL18:
+  66:../Source/command.c **** 	ptr[6] = HexChar[(val >> 4) & 0xF];
+ 235              		.loc 1 66 0
+ 236 0050 A171     		strb	r1, [r4, #6]
+ 237              		.loc 1 67 0
+ 238 0052 505D     		ldrb	r0, [r2, r5]
+  68:../Source/command.c **** 	ptr[8] = 0x0;
+ 239              		.loc 1 68 0
+ 240 0054 0023     		mov	r3, #0
+  67:../Source/command.c **** 	ptr[7] = HexChar[val & 0xF];
+ 241              		.loc 1 67 0
+ 242 0056 E071     		strb	r0, [r4, #7]
+ 243              		.loc 1 68 0
+ 244 0058 2372     		strb	r3, [r4, #8]
+ 245              	.LVL19:
+  69:../Source/command.c **** }
+ 246              		.loc 1 69 0
+ 247 005a 38BD     		pop	{r3, r4, r5, pc}
+ 248              	.L9:
+ 249              		.align	2
+ 250              	.L8:
+ 251 005c 00000000 		.word	.LANCHOR0
+ 252              		.cfi_endproc
+ 253              	.LFE35:
+ 255              		.section	.text.cmd_response,"ax",%progbits
+ 256              		.align	1
+ 257              		.global	cmd_response
+ 258              		.code	16
+ 259              		.thumb_func
+ 261              	cmd_response:
+ 262              	.LFB36:
+  70:../Source/command.c **** 
+  71:../Source/command.c **** int cmd_response(char* buff, int size, char *cmd, const char *fmt, ...)
+  72:../Source/command.c **** {
+ 263              		.loc 1 72 0
+ 264              		.cfi_startproc
+ 265 0000 08B4     		push	{r3}
+ 266              	.LCFI3:
+ 267              		.cfi_def_cfa_offset 4
+ 268 0002 FFB5     		push	{r0, r1, r2, r3, r4, r5, r6, r7, lr}
+ 269              	.LCFI4:
+ 270              		.cfi_def_cfa_offset 40
+ 271              		.cfi_offset 0, -40
+ 272              		.cfi_offset 1, -36
+ 273              		.cfi_offset 2, -32
+ 274              		.cfi_offset 3, -28
+ 275              		.cfi_offset 4, -24
+ 276              		.cfi_offset 5, -20
+ 277              		.cfi_offset 6, -16
+ 278              		.cfi_offset 7, -12
+ 279              		.cfi_offset 14, -8
+ 280              	.LVL20:
+ 281              		.loc 1 72 0
+ 282 0004 09AC     		add	r4, sp, #36
+ 283 0006 80CC     		ldmia	r4!, {r7}
+  73:../Source/command.c **** 	int n = 0;
+  74:../Source/command.c ****     va_list ap;
+  75:../Source/command.c ****     n = usnprintf(buff, size, "*SS,%s,V9,%s,", g_config.deviceCode, cmd);
+ 284              		.loc 1 75 0
+ 285 0008 0E4B     		ldr	r3, .L11
+ 286 000a 0092     		str	r2, [sp]
+ 287 000c 0E4A     		ldr	r2, .L11+4
+ 288              	.LVL21:
+  72:../Source/command.c **** {
+ 289              		.loc 1 72 0
+ 290 000e 0E1C     		mov	r6, r1
+ 291 0010 051C     		mov	r5, r0
+ 292              		.loc 1 75 0
+ 293 0012 FFF7FEFF 		bl	usnprintf
+ 294              	.LVL22:
+  76:../Source/command.c ****     va_start(ap, fmt);
+  77:../Source/command.c ****     char *bufftmp = buff + (n);
+ 295              		.loc 1 77 0
+ 296 0016 2D18     		add	r5, r5, r0
+ 297              	.LVL23:
+  78:../Source/command.c ****     n = uvsnprintf(bufftmp, size-(n+1), (char *) fmt, ap );
+ 298              		.loc 1 78 0
+ 299 0018 C043     		mvn	r0, r0
+ 300              	.LVL24:
+ 301 001a 3118     		add	r1, r6, r0
+ 302 001c 3A1C     		mov	r2, r7
+ 303 001e 231C     		mov	r3, r4
+ 304 0020 281C     		mov	r0, r5
+ 305              	.LVL25:
+  76:../Source/command.c ****     va_start(ap, fmt);
+ 306              		.loc 1 76 0
+ 307 0022 0394     		str	r4, [sp, #12]
+ 308              		.loc 1 78 0
+ 309 0024 FFF7FEFF 		bl	uvsnprintf
+ 310              	.LVL26:
+  79:../Source/command.c ****     va_end(ap);
+  80:../Source/command.c ****     bufftmp[n] = '#';
+ 311              		.loc 1 80 0
+ 312 0028 2322     		mov	r2, #35
+ 313 002a 2A54     		strb	r2, [r5, r0]
+ 314              	.LVL27:
+  81:../Source/command.c ****     n++;
+  82:../Source/command.c ****     bufftmp[n] = '\r';
+ 315              		.loc 1 82 0
+ 316 002c 0D21     		mov	r1, #13
+ 317 002e 2D18     		add	r5, r5, r0
+ 318              	.LVL28:
+  83:../Source/command.c ****     n++;
+  84:../Source/command.c ****     bufftmp[n] = '\n';
+ 319              		.loc 1 84 0
+ 320 0030 0A23     		mov	r3, #10
+  85:../Source/command.c ****     return n+1;
+ 321              		.loc 1 85 0
+ 322 0032 0330     		add	r0, r0, #3
+ 323              	.LVL29:
+  82:../Source/command.c ****     bufftmp[n] = '\r';
+ 324              		.loc 1 82 0
+ 325 0034 6970     		strb	r1, [r5, #1]
+ 326              	.LVL30:
+  84:../Source/command.c ****     bufftmp[n] = '\n';
+ 327              		.loc 1 84 0
+ 328 0036 AB70     		strb	r3, [r5, #2]
+  86:../Source/command.c **** }
+ 329              		.loc 1 86 0
+ 330 0038 04B0     		add	sp, sp, #16
+ 331              		@ sp needed for prologue
+ 332              	.LVL31:
+ 333 003a F0BC     		pop	{r4, r5, r6, r7}
+ 334 003c 08BC     		pop	{r3}
+ 335 003e 01B0     		add	sp, sp, #4
+ 336 0040 1847     		bx	r3
+ 337              	.L12:
+ 338 0042 C046     		.align	2
+ 339              	.L11:
+ 340 0044 02000000 		.word	g_config+2
+ 341 0048 00000000 		.word	.LC2
+ 342              		.cfi_endproc
+ 343              	.LFE36:
+ 345              		.section	.text.sks_cmd_set_debug,"ax",%progbits
+ 346              		.align	1
+ 347              		.code	16
+ 348              		.thumb_func
+ 350              	sks_cmd_set_debug:
+ 351              	.LFB42:
+  87:../Source/command.c **** 
+  88:../Source/command.c **** int append_sign(char* buff) {
+  89:../Source/command.c **** 	strcpy(buff, "*SS,");
+  90:../Source/command.c **** 	strcat(buff, (char*)g_config.deviceCode);
+  91:../Source/command.c **** 	return 1;
+  92:../Source/command.c **** }
+  93:../Source/command.c **** 
+  94:../Source/command.c **** int append_time(char* buff, time_t ti) {
+  95:../Source/command.c **** 	time_t now = ti;
+  96:../Source/command.c **** 	struct tm *tm = gmtime(&now);
+  97:../Source/command.c **** 	char *ptr = buff + strlen(buff);
+  98:../Source/command.c **** 	append_int(ptr, 4, tm->tm_year + 1900);
+  99:../Source/command.c **** 	strcat(ptr, "-");
+ 100:../Source/command.c **** 	append_int(ptr, 2, tm->tm_mon + 1);
+ 101:../Source/command.c **** 	strcat(ptr, "-");
+ 102:../Source/command.c **** 	append_int(ptr, 2, tm->tm_mday);
+ 103:../Source/command.c **** 	strcat(ptr, " ");
+ 104:../Source/command.c **** 	append_int(ptr, 2, tm->tm_hour);
+ 105:../Source/command.c **** 	strcat(ptr, ":");
+ 106:../Source/command.c **** 	append_int(ptr, 2, tm->tm_min);
+ 107:../Source/command.c **** 	strcat(ptr, ":");
+ 108:../Source/command.c **** 	append_int(ptr, 2, tm->tm_sec);
+ 109:../Source/command.c **** 	return 1;
+ 110:../Source/command.c **** }
+ 111:../Source/command.c **** 
+ 112:../Source/command.c **** int append_v9_command(char *buff, char* command) {
+ 113:../Source/command.c **** 	strcat(buff, ",V9,");
+ 114:../Source/command.c **** 	strcat(buff, command);
+ 115:../Source/command.c **** 	return 1;
+ 116:../Source/command.c **** }
+ 117:../Source/command.c **** 
+ 118:../Source/command.c **** int next_char(char* data, char sep, int max) {
+ 119:../Source/command.c **** 	char *ptr = strchr(data, sep);
+ 120:../Source/command.c **** 	if (ptr) {
+ 121:../Source/command.c **** 		return (ptr - data) >= max ? max : (ptr - data);
+ 122:../Source/command.c **** 	} else {
+ 123:../Source/command.c **** 		return 0;
+ 124:../Source/command.c **** 	}
+ 125:../Source/command.c **** }
+ 126:../Source/command.c **** 
+ 127:../Source/command.c **** static char Response[256];
+ 128:../Source/command.c **** void create_v3(int blockno) {
+ 129:../Source/command.c **** 	append_sign(Response);
+ 130:../Source/command.c **** 	strcat(Response, ",V3,");
+ 131:../Source/command.c **** 	if (blockno >= 10000) {
+ 132:../Source/command.c **** 		append_int(Response, 5, blockno);
+ 133:../Source/command.c **** 	} else if (blockno >= 1000) {
+ 134:../Source/command.c **** 		append_int(Response, 4, blockno);
+ 135:../Source/command.c **** 	} else if (blockno >= 100) {
+ 136:../Source/command.c **** 		append_int(Response, 3, blockno);
+ 137:../Source/command.c **** 	} else if (blockno >= 10) {
+ 138:../Source/command.c **** 		append_int(Response, 2, blockno);
+ 139:../Source/command.c **** 	} else {
+ 140:../Source/command.c **** 		append_int(Response, 1, blockno);
+ 141:../Source/command.c **** 	}
+ 142:../Source/command.c **** }
+ 143:../Source/command.c **** 
+ 144:../Source/command.c **** int write_flash = 0;
+ 145:../Source/command.c **** 
+ 146:../Source/command.c **** static int sks_cmd_set_debug(int from, char* command, int argc, char** argv, int size, int total) {
+ 352              		.loc 1 146 0
+ 353              		.cfi_startproc
+ 354 0000 13B5     		push	{r0, r1, r4, lr}
+ 355              	.LCFI5:
+ 356              		.cfi_def_cfa_offset 16
+ 357              		.cfi_offset 0, -16
+ 358              		.cfi_offset 1, -12
+ 359              		.cfi_offset 4, -8
+ 360              		.cfi_offset 14, -4
+ 361              	.LVL32:
+ 147:../Source/command.c **** 	//G9, debug setting
+ 148:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 149:../Source/command.c **** 	char set = 0;
+ 150:../Source/command.c **** 	if (argv[4] == NULL)
+ 362              		.loc 1 150 0
+ 363 0002 1869     		ldr	r0, [r3, #16]
+ 364              	.LVL33:
+ 146:../Source/command.c **** static int sks_cmd_set_debug(int from, char* command, int argc, char** argv, int size, int total) {
+ 365              		.loc 1 146 0
+ 366 0004 0C1C     		mov	r4, r1
+ 367              		.loc 1 150 0
+ 368 0006 0028     		cmp	r0, #0
+ 369 0008 11D0     		beq	.L14
+ 151:../Source/command.c **** 		return size;
+ 152:../Source/command.c **** 	set = atoi(argv[4]);
+ 370              		.loc 1 152 0
+ 371 000a FFF7FEFF 		bl	atoi
+ 372              	.LVL34:
+ 153:../Source/command.c **** 
+ 154:../Source/command.c **** 	g_appStats.debugOn = set;
+ 373              		.loc 1 154 0
+ 374 000e 094A     		ldr	r2, .L15
+ 152:../Source/command.c **** 	set = atoi(argv[4]);
+ 375              		.loc 1 152 0
+ 376 0010 C0B2     		uxtb	r0, r0
+ 377              	.LVL35:
+ 378              		.loc 1 154 0
+ 379 0012 4D32     		add	r2, r2, #77
+ 155:../Source/command.c **** 
+ 156:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d", set, g_appStats.debugOn);
+ 380              		.loc 1 156 0
+ 381 0014 8021     		mov	r1, #128
+ 154:../Source/command.c **** 	g_appStats.debugOn = set;
+ 382              		.loc 1 154 0
+ 383 0016 1070     		strb	r0, [r2]
+ 384              		.loc 1 156 0
+ 385 0018 074B     		ldr	r3, .L15+4
+ 386 001a 0090     		str	r0, [sp]
+ 387 001c 0190     		str	r0, [sp, #4]
+ 388 001e 221C     		mov	r2, r4
+ 389 0020 0648     		ldr	r0, .L15+8
+ 390              	.LVL36:
+ 391 0022 4900     		lsl	r1, r1, #1
+ 392 0024 FFF7FEFF 		bl	cmd_response
+ 393              	.LVL37:
+ 157:../Source/command.c **** 
+ 158:../Source/command.c **** 	response = 1;
+ 394              		.loc 1 158 0
+ 395 0028 054B     		ldr	r3, .L15+12
+ 396 002a 0122     		mov	r2, #1
+ 397 002c 1A60     		str	r2, [r3]
+ 398              	.L14:
+ 159:../Source/command.c **** 
+ 160:../Source/command.c **** 	return size;
+ 161:../Source/command.c **** }
+ 399              		.loc 1 161 0
+ 400 002e 0498     		ldr	r0, [sp, #16]
+ 401              		@ sp needed for prologue
+ 402              	.LVL38:
+ 403 0030 16BD     		pop	{r1, r2, r4, pc}
+ 404              	.L16:
+ 405 0032 C046     		.align	2
+ 406              	.L15:
+ 407 0034 00000000 		.word	g_appStats
+ 408 0038 0E000000 		.word	.LC7
+ 409 003c 00000000 		.word	.LANCHOR1
+ 410 0040 00000000 		.word	.LANCHOR2
+ 411              		.cfi_endproc
+ 412              	.LFE42:
+ 414              		.section	.text.sks_cmd_set_empty,"ax",%progbits
+ 415              		.align	1
+ 416              		.code	16
+ 417              		.thumb_func
+ 419              	sks_cmd_set_empty:
+ 420              	.LFB44:
+ 162:../Source/command.c **** 
+ 163:../Source/command.c **** static int sks_cmd_set_full(int from, char* command, int argc, char** argv, int size, int total) {
+ 164:../Source/command.c **** 	//G9, debug setting
+ 165:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 166:../Source/command.c **** 	char set = 0;
+ 167:../Source/command.c **** 	if (argv[4] == NULL)
+ 168:../Source/command.c **** 		return size;
+ 169:../Source/command.c **** 	set = atoi(argv[4]);
+ 170:../Source/command.c **** 
+ 171:../Source/command.c **** 	if(set == 1) {
+ 172:../Source/command.c **** 		if(argv[5] != NULL) {
+ 173:../Source/command.c **** 			g_config.fullValue = atoi(argv[5]);
+ 174:../Source/command.c **** 			if(g_config.fullValue == 0) {
+ 175:../Source/command.c **** 				g_config.fullValue = g_appStats.frequency;
+ 176:../Source/command.c **** 			}
+ 177:../Source/command.c **** 		} else {
+ 178:../Source/command.c **** 			g_config.fullValue = g_appStats.frequency;
+ 179:../Source/command.c **** 		}
+ 180:../Source/command.c **** 		write_flash = 1;
+ 181:../Source/command.c **** 	}
+ 182:../Source/command.c **** 
+ 183:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d", set, g_config.emptyValue, g_config.f
+ 184:../Source/command.c **** 
+ 185:../Source/command.c **** 	raise_command_coming();
+ 186:../Source/command.c **** 
+ 187:../Source/command.c **** 	response = 1;
+ 188:../Source/command.c **** 	return size;
+ 189:../Source/command.c **** }
+ 190:../Source/command.c **** 
+ 191:../Source/command.c **** static int sks_cmd_set_empty(int from, char* command, int argc, char** argv, int size, int total) {
+ 421              		.loc 1 191 0
+ 422              		.cfi_startproc
+ 423 0000 7FB5     		push	{r0, r1, r2, r3, r4, r5, r6, lr}
+ 424              	.LCFI6:
+ 425              		.cfi_def_cfa_offset 32
+ 426              		.cfi_offset 0, -32
+ 427              		.cfi_offset 1, -28
+ 428              		.cfi_offset 2, -24
+ 429              		.cfi_offset 3, -20
+ 430              		.cfi_offset 4, -16
+ 431              		.cfi_offset 5, -12
+ 432              		.cfi_offset 6, -8
+ 433              		.cfi_offset 14, -4
+ 434              	.LVL39:
+ 192:../Source/command.c **** 	//G9, debug setting
+ 193:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 194:../Source/command.c **** 	char set = 0;
+ 195:../Source/command.c **** 	if (argv[4] == NULL)
+ 435              		.loc 1 195 0
+ 436 0002 1869     		ldr	r0, [r3, #16]
+ 437              	.LVL40:
+ 191:../Source/command.c **** static int sks_cmd_set_empty(int from, char* command, int argc, char** argv, int size, int total) {
+ 438              		.loc 1 191 0
+ 439 0004 0E1C     		mov	r6, r1
+ 440 0006 1C1C     		mov	r4, r3
+ 441              		.loc 1 195 0
+ 442 0008 0028     		cmp	r0, #0
+ 443 000a 25D0     		beq	.L18
+ 196:../Source/command.c **** 		return size;
+ 197:../Source/command.c **** 	set = atoi(argv[4]);
+ 444              		.loc 1 197 0
+ 445 000c FFF7FEFF 		bl	atoi
+ 446              	.LVL41:
+ 447 0010 C5B2     		uxtb	r5, r0
+ 448              	.LVL42:
+ 198:../Source/command.c **** 
+ 199:../Source/command.c **** 	if(set == 1) {
+ 449              		.loc 1 199 0
+ 450 0012 012D     		cmp	r5, #1
+ 451 0014 0ED1     		bne	.L19
+ 200:../Source/command.c **** 		if(argv[5] != NULL) {
+ 452              		.loc 1 200 0
+ 453 0016 6069     		ldr	r0, [r4, #20]
+ 454 0018 114C     		ldr	r4, .L22
+ 455              	.LVL43:
+ 456 001a 0028     		cmp	r0, #0
+ 457 001c 04D0     		beq	.L20
+ 201:../Source/command.c **** 			g_config.emptyValue = atoi(argv[5]);
+ 458              		.loc 1 201 0
+ 459 001e FFF7FEFF 		bl	atoi
+ 460 0022 2061     		str	r0, [r4, #16]
+ 202:../Source/command.c **** 			if(g_config.emptyValue == 0) {
+ 461              		.loc 1 202 0
+ 462 0024 0028     		cmp	r0, #0
+ 463 0026 02D1     		bne	.L21
+ 464              	.L20:
+ 203:../Source/command.c **** 				g_config.emptyValue = g_appStats.frequency;
+ 204:../Source/command.c **** 			}
+ 205:../Source/command.c **** 		} else {
+ 206:../Source/command.c **** 			g_config.emptyValue = g_appStats.frequency;
+ 465              		.loc 1 206 0
+ 466 0028 0E48     		ldr	r0, .L22+4
+ 467 002a 036A     		ldr	r3, [r0, #32]
+ 468 002c 2361     		str	r3, [r4, #16]
+ 469              	.L21:
+ 207:../Source/command.c **** 		}
+ 208:../Source/command.c **** 		write_flash = 1;
+ 470              		.loc 1 208 0
+ 471 002e 0E49     		ldr	r1, .L22+8
+ 472 0030 0122     		mov	r2, #1
+ 473 0032 0A60     		str	r2, [r1]
+ 474              	.L19:
+ 209:../Source/command.c **** 	}
+ 210:../Source/command.c **** 
+ 211:../Source/command.c **** //	append_sign(Response);
+ 212:../Source/command.c **** //	append_v9_command(Response, command);
+ 213:../Source/command.c **** //	strcat(Response, ",");
+ 214:../Source/command.c **** //	append_int(Response, 1, set);
+ 215:../Source/command.c **** //	strcat(Response, ",");
+ 216:../Source/command.c **** //	append_number(Response, g_config.emptyValue);
+ 217:../Source/command.c **** //	strcat(Response, ",");
+ 218:../Source/command.c **** //	append_number(Response, g_config.fullValue);
+ 219:../Source/command.c **** //	strcat(Response, "#\r\n");
+ 220:../Source/command.c **** 
+ 221:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d", set, g_config.emptyValue, g_config.f
+ 475              		.loc 1 221 0
+ 476 0034 0A49     		ldr	r1, .L22
+ 477 0036 0095     		str	r5, [sp]
+ 478 0038 0A69     		ldr	r2, [r1, #16]
+ 479 003a 8023     		mov	r3, #128
+ 480 003c 0192     		str	r2, [sp, #4]
+ 481 003e C868     		ldr	r0, [r1, #12]
+ 482 0040 321C     		mov	r2, r6
+ 483 0042 5900     		lsl	r1, r3, #1
+ 484 0044 0290     		str	r0, [sp, #8]
+ 485 0046 094B     		ldr	r3, .L22+12
+ 486 0048 0948     		ldr	r0, .L22+16
+ 487 004a FFF7FEFF 		bl	cmd_response
+ 222:../Source/command.c **** 
+ 223:../Source/command.c **** 	raise_command_coming();
+ 488              		.loc 1 223 0
+ 489 004e FFF7FEFF 		bl	raise_command_coming
+ 224:../Source/command.c **** 
+ 225:../Source/command.c **** 	response = 1;
+ 490              		.loc 1 225 0
+ 491 0052 084D     		ldr	r5, .L22+20
+ 492              	.LVL44:
+ 493 0054 0124     		mov	r4, #1
+ 494 0056 2C60     		str	r4, [r5]
+ 495              	.L18:
+ 226:../Source/command.c **** 	return size;
+ 227:../Source/command.c **** }
+ 496              		.loc 1 227 0
+ 497 0058 0898     		ldr	r0, [sp, #32]
+ 498 005a 04B0     		add	sp, sp, #16
+ 499              		@ sp needed for prologue
+ 500              	.LVL45:
+ 501 005c 70BD     		pop	{r4, r5, r6, pc}
+ 502              	.L23:
+ 503 005e C046     		.align	2
+ 504              	.L22:
+ 505 0060 00000000 		.word	g_config
+ 506 0064 00000000 		.word	g_appStats
+ 507 0068 00000000 		.word	.LANCHOR3
+ 508 006c 14000000 		.word	.LC15
+ 509 0070 00000000 		.word	.LANCHOR1
+ 510 0074 00000000 		.word	.LANCHOR2
+ 511              		.cfi_endproc
+ 512              	.LFE44:
+ 514              		.section	.text.sks_cmd_set_full,"ax",%progbits
+ 515              		.align	1
+ 516              		.code	16
+ 517              		.thumb_func
+ 519              	sks_cmd_set_full:
+ 520              	.LFB43:
+ 163:../Source/command.c **** static int sks_cmd_set_full(int from, char* command, int argc, char** argv, int size, int total) {
+ 521              		.loc 1 163 0
+ 522              		.cfi_startproc
+ 523 0000 7FB5     		push	{r0, r1, r2, r3, r4, r5, r6, lr}
+ 524              	.LCFI7:
+ 525              		.cfi_def_cfa_offset 32
+ 526              		.cfi_offset 0, -32
+ 527              		.cfi_offset 1, -28
+ 528              		.cfi_offset 2, -24
+ 529              		.cfi_offset 3, -20
+ 530              		.cfi_offset 4, -16
+ 531              		.cfi_offset 5, -12
+ 532              		.cfi_offset 6, -8
+ 533              		.cfi_offset 14, -4
+ 534              	.LVL46:
+ 167:../Source/command.c **** 	if (argv[4] == NULL)
+ 535              		.loc 1 167 0
+ 536 0002 1869     		ldr	r0, [r3, #16]
+ 537              	.LVL47:
+ 163:../Source/command.c **** static int sks_cmd_set_full(int from, char* command, int argc, char** argv, int size, int total) {
+ 538              		.loc 1 163 0
+ 539 0004 0E1C     		mov	r6, r1
+ 540 0006 1C1C     		mov	r4, r3
+ 167:../Source/command.c **** 	if (argv[4] == NULL)
+ 541              		.loc 1 167 0
+ 542 0008 0028     		cmp	r0, #0
+ 543 000a 25D0     		beq	.L25
+ 169:../Source/command.c **** 	set = atoi(argv[4]);
+ 544              		.loc 1 169 0
+ 545 000c FFF7FEFF 		bl	atoi
+ 546              	.LVL48:
+ 547 0010 C5B2     		uxtb	r5, r0
+ 548              	.LVL49:
+ 171:../Source/command.c **** 	if(set == 1) {
+ 549              		.loc 1 171 0
+ 550 0012 012D     		cmp	r5, #1
+ 551 0014 0ED1     		bne	.L26
+ 172:../Source/command.c **** 		if(argv[5] != NULL) {
+ 552              		.loc 1 172 0
+ 553 0016 6069     		ldr	r0, [r4, #20]
+ 554 0018 114C     		ldr	r4, .L29
+ 555              	.LVL50:
+ 556 001a 0028     		cmp	r0, #0
+ 557 001c 04D0     		beq	.L27
+ 173:../Source/command.c **** 			g_config.fullValue = atoi(argv[5]);
+ 558              		.loc 1 173 0
+ 559 001e FFF7FEFF 		bl	atoi
+ 560 0022 E060     		str	r0, [r4, #12]
+ 174:../Source/command.c **** 			if(g_config.fullValue == 0) {
+ 561              		.loc 1 174 0
+ 562 0024 0028     		cmp	r0, #0
+ 563 0026 02D1     		bne	.L28
+ 564              	.L27:
+ 178:../Source/command.c **** 			g_config.fullValue = g_appStats.frequency;
+ 565              		.loc 1 178 0
+ 566 0028 0E48     		ldr	r0, .L29+4
+ 567 002a 036A     		ldr	r3, [r0, #32]
+ 568 002c E360     		str	r3, [r4, #12]
+ 569              	.L28:
+ 180:../Source/command.c **** 		write_flash = 1;
+ 570              		.loc 1 180 0
+ 571 002e 0E49     		ldr	r1, .L29+8
+ 572 0030 0122     		mov	r2, #1
+ 573 0032 0A60     		str	r2, [r1]
+ 574              	.L26:
+ 183:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d", set, g_config.emptyValue, g_config.f
+ 575              		.loc 1 183 0
+ 576 0034 0A49     		ldr	r1, .L29
+ 577 0036 0095     		str	r5, [sp]
+ 578 0038 0A69     		ldr	r2, [r1, #16]
+ 579 003a 8023     		mov	r3, #128
+ 580 003c 0192     		str	r2, [sp, #4]
+ 581 003e C868     		ldr	r0, [r1, #12]
+ 582 0040 321C     		mov	r2, r6
+ 583 0042 5900     		lsl	r1, r3, #1
+ 584 0044 0290     		str	r0, [sp, #8]
+ 585 0046 094B     		ldr	r3, .L29+12
+ 586 0048 0948     		ldr	r0, .L29+16
+ 587 004a FFF7FEFF 		bl	cmd_response
+ 185:../Source/command.c **** 	raise_command_coming();
+ 588              		.loc 1 185 0
+ 589 004e FFF7FEFF 		bl	raise_command_coming
+ 187:../Source/command.c **** 	response = 1;
+ 590              		.loc 1 187 0
+ 591 0052 084D     		ldr	r5, .L29+20
+ 592              	.LVL51:
+ 593 0054 0124     		mov	r4, #1
+ 594 0056 2C60     		str	r4, [r5]
+ 595              	.L25:
+ 189:../Source/command.c **** }
+ 596              		.loc 1 189 0
+ 597 0058 0898     		ldr	r0, [sp, #32]
+ 598 005a 04B0     		add	sp, sp, #16
+ 599              		@ sp needed for prologue
+ 600              	.LVL52:
+ 601 005c 70BD     		pop	{r4, r5, r6, pc}
+ 602              	.L30:
+ 603 005e C046     		.align	2
+ 604              	.L29:
+ 605 0060 00000000 		.word	g_config
+ 606 0064 00000000 		.word	g_appStats
+ 607 0068 00000000 		.word	.LANCHOR3
+ 608 006c 14000000 		.word	.LC15
+ 609 0070 00000000 		.word	.LANCHOR1
+ 610 0074 00000000 		.word	.LANCHOR2
+ 611              		.cfi_endproc
+ 612              	.LFE43:
+ 614              		.section	.text.sks_cmd_reset,"ax",%progbits
+ 615              		.align	1
+ 616              		.code	16
+ 617              		.thumb_func
+ 619              	sks_cmd_reset:
+ 620              	.LFB49:
+ 228:../Source/command.c **** 
+ 229:../Source/command.c **** static int sks_cmd_disable_ema(int from, char* command, int argc, char** argv, int size, int total)
+ 230:../Source/command.c **** 	//G9, debug setting
+ 231:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 232:../Source/command.c **** 	char set = 0;
+ 233:../Source/command.c **** 
+ 234:../Source/command.c **** 	if (argv[4] == NULL)
+ 235:../Source/command.c **** 		return size;
+ 236:../Source/command.c **** 
+ 237:../Source/command.c **** 	set = atoi(argv[4]);
+ 238:../Source/command.c **** 
+ 239:../Source/command.c **** 	if(set == 1) {
+ 240:../Source/command.c **** 		if(argv[5] != NULL) {
+ 241:../Source/command.c **** 			int tmp = atoi(argv[5]);
+ 242:../Source/command.c **** 			g_config.disableEma = (tmp > 0)?1:0;
+ 243:../Source/command.c **** 		}
+ 244:../Source/command.c **** 
+ 245:../Source/command.c **** 		write_flash = 1;
+ 246:../Source/command.c **** 	}
+ 247:../Source/command.c **** 
+ 248:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d", set, g_config.disableEma);
+ 249:../Source/command.c **** 
+ 250:../Source/command.c **** 	raise_command_coming();
+ 251:../Source/command.c **** 
+ 252:../Source/command.c **** 	response = 1;
+ 253:../Source/command.c **** 	return size;
+ 254:../Source/command.c **** }
+ 255:../Source/command.c **** 
+ 256:../Source/command.c **** static int sks_cmd_interval(int from, char* command, int argc, char** argv, int size, int total) {
+ 257:../Source/command.c **** 	//G9, debug setting
+ 258:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 259:../Source/command.c **** 	char set = 0;
+ 260:../Source/command.c **** 
+ 261:../Source/command.c **** 	if (argv[4] == NULL)
+ 262:../Source/command.c **** 		return size;
+ 263:../Source/command.c **** 
+ 264:../Source/command.c **** 	set = atoi(argv[4]);
+ 265:../Source/command.c **** 
+ 266:../Source/command.c **** 	if(set == 1) {
+ 267:../Source/command.c **** 		if(argv[5] != NULL) {
+ 268:../Source/command.c **** 			g_config.interval = atoi(argv[5]);
+ 269:../Source/command.c **** 		}
+ 270:../Source/command.c **** 
+ 271:../Source/command.c **** 		write_flash = 1;
+ 272:../Source/command.c **** 	}
+ 273:../Source/command.c **** 
+ 274:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d", set, g_config.interval);
+ 275:../Source/command.c **** 
+ 276:../Source/command.c **** 	raise_command_coming();
+ 277:../Source/command.c **** 
+ 278:../Source/command.c **** 	response = 1;
+ 279:../Source/command.c **** 	return size;
+ 280:../Source/command.c **** }
+ 281:../Source/command.c **** 
+ 282:../Source/command.c **** static int sks_cmd_config(int from, char* command, int argc, char** argv, int size, int total) {
+ 283:../Source/command.c **** 	//G9, debug setting
+ 284:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 285:../Source/command.c **** 	char set = 0;
+ 286:../Source/command.c **** 	if (argv[4] == NULL)
+ 287:../Source/command.c **** 		return size;
+ 288:../Source/command.c **** 
+ 289:../Source/command.c **** 	set = atoi(argv[4]);
+ 290:../Source/command.c **** 
+ 291:../Source/command.c **** 	if(set == 1) {
+ 292:../Source/command.c **** 		if(argv[5] != NULL) {
+ 293:../Source/command.c **** 			g_config.timeout3D = atoi(argv[5]);
+ 294:../Source/command.c **** 		}
+ 295:../Source/command.c **** 
+ 296:../Source/command.c **** 		if(argv[6] != NULL) {
+ 297:../Source/command.c **** 			g_config.filterMode = atoi(argv[6]);
+ 298:../Source/command.c **** 		}
+ 299:../Source/command.c **** 
+ 300:../Source/command.c **** 		if(argv[7] != NULL) {
+ 301:../Source/command.c **** 			int diffX = atoi(argv[7]);
+ 302:../Source/command.c **** 			if(diffX >= 3 && diffX <= 30) {
+ 303:../Source/command.c **** 				g_config.diffX = diffX;
+ 304:../Source/command.c **** 			}
+ 305:../Source/command.c **** 		}
+ 306:../Source/command.c **** 
+ 307:../Source/command.c **** 		if(argv[8] != NULL) {
+ 308:../Source/command.c **** 			int diffY = atoi(argv[8]);
+ 309:../Source/command.c **** 			if(diffY >= 3 && diffY <= 30) {
+ 310:../Source/command.c **** 				g_config.diffY = diffY;
+ 311:../Source/command.c **** 			}
+ 312:../Source/command.c **** 		}
+ 313:../Source/command.c **** 
+ 314:../Source/command.c **** 		write_flash = 1;
+ 315:../Source/command.c **** 	}
+ 316:../Source/command.c **** 
+ 317:../Source/command.c **** //	append_sign(Response);
+ 318:../Source/command.c **** //	append_v9_command(Response, command);
+ 319:../Source/command.c **** //	strcat(Response, ",");
+ 320:../Source/command.c **** //	append_int(Response, 1, set);
+ 321:../Source/command.c **** //	strcat(Response, ",");
+ 322:../Source/command.c **** //	append_int(Response, 2, g_config.timeout3D);
+ 323:../Source/command.c **** //	strcat(Response, ",");
+ 324:../Source/command.c **** //	append_int(Response, 1, g_config.filterMode);
+ 325:../Source/command.c **** //	strcat(Response, ",");
+ 326:../Source/command.c **** //	append_int(Response, 2, g_config.diffX);
+ 327:../Source/command.c **** //	strcat(Response, ",");
+ 328:../Source/command.c **** //	append_int(Response, 2, g_config.diffY);
+ 329:../Source/command.c **** //	strcat(Response, "#\r\n");
+ 330:../Source/command.c **** 
+ 331:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d,%d,%d", set, g_config.timeout3D, g_con
+ 332:../Source/command.c **** 
+ 333:../Source/command.c **** 	response = 1;
+ 334:../Source/command.c **** 	return size;
+ 335:../Source/command.c **** }
+ 336:../Source/command.c **** 
+ 337:../Source/command.c **** static int sks_cmd_serial(int from, char* command, int argc, char** argv, int size, int total) {
+ 338:../Source/command.c **** 	//G9, debug setting
+ 339:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 340:../Source/command.c **** 	char set = 0;
+ 341:../Source/command.c **** 	if (argv[4] == NULL)
+ 342:../Source/command.c **** 		return size;
+ 343:../Source/command.c **** 
+ 344:../Source/command.c **** 	set = atoi(argv[4]);
+ 345:../Source/command.c **** 
+ 346:../Source/command.c **** 	if(set == 1) {
+ 347:../Source/command.c **** 		memset(g_config.deviceCode, 0, sizeof(g_config.deviceCode));
+ 348:../Source/command.c **** 		strncpy(g_config.deviceCode, argv[5], next_char(argv[5], '#', DEVICE_CODE_LEN));
+ 349:../Source/command.c **** 
+ 350:../Source/command.c **** 		write_flash = 1;
+ 351:../Source/command.c **** 	}
+ 352:../Source/command.c **** 
+ 353:../Source/command.c **** //	append_sign(Response);
+ 354:../Source/command.c **** //	append_v9_command(Response, command);
+ 355:../Source/command.c **** //	strcat(Response, ",");
+ 356:../Source/command.c **** //	append_int(Response, 1, set);
+ 357:../Source/command.c **** //	strcat(Response, ",");
+ 358:../Source/command.c **** //	strcat(Response, g_config.deviceCode);
+ 359:../Source/command.c **** //	strcat(Response, "#\r\n");
+ 360:../Source/command.c **** 
+ 361:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%s", set, g_config.deviceCode);
+ 362:../Source/command.c **** 
+ 363:../Source/command.c **** 	response = 1;
+ 364:../Source/command.c **** 	return size;
+ 365:../Source/command.c **** }
+ 366:../Source/command.c **** 
+ 367:../Source/command.c **** static int sks_cmd_reset(int from, char* command, int argc, char** argv, int size, int total) {
+ 621              		.loc 1 367 0
+ 622              		.cfi_startproc
+ 623 0000 13B5     		push	{r0, r1, r4, lr}
+ 624              	.LCFI8:
+ 625              		.cfi_def_cfa_offset 16
+ 626              		.cfi_offset 0, -16
+ 627              		.cfi_offset 1, -12
+ 628              		.cfi_offset 4, -8
+ 629              		.cfi_offset 14, -4
+ 630              	.LVL53:
+ 368:../Source/command.c **** 	//G9, debug setting
+ 369:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 370:../Source/command.c **** 	char set = 0;
+ 371:../Source/command.c **** 	if (argv[4] == NULL)
+ 631              		.loc 1 371 0
+ 632 0002 1869     		ldr	r0, [r3, #16]
+ 633              	.LVL54:
+ 367:../Source/command.c **** static int sks_cmd_reset(int from, char* command, int argc, char** argv, int size, int total) {
+ 634              		.loc 1 367 0
+ 635 0004 0C1C     		mov	r4, r1
+ 636              		.loc 1 371 0
+ 637 0006 0028     		cmp	r0, #0
+ 638 0008 13D0     		beq	.L32
+ 372:../Source/command.c **** 		return size;
+ 373:../Source/command.c **** 
+ 374:../Source/command.c **** 	set = atoi(argv[4]);
+ 639              		.loc 1 374 0
+ 640 000a FFF7FEFF 		bl	atoi
+ 641              	.LVL55:
+ 642 000e C0B2     		uxtb	r0, r0
+ 643              	.LVL56:
+ 375:../Source/command.c **** 
+ 376:../Source/command.c **** 	if(set == 1) {
+ 644              		.loc 1 376 0
+ 645 0010 0128     		cmp	r0, #1
+ 646 0012 03D1     		bne	.L33
+ 377:../Source/command.c **** 		g_appStats.resetNow = ulSecCount;
+ 647              		.loc 1 377 0
+ 648 0014 0849     		ldr	r1, .L34
+ 649 0016 094B     		ldr	r3, .L34+4
+ 650 0018 0A68     		ldr	r2, [r1]
+ 651 001a 1A65     		str	r2, [r3, #80]
+ 652              	.L33:
+ 378:../Source/command.c **** 	}
+ 379:../Source/command.c **** 
+ 380:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d", set);
+ 653              		.loc 1 380 0
+ 654 001c 8022     		mov	r2, #128
+ 655 001e 0090     		str	r0, [sp]
+ 656 0020 5100     		lsl	r1, r2, #1
+ 657 0022 0748     		ldr	r0, .L34+8
+ 658              	.LVL57:
+ 659 0024 221C     		mov	r2, r4
+ 660 0026 074B     		ldr	r3, .L34+12
+ 661 0028 FFF7FEFF 		bl	cmd_response
+ 662              	.LVL58:
+ 381:../Source/command.c **** 
+ 382:../Source/command.c **** 	response = 1;
+ 663              		.loc 1 382 0
+ 664 002c 064C     		ldr	r4, .L34+16
+ 665              	.LVL59:
+ 666 002e 0120     		mov	r0, #1
+ 667 0030 2060     		str	r0, [r4]
+ 668              	.L32:
+ 383:../Source/command.c **** 	return size;
+ 384:../Source/command.c **** }
+ 669              		.loc 1 384 0
+ 670 0032 0498     		ldr	r0, [sp, #16]
+ 671              		@ sp needed for prologue
+ 672 0034 16BD     		pop	{r1, r2, r4, pc}
+ 673              	.L35:
+ 674 0036 C046     		.align	2
+ 675              	.L34:
+ 676 0038 00000000 		.word	ulSecCount
+ 677 003c 00000000 		.word	g_appStats
+ 678 0040 00000000 		.word	.LANCHOR1
+ 679 0044 1D000000 		.word	.LC29
+ 680 0048 00000000 		.word	.LANCHOR2
+ 681              		.cfi_endproc
+ 682              	.LFE49:
+ 684              		.section	.text.sks_cmd_disable_ema,"ax",%progbits
+ 685              		.align	1
+ 686              		.code	16
+ 687              		.thumb_func
+ 689              	sks_cmd_disable_ema:
+ 690              	.LFB45:
+ 229:../Source/command.c **** static int sks_cmd_disable_ema(int from, char* command, int argc, char** argv, int size, int total)
+ 691              		.loc 1 229 0
+ 692              		.cfi_startproc
+ 693 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 694              	.LCFI9:
+ 695              		.cfi_def_cfa_offset 24
+ 696              		.cfi_offset 0, -24
+ 697              		.cfi_offset 1, -20
+ 698              		.cfi_offset 4, -16
+ 699              		.cfi_offset 5, -12
+ 700              		.cfi_offset 6, -8
+ 701              		.cfi_offset 14, -4
+ 702              	.LVL60:
+ 234:../Source/command.c **** 	if (argv[4] == NULL)
+ 703              		.loc 1 234 0
+ 704 0002 1869     		ldr	r0, [r3, #16]
+ 705              	.LVL61:
+ 229:../Source/command.c **** static int sks_cmd_disable_ema(int from, char* command, int argc, char** argv, int size, int total)
+ 706              		.loc 1 229 0
+ 707 0004 0E1C     		mov	r6, r1
+ 708 0006 1C1C     		mov	r4, r3
+ 234:../Source/command.c **** 	if (argv[4] == NULL)
+ 709              		.loc 1 234 0
+ 710 0008 0028     		cmp	r0, #0
+ 711 000a 21D0     		beq	.L37
+ 237:../Source/command.c **** 	set = atoi(argv[4]);
+ 712              		.loc 1 237 0
+ 713 000c FFF7FEFF 		bl	atoi
+ 714              	.LVL62:
+ 715 0010 C5B2     		uxtb	r5, r0
+ 716              	.LVL63:
+ 239:../Source/command.c **** 	if(set == 1) {
+ 717              		.loc 1 239 0
+ 718 0012 012D     		cmp	r5, #1
+ 719 0014 0CD1     		bne	.L38
+ 240:../Source/command.c **** 		if(argv[5] != NULL) {
+ 720              		.loc 1 240 0
+ 721 0016 6069     		ldr	r0, [r4, #20]
+ 722 0018 0028     		cmp	r0, #0
+ 723 001a 06D0     		beq	.L39
+ 724              	.LBB2:
+ 241:../Source/command.c **** 			int tmp = atoi(argv[5]);
+ 725              		.loc 1 241 0
+ 726 001c FFF7FEFF 		bl	atoi
+ 727              	.LVL64:
+ 242:../Source/command.c **** 			g_config.disableEma = (tmp > 0)?1:0;
+ 728              		.loc 1 242 0
+ 729 0020 C217     		asr	r2, r0, #31
+ 730 0022 111A     		sub	r1, r2, r0
+ 731 0024 0B4B     		ldr	r3, .L40
+ 732 0026 C80F     		lsr	r0, r1, #31
+ 733              	.LVL65:
+ 734 0028 D876     		strb	r0, [r3, #27]
+ 735              	.L39:
+ 736              	.LBE2:
+ 245:../Source/command.c **** 		write_flash = 1;
+ 737              		.loc 1 245 0
+ 738 002a 0B48     		ldr	r0, .L40+4
+ 739 002c 0124     		mov	r4, #1
+ 740              	.LVL66:
+ 741 002e 0460     		str	r4, [r0]
+ 742              	.L38:
+ 248:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d", set, g_config.disableEma);
+ 743              		.loc 1 248 0
+ 744 0030 084A     		ldr	r2, .L40
+ 745 0032 0095     		str	r5, [sp]
+ 746 0034 D17E     		ldrb	r1, [r2, #27]
+ 747 0036 8023     		mov	r3, #128
+ 748 0038 321C     		mov	r2, r6
+ 749 003a 0191     		str	r1, [sp, #4]
+ 750 003c 0748     		ldr	r0, .L40+8
+ 751 003e 5900     		lsl	r1, r3, #1
+ 752 0040 074B     		ldr	r3, .L40+12
+ 753 0042 FFF7FEFF 		bl	cmd_response
+ 250:../Source/command.c **** 	raise_command_coming();
+ 754              		.loc 1 250 0
+ 755 0046 FFF7FEFF 		bl	raise_command_coming
+ 252:../Source/command.c **** 	response = 1;
+ 756              		.loc 1 252 0
+ 757 004a 064E     		ldr	r6, .L40+16
+ 758              	.LVL67:
+ 759 004c 0125     		mov	r5, #1
+ 760              	.LVL68:
+ 761 004e 3560     		str	r5, [r6]
+ 762              	.L37:
+ 254:../Source/command.c **** }
+ 763              		.loc 1 254 0
+ 764 0050 0698     		ldr	r0, [sp, #24]
+ 765              		@ sp needed for prologue
+ 766 0052 76BD     		pop	{r1, r2, r4, r5, r6, pc}
+ 767              	.L41:
+ 768              		.align	2
+ 769              	.L40:
+ 770 0054 00000000 		.word	g_config
+ 771 0058 00000000 		.word	.LANCHOR3
+ 772 005c 00000000 		.word	.LANCHOR1
+ 773 0060 0E000000 		.word	.LC7
+ 774 0064 00000000 		.word	.LANCHOR2
+ 775              		.cfi_endproc
+ 776              	.LFE45:
+ 778              		.section	.text.sks_cmd_interval,"ax",%progbits
+ 779              		.align	1
+ 780              		.code	16
+ 781              		.thumb_func
+ 783              	sks_cmd_interval:
+ 784              	.LFB46:
+ 256:../Source/command.c **** static int sks_cmd_interval(int from, char* command, int argc, char** argv, int size, int total) {
+ 785              		.loc 1 256 0
+ 786              		.cfi_startproc
+ 787 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 788              	.LCFI10:
+ 789              		.cfi_def_cfa_offset 24
+ 790              		.cfi_offset 0, -24
+ 791              		.cfi_offset 1, -20
+ 792              		.cfi_offset 4, -16
+ 793              		.cfi_offset 5, -12
+ 794              		.cfi_offset 6, -8
+ 795              		.cfi_offset 14, -4
+ 796              	.LVL69:
+ 261:../Source/command.c **** 	if (argv[4] == NULL)
+ 797              		.loc 1 261 0
+ 798 0002 1869     		ldr	r0, [r3, #16]
+ 799              	.LVL70:
+ 256:../Source/command.c **** static int sks_cmd_interval(int from, char* command, int argc, char** argv, int size, int total) {
+ 800              		.loc 1 256 0
+ 801 0004 0E1C     		mov	r6, r1
+ 802 0006 1C1C     		mov	r4, r3
+ 261:../Source/command.c **** 	if (argv[4] == NULL)
+ 803              		.loc 1 261 0
+ 804 0008 0028     		cmp	r0, #0
+ 805 000a 1ED0     		beq	.L43
+ 264:../Source/command.c **** 	set = atoi(argv[4]);
+ 806              		.loc 1 264 0
+ 807 000c FFF7FEFF 		bl	atoi
+ 808              	.LVL71:
+ 809 0010 C5B2     		uxtb	r5, r0
+ 810              	.LVL72:
+ 266:../Source/command.c **** 	if(set == 1) {
+ 811              		.loc 1 266 0
+ 812 0012 012D     		cmp	r5, #1
+ 813 0014 09D1     		bne	.L44
+ 267:../Source/command.c **** 		if(argv[5] != NULL) {
+ 814              		.loc 1 267 0
+ 815 0016 6069     		ldr	r0, [r4, #20]
+ 816 0018 0028     		cmp	r0, #0
+ 817 001a 03D0     		beq	.L45
+ 268:../Source/command.c **** 			g_config.interval = atoi(argv[5]);
+ 818              		.loc 1 268 0
+ 819 001c FFF7FEFF 		bl	atoi
+ 820 0020 0B4B     		ldr	r3, .L46
+ 821 0022 9876     		strb	r0, [r3, #26]
+ 822              	.L45:
+ 271:../Source/command.c **** 		write_flash = 1;
+ 823              		.loc 1 271 0
+ 824 0024 0B48     		ldr	r0, .L46+4
+ 825 0026 0122     		mov	r2, #1
+ 826 0028 0260     		str	r2, [r0]
+ 827              	.L44:
+ 274:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d", set, g_config.interval);
+ 828              		.loc 1 274 0
+ 829 002a 094A     		ldr	r2, .L46
+ 830 002c 0095     		str	r5, [sp]
+ 831 002e 937E     		ldrb	r3, [r2, #26]
+ 832 0030 8025     		mov	r5, #128
+ 833              	.LVL73:
+ 834 0032 6900     		lsl	r1, r5, #1
+ 835 0034 0193     		str	r3, [sp, #4]
+ 836 0036 321C     		mov	r2, r6
+ 837 0038 074B     		ldr	r3, .L46+8
+ 838 003a 0848     		ldr	r0, .L46+12
+ 839 003c FFF7FEFF 		bl	cmd_response
+ 840              	.LVL74:
+ 276:../Source/command.c **** 	raise_command_coming();
+ 841              		.loc 1 276 0
+ 842 0040 FFF7FEFF 		bl	raise_command_coming
+ 278:../Source/command.c **** 	response = 1;
+ 843              		.loc 1 278 0
+ 844 0044 064C     		ldr	r4, .L46+16
+ 845              	.LVL75:
+ 846 0046 0121     		mov	r1, #1
+ 847 0048 2160     		str	r1, [r4]
+ 848              	.L43:
+ 280:../Source/command.c **** }
+ 849              		.loc 1 280 0
+ 850 004a 0698     		ldr	r0, [sp, #24]
+ 851              		@ sp needed for prologue
+ 852              	.LVL76:
+ 853 004c 76BD     		pop	{r1, r2, r4, r5, r6, pc}
+ 854              	.L47:
+ 855 004e C046     		.align	2
+ 856              	.L46:
+ 857 0050 00000000 		.word	g_config
+ 858 0054 00000000 		.word	.LANCHOR3
+ 859 0058 0E000000 		.word	.LC7
+ 860 005c 00000000 		.word	.LANCHOR1
+ 861 0060 00000000 		.word	.LANCHOR2
+ 862              		.cfi_endproc
+ 863              	.LFE46:
+ 865              		.section	.text.sks_cmd_info,"ax",%progbits
+ 866              		.align	1
+ 867              		.code	16
+ 868              		.thumb_func
+ 870              	sks_cmd_info:
+ 871              	.LFB50:
+ 385:../Source/command.c **** 
+ 386:../Source/command.c **** static int sks_cmd_info(int from, char* command, int argc, char** argv, int size, int total) {
+ 872              		.loc 1 386 0
+ 873              		.cfi_startproc
+ 874 0000 10B5     		push	{r4, lr}
+ 875              	.LCFI11:
+ 876              		.cfi_def_cfa_offset 8
+ 877              		.cfi_offset 4, -8
+ 878              		.cfi_offset 14, -4
+ 879              	.LVL77:
+ 387:../Source/command.c **** 	//G9, debug setting
+ 388:../Source/command.c **** 	//*XX,YYYYYYYYYY,SF,HHMMSS,S#
+ 389:../Source/command.c **** 	char set = 0;
+ 390:../Source/command.c **** 	if (argv[4] == NULL)
+ 880              		.loc 1 390 0
+ 881 0002 1869     		ldr	r0, [r3, #16]
+ 882              	.LVL78:
+ 386:../Source/command.c **** static int sks_cmd_info(int from, char* command, int argc, char** argv, int size, int total) {
+ 883              		.loc 1 386 0
+ 884 0004 88B0     		sub	sp, sp, #32
+ 885              	.LCFI12:
+ 886              		.cfi_def_cfa_offset 40
+ 386:../Source/command.c **** static int sks_cmd_info(int from, char* command, int argc, char** argv, int size, int total) {
+ 887              		.loc 1 386 0
+ 888 0006 0C1C     		mov	r4, r1
+ 889              		.loc 1 390 0
+ 890 0008 0028     		cmp	r0, #0
+ 891 000a 1CD0     		beq	.L49
+ 391:../Source/command.c **** 		return size;
+ 392:../Source/command.c **** 	set = atoi(argv[4]);
+ 892              		.loc 1 392 0
+ 893 000c FFF7FEFF 		bl	atoi
+ 894              	.LVL79:
+ 393:../Source/command.c **** 
+ 394:../Source/command.c **** 	if(set == 1) {
+ 395:../Source/command.c **** 	}
+ 396:../Source/command.c **** 
+ 397:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d,%d,%d,%s,%s", set, g_config.interval, 
+ 895              		.loc 1 397 0
+ 896 0010 C3B2     		uxtb	r3, r0
+ 897 0012 0093     		str	r3, [sp]
+ 898 0014 0D4B     		ldr	r3, .L50
+ 899 0016 9A7E     		ldrb	r2, [r3, #26]
+ 900 0018 0192     		str	r2, [sp, #4]
+ 901 001a D87D     		ldrb	r0, [r3, #23]
+ 902              	.LVL80:
+ 903 001c 0290     		str	r0, [sp, #8]
+ 904 001e 1969     		ldr	r1, [r3, #16]
+ 905 0020 0B48     		ldr	r0, .L50+4
+ 906 0022 0391     		str	r1, [sp, #12]
+ 907 0024 DA68     		ldr	r2, [r3, #12]
+ 908 0026 8021     		mov	r1, #128
+ 909 0028 0233     		add	r3, r3, #2
+ 910 002a 0492     		str	r2, [sp, #16]
+ 911 002c 0593     		str	r3, [sp, #20]
+ 912 002e 221C     		mov	r2, r4
+ 913 0030 084B     		ldr	r3, .L50+8
+ 914 0032 0690     		str	r0, [sp, #24]
+ 915 0034 4900     		lsl	r1, r1, #1
+ 916 0036 0848     		ldr	r0, .L50+12
+ 917 0038 FFF7FEFF 		bl	cmd_response
+ 398:../Source/command.c **** 
+ 399:../Source/command.c **** 	raise_command_coming();
+ 918              		.loc 1 399 0
+ 919 003c FFF7FEFF 		bl	raise_command_coming
+ 400:../Source/command.c **** 
+ 401:../Source/command.c **** 	response = 1;
+ 920              		.loc 1 401 0
+ 921 0040 064B     		ldr	r3, .L50+16
+ 922 0042 0122     		mov	r2, #1
+ 923 0044 1A60     		str	r2, [r3]
+ 924              	.L49:
+ 402:../Source/command.c **** 	return size;
+ 403:../Source/command.c **** }
+ 925              		.loc 1 403 0
+ 926 0046 0A98     		ldr	r0, [sp, #40]
+ 927 0048 08B0     		add	sp, sp, #32
+ 928              		@ sp needed for prologue
+ 929              	.LVL81:
+ 930 004a 10BD     		pop	{r4, pc}
+ 931              	.L51:
+ 932              		.align	2
+ 933              	.L50:
+ 934 004c 00000000 		.word	g_config
+ 935 0050 35000000 		.word	.LC47
+ 936 0054 20000000 		.word	.LC43
+ 937 0058 00000000 		.word	.LANCHOR1
+ 938 005c 00000000 		.word	.LANCHOR2
+ 939              		.cfi_endproc
+ 940              	.LFE50:
+ 942              		.section	.text.sks_cmd_config,"ax",%progbits
+ 943              		.align	1
+ 944              		.code	16
+ 945              		.thumb_func
+ 947              	sks_cmd_config:
+ 948              	.LFB47:
+ 282:../Source/command.c **** static int sks_cmd_config(int from, char* command, int argc, char** argv, int size, int total) {
+ 949              		.loc 1 282 0
+ 950              		.cfi_startproc
+ 951 0000 70B5     		push	{r4, r5, r6, lr}
+ 952              	.LCFI13:
+ 953              		.cfi_def_cfa_offset 16
+ 954              		.cfi_offset 4, -16
+ 955              		.cfi_offset 5, -12
+ 956              		.cfi_offset 6, -8
+ 957              		.cfi_offset 14, -4
+ 958              	.LVL82:
+ 286:../Source/command.c **** 	if (argv[4] == NULL)
+ 959              		.loc 1 286 0
+ 960 0002 1869     		ldr	r0, [r3, #16]
+ 961              	.LVL83:
+ 282:../Source/command.c **** static int sks_cmd_config(int from, char* command, int argc, char** argv, int size, int total) {
+ 962              		.loc 1 282 0
+ 963 0004 86B0     		sub	sp, sp, #24
+ 964              	.LCFI14:
+ 965              		.cfi_def_cfa_offset 40
+ 282:../Source/command.c **** static int sks_cmd_config(int from, char* command, int argc, char** argv, int size, int total) {
+ 966              		.loc 1 282 0
+ 967 0006 0E1C     		mov	r6, r1
+ 968 0008 1C1C     		mov	r4, r3
+ 286:../Source/command.c **** 	if (argv[4] == NULL)
+ 969              		.loc 1 286 0
+ 970 000a 0028     		cmp	r0, #0
+ 971 000c 3DD0     		beq	.L53
+ 289:../Source/command.c **** 	set = atoi(argv[4]);
+ 972              		.loc 1 289 0
+ 973 000e FFF7FEFF 		bl	atoi
+ 974              	.LVL84:
+ 975 0012 C5B2     		uxtb	r5, r0
+ 976              	.LVL85:
+ 291:../Source/command.c **** 	if(set == 1) {
+ 977              		.loc 1 291 0
+ 978 0014 012D     		cmp	r5, #1
+ 979 0016 24D1     		bne	.L54
+ 292:../Source/command.c **** 		if(argv[5] != NULL) {
+ 980              		.loc 1 292 0
+ 981 0018 6069     		ldr	r0, [r4, #20]
+ 982 001a 0028     		cmp	r0, #0
+ 983 001c 03D0     		beq	.L55
+ 293:../Source/command.c **** 			g_config.timeout3D = atoi(argv[5]);
+ 984              		.loc 1 293 0
+ 985 001e FFF7FEFF 		bl	atoi
+ 986 0022 1B4B     		ldr	r3, .L59
+ 987 0024 9882     		strh	r0, [r3, #20]
+ 988              	.L55:
+ 296:../Source/command.c **** 		if(argv[6] != NULL) {
+ 989              		.loc 1 296 0
+ 990 0026 A069     		ldr	r0, [r4, #24]
+ 991 0028 0028     		cmp	r0, #0
+ 992 002a 03D0     		beq	.L56
+ 297:../Source/command.c **** 			g_config.filterMode = atoi(argv[6]);
+ 993              		.loc 1 297 0
+ 994 002c FFF7FEFF 		bl	atoi
+ 995 0030 1749     		ldr	r1, .L59
+ 996 0032 C875     		strb	r0, [r1, #23]
+ 997              	.L56:
+ 300:../Source/command.c **** 		if(argv[7] != NULL) {
+ 998              		.loc 1 300 0
+ 999 0034 E069     		ldr	r0, [r4, #28]
+ 1000 0036 0028     		cmp	r0, #0
+ 1001 0038 06D0     		beq	.L57
+ 1002              	.LBB3:
+ 301:../Source/command.c **** 			int diffX = atoi(argv[7]);
+ 1003              		.loc 1 301 0
+ 1004 003a FFF7FEFF 		bl	atoi
+ 1005              	.LVL86:
+ 302:../Source/command.c **** 			if(diffX >= 3 && diffX <= 30) {
+ 1006              		.loc 1 302 0
+ 1007 003e C21E     		sub	r2, r0, #3
+ 1008 0040 1B2A     		cmp	r2, #27
+ 1009 0042 01D8     		bhi	.L57
+ 303:../Source/command.c **** 				g_config.diffX = diffX;
+ 1010              		.loc 1 303 0
+ 1011 0044 124B     		ldr	r3, .L59
+ 1012 0046 1876     		strb	r0, [r3, #24]
+ 1013              	.LVL87:
+ 1014              	.L57:
+ 1015              	.LBE3:
+ 307:../Source/command.c **** 		if(argv[8] != NULL) {
+ 1016              		.loc 1 307 0
+ 1017 0048 206A     		ldr	r0, [r4, #32]
+ 1018 004a 0028     		cmp	r0, #0
+ 1019 004c 06D0     		beq	.L58
+ 1020              	.LBB4:
+ 308:../Source/command.c **** 			int diffY = atoi(argv[8]);
+ 1021              		.loc 1 308 0
+ 1022 004e FFF7FEFF 		bl	atoi
+ 1023              	.LVL88:
+ 309:../Source/command.c **** 			if(diffY >= 3 && diffY <= 30) {
+ 1024              		.loc 1 309 0
+ 1025 0052 C41E     		sub	r4, r0, #3
+ 1026              	.LVL89:
+ 1027 0054 1B2C     		cmp	r4, #27
+ 1028 0056 01D8     		bhi	.L58
+ 310:../Source/command.c **** 				g_config.diffY = diffY;
+ 1029              		.loc 1 310 0
+ 1030 0058 0D49     		ldr	r1, .L59
+ 1031 005a 4876     		strb	r0, [r1, #25]
+ 1032              	.LVL90:
+ 1033              	.L58:
+ 1034              	.LBE4:
+ 314:../Source/command.c **** 		write_flash = 1;
+ 1035              		.loc 1 314 0
+ 1036 005c 0D4A     		ldr	r2, .L59+4
+ 1037 005e 0120     		mov	r0, #1
+ 1038 0060 1060     		str	r0, [r2]
+ 1039              	.L54:
+ 331:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d,%d,%d", set, g_config.timeout3D, g_con
+ 1040              		.loc 1 331 0
+ 1041 0062 0B49     		ldr	r1, .L59
+ 1042 0064 0095     		str	r5, [sp]
+ 1043 0066 8D8A     		ldrh	r5, [r1, #20]
+ 1044              	.LVL91:
+ 1045 0068 8023     		mov	r3, #128
+ 1046 006a 0195     		str	r5, [sp, #4]
+ 1047 006c CA7D     		ldrb	r2, [r1, #23]
+ 333:../Source/command.c **** 	response = 1;
+ 1048              		.loc 1 333 0
+ 1049 006e 0125     		mov	r5, #1
+ 331:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%d,%d,%d,%d", set, g_config.timeout3D, g_con
+ 1050              		.loc 1 331 0
+ 1051 0070 0292     		str	r2, [sp, #8]
+ 1052 0072 087E     		ldrb	r0, [r1, #24]
+ 1053 0074 321C     		mov	r2, r6
+ 1054 0076 0390     		str	r0, [sp, #12]
+ 1055 0078 4C7E     		ldrb	r4, [r1, #25]
+ 1056 007a 0748     		ldr	r0, .L59+8
+ 1057 007c 5900     		lsl	r1, r3, #1
+ 1058 007e 074B     		ldr	r3, .L59+12
+ 1059 0080 0494     		str	r4, [sp, #16]
+ 1060 0082 FFF7FEFF 		bl	cmd_response
+ 1061              	.LVL92:
+ 333:../Source/command.c **** 	response = 1;
+ 1062              		.loc 1 333 0
+ 1063 0086 064E     		ldr	r6, .L59+16
+ 1064              	.LVL93:
+ 1065 0088 3560     		str	r5, [r6]
+ 1066              	.L53:
+ 335:../Source/command.c **** }
+ 1067              		.loc 1 335 0
+ 1068 008a 0A98     		ldr	r0, [sp, #40]
+ 1069 008c 06B0     		add	sp, sp, #24
+ 1070              		@ sp needed for prologue
+ 1071 008e 70BD     		pop	{r4, r5, r6, pc}
+ 1072              	.L60:
+ 1073              		.align	2
+ 1074              	.L59:
+ 1075 0090 00000000 		.word	g_config
+ 1076 0094 00000000 		.word	.LANCHOR3
+ 1077 0098 00000000 		.word	.LANCHOR1
+ 1078 009c 4A000000 		.word	.LC53
+ 1079 00a0 00000000 		.word	.LANCHOR2
+ 1080              		.cfi_endproc
+ 1081              	.LFE47:
+ 1083              		.section	.text.append_sign,"ax",%progbits
+ 1084              		.align	1
+ 1085              		.global	append_sign
+ 1086              		.code	16
+ 1087              		.thumb_func
+ 1089              	append_sign:
+ 1090              	.LFB37:
+  88:../Source/command.c **** int append_sign(char* buff) {
+ 1091              		.loc 1 88 0
+ 1092              		.cfi_startproc
+ 1093 0000 10B5     		push	{r4, lr}
+ 1094              	.LCFI15:
+ 1095              		.cfi_def_cfa_offset 8
+ 1096              		.cfi_offset 4, -8
+ 1097              		.cfi_offset 14, -4
+ 1098              	.LVL94:
+  88:../Source/command.c **** int append_sign(char* buff) {
+ 1099              		.loc 1 88 0
+ 1100 0002 041C     		mov	r4, r0
+  89:../Source/command.c **** 	strcpy(buff, "*SS,");
+ 1101              		.loc 1 89 0
+ 1102 0004 0449     		ldr	r1, .L62
+ 1103 0006 FFF7FEFF 		bl	strcpy
+ 1104              	.LVL95:
+  90:../Source/command.c **** 	strcat(buff, (char*)g_config.deviceCode);
+ 1105              		.loc 1 90 0
+ 1106 000a 201C     		mov	r0, r4
+ 1107 000c 0349     		ldr	r1, .L62+4
+ 1108 000e FFF7FEFF 		bl	strcat
+ 1109              		@ sp needed for prologue
+  92:../Source/command.c **** }
+ 1110              		.loc 1 92 0
+ 1111 0012 0120     		mov	r0, #1
+ 1112              	.LVL96:
+ 1113 0014 10BD     		pop	{r4, pc}
+ 1114              	.L63:
+ 1115 0016 C046     		.align	2
+ 1116              	.L62:
+ 1117 0018 59000000 		.word	.LC56
+ 1118 001c 02000000 		.word	g_config+2
+ 1119              		.cfi_endproc
+ 1120              	.LFE37:
+ 1122              		.section	.text.append_time,"ax",%progbits
+ 1123              		.align	1
+ 1124              		.global	append_time
+ 1125              		.code	16
+ 1126              		.thumb_func
+ 1128              	append_time:
+ 1129              	.LFB38:
+  94:../Source/command.c **** int append_time(char* buff, time_t ti) {
+ 1130              		.loc 1 94 0
+ 1131              		.cfi_startproc
+ 1132 0000 73B5     		push	{r0, r1, r4, r5, r6, lr}
+ 1133              	.LCFI16:
+ 1134              		.cfi_def_cfa_offset 24
+ 1135              		.cfi_offset 0, -24
+ 1136              		.cfi_offset 1, -20
+ 1137              		.cfi_offset 4, -16
+ 1138              		.cfi_offset 5, -12
+ 1139              		.cfi_offset 6, -8
+ 1140              		.cfi_offset 14, -4
+ 1141              	.LVL97:
+  94:../Source/command.c **** int append_time(char* buff, time_t ti) {
+ 1142              		.loc 1 94 0
+ 1143 0002 051C     		mov	r5, r0
+  96:../Source/command.c **** 	struct tm *tm = gmtime(&now);
+ 1144              		.loc 1 96 0
+ 1145 0004 01A8     		add	r0, sp, #4
+ 1146              	.LVL98:
+  95:../Source/command.c **** 	time_t now = ti;
+ 1147              		.loc 1 95 0
+ 1148 0006 0191     		str	r1, [sp, #4]
+ 1149              	.LVL99:
+  96:../Source/command.c **** 	struct tm *tm = gmtime(&now);
+ 1150              		.loc 1 96 0
+ 1151 0008 FFF7FEFF 		bl	gmtime
+ 1152              	.LVL100:
+ 1153 000c 041C     		mov	r4, r0
+ 1154              	.LVL101:
+  97:../Source/command.c **** 	char *ptr = buff + strlen(buff);
+ 1155              		.loc 1 97 0
+ 1156 000e 281C     		mov	r0, r5
+ 1157              	.LVL102:
+ 1158 0010 FFF7FEFF 		bl	strlen
+  98:../Source/command.c **** 	append_int(ptr, 4, tm->tm_year + 1900);
+ 1159              		.loc 1 98 0
+ 1160 0014 1C4B     		ldr	r3, .L65
+ 1161 0016 6269     		ldr	r2, [r4, #20]
+  97:../Source/command.c **** 	char *ptr = buff + strlen(buff);
+ 1162              		.loc 1 97 0
+ 1163 0018 2D18     		add	r5, r5, r0
+ 1164              	.LVL103:
+  98:../Source/command.c **** 	append_int(ptr, 4, tm->tm_year + 1900);
+ 1165              		.loc 1 98 0
+ 1166 001a D218     		add	r2, r2, r3
+ 1167 001c 281C     		mov	r0, r5
+ 1168 001e 0421     		mov	r1, #4
+ 1169 0020 FFF7FEFF 		bl	append_int
+  99:../Source/command.c **** 	strcat(ptr, "-");
+ 1170              		.loc 1 99 0
+ 1171 0024 194E     		ldr	r6, .L65+4
+ 1172 0026 281C     		mov	r0, r5
+ 1173 0028 311C     		mov	r1, r6
+ 1174 002a FFF7FEFF 		bl	strcat
+ 100:../Source/command.c **** 	append_int(ptr, 2, tm->tm_mon + 1);
+ 1175              		.loc 1 100 0
+ 1176 002e 2269     		ldr	r2, [r4, #16]
+ 1177 0030 281C     		mov	r0, r5
+ 1178 0032 0132     		add	r2, r2, #1
+ 1179 0034 0221     		mov	r1, #2
+ 1180 0036 FFF7FEFF 		bl	append_int
+ 101:../Source/command.c **** 	strcat(ptr, "-");
+ 1181              		.loc 1 101 0
+ 1182 003a 281C     		mov	r0, r5
+ 1183 003c 311C     		mov	r1, r6
+ 1184 003e FFF7FEFF 		bl	strcat
+ 102:../Source/command.c **** 	append_int(ptr, 2, tm->tm_mday);
+ 1185              		.loc 1 102 0
+ 1186 0042 281C     		mov	r0, r5
+ 1187 0044 E268     		ldr	r2, [r4, #12]
+ 1188 0046 0221     		mov	r1, #2
+ 1189 0048 FFF7FEFF 		bl	append_int
+ 103:../Source/command.c **** 	strcat(ptr, " ");
+ 1190              		.loc 1 103 0
+ 1191 004c 281C     		mov	r0, r5
+ 1192 004e 1049     		ldr	r1, .L65+8
+ 1193 0050 FFF7FEFF 		bl	strcat
+ 104:../Source/command.c **** 	append_int(ptr, 2, tm->tm_hour);
+ 1194              		.loc 1 104 0
+ 1195 0054 281C     		mov	r0, r5
+ 1196 0056 A268     		ldr	r2, [r4, #8]
+ 1197 0058 0221     		mov	r1, #2
+ 1198 005a FFF7FEFF 		bl	append_int
+ 105:../Source/command.c **** 	strcat(ptr, ":");
+ 1199              		.loc 1 105 0
+ 1200 005e 0D4E     		ldr	r6, .L65+12
+ 1201 0060 281C     		mov	r0, r5
+ 1202 0062 311C     		mov	r1, r6
+ 1203 0064 FFF7FEFF 		bl	strcat
+ 106:../Source/command.c **** 	append_int(ptr, 2, tm->tm_min);
+ 1204              		.loc 1 106 0
+ 1205 0068 281C     		mov	r0, r5
+ 1206 006a 6268     		ldr	r2, [r4, #4]
+ 1207 006c 0221     		mov	r1, #2
+ 1208 006e FFF7FEFF 		bl	append_int
+ 107:../Source/command.c **** 	strcat(ptr, ":");
+ 1209              		.loc 1 107 0
+ 1210 0072 311C     		mov	r1, r6
+ 1211 0074 281C     		mov	r0, r5
+ 1212 0076 FFF7FEFF 		bl	strcat
+ 108:../Source/command.c **** 	append_int(ptr, 2, tm->tm_sec);
+ 1213              		.loc 1 108 0
+ 1214 007a 281C     		mov	r0, r5
+ 1215 007c 0221     		mov	r1, #2
+ 1216 007e 2268     		ldr	r2, [r4]
+ 1217 0080 FFF7FEFF 		bl	append_int
+ 1218              		@ sp needed for prologue
+ 110:../Source/command.c **** }
+ 1219              		.loc 1 110 0
+ 1220 0084 0120     		mov	r0, #1
+ 1221              	.LVL104:
+ 1222              	.LVL105:
+ 1223 0086 76BD     		pop	{r1, r2, r4, r5, r6, pc}
+ 1224              	.L66:
+ 1225              		.align	2
+ 1226              	.L65:
+ 1227 0088 6C070000 		.word	1900
+ 1228 008c 5E000000 		.word	.LC59
+ 1229 0090 60000000 		.word	.LC61
+ 1230 0094 62000000 		.word	.LC63
+ 1231              		.cfi_endproc
+ 1232              	.LFE38:
+ 1234              		.section	.text.append_v9_command,"ax",%progbits
+ 1235              		.align	1
+ 1236              		.global	append_v9_command
+ 1237              		.code	16
+ 1238              		.thumb_func
+ 1240              	append_v9_command:
+ 1241              	.LFB39:
+ 112:../Source/command.c **** int append_v9_command(char *buff, char* command) {
+ 1242              		.loc 1 112 0
+ 1243              		.cfi_startproc
+ 1244 0000 38B5     		push	{r3, r4, r5, lr}
+ 1245              	.LCFI17:
+ 1246              		.cfi_def_cfa_offset 16
+ 1247              		.cfi_offset 3, -16
+ 1248              		.cfi_offset 4, -12
+ 1249              		.cfi_offset 5, -8
+ 1250              		.cfi_offset 14, -4
+ 1251              	.LVL106:
+ 112:../Source/command.c **** int append_v9_command(char *buff, char* command) {
+ 1252              		.loc 1 112 0
+ 1253 0002 0D1C     		mov	r5, r1
+ 1254 0004 041C     		mov	r4, r0
+ 113:../Source/command.c **** 	strcat(buff, ",V9,");
+ 1255              		.loc 1 113 0
+ 1256 0006 0449     		ldr	r1, .L68
+ 1257              	.LVL107:
+ 1258 0008 FFF7FEFF 		bl	strcat
+ 1259              	.LVL108:
+ 114:../Source/command.c **** 	strcat(buff, command);
+ 1260              		.loc 1 114 0
+ 1261 000c 291C     		mov	r1, r5
+ 1262 000e 201C     		mov	r0, r4
+ 1263 0010 FFF7FEFF 		bl	strcat
+ 1264              		@ sp needed for prologue
+ 116:../Source/command.c **** }
+ 1265              		.loc 1 116 0
+ 1266 0014 0120     		mov	r0, #1
+ 1267              	.LVL109:
+ 1268              	.LVL110:
+ 1269 0016 38BD     		pop	{r3, r4, r5, pc}
+ 1270              	.L69:
+ 1271              		.align	2
+ 1272              	.L68:
+ 1273 0018 64000000 		.word	.LC65
+ 1274              		.cfi_endproc
+ 1275              	.LFE39:
+ 1277              		.section	.text.next_char,"ax",%progbits
+ 1278              		.align	1
+ 1279              		.global	next_char
+ 1280              		.code	16
+ 1281              		.thumb_func
+ 1283              	next_char:
+ 1284              	.LFB40:
+ 118:../Source/command.c **** int next_char(char* data, char sep, int max) {
+ 1285              		.loc 1 118 0
+ 1286              		.cfi_startproc
+ 1287 0000 38B5     		push	{r3, r4, r5, lr}
+ 1288              	.LCFI18:
+ 1289              		.cfi_def_cfa_offset 16
+ 1290              		.cfi_offset 3, -16
+ 1291              		.cfi_offset 4, -12
+ 1292              		.cfi_offset 5, -8
+ 1293              		.cfi_offset 14, -4
+ 1294              	.LVL111:
+ 118:../Source/command.c **** int next_char(char* data, char sep, int max) {
+ 1295              		.loc 1 118 0
+ 1296 0002 041C     		mov	r4, r0
+ 1297 0004 151C     		mov	r5, r2
+ 119:../Source/command.c **** 	char *ptr = strchr(data, sep);
+ 1298              		.loc 1 119 0
+ 1299 0006 FFF7FEFF 		bl	strchr
+ 1300              	.LVL112:
+ 120:../Source/command.c **** 	if (ptr) {
+ 1301              		.loc 1 120 0
+ 1302 000a 0028     		cmp	r0, #0
+ 1303 000c 03D0     		beq	.L71
+ 121:../Source/command.c **** 		return (ptr - data) >= max ? max : (ptr - data);
+ 1304              		.loc 1 121 0
+ 1305 000e 001B     		sub	r0, r0, r4
+ 1306              	.LVL113:
+ 1307 0010 A842     		cmp	r0, r5
+ 1308 0012 00DD     		ble	.L71
+ 1309 0014 281C     		mov	r0, r5
+ 1310              	.L71:
+ 1311              		@ sp needed for prologue
+ 1312              	.LVL114:
+ 1313              	.LVL115:
+ 125:../Source/command.c **** }
+ 1314              		.loc 1 125 0
+ 1315 0016 38BD     		pop	{r3, r4, r5, pc}
+ 1316              		.cfi_endproc
+ 1317              	.LFE40:
+ 1319              		.section	.text.sks_cmd_serial,"ax",%progbits
+ 1320              		.align	1
+ 1321              		.code	16
+ 1322              		.thumb_func
+ 1324              	sks_cmd_serial:
+ 1325              	.LFB48:
+ 337:../Source/command.c **** static int sks_cmd_serial(int from, char* command, int argc, char** argv, int size, int total) {
+ 1326              		.loc 1 337 0
+ 1327              		.cfi_startproc
+ 1328 0000 F7B5     		push	{r0, r1, r2, r4, r5, r6, r7, lr}
+ 1329              	.LCFI19:
+ 1330              		.cfi_def_cfa_offset 32
+ 1331              		.cfi_offset 0, -32
+ 1332              		.cfi_offset 1, -28
+ 1333              		.cfi_offset 2, -24
+ 1334              		.cfi_offset 4, -20
+ 1335              		.cfi_offset 5, -16
+ 1336              		.cfi_offset 6, -12
+ 1337              		.cfi_offset 7, -8
+ 1338              		.cfi_offset 14, -4
+ 1339              	.LVL116:
+ 341:../Source/command.c **** 	if (argv[4] == NULL)
+ 1340              		.loc 1 341 0
+ 1341 0002 1869     		ldr	r0, [r3, #16]
+ 1342              	.LVL117:
+ 337:../Source/command.c **** static int sks_cmd_serial(int from, char* command, int argc, char** argv, int size, int total) {
+ 1343              		.loc 1 337 0
+ 1344 0004 0F1C     		mov	r7, r1
+ 1345 0006 1C1C     		mov	r4, r3
+ 341:../Source/command.c **** 	if (argv[4] == NULL)
+ 1346              		.loc 1 341 0
+ 1347 0008 0028     		cmp	r0, #0
+ 1348 000a 24D0     		beq	.L75
+ 344:../Source/command.c **** 	set = atoi(argv[4]);
+ 1349              		.loc 1 344 0
+ 1350 000c FFF7FEFF 		bl	atoi
+ 1351              	.LVL118:
+ 1352 0010 C5B2     		uxtb	r5, r0
+ 1353              	.LVL119:
+ 346:../Source/command.c **** 	if(set == 1) {
+ 1354              		.loc 1 346 0
+ 1355 0012 012D     		cmp	r5, #1
+ 1356 0014 12D1     		bne	.L76
+ 347:../Source/command.c **** 		memset(g_config.deviceCode, 0, sizeof(g_config.deviceCode));
+ 1357              		.loc 1 347 0
+ 1358 0016 114E     		ldr	r6, .L77
+ 1359 0018 0021     		mov	r1, #0
+ 1360 001a 0A22     		mov	r2, #10
+ 1361 001c 301C     		mov	r0, r6
+ 1362 001e FFF7FEFF 		bl	memset
+ 348:../Source/command.c **** 		strncpy(g_config.deviceCode, argv[5], next_char(argv[5], '#', DEVICE_CODE_LEN));
+ 1363              		.loc 1 348 0
+ 1364 0022 6469     		ldr	r4, [r4, #20]
+ 1365              	.LVL120:
+ 1366 0024 2321     		mov	r1, #35
+ 1367 0026 0A22     		mov	r2, #10
+ 1368 0028 201C     		mov	r0, r4
+ 1369 002a FFF7FEFF 		bl	next_char
+ 1370 002e 211C     		mov	r1, r4
+ 1371 0030 021C     		mov	r2, r0
+ 1372 0032 301C     		mov	r0, r6
+ 1373 0034 FFF7FEFF 		bl	strncpy
+ 350:../Source/command.c **** 		write_flash = 1;
+ 1374              		.loc 1 350 0
+ 1375 0038 094B     		ldr	r3, .L77+4
+ 1376 003a 1D60     		str	r5, [r3]
+ 1377              	.L76:
+ 361:../Source/command.c **** 	cmd_response(Response, sizeof(Response), command, "%d,%s", set, g_config.deviceCode);
+ 1378              		.loc 1 361 0
+ 1379 003c 0095     		str	r5, [sp]
+ 1380 003e 8021     		mov	r1, #128
+ 1381 0040 064D     		ldr	r5, .L77
+ 1382              	.LVL121:
+ 1383 0042 3A1C     		mov	r2, r7
+ 1384 0044 0748     		ldr	r0, .L77+8
+ 1385 0046 4900     		lsl	r1, r1, #1
+ 1386 0048 074B     		ldr	r3, .L77+12
+ 1387 004a 0195     		str	r5, [sp, #4]
+ 1388 004c FFF7FEFF 		bl	cmd_response
+ 1389              	.LVL122:
+ 363:../Source/command.c **** 	response = 1;
+ 1390              		.loc 1 363 0
+ 1391 0050 0648     		ldr	r0, .L77+16
+ 1392 0052 0122     		mov	r2, #1
+ 1393 0054 0260     		str	r2, [r0]
+ 1394              	.L75:
+ 365:../Source/command.c **** }
+ 1395              		.loc 1 365 0
+ 1396 0056 0898     		ldr	r0, [sp, #32]
+ 1397              		@ sp needed for prologue
+ 1398              	.LVL123:
+ 1399 0058 FEBD     		pop	{r1, r2, r3, r4, r5, r6, r7, pc}
+ 1400              	.L78:
+ 1401 005a C046     		.align	2
+ 1402              	.L77:
+ 1403 005c 02000000 		.word	g_config+2
+ 1404 0060 00000000 		.word	.LANCHOR3
+ 1405 0064 00000000 		.word	.LANCHOR1
+ 1406 0068 69000000 		.word	.LC70
+ 1407 006c 00000000 		.word	.LANCHOR2
+ 1408              		.cfi_endproc
+ 1409              	.LFE48:
+ 1411              		.section	.text.create_v3,"ax",%progbits
+ 1412              		.align	1
+ 1413              		.global	create_v3
+ 1414              		.code	16
+ 1415              		.thumb_func
+ 1417              	create_v3:
+ 1418              	.LFB41:
+ 128:../Source/command.c **** void create_v3(int blockno) {
+ 1419              		.loc 1 128 0
+ 1420              		.cfi_startproc
+ 1421 0000 38B5     		push	{r3, r4, r5, lr}
+ 1422              	.LCFI20:
+ 1423              		.cfi_def_cfa_offset 16
+ 1424              		.cfi_offset 3, -16
+ 1425              		.cfi_offset 4, -12
+ 1426              		.cfi_offset 5, -8
+ 1427              		.cfi_offset 14, -4
+ 1428              	.LVL124:
+ 129:../Source/command.c **** 	append_sign(Response);
+ 1429              		.loc 1 129 0
+ 1430 0002 0F4D     		ldr	r5, .L86
+ 128:../Source/command.c **** void create_v3(int blockno) {
+ 1431              		.loc 1 128 0
+ 1432 0004 041C     		mov	r4, r0
+ 129:../Source/command.c **** 	append_sign(Response);
+ 1433              		.loc 1 129 0
+ 1434 0006 281C     		mov	r0, r5
+ 1435              	.LVL125:
+ 1436 0008 FFF7FEFF 		bl	append_sign
+ 130:../Source/command.c **** 	strcat(Response, ",V3,");
+ 1437              		.loc 1 130 0
+ 1438 000c 281C     		mov	r0, r5
+ 1439 000e 0D49     		ldr	r1, .L86+4
+ 1440 0010 FFF7FEFF 		bl	strcat
+ 131:../Source/command.c **** 	if (blockno >= 10000) {
+ 1441              		.loc 1 131 0
+ 1442 0014 0C4B     		ldr	r3, .L86+8
+ 1443 0016 9C42     		cmp	r4, r3
+ 1444 0018 02DD     		ble	.L80
+ 132:../Source/command.c **** 		append_int(Response, 5, blockno);
+ 1445              		.loc 1 132 0
+ 1446 001a 281C     		mov	r0, r5
+ 1447 001c 0521     		mov	r1, #5
+ 1448 001e 0BE0     		b	.L85
+ 1449              	.L80:
+ 133:../Source/command.c **** 	} else if (blockno >= 1000) {
+ 1450              		.loc 1 133 0
+ 1451 0020 0A4A     		ldr	r2, .L86+12
+ 134:../Source/command.c **** 		append_int(Response, 4, blockno);
+ 1452              		.loc 1 134 0
+ 1453 0022 281C     		mov	r0, r5
+ 1454 0024 0421     		mov	r1, #4
+ 133:../Source/command.c **** 	} else if (blockno >= 1000) {
+ 1455              		.loc 1 133 0
+ 1456 0026 9442     		cmp	r4, r2
+ 1457 0028 06DC     		bgt	.L85
+ 136:../Source/command.c **** 		append_int(Response, 3, blockno);
+ 1458              		.loc 1 136 0
+ 1459 002a 0321     		mov	r1, #3
+ 135:../Source/command.c **** 	} else if (blockno >= 100) {
+ 1460              		.loc 1 135 0
+ 1461 002c 632C     		cmp	r4, #99
+ 1462 002e 03DC     		bgt	.L85
+ 138:../Source/command.c **** 		append_int(Response, 2, blockno);
+ 1463              		.loc 1 138 0
+ 1464 0030 0221     		mov	r1, #2
+ 137:../Source/command.c **** 	} else if (blockno >= 10) {
+ 1465              		.loc 1 137 0
+ 1466 0032 092C     		cmp	r4, #9
+ 1467 0034 00DC     		bgt	.L85
+ 140:../Source/command.c **** 		append_int(Response, 1, blockno);
+ 1468              		.loc 1 140 0
+ 1469 0036 0121     		mov	r1, #1
+ 1470              	.L85:
+ 1471 0038 221C     		mov	r2, r4
+ 1472 003a FFF7FEFF 		bl	append_int
+ 1473              		@ sp needed for prologue
+ 1474              	.LVL126:
+ 142:../Source/command.c **** }
+ 1475              		.loc 1 142 0
+ 1476 003e 38BD     		pop	{r3, r4, r5, pc}
+ 1477              	.L87:
+ 1478              		.align	2
+ 1479              	.L86:
+ 1480 0040 00000000 		.word	.LANCHOR1
+ 1481 0044 6F000000 		.word	.LC74
+ 1482 0048 0F270000 		.word	9999
+ 1483 004c E7030000 		.word	999
+ 1484              		.cfi_endproc
+ 1485              	.LFE41:
+ 1487              		.global	__aeabi_idivmod
+ 1488              		.section	.text.server_on_command,"ax",%progbits
+ 1489              		.align	1
+ 1490              		.global	server_on_command
+ 1491              		.code	16
+ 1492              		.thumb_func
+ 1494              	server_on_command:
+ 1495              	.LFB51:
+ 404:../Source/command.c **** 
+ 405:../Source/command.c **** SKS_HANDLER handlers[] = {
+ 406:../Source/command.c **** 		{ "CFG", sks_cmd_config }, //get config
+ 407:../Source/command.c **** 		{ "INFO", sks_cmd_info }, //get config
+ 408:../Source/command.c **** 		{ "INTERVAL", sks_cmd_interval }, //get config
+ 409:../Source/command.c **** 		{ "EMA", sks_cmd_disable_ema }, //get config
+ 410:../Source/command.c **** 		{ "SN", sks_cmd_serial }, //set serial
+ 411:../Source/command.c **** 		{ "RESET", sks_cmd_reset }, //set serial
+ 412:../Source/command.c **** 		{ "SF", sks_cmd_set_full }, //get config
+ 413:../Source/command.c **** 		{ "SE", sks_cmd_set_empty }, //get config
+ 414:../Source/command.c **** 		{ "DEBUG", sks_cmd_set_debug }, //get config
+ 415:../Source/command.c **** 		{ NULL, NULL } };
+ 416:../Source/command.c **** 
+ 417:../Source/command.c **** int server_on_command(int from, char* data, int size) {
+ 1496              		.loc 1 417 0
+ 1497              		.cfi_startproc
+ 1498 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1499              	.LCFI21:
+ 1500              		.cfi_def_cfa_offset 20
+ 1501              		.cfi_offset 4, -20
+ 1502              		.cfi_offset 5, -16
+ 1503              		.cfi_offset 6, -12
+ 1504              		.cfi_offset 7, -8
+ 1505              		.cfi_offset 14, -4
+ 1506              	.LVL127:
+ 1507 0002 A5B0     		sub	sp, sp, #148
+ 1508              	.LCFI22:
+ 1509              		.cfi_def_cfa_offset 168
+ 1510              	.LVL128:
+ 1511              		.loc 1 417 0
+ 1512 0004 0690     		str	r0, [sp, #24]
+ 1513 0006 0591     		str	r1, [sp, #20]
+ 1514 0008 0792     		str	r2, [sp, #28]
+ 418:../Source/command.c **** 	#define SKS_MAX_CMD_LEN 10
+ 419:../Source/command.c **** 	#define SKS_MAX_ARGV 	25
+ 420:../Source/command.c **** 	int result = 0;
+ 421:../Source/command.c **** 	int field = 0;
+ 422:../Source/command.c **** 	int ftmp;
+ 423:../Source/command.c **** 	int j = 0;
+ 424:../Source/command.c **** 	char *ptr = data;
+ 425:../Source/command.c **** 
+ 426:../Source/command.c **** 	char command[SKS_MAX_CMD_LEN + 1] = { 0 };
+ 1515              		.loc 1 426 0
+ 1516 000a 21A8     		add	r0, sp, #132
+ 1517              	.LVL129:
+ 1518 000c 0021     		mov	r1, #0
+ 1519              	.LVL130:
+ 1520 000e 0B22     		mov	r2, #11
+ 1521              	.LVL131:
+ 1522 0010 FFF7FEFF 		bl	memset
+ 1523              	.LVL132:
+ 427:../Source/command.c **** 
+ 428:../Source/command.c **** 	int endPos = 0;
+ 429:../Source/command.c **** 	int i = 0;
+ 430:../Source/command.c **** 	char item_buff[20] = { 0 };
+ 431:../Source/command.c **** 	char* arg[SKS_MAX_ARGV];
+ 432:../Source/command.c **** 	for (i = 0; i < size; i++) {
+ 1524              		.loc 1 432 0
+ 1525 0014 0026     		mov	r6, #0
+ 1526 0016 13E0     		b	.L89
+ 1527              	.LVL133:
+ 1528              	.L94:
+ 433:../Source/command.c **** 		if ((data[i] == '#') || (data[i] == '\n') || (data[i] == '\0')) {
+ 1529              		.loc 1 433 0
+ 1530 0018 059A     		ldr	r2, [sp, #20]
+ 1531 001a 935D     		ldrb	r3, [r2, r6]
+ 1532 001c 0A2B     		cmp	r3, #10
+ 1533 001e 03D0     		beq	.L90
+ 1534 0020 232B     		cmp	r3, #35
+ 1535 0022 01D0     		beq	.L90
+ 1536              		.loc 1 433 0 is_stmt 0 discriminator 1
+ 1537 0024 002B     		cmp	r3, #0
+ 1538 0026 0AD1     		bne	.L91
+ 1539              	.L90:
+ 434:../Source/command.c **** 			endPos = i + 1;
+ 1540              		.loc 1 434 0 is_stmt 1
+ 1541 0028 0136     		add	r6, r6, #1
+ 1542              	.LVL134:
+ 435:../Source/command.c **** 			break;
+ 436:../Source/command.c **** 		}
+ 437:../Source/command.c **** 	}
+ 438:../Source/command.c **** 
+ 439:../Source/command.c **** 	//xprintf("come here: %d\r\n", 1);
+ 440:../Source/command.c **** 
+ 441:../Source/command.c **** 	if (endPos == 0)
+ 1543              		.loc 1 441 0
+ 1544 002a 002E     		cmp	r6, #0
+ 1545 002c 00D1     		bne	.LCB1333
+ 1546 002e 9EE0     		b	.L92	@long jump
+ 1547              	.LCB1333:
+ 1548 0030 059B     		ldr	r3, [sp, #20]
+ 1549 0032 0024     		mov	r4, #0
+ 1550 0034 0493     		str	r3, [sp, #16]
+ 1551 0036 1F1C     		mov	r7, r3
+ 1552 0038 0394     		str	r4, [sp, #12]
+ 1553 003a 251C     		mov	r5, r4
+ 1554 003c 4EE0     		b	.L93
+ 1555              	.LVL135:
+ 1556              	.L91:
+ 432:../Source/command.c **** 	for (i = 0; i < size; i++) {
+ 1557              		.loc 1 432 0
+ 1558 003e 0136     		add	r6, r6, #1
+ 1559              	.LVL136:
+ 1560              	.L89:
+ 432:../Source/command.c **** 	for (i = 0; i < size; i++) {
+ 1561              		.loc 1 432 0 is_stmt 0 discriminator 1
+ 1562 0040 0798     		ldr	r0, [sp, #28]
+ 1563 0042 8642     		cmp	r6, r0
+ 1564 0044 E8DB     		blt	.L94
+ 442:../Source/command.c **** 		return 0; //Waiting for end command sign
+ 1565              		.loc 1 442 0 is_stmt 1
+ 1566 0046 0026     		mov	r6, #0
+ 1567              	.LVL137:
+ 1568 0048 91E0     		b	.L92
+ 1569              	.LVL138:
+ 1570              	.L104:
+ 1571              	.LBB5:
+ 443:../Source/command.c **** 
+ 444:../Source/command.c **** 	//xprintf("come here: %d, endPos: %d\r\n", 2, endPos);
+ 445:../Source/command.c **** 
+ 446:../Source/command.c **** 	for (int i = 0; i < endPos; i++) {
+ 447:../Source/command.c **** 		if ((data[i] == ',') || (data[i] == '\n') || (data[i] == '#') || (data[i] == 0x00)) //complete on
+ 1572              		.loc 1 447 0
+ 1573 004a 059A     		ldr	r2, [sp, #20]
+ 1574 004c 0499     		ldr	r1, [sp, #16]
+ 1575 004e 135D     		ldrb	r3, [r2, r4]
+ 1576 0050 0131     		add	r1, r1, #1
+ 1577 0052 0491     		str	r1, [sp, #16]
+ 1578 0054 0A2B     		cmp	r3, #10
+ 1579 0056 05D0     		beq	.L95
+ 1580 0058 2C2B     		cmp	r3, #44
+ 1581 005a 03D0     		beq	.L95
+ 1582              		.loc 1 447 0 is_stmt 0 discriminator 1
+ 1583 005c 232B     		cmp	r3, #35
+ 1584 005e 01D0     		beq	.L95
+ 1585 0060 002B     		cmp	r3, #0
+ 1586 0062 37D1     		bne	.L96
+ 1587              	.L95:
+ 448:../Source/command.c **** 		{
+ 449:../Source/command.c **** 			//xprintf("FIELD0 %d j=%d DATA %s\r\n", field, j, item_buff);
+ 450:../Source/command.c **** 
+ 451:../Source/command.c **** 			if (j > 0) {
+ 1588              		.loc 1 451 0 is_stmt 1
+ 1589 0064 039B     		ldr	r3, [sp, #12]
+ 1590 0066 002B     		cmp	r3, #0
+ 1591 0068 26D0     		beq	.L97
+ 452:../Source/command.c **** 				//xprintf("FIELD1 %d DATA %s, ptr=%s\r\n", field, item_buff, ptr);
+ 453:../Source/command.c **** 
+ 454:../Source/command.c **** 				//if(*(uint32_t*)(ptr) == 0x2C53532A) //*SS,
+ 455:../Source/command.c **** 				if(strncmp(ptr, "*SS,", 4) == 0) //*SS,
+ 1592              		.loc 1 455 0
+ 1593 006a 381C     		mov	r0, r7
+ 1594 006c 4149     		ldr	r1, .L116
+ 1595 006e 0422     		mov	r2, #4
+ 1596 0070 FFF7FEFF 		bl	strncmp
+ 1597 0074 0028     		cmp	r0, #0
+ 1598 0076 00D1     		bne	.L98
+ 456:../Source/command.c **** 				{
+ 457:../Source/command.c **** 					field = 0;
+ 1599              		.loc 1 457 0
+ 1600 0078 051C     		mov	r5, r0
+ 1601              	.LVL139:
+ 1602              	.L98:
+ 458:../Source/command.c **** 				}
+ 459:../Source/command.c **** 				ftmp = field;
+ 460:../Source/command.c **** 
+ 461:../Source/command.c **** 				//xprintf("FIELD %d DATA %s\r\n", field, item_buff);
+ 462:../Source/command.c **** 
+ 463:../Source/command.c **** 				arg[field % SKS_MAX_ARGV] = ptr;
+ 1603              		.loc 1 463 0
+ 1604 007a 281C     		mov	r0, r5
+ 1605 007c 1921     		mov	r1, #25
+ 1606 007e FFF7FEFF 		bl	__aeabi_idivmod
+ 1607 0082 8800     		lsl	r0, r1, #2
+ 1608 0084 08A9     		add	r1, sp, #32
+ 1609 0086 4750     		str	r7, [r0, r1]
+ 464:../Source/command.c **** 				switch (ftmp) {
+ 1610              		.loc 1 464 0
+ 1611 0088 002D     		cmp	r5, #0
+ 1612 008a 02D0     		beq	.L99
+ 1613 008c 022D     		cmp	r5, #2
+ 1614 008e 13D1     		bne	.L97
+ 1615 0090 08E0     		b	.L115
+ 1616              	.L99:
+ 465:../Source/command.c **** 				case 0:
+ 466:../Source/command.c **** 					if(strncmp(ptr, "*SS,", 4) != 0) //*SS,
+ 1617              		.loc 1 466 0
+ 1618 0092 381C     		mov	r0, r7
+ 1619 0094 3749     		ldr	r1, .L116
+ 1620 0096 0422     		mov	r2, #4
+ 1621 0098 FFF7FEFF 		bl	strncmp
+ 1622 009c 0028     		cmp	r0, #0
+ 1623 009e 64D1     		bne	.L111
+ 1624 00a0 0125     		mov	r5, #1
+ 1625              	.LVL140:
+ 1626 00a2 0CE0     		b	.L114
+ 1627              	.LVL141:
+ 1628              	.L115:
+ 467:../Source/command.c **** 						return -1; //*SS,
+ 468:../Source/command.c **** 					break;
+ 469:../Source/command.c **** 				case 1:
+ 470:../Source/command.c **** 					break;
+ 471:../Source/command.c **** 				case 2:
+ 472:../Source/command.c **** 					memcpy(command, ptr, j < SKS_MAX_CMD_LEN ? j : SKS_MAX_CMD_LEN);
+ 1629              		.loc 1 472 0
+ 1630 00a4 039A     		ldr	r2, [sp, #12]
+ 1631 00a6 0A2A     		cmp	r2, #10
+ 1632 00a8 00DD     		ble	.L101
+ 1633 00aa 0A22     		mov	r2, #10
+ 1634              	.L101:
+ 1635 00ac 21A8     		add	r0, sp, #132
+ 1636 00ae 391C     		mov	r1, r7
+ 1637 00b0 FFF7FEFF 		bl	memcpy
+ 1638 00b4 0325     		mov	r5, #3
+ 1639              	.LVL142:
+ 473:../Source/command.c **** 					break;
+ 1640              		.loc 1 473 0
+ 1641 00b6 02E0     		b	.L114
+ 1642              	.LVL143:
+ 1643              	.L97:
+ 474:../Source/command.c **** 				case 3:
+ 475:../Source/command.c **** 					break;
+ 476:../Source/command.c **** 				default:
+ 477:../Source/command.c **** 					break;
+ 478:../Source/command.c **** 				}
+ 479:../Source/command.c **** 			}
+ 480:../Source/command.c **** 
+ 481:../Source/command.c **** 			field++;
+ 1644              		.loc 1 481 0
+ 1645 00b8 0135     		add	r5, r5, #1
+ 1646              	.LVL144:
+ 482:../Source/command.c **** 			if (field >= SKS_MAX_ARGV)
+ 1647              		.loc 1 482 0
+ 1648 00ba 182D     		cmp	r5, #24
+ 1649 00bc 10DC     		bgt	.L102
+ 1650              	.LVL145:
+ 1651              	.L114:
+ 483:../Source/command.c **** 				break;
+ 484:../Source/command.c **** 
+ 485:../Source/command.c **** 			j = 0; //reset index
+ 486:../Source/command.c **** 			ptr = data + i + 1;
+ 487:../Source/command.c **** 			arg[field % SKS_MAX_ARGV] = ptr;
+ 1652              		.loc 1 487 0
+ 1653 00be 281C     		mov	r0, r5
+ 1654 00c0 1921     		mov	r1, #25
+ 1655 00c2 FFF7FEFF 		bl	__aeabi_idivmod
+ 1656 00c6 049F     		ldr	r7, [sp, #16]
+ 1657 00c8 8800     		lsl	r0, r1, #2
+ 1658 00ca 08AB     		add	r3, sp, #32
+ 485:../Source/command.c **** 			j = 0; //reset index
+ 1659              		.loc 1 485 0
+ 1660 00cc 0022     		mov	r2, #0
+ 1661              		.loc 1 487 0
+ 1662 00ce C750     		str	r7, [r0, r3]
+ 485:../Source/command.c **** 			j = 0; //reset index
+ 1663              		.loc 1 485 0
+ 1664 00d0 0392     		str	r2, [sp, #12]
+ 1665              		.loc 1 487 0
+ 1666 00d2 02E0     		b	.L103
+ 1667              	.LVL146:
+ 1668              	.L96:
+ 488:../Source/command.c **** 		} else {
+ 489:../Source/command.c **** 			item_buff[j % sizeof(item_buff)] = data[i];
+ 490:../Source/command.c **** 			j++;
+ 1669              		.loc 1 490 0
+ 1670 00d4 0399     		ldr	r1, [sp, #12]
+ 1671 00d6 0131     		add	r1, r1, #1
+ 1672 00d8 0391     		str	r1, [sp, #12]
+ 1673              	.LVL147:
+ 1674              	.L103:
+ 446:../Source/command.c **** 	for (int i = 0; i < endPos; i++) {
+ 1675              		.loc 1 446 0
+ 1676 00da 0134     		add	r4, r4, #1
+ 1677              	.LVL148:
+ 1678              	.L93:
+ 446:../Source/command.c **** 	for (int i = 0; i < endPos; i++) {
+ 1679              		.loc 1 446 0 is_stmt 0 discriminator 1
+ 1680 00dc B442     		cmp	r4, r6
+ 1681 00de B4DB     		blt	.L104
+ 1682              	.L102:
+ 1683              	.LBE5:
+ 491:../Source/command.c **** 			item_buff[j] = 0x00;
+ 492:../Source/command.c **** 
+ 493:../Source/command.c **** 			//xprintf("Item buff %s\r\n", item_buff);
+ 494:../Source/command.c **** 		}
+ 495:../Source/command.c **** 	}
+ 496:../Source/command.c **** 
+ 497:../Source/command.c **** 	//xprintf("come here: %d\r\n", 3);
+ 498:../Source/command.c **** 
+ 499:../Source/command.c **** 	if (field > SKS_MAX_ARGV)
+ 1684              		.loc 1 499 0 is_stmt 1
+ 1685 00e0 192D     		cmp	r5, #25
+ 1686 00e2 44DC     		bgt	.L92
+ 500:../Source/command.c **** 		return endPos; //Too many param
+ 501:../Source/command.c **** 
+ 502:../Source/command.c **** 	//xprintf("come here: %d\r\n", 4);
+ 503:../Source/command.c **** 
+ 504:../Source/command.c **** 	if (field <= 3)
+ 1687              		.loc 1 504 0
+ 1688 00e4 032D     		cmp	r5, #3
+ 1689 00e6 42DD     		ble	.L92
+ 1690              	.LVL149:
+ 505:../Source/command.c **** 		return endPos; //Too few param
+ 506:../Source/command.c **** 
+ 507:../Source/command.c **** 	//xprintf("server_on_command: %s, command: %s \r\n", data, command);
+ 508:../Source/command.c **** 
+ 509:../Source/command.c **** 	i = 0;
+ 510:../Source/command.c **** 	result = -1;
+ 511:../Source/command.c **** 	response = 0;
+ 1691              		.loc 1 511 0
+ 1692 00e8 234C     		ldr	r4, .L116+4
+ 1693              	.LVL150:
+ 1694 00ea 0027     		mov	r7, #0
+ 1695              	.LVL151:
+ 1696 00ec 2760     		str	r7, [r4]
+ 1697 00ee 234C     		ldr	r4, .L116+8
+ 512:../Source/command.c **** 	while(handlers[i].cmd) {
+ 1698              		.loc 1 512 0
+ 1699 00f0 25E0     		b	.L105
+ 1700              	.LVL152:
+ 1701              	.L108:
+ 513:../Source/command.c **** 		if (strcmp(command, handlers[i].cmd) == 0) {
+ 1702              		.loc 1 513 0
+ 1703 00f2 21A8     		add	r0, sp, #132
+ 1704 00f4 FFF7FEFF 		bl	strcmp
+ 1705 00f8 0C34     		add	r4, r4, #12
+ 1706 00fa 0028     		cmp	r0, #0
+ 1707 00fc 1ED1     		bne	.L106
+ 514:../Source/command.c **** 			//sks_log(LOG_INFO, "COMMAND A %s handlers[%d].cmd=%s", command, i, handlers[i].cmd);
+ 515:../Source/command.c **** 			if (!(handlers[i].dis_mask & from)) //Chi cho phep gui lenh tu nguon
+ 1708              		.loc 1 515 0
+ 1709 00fe 0C20     		mov	r0, #12
+ 1710 0100 4743     		mul	r7, r0
+ 1711              	.LVL153:
+ 1712 0102 1E4A     		ldr	r2, .L116+8
+ 1713 0104 D419     		add	r4, r2, r7
+ 1714 0106 2189     		ldrh	r1, [r4, #8]
+ 1715 0108 069F     		ldr	r7, [sp, #24]
+ 1716 010a 3940     		and	r1, r7
+ 1717 010c 2FD1     		bne	.L92
+ 516:../Source/command.c **** 			{
+ 517:../Source/command.c **** 				write_flash = 0;
+ 1718              		.loc 1 517 0
+ 1719 010e 1C4F     		ldr	r7, .L116+12
+ 518:../Source/command.c **** 				memset(Response, 0, 200);
+ 1720              		.loc 1 518 0
+ 1721 0110 C822     		mov	r2, #200
+ 517:../Source/command.c **** 				write_flash = 0;
+ 1722              		.loc 1 517 0
+ 1723 0112 3960     		str	r1, [r7]
+ 1724              		.loc 1 518 0
+ 1725 0114 1B48     		ldr	r0, .L116+16
+ 1726 0116 FFF7FEFF 		bl	memset
+ 519:../Source/command.c **** 
+ 520:../Source/command.c **** 				result = handlers[i].handler(from, command, field, arg, endPos, size);
+ 1727              		.loc 1 520 0
+ 1728 011a 0799     		ldr	r1, [sp, #28]
+ 1729 011c 0096     		str	r6, [sp]
+ 1730 011e 0191     		str	r1, [sp, #4]
+ 1731 0120 6468     		ldr	r4, [r4, #4]
+ 1732 0122 2A1C     		mov	r2, r5
+ 1733 0124 08AB     		add	r3, sp, #32
+ 1734 0126 0698     		ldr	r0, [sp, #24]
+ 1735 0128 21A9     		add	r1, sp, #132
+ 1736 012a A047     		blx	r4
+ 521:../Source/command.c **** 				//sks_log(LOG_INFO, "***********===************COMMAND B%s handlers[%d].cmd=%s, total %d result
+ 522:../Source/command.c **** 
+ 523:../Source/command.c **** 				if(write_flash) {
+ 1737              		.loc 1 523 0
+ 1738 012c 3B68     		ldr	r3, [r7]
+ 520:../Source/command.c **** 				result = handlers[i].handler(from, command, field, arg, endPos, size);
+ 1739              		.loc 1 520 0
+ 1740 012e 041C     		mov	r4, r0
+ 1741              	.LVL154:
+ 1742 0130 144D     		ldr	r5, .L116+16
+ 1743              	.LVL155:
+ 1744              		.loc 1 523 0
+ 1745 0132 002B     		cmp	r3, #0
+ 1746 0134 07D0     		beq	.L107
+ 524:../Source/command.c **** 					write_config();
+ 1747              		.loc 1 524 0
+ 1748 0136 FFF7FEFF 		bl	write_config
+ 1749              	.LVL156:
+ 1750 013a 04E0     		b	.L107
+ 1751              	.LVL157:
+ 1752              	.L106:
+ 525:../Source/command.c **** 				}
+ 526:../Source/command.c **** 			}
+ 527:../Source/command.c **** 			break;
+ 528:../Source/command.c **** 		}
+ 529:../Source/command.c **** 		i++;
+ 1753              		.loc 1 529 0
+ 1754 013c 0137     		add	r7, r7, #1
+ 1755              	.LVL158:
+ 1756              	.L105:
+ 512:../Source/command.c **** 	while(handlers[i].cmd) {
+ 1757              		.loc 1 512 0 discriminator 1
+ 1758 013e 2168     		ldr	r1, [r4]
+ 1759 0140 0029     		cmp	r1, #0
+ 1760 0142 D6D1     		bne	.L108
+ 1761 0144 13E0     		b	.L92
+ 1762              	.LVL159:
+ 1763              	.L107:
+ 530:../Source/command.c **** 	}
+ 531:../Source/command.c **** 
+ 532:../Source/command.c **** 	if (result > 0) {
+ 1764              		.loc 1 532 0
+ 1765 0146 002C     		cmp	r4, #0
+ 1766 0148 0BDD     		ble	.L109
+ 533:../Source/command.c **** 		if (response) {
+ 1767              		.loc 1 533 0
+ 1768 014a 0B4E     		ldr	r6, .L116+4
+ 1769              	.LVL160:
+ 1770 014c 3268     		ldr	r2, [r6]
+ 1771 014e 261C     		mov	r6, r4
+ 1772 0150 002A     		cmp	r2, #0
+ 1773 0152 0CD0     		beq	.L92
+ 534:../Source/command.c **** 			if (from == SKS_CMD_SOURCE_COM1) {
+ 1774              		.loc 1 534 0
+ 1775 0154 0698     		ldr	r0, [sp, #24]
+ 1776 0156 0128     		cmp	r0, #1
+ 1777 0158 09D1     		bne	.L92
+ 535:../Source/command.c **** 				xprintf(Response);
+ 1778              		.loc 1 535 0
+ 1779 015a 281C     		mov	r0, r5
+ 1780 015c FFF7FEFF 		bl	xprintf
+ 1781 0160 05E0     		b	.L92
+ 1782              	.LVL161:
+ 1783              	.L109:
+ 536:../Source/command.c **** 			} else if (from == SKS_CMD_SOURCE_COM2) {
+ 537:../Source/command.c **** 				//ExtSerial_PutString(Response);
+ 538:../Source/command.c **** 			} else {
+ 539:../Source/command.c **** 			}
+ 540:../Source/command.c **** 		}
+ 541:../Source/command.c **** 	} else if (result < 0) {
+ 1784              		.loc 1 541 0
+ 1785 0162 002C     		cmp	r4, #0
+ 1786 0164 03D1     		bne	.L92
+ 1787 0166 261C     		mov	r6, r4
+ 1788              	.LVL162:
+ 1789 0168 01E0     		b	.L92
+ 1790              	.LVL163:
+ 1791              	.L111:
+ 1792              	.LBB6:
+ 467:../Source/command.c **** 						return -1; //*SS,
+ 1793              		.loc 1 467 0
+ 1794 016a 0125     		mov	r5, #1
+ 1795              	.LVL164:
+ 1796 016c 6E42     		neg	r6, r5
+ 1797              	.LVL165:
+ 1798              	.L92:
+ 1799              	.LBE6:
+ 542:../Source/command.c **** 		result = endPos;
+ 543:../Source/command.c **** 	}
+ 544:../Source/command.c **** 
+ 545:../Source/command.c **** 	return result;
+ 546:../Source/command.c **** }
+ 1800              		.loc 1 546 0
+ 1801 016e 301C     		mov	r0, r6
+ 1802 0170 25B0     		add	sp, sp, #148
+ 1803              		@ sp needed for prologue
+ 1804 0172 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1805              	.L117:
+ 1806              		.align	2
+ 1807              	.L116:
+ 1808 0174 59000000 		.word	.LC56
+ 1809 0178 00000000 		.word	.LANCHOR2
+ 1810 017c 00000000 		.word	.LANCHOR4
+ 1811 0180 00000000 		.word	.LANCHOR3
+ 1812 0184 00000000 		.word	.LANCHOR1
+ 1813              		.cfi_endproc
+ 1814              	.LFE51:
+ 1816              		.global	handlers
+ 1817              		.global	write_flash
+ 1818              		.global	HexChar
+ 1819              		.comm	g_appStats,108,4
+ 1820              		.comm	g_config,28,4
+ 1821              		.section	.bss.Response,"aw",%nobits
+ 1822              		.set	.LANCHOR1,. + 0
+ 1825              	Response:
+ 1826 0000 00000000 		.space	256
+ 1826      00000000 
+ 1826      00000000 
+ 1826      00000000 
+ 1826      00000000 
+ 1827              		.section	.rodata.str1.1,"aMS",%progbits,1
+ 1828              	.LC2:
+ 1829 0000 2A53532C 		.ascii	"*SS,%s,V9,%s,\000"
+ 1829      25732C56 
+ 1829      392C2573 
+ 1829      2C00
+ 1830              	.LC7:
+ 1831 000e 25642C25 		.ascii	"%d,%d\000"
+ 1831      6400
+ 1832              	.LC15:
+ 1833 0014 25642C25 		.ascii	"%d,%d,%d\000"
+ 1833      642C2564 
+ 1833      00
+ 1834              	.LC29:
+ 1835 001d 256400   		.ascii	"%d\000"
+ 1836              	.LC43:
+ 1837 0020 25642C25 		.ascii	"%d,%d,%d,%d,%d,%s,%s\000"
+ 1837      642C2564 
+ 1837      2C25642C 
+ 1837      25642C25 
+ 1837      732C2573 
+ 1838              	.LC47:
+ 1839 0035 4C4C5333 		.ascii	"LLS3.0.24F0-20221007\000"
+ 1839      2E302E32 
+ 1839      3446302D 
+ 1839      32303232 
+ 1839      31303037 
+ 1840              	.LC53:
+ 1841 004a 25642C25 		.ascii	"%d,%d,%d,%d,%d\000"
+ 1841      642C2564 
+ 1841      2C25642C 
+ 1841      256400
+ 1842              	.LC56:
+ 1843 0059 2A53532C 		.ascii	"*SS,\000"
+ 1843      00
+ 1844              	.LC59:
+ 1845 005e 2D00     		.ascii	"-\000"
+ 1846              	.LC61:
+ 1847 0060 2000     		.ascii	" \000"
+ 1848              	.LC63:
+ 1849 0062 3A00     		.ascii	":\000"
+ 1850              	.LC65:
+ 1851 0064 2C56392C 		.ascii	",V9,\000"
+ 1851      00
+ 1852              	.LC70:
+ 1853 0069 25642C25 		.ascii	"%d,%s\000"
+ 1853      7300
+ 1854              	.LC74:
+ 1855 006f 2C56332C 		.ascii	",V3,\000"
+ 1855      00
+ 1856              	.LC84:
+ 1857 0074 43464700 		.ascii	"CFG\000"
+ 1858              	.LC85:
+ 1859 0078 494E464F 		.ascii	"INFO\000"
+ 1859      00
+ 1860              	.LC86:
+ 1861 007d 494E5445 		.ascii	"INTERVAL\000"
+ 1861      5256414C 
+ 1861      00
+ 1862              	.LC87:
+ 1863 0086 454D4100 		.ascii	"EMA\000"
+ 1864              	.LC88:
+ 1865 008a 534E00   		.ascii	"SN\000"
+ 1866              	.LC89:
+ 1867 008d 52455345 		.ascii	"RESET\000"
+ 1867      5400
+ 1868              	.LC90:
+ 1869 0093 534600   		.ascii	"SF\000"
+ 1870              	.LC91:
+ 1871 0096 534500   		.ascii	"SE\000"
+ 1872              	.LC92:
+ 1873 0099 44454255 		.ascii	"DEBUG\000"
+ 1873      4700
+ 1874              	.LC93:
+ 1875 009f 31323334 		.ascii	"1234567890ABCDEF\000"
+ 1875      35363738 
+ 1875      39304142 
+ 1875      43444546 
+ 1875      00
+ 1876              		.section	.bss.write_flash,"aw",%nobits
+ 1877              		.align	2
+ 1878              		.set	.LANCHOR3,. + 0
+ 1881              	write_flash:
+ 1882 0000 00000000 		.space	4
+ 1883              		.section	.bss.response,"aw",%nobits
+ 1884              		.align	2
+ 1885              		.set	.LANCHOR2,. + 0
+ 1888              	response:
+ 1889 0000 00000000 		.space	4
+ 1890              		.section	.data.handlers,"aw",%progbits
+ 1891              		.align	2
+ 1892              		.set	.LANCHOR4,. + 0
+ 1895              	handlers:
+ 1896 0000 74000000 		.word	.LC84
+ 1897 0004 00000000 		.word	sks_cmd_config
+ 1898 0008 00000000 		.space	4
+ 1899 000c 78000000 		.word	.LC85
+ 1900 0010 00000000 		.word	sks_cmd_info
+ 1901 0014 00000000 		.space	4
+ 1902 0018 7D000000 		.word	.LC86
+ 1903 001c 00000000 		.word	sks_cmd_interval
+ 1904 0020 00000000 		.space	4
+ 1905 0024 86000000 		.word	.LC87
+ 1906 0028 00000000 		.word	sks_cmd_disable_ema
+ 1907 002c 00000000 		.space	4
+ 1908 0030 8A000000 		.word	.LC88
+ 1909 0034 00000000 		.word	sks_cmd_serial
+ 1910 0038 00000000 		.space	4
+ 1911 003c 8D000000 		.word	.LC89
+ 1912 0040 00000000 		.word	sks_cmd_reset
+ 1913 0044 00000000 		.space	4
+ 1914 0048 93000000 		.word	.LC90
+ 1915 004c 00000000 		.word	sks_cmd_set_full
+ 1916 0050 00000000 		.space	4
+ 1917 0054 96000000 		.word	.LC91
+ 1918 0058 00000000 		.word	sks_cmd_set_empty
+ 1919 005c 00000000 		.space	4
+ 1920 0060 99000000 		.word	.LC92
+ 1921 0064 00000000 		.word	sks_cmd_set_debug
+ 1922 0068 00000000 		.space	4
+ 1923 006c 00000000 		.word	0
+ 1924 0070 00000000 		.word	0
+ 1925 0074 00000000 		.space	4
+ 1926              		.section	.data.HexChar,"aw",%progbits
+ 1927              		.align	2
+ 1928              		.set	.LANCHOR0,. + 0
+ 1931              	HexChar:
+ 1932 0000 9F000000 		.word	.LC93
+ 1933              		.text
+ 1934              	.Letext0:
+ 1935              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1936              		.file 3 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1937              		.file 4 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1938              		.file 5 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 1939              		.file 6 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Source/global
+ 1940              		.file 7 "<built-in>"
+ 1941              		.file 8 "../Source/DataUtil.h"
+DEFINED SYMBOLS
+                            *ABS*:00000000 command.c
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:20     .text.append_int:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:25     .text.append_int:00000000 append_int
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:98     .text.append_hex:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:103    .text.append_hex:00000000 append_hex
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:151    .text.append_hex:00000028 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:156    .text.append_hex_long:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:161    .text.append_hex_long:00000000 append_hex_long
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:251    .text.append_hex_long:0000005c $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:256    .text.cmd_response:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:261    .text.cmd_response:00000000 cmd_response
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:340    .text.cmd_response:00000044 $d
+                            *COM*:0000001c g_config
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:346    .text.sks_cmd_set_debug:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:350    .text.sks_cmd_set_debug:00000000 sks_cmd_set_debug
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:407    .text.sks_cmd_set_debug:00000034 $d
+                            *COM*:0000006c g_appStats
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:415    .text.sks_cmd_set_empty:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:419    .text.sks_cmd_set_empty:00000000 sks_cmd_set_empty
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:505    .text.sks_cmd_set_empty:00000060 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:515    .text.sks_cmd_set_full:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:519    .text.sks_cmd_set_full:00000000 sks_cmd_set_full
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:605    .text.sks_cmd_set_full:00000060 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:615    .text.sks_cmd_reset:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:619    .text.sks_cmd_reset:00000000 sks_cmd_reset
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:676    .text.sks_cmd_reset:00000038 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:685    .text.sks_cmd_disable_ema:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:689    .text.sks_cmd_disable_ema:00000000 sks_cmd_disable_ema
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:770    .text.sks_cmd_disable_ema:00000054 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:779    .text.sks_cmd_interval:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:783    .text.sks_cmd_interval:00000000 sks_cmd_interval
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:857    .text.sks_cmd_interval:00000050 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:866    .text.sks_cmd_info:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:870    .text.sks_cmd_info:00000000 sks_cmd_info
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:934    .text.sks_cmd_info:0000004c $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:943    .text.sks_cmd_config:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:947    .text.sks_cmd_config:00000000 sks_cmd_config
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1075   .text.sks_cmd_config:00000090 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1084   .text.append_sign:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1089   .text.append_sign:00000000 append_sign
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1117   .text.append_sign:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1123   .text.append_time:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1128   .text.append_time:00000000 append_time
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1227   .text.append_time:00000088 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1235   .text.append_v9_command:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1240   .text.append_v9_command:00000000 append_v9_command
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1273   .text.append_v9_command:00000018 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1278   .text.next_char:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1283   .text.next_char:00000000 next_char
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1320   .text.sks_cmd_serial:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1324   .text.sks_cmd_serial:00000000 sks_cmd_serial
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1403   .text.sks_cmd_serial:0000005c $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1412   .text.create_v3:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1417   .text.create_v3:00000000 create_v3
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1480   .text.create_v3:00000040 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1489   .text.server_on_command:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1494   .text.server_on_command:00000000 server_on_command
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1808   .text.server_on_command:00000174 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1895   .data.handlers:00000000 handlers
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1881   .bss.write_flash:00000000 write_flash
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1931   .data.HexChar:00000000 HexChar
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1825   .bss.Response:00000000 Response
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1826   .bss.Response:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1877   .bss.write_flash:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1884   .bss.response:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1888   .bss.response:00000000 response
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1891   .data.handlers:00000000 $d
+C:\Users\khanh\AppData\Local\Temp\ccab5LLn.s:1927   .data.HexChar:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+__aeabi_uidivmod
+__aeabi_uidiv
+strlen
+usnprintf
+uvsnprintf
+atoi
+raise_command_coming
+ulSecCount
+strcpy
+strcat
+gmtime
+strchr
+memset
+strncpy
+__aeabi_idivmod
+strncmp
+memcpy
+strcmp
+write_config
+xprintf

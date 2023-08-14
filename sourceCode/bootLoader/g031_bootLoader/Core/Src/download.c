@@ -52,7 +52,7 @@ void SerialDownload(void) {
 	//FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);
 #define REPORT_POINTER_ADDRESS			0x807F000  //Page 254
 	//FLASH_ErasePage(REPORT_POINTER_ADDRESS);
-	printf(
+	xprintf(
 			"\r\nWaiting for the file to be sent ... (press 'a' to abort)\n\r");
 	Size = Ymodem_Receive(&tab_1024[0]);
 	if (Size > 0) {
@@ -64,27 +64,25 @@ void SerialDownload(void) {
 						| FLASH_FLAG_WRPERR);*/
 		CRC_ResetDR();
 		//boot_inf.SecondaryCRC = CRC_CalcBlockCRC(BOOT_SECONDARY_ADDRESS, (uint32_t)(Size/4)+1);
-		boot_inf.SecondaryCRC = CRC_CalcBlockCRC(BOOT_PRIMARY_ADDRESS,
-				(uint32_t) (Size / 4) + 1);
-		boot_inf.PrimaryCRC = boot_inf.SecondaryCRC;
+		boot_inf.SecondaryCRC = CRC_CalcBlockCRC(BOOT_PRIMARY_ADDRESS,(uint32_t) (Size / 4) + 1);
 		boot_inf.PrimarySize = boot_inf.SecondarySize;
 		//PrintBootInfo();
 		boot_inf.PrimaryAddress = BOOT_PRIMARY_ADDRESS;
 		boot_inf.SecondaryAddress = BOOT_SECONDARY_ADDRESS;
 		boot_inf.UpdateFirmware = 1;
 		flash_write_uboot_info(&boot_inf);
-		printf(
+		xprintf(
 				"\n\n\r Programming Completed Successfully!\n\r--------------------------------\r\n");
 
 	} else if (Size == -1) {
-		printf(
+		xprintf(
 				"\n\n\rThe image size is higher than the allowed space memory!\n\r");
 	} else if (Size == -2) {
-		printf("\n\n\rVerification failed!\n\r");
+		xprintf("\n\n\rVerification failed!\n\r");
 	} else if (Size == -3) {
-		printf("\r\n\nAborted by user.\n\r");
+		xprintf("\r\n\nAborted by user.\n\r");
 	} else {
-		printf("\n\rFailed to receive the file!\n\r");
+		xprintf("\n\rFailed to receive the file!\n\r");
 	}
 }
 

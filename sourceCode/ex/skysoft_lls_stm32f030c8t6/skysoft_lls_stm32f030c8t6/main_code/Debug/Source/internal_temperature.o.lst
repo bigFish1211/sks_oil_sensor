@@ -1,0 +1,463 @@
+   1              		.cpu cortex-m0
+   2              		.fpu softvfp
+   3              		.eabi_attribute 20, 1
+   4              		.eabi_attribute 21, 1
+   5              		.eabi_attribute 23, 3
+   6              		.eabi_attribute 24, 1
+   7              		.eabi_attribute 25, 1
+   8              		.eabi_attribute 26, 1
+   9              		.eabi_attribute 30, 4
+  10              		.eabi_attribute 34, 0
+  11              		.eabi_attribute 18, 4
+  12              		.code	16
+  13              		.file	"internal_temperature.c"
+  14              		.text
+  15              	.Ltext0:
+  16              		.cfi_sections	.debug_frame
+  17              		.section	.text.internalTempInit,"ax",%progbits
+  18              		.align	1
+  19              		.global	internalTempInit
+  20              		.code	16
+  21              		.thumb_func
+  23              	internalTempInit:
+  24              	.LFB33:
+  25              		.file 1 "../Source/internal_temperature.c"
+   1:../Source/internal_temperature.c **** /*
+   2:../Source/internal_temperature.c ****  * internal_temperature.c
+   3:../Source/internal_temperature.c ****  *
+   4:../Source/internal_temperature.c ****  *  Created on: Sep 19, 2022
+   5:../Source/internal_temperature.c ****  *      Author: icepe
+   6:../Source/internal_temperature.c ****  */
+   7:../Source/internal_temperature.c **** 
+   8:../Source/internal_temperature.c **** #include "internal_temperature.h"
+   9:../Source/internal_temperature.c **** #include "stm32f0xx.h"
+  10:../Source/internal_temperature.c **** #include "stm32f0xx_dma.h"
+  11:../Source/internal_temperature.c **** #include "stm32f0xx_adc.h"
+  12:../Source/internal_temperature.c **** #include "define.h"
+  13:../Source/internal_temperature.c **** 
+  14:../Source/internal_temperature.c **** /* Configurations BEGIN */
+  15:../Source/internal_temperature.c **** #define TMPSENSOR_USE_INTREF 1 /* 1 - Use Internal Reference Voltage; 0 - Not use; */
+  16:../Source/internal_temperature.c **** /* Configurations END */
+  17:../Source/internal_temperature.c **** 
+  18:../Source/internal_temperature.c **** /* Constant values BEGIN */
+  19:../Source/internal_temperature.c **** #define TMPSENSOR_AVGSLOPE  	((uint32_t) 4000) /* mV/°C */
+  20:../Source/internal_temperature.c **** #define TMPSENSOR_V30  			((uint32_t) 1340)/* V (at 30 °C)  */
+  21:../Source/internal_temperature.c **** 
+  22:../Source/internal_temperature.c **** #define TMPSENSOR_ADCMAX 		((uint32_t) 3095) /* 12-bit ADC maximum value (12^2)-1)  */
+  23:../Source/internal_temperature.c **** #define TMPSENSOR_ADCREFVOL  	((uint32_t) 3300) /* Typical reference voltage, V  */
+  24:../Source/internal_temperature.c **** #define TMPSENSOR_ADCVREFINT	((uint32_t) 1200)/* Internal reference voltage, V  */
+  25:../Source/internal_temperature.c **** /* Constant values END */
+  26:../Source/internal_temperature.c **** 
+  27:../Source/internal_temperature.c **** 
+  28:../Source/internal_temperature.c **** static void ADC_Config(void);
+  29:../Source/internal_temperature.c **** static void DMA_Config(void);
+  30:../Source/internal_temperature.c **** 
+  31:../Source/internal_temperature.c **** __IO uint16_t ADC_val[NUMBER_OF_ADC_CHANNEL]={0};
+  32:../Source/internal_temperature.c **** void internalTempInit(void){
+  26              		.loc 1 32 0
+  27              		.cfi_startproc
+  28 0000 30B5     		push	{r4, r5, lr}
+  29              	.LCFI0:
+  30              		.cfi_def_cfa_offset 12
+  31              		.cfi_offset 4, -12
+  32              		.cfi_offset 5, -8
+  33              		.cfi_offset 14, -4
+  34 0002 93B0     		sub	sp, sp, #76
+  35              	.LCFI1:
+  36              		.cfi_def_cfa_offset 88
+  37              	.LBB6:
+  38              	.LBB7:
+  33:../Source/internal_temperature.c **** 	ADC_Config();
+  34:../Source/internal_temperature.c **** 	DMA_Config();
+  35:../Source/internal_temperature.c **** }
+  36:../Source/internal_temperature.c **** 
+  37:../Source/internal_temperature.c **** uint32_t getTemperature(void){
+  38:../Source/internal_temperature.c **** 	float  adc_intref = ADC_val[1];
+  39:../Source/internal_temperature.c **** 	float  adc_sensor = ADC_val[0];
+  40:../Source/internal_temperature.c **** #if(TMPSENSOR_USE_INTREF)
+  41:../Source/internal_temperature.c **** 
+  42:../Source/internal_temperature.c **** 	float intref_vol = (TMPSENSOR_ADCMAX*TMPSENSOR_ADCVREFINT)/adc_intref;
+  43:../Source/internal_temperature.c **** 
+  44:../Source/internal_temperature.c **** #else
+  45:../Source/internal_temperature.c **** 	float intref_vol = TMPSENSOR_ADCREFVOL;
+  46:../Source/internal_temperature.c **** #endif
+  47:../Source/internal_temperature.c **** 
+  48:../Source/internal_temperature.c **** 	float sensor_vol = adc_sensor * intref_vol/TMPSENSOR_ADCMAX;
+  49:../Source/internal_temperature.c **** 
+  50:../Source/internal_temperature.c **** 	uint32_t sensor_tmp = (uint32_t)((TMPSENSOR_V30 - sensor_vol)*1000/TMPSENSOR_AVGSLOPE + 30);
+  51:../Source/internal_temperature.c **** 
+  52:../Source/internal_temperature.c **** 	return sensor_tmp;
+  53:../Source/internal_temperature.c **** }
+  54:../Source/internal_temperature.c **** 
+  55:../Source/internal_temperature.c **** 
+  56:../Source/internal_temperature.c **** static void ADC_Config(void)
+  57:../Source/internal_temperature.c **** {
+  58:../Source/internal_temperature.c ****   ADC_InitTypeDef     ADC_InitStructure;
+  59:../Source/internal_temperature.c ****   /* ADC1 DeInit */
+  60:../Source/internal_temperature.c ****   ADC_DeInit(ADC1);
+  39              		.loc 1 60 0
+  40 0004 3348     		ldr	r0, .L4
+  41 0006 FFF7FEFF 		bl	ADC_DeInit
+  61:../Source/internal_temperature.c **** 
+  62:../Source/internal_temperature.c ****    /* ADC1 Periph clock enable */
+  63:../Source/internal_temperature.c ****   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+  42              		.loc 1 63 0
+  43 000a 8020     		mov	r0, #128
+  64:../Source/internal_temperature.c ****   /* Initialize ADC structure */
+  65:../Source/internal_temperature.c ****   ADC_StructInit(&ADC_InitStructure);
+  44              		.loc 1 65 0
+  45 000c 0CAC     		add	r4, sp, #48
+  63:../Source/internal_temperature.c ****   RCC_APB2PeriphClockCmd(RCC_APB2Periph_ADC1, ENABLE);
+  46              		.loc 1 63 0
+  47 000e 0121     		mov	r1, #1
+  48 0010 8000     		lsl	r0, r0, #2
+  49 0012 FFF7FEFF 		bl	RCC_APB2PeriphClockCmd
+  50              		.loc 1 65 0
+  51 0016 201C     		mov	r0, r4
+  52 0018 FFF7FEFF 		bl	ADC_StructInit
+  66:../Source/internal_temperature.c **** 
+  67:../Source/internal_temperature.c ****   /* Configure the ADC1 in continuous mode withe a resolution equal to 12 bits  */
+  68:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+  69:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+  53              		.loc 1 69 0
+  54 001c 0125     		mov	r5, #1
+  68:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+  55              		.loc 1 68 0
+  56 001e 0023     		mov	r3, #0
+  70:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_ExternalTrigConvEdge = ADC_ExternalTrigConvEdge_None;
+  57              		.loc 1 70 0
+  58 0020 A360     		str	r3, [r4, #8]
+  71:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Right;
+  59              		.loc 1 71 0
+  60 0022 2361     		str	r3, [r4, #16]
+  72:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_ScanDirection = ADC_ScanDirection_Upward;
+  61              		.loc 1 72 0
+  62 0024 6361     		str	r3, [r4, #20]
+  73:../Source/internal_temperature.c ****   ADC_Init(ADC1, &ADC_InitStructure);
+  63              		.loc 1 73 0
+  64 0026 2B48     		ldr	r0, .L4
+  65 0028 211C     		mov	r1, r4
+  69:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_ContinuousConvMode = ENABLE;
+  66              		.loc 1 69 0
+  67 002a 2571     		strb	r5, [r4, #4]
+  68:../Source/internal_temperature.c ****   ADC_InitStructure.ADC_Resolution = ADC_Resolution_12b;
+  68              		.loc 1 68 0
+  69 002c 0C93     		str	r3, [sp, #48]
+  70              		.loc 1 73 0
+  71 002e FFF7FEFF 		bl	ADC_Init
+  74:../Source/internal_temperature.c **** 
+  75:../Source/internal_temperature.c ****   /* Convert the ADC1 temperature sensor  with 55.5 Cycles as sampling time */
+  76:../Source/internal_temperature.c ****   ADC_ChannelConfig(ADC1, ADC_Channel_TempSensor , ADC_SampleTime_239_5Cycles);
+  72              		.loc 1 76 0
+  73 0032 8022     		mov	r2, #128
+  74 0034 5102     		lsl	r1, r2, #9
+  75 0036 2748     		ldr	r0, .L4
+  76 0038 0722     		mov	r2, #7
+  77 003a FFF7FEFF 		bl	ADC_ChannelConfig
+  77:../Source/internal_temperature.c ****   ADC_TempSensorCmd(ENABLE);
+  78              		.loc 1 77 0
+  79 003e 281C     		mov	r0, r5
+  80 0040 FFF7FEFF 		bl	ADC_TempSensorCmd
+  78:../Source/internal_temperature.c **** 
+  79:../Source/internal_temperature.c ****   /* Convert the ADC1 Vref  with 55.5 Cycles as sampling time */
+  80:../Source/internal_temperature.c ****   ADC_ChannelConfig(ADC1, ADC_Channel_Vrefint , ADC_SampleTime_239_5Cycles);
+  81              		.loc 1 80 0
+  82 0044 8021     		mov	r1, #128
+  83 0046 0722     		mov	r2, #7
+  84 0048 8902     		lsl	r1, r1, #10
+  85 004a 2248     		ldr	r0, .L4
+  86 004c FFF7FEFF 		bl	ADC_ChannelConfig
+  81:../Source/internal_temperature.c ****   ADC_VrefintCmd(ENABLE);
+  87              		.loc 1 81 0
+  88 0050 281C     		mov	r0, r5
+  89 0052 FFF7FEFF 		bl	ADC_VrefintCmd
+  82:../Source/internal_temperature.c **** 
+  83:../Source/internal_temperature.c ****   /* ADC Calibration */
+  84:../Source/internal_temperature.c ****   ADC_GetCalibrationFactor(ADC1);
+  90              		.loc 1 84 0
+  91 0056 1F48     		ldr	r0, .L4
+  92 0058 FFF7FEFF 		bl	ADC_GetCalibrationFactor
+  85:../Source/internal_temperature.c **** 
+  86:../Source/internal_temperature.c ****   /* ADC DMA request in circular mode */
+  87:../Source/internal_temperature.c ****   ADC_DMARequestModeConfig(ADC1, ADC_DMAMode_Circular);
+  93              		.loc 1 87 0
+  94 005c 1D48     		ldr	r0, .L4
+  95 005e 0221     		mov	r1, #2
+  96 0060 FFF7FEFF 		bl	ADC_DMARequestModeConfig
+  88:../Source/internal_temperature.c **** 
+  89:../Source/internal_temperature.c ****   /* Enable ADC_DMA */
+  90:../Source/internal_temperature.c ****   ADC_DMACmd(ADC1, ENABLE);
+  97              		.loc 1 90 0
+  98 0064 1B48     		ldr	r0, .L4
+  99 0066 291C     		mov	r1, r5
+ 100 0068 FFF7FEFF 		bl	ADC_DMACmd
+  91:../Source/internal_temperature.c **** 
+  92:../Source/internal_temperature.c ****   /* Enable the ADC peripheral */
+  93:../Source/internal_temperature.c ****   ADC_Cmd(ADC1, ENABLE);
+ 101              		.loc 1 93 0
+ 102 006c 1948     		ldr	r0, .L4
+ 103 006e 291C     		mov	r1, r5
+ 104 0070 FFF7FEFF 		bl	ADC_Cmd
+ 105              	.L2:
+  94:../Source/internal_temperature.c **** 
+  95:../Source/internal_temperature.c ****   /* Wait the ADRDY flag */
+  96:../Source/internal_temperature.c ****   while(!ADC_GetFlagStatus(ADC1, ADC_FLAG_ADRDY));
+ 106              		.loc 1 96 0
+ 107 0074 1748     		ldr	r0, .L4
+ 108 0076 0121     		mov	r1, #1
+ 109 0078 FFF7FEFF 		bl	ADC_GetFlagStatus
+ 110 007c 0028     		cmp	r0, #0
+ 111 007e F9D0     		beq	.L2
+  97:../Source/internal_temperature.c **** 
+  98:../Source/internal_temperature.c ****   /* ADC1 regular Software Start Conv */
+  99:../Source/internal_temperature.c ****   ADC_StartOfConversion(ADC1);
+ 112              		.loc 1 99 0
+ 113 0080 1448     		ldr	r0, .L4
+ 114 0082 FFF7FEFF 		bl	ADC_StartOfConversion
+ 115              	.LBE7:
+ 116              	.LBE6:
+ 117              	.LBB8:
+ 118              	.LBB9:
+ 100:../Source/internal_temperature.c **** }
+ 101:../Source/internal_temperature.c **** static void DMA_Config(void)
+ 102:../Source/internal_temperature.c **** {
+ 103:../Source/internal_temperature.c ****   DMA_InitTypeDef   DMA_InitStructure;
+ 104:../Source/internal_temperature.c ****   /* DMA1 clock enable */
+ 105:../Source/internal_temperature.c ****   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1 , ENABLE);
+ 119              		.loc 1 105 0
+ 120 0086 0120     		mov	r0, #1
+ 121 0088 011C     		mov	r1, r0
+ 122 008a FFF7FEFF 		bl	RCC_AHBPeriphClockCmd
+ 106:../Source/internal_temperature.c **** 
+ 107:../Source/internal_temperature.c ****   /* DMA1 Channel1 Config */
+ 108:../Source/internal_temperature.c ****   DMA_DeInit(DMA1_Channel1);
+ 123              		.loc 1 108 0
+ 124 008e 1248     		ldr	r0, .L4+4
+ 125 0090 FFF7FEFF 		bl	DMA_DeInit
+ 109:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&(ADC1->DR));
+ 110:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)ADC_val;
+ 111:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
+ 112:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_BufferSize = NUMBER_OF_ADC_CHANNEL;
+ 113:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+ 114:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+ 126              		.loc 1 114 0
+ 127 0094 8022     		mov	r2, #128
+ 110:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)ADC_val;
+ 128              		.loc 1 110 0
+ 129 0096 114D     		ldr	r5, .L4+8
+ 130              		.loc 1 114 0
+ 131 0098 0692     		str	r2, [sp, #24]
+ 115:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+ 132              		.loc 1 115 0
+ 133 009a 5100     		lsl	r1, r2, #1
+ 109:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&(ADC1->DR));
+ 134              		.loc 1 109 0
+ 135 009c 104B     		ldr	r3, .L4+12
+ 116:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+ 117:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+ 118:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+ 136              		.loc 1 118 0
+ 137 009e 8022     		mov	r2, #128
+ 115:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+ 138              		.loc 1 115 0
+ 139 00a0 0791     		str	r1, [sp, #28]
+ 112:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_BufferSize = NUMBER_OF_ADC_CHANNEL;
+ 140              		.loc 1 112 0
+ 141 00a2 0224     		mov	r4, #2
+ 142              		.loc 1 118 0
+ 143 00a4 9101     		lsl	r1, r2, #6
+ 116:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+ 144              		.loc 1 116 0
+ 145 00a6 8020     		mov	r0, #128
+ 109:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)(&(ADC1->DR));
+ 146              		.loc 1 109 0
+ 147 00a8 0193     		str	r3, [sp, #4]
+ 110:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)ADC_val;
+ 148              		.loc 1 110 0
+ 149 00aa 0295     		str	r5, [sp, #8]
+ 116:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+ 150              		.loc 1 116 0
+ 151 00ac C300     		lsl	r3, r0, #3
+ 111:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
+ 152              		.loc 1 111 0
+ 153 00ae 0025     		mov	r5, #0
+ 112:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_BufferSize = NUMBER_OF_ADC_CHANNEL;
+ 154              		.loc 1 112 0
+ 155 00b0 0494     		str	r4, [sp, #16]
+ 156              		.loc 1 118 0
+ 157 00b2 0A91     		str	r1, [sp, #40]
+ 117:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+ 158              		.loc 1 117 0
+ 159 00b4 2024     		mov	r4, #32
+ 119:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+ 120:../Source/internal_temperature.c ****   DMA_Init(DMA1_Channel1, &DMA_InitStructure);
+ 160              		.loc 1 120 0
+ 161 00b6 01A9     		add	r1, sp, #4
+ 162 00b8 0748     		ldr	r0, .L4+4
+ 116:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+ 163              		.loc 1 116 0
+ 164 00ba 0893     		str	r3, [sp, #32]
+ 111:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralSRC;
+ 165              		.loc 1 111 0
+ 166 00bc 0395     		str	r5, [sp, #12]
+ 113:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+ 167              		.loc 1 113 0
+ 168 00be 0595     		str	r5, [sp, #20]
+ 117:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_Mode = DMA_Mode_Circular;
+ 169              		.loc 1 117 0
+ 170 00c0 0994     		str	r4, [sp, #36]
+ 119:../Source/internal_temperature.c ****   DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
+ 171              		.loc 1 119 0
+ 172 00c2 0B95     		str	r5, [sp, #44]
+ 173              		.loc 1 120 0
+ 174 00c4 FFF7FEFF 		bl	DMA_Init
+ 121:../Source/internal_temperature.c ****   /* DMA1 Channel1 enable */
+ 122:../Source/internal_temperature.c ****   DMA_Cmd(DMA1_Channel1, ENABLE);
+ 175              		.loc 1 122 0
+ 176 00c8 0348     		ldr	r0, .L4+4
+ 177 00ca 0121     		mov	r1, #1
+ 178 00cc FFF7FEFF 		bl	DMA_Cmd
+ 179              	.LBE9:
+ 180              	.LBE8:
+  35:../Source/internal_temperature.c **** }
+ 181              		.loc 1 35 0
+ 182 00d0 13B0     		add	sp, sp, #76
+ 183              		@ sp needed for prologue
+ 184 00d2 30BD     		pop	{r4, r5, pc}
+ 185              	.L5:
+ 186              		.align	2
+ 187              	.L4:
+ 188 00d4 00240140 		.word	1073816576
+ 189 00d8 08000240 		.word	1073872904
+ 190 00dc 00000000 		.word	.LANCHOR0
+ 191 00e0 40240140 		.word	1073816640
+ 192              		.cfi_endproc
+ 193              	.LFE33:
+ 195              		.global	__aeabi_ui2f
+ 196              		.global	__aeabi_fdiv
+ 197              		.global	__aeabi_fmul
+ 198              		.global	__aeabi_fsub
+ 199              		.global	__aeabi_fadd
+ 200              		.global	__aeabi_f2uiz
+ 201              		.section	.text.getTemperature,"ax",%progbits
+ 202              		.align	1
+ 203              		.global	getTemperature
+ 204              		.code	16
+ 205              		.thumb_func
+ 207              	getTemperature:
+ 208              	.LFB34:
+  37:../Source/internal_temperature.c **** uint32_t getTemperature(void){
+ 209              		.loc 1 37 0
+ 210              		.cfi_startproc
+ 211 0000 38B5     		push	{r3, r4, r5, lr}
+ 212              	.LCFI2:
+ 213              		.cfi_def_cfa_offset 16
+ 214              		.cfi_offset 3, -16
+ 215              		.cfi_offset 4, -12
+ 216              		.cfi_offset 5, -8
+ 217              		.cfi_offset 14, -4
+  38:../Source/internal_temperature.c **** 	float  adc_intref = ADC_val[1];
+ 218              		.loc 1 38 0
+ 219 0002 124B     		ldr	r3, .L7
+ 220              		@ sp needed for prologue
+ 221 0004 5C88     		ldrh	r4, [r3, #2]
+ 222              	.LVL0:
+  39:../Source/internal_temperature.c **** 	float  adc_sensor = ADC_val[0];
+ 223              		.loc 1 39 0
+ 224 0006 1888     		ldrh	r0, [r3]
+ 225              	.LVL1:
+ 226 0008 FFF7FEFF 		bl	__aeabi_ui2f
+ 227              	.LVL2:
+ 228 000c 051C     		add	r5, r0, #0
+  38:../Source/internal_temperature.c **** 	float  adc_intref = ADC_val[1];
+ 229              		.loc 1 38 0
+ 230 000e 201C     		mov	r0, r4
+ 231 0010 FFF7FEFF 		bl	__aeabi_ui2f
+ 232 0014 011C     		add	r1, r0, #0
+  42:../Source/internal_temperature.c **** 	float intref_vol = (TMPSENSOR_ADCMAX*TMPSENSOR_ADCVREFINT)/adc_intref;
+ 233              		.loc 1 42 0
+ 234 0016 0E48     		ldr	r0, .L7+4
+ 235 0018 FFF7FEFF 		bl	__aeabi_fdiv
+ 236 001c 011C     		add	r1, r0, #0
+  48:../Source/internal_temperature.c **** 	float sensor_vol = adc_sensor * intref_vol/TMPSENSOR_ADCMAX;
+ 237              		.loc 1 48 0
+ 238 001e 281C     		add	r0, r5, #0
+ 239 0020 FFF7FEFF 		bl	__aeabi_fmul
+ 240 0024 0B49     		ldr	r1, .L7+8
+ 241 0026 FFF7FEFF 		bl	__aeabi_fdiv
+ 242 002a 011C     		add	r1, r0, #0
+  50:../Source/internal_temperature.c **** 	uint32_t sensor_tmp = (uint32_t)((TMPSENSOR_V30 - sensor_vol)*1000/TMPSENSOR_AVGSLOPE + 30);
+ 243              		.loc 1 50 0
+ 244 002c 0A48     		ldr	r0, .L7+12
+ 245 002e FFF7FEFF 		bl	__aeabi_fsub
+ 246 0032 0A49     		ldr	r1, .L7+16
+ 247 0034 FFF7FEFF 		bl	__aeabi_fmul
+ 248 0038 0949     		ldr	r1, .L7+20
+ 249 003a FFF7FEFF 		bl	__aeabi_fdiv
+ 250 003e 0949     		ldr	r1, .L7+24
+ 251 0040 FFF7FEFF 		bl	__aeabi_fadd
+ 252 0044 FFF7FEFF 		bl	__aeabi_f2uiz
+ 253              	.LVL3:
+  53:../Source/internal_temperature.c **** }
+ 254              		.loc 1 53 0
+ 255 0048 38BD     		pop	{r3, r4, r5, pc}
+ 256              	.L8:
+ 257 004a C046     		.align	2
+ 258              	.L7:
+ 259 004c 00000000 		.word	.LANCHOR0
+ 260 0050 40AF624A 		.word	1247981376
+ 261 0054 00704145 		.word	1161916416
+ 262 0058 0080A744 		.word	1151827968
+ 263 005c 00007A44 		.word	1148846080
+ 264 0060 00007A45 		.word	1165623296
+ 265 0064 0000F041 		.word	1106247680
+ 266              		.cfi_endproc
+ 267              	.LFE34:
+ 269              		.global	ADC_val
+ 270              		.section	.bss.ADC_val,"aw",%nobits
+ 271              		.align	1
+ 272              		.set	.LANCHOR0,. + 0
+ 275              	ADC_val:
+ 276 0000 00000000 		.space	4
+ 277              		.text
+ 278              	.Letext0:
+ 279              		.file 2 "c:\\eclipseindigo\\codesourcery\\sourcery_codebench_lite_for_arm_eabi\\bin\\../lib/gcc/ar
+ 280              		.file 3 "../Source/stm32f0xx.h"
+ 281              		.file 4 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+ 282              		.file 5 "C:\\Working\\CURRENT_PROJECT\\SKYBOX\\skysoft_lls_stm32f030c8t6\\main_code\\Libraries\\ST
+DEFINED SYMBOLS
+                            *ABS*:00000000 internal_temperature.c
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:18     .text.internalTempInit:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:23     .text.internalTempInit:00000000 internalTempInit
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:188    .text.internalTempInit:000000d4 $d
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:202    .text.getTemperature:00000000 $t
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:207    .text.getTemperature:00000000 getTemperature
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:259    .text.getTemperature:0000004c $d
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:275    .bss.ADC_val:00000000 ADC_val
+C:\Users\khanh\AppData\Local\Temp\cc15pNXP.s:271    .bss.ADC_val:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+ADC_DeInit
+RCC_APB2PeriphClockCmd
+ADC_StructInit
+ADC_Init
+ADC_ChannelConfig
+ADC_TempSensorCmd
+ADC_VrefintCmd
+ADC_GetCalibrationFactor
+ADC_DMARequestModeConfig
+ADC_DMACmd
+ADC_Cmd
+ADC_GetFlagStatus
+ADC_StartOfConversion
+RCC_AHBPeriphClockCmd
+DMA_DeInit
+DMA_Init
+DMA_Cmd
+__aeabi_ui2f
+__aeabi_fdiv
+__aeabi_fmul
+__aeabi_fsub
+__aeabi_fadd
+__aeabi_f2uiz

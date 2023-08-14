@@ -67,6 +67,7 @@ void FLASH_DisableWriteProtectionPages(uint32_t UserMemoryMask) {
 #define FLASH_DEBUG 0
 int flash_verify_image(SKS_BOOT_INFO *boot_info) {
 	//char str [255] = {0};
+/*
 	uint32_t crc_primary = 0;
 
 	flash_read_uboot_info(boot_info);
@@ -78,6 +79,7 @@ int flash_verify_image(SKS_BOOT_INFO *boot_info) {
 	}
 	//printf("VERIFY DATA SUCCESS\r\n");
 	//CRC->DR
+*/
 	return 1;
 }
 

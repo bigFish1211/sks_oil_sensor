@@ -132,14 +132,11 @@ static int32_t Receive_Packet(uint8_t *data, int32_t *length, uint32_t timeout) 
  * @retval The size of the file
  */
 uint8_t packet_data[PACKET_1K_SIZE + PACKET_OVERHEAD];
-int32_t Ymodem_Receive() {
+int32_t Ymodem_Receive(uint8_t *buf) {
 	uint8_t file_size[FILE_SIZE_LENGTH], *file_ptr, *buf_ptr;
 	uint8_t buf_data[PACKET_1K_SIZE];
 	int32_t i, j, packet_length, session_done, file_done, packets_received, errors, session_begin, size = 0;
-
-	/* Initialize FlashDestination variable */
-	// uint32_t DestinationAddress = ApplicationAddress; /* Flash user program offset */
-	uint32_t DestinationAddress = BOOT_SECONDARY_ADDRESS; /* Flash user program offset */
+	uint32_t DestinationAddress = BOOT_PRIMARY_ADDRESS; /* Flash user program offset */
 	uint32_t FlashDestination = DestinationAddress;
 	FLASH_Unlock();
 	for (session_done = 0, errors = 0, session_begin = 0;;) {
@@ -207,7 +204,6 @@ int32_t Ymodem_Receive() {
 						}
 						/* Data packet */
 						else {
-							//memcpy(buf_ptr, packet_data + PACKET_HEADER, packet_length);
 							memcpy(buf_data, &packet_data[PACKET_HEADER], packet_length);
 							RamSource = packet_data + PACKET_HEADER;
 							uint64_t *pRecord = (uint64_t*) buf_data;
