@@ -1,0 +1,4 @@
+../Core/Src/EMA.c:41:8:calcMA	32	static
+../Core/Src/EMA.c:50:8:calcEMA	40	static
+../Core/Src/EMA.c:58:6:addStock	40	static
+../Core/Src/EMA.c:68:8:getAverage	8	static

@@ -165,7 +165,8 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 						sensorCapture.freq = TIM2_FREQ / sensorCapture.diffirent;
 						sensorCapture.freq_update =1;
 
-						__HAL_TIM_SET_COUNTER(&htim2, 0);
+						//__HAL_TIM_SET_COUNTER(&htim2, 0);
+						TIM2->CNT = 0;
 						sensorCapture.isFirstCap = 0;
 					}
 				}
