@@ -32,6 +32,8 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+#define ENABLLE_BOOTLOADER		1
+#define BOOT_PRIMARY_ADDRESS    0x8002800
 t_APP_CONFIG g_config;
 
 uint32_t ulMiliCount = 0;
@@ -44,6 +46,11 @@ static int setup(void);
 static void printTest(void);
 
 int main(void) {
+#if ENABLLE_BOOTLOADER
+	SCB->VTOR = (uint32_t) BOOT_PRIMARY_ADDRESS;
+	__DSB();
+	__enable_irq();
+#endif
 	setup();
 	while (1){
 		printTest();

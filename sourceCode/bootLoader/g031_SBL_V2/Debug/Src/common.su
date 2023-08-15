@@ -1,0 +1,6 @@
+../Src/common.c:35:10:FLASH_PagesMask	24	static
+../Src/common.c:53:6:FLASH_DisableWriteProtectionPages	16	static
+../Src/common.c:67:5:flash_verify_image	24	static
+../Src/common.c:79:6:flash_read_uboot_info	32	static
+../Src/common.c:93:6:flash_write_uboot_info	32	static
+../Src/common.c:105:5:flash_copy_image	40	static

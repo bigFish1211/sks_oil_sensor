@@ -1,0 +1,11 @@
+lsm6ds3.c:17:5:Lsm6ds3_int	2
+lsm6ds3.c:41:6:Lsm6ds3_end	1
+lsm6ds3.c:47:5:Lsm6ds3_readAcceleration	2
+lsm6ds3.c:64:5:Lsm6ds3_accelerationAvailable	2
+lsm6ds3.c:73:5:Lsm6ds3_readGyroscope	2
+lsm6ds3.c:89:5:Lsm6ds3_gyroscopeAvailable	2
+lsm6ds3.c:97:7:Lsm6ds3_gyroscopeSampleRate	1
+lsm6ds3.c:102:5:Lsm6ds3_readRegister	2
+lsm6ds3.c:113:5:Lsm6ds3_readRegisters	2
+lsm6ds3.c:125:5:Lsm6ds3_writeRegister	1
+lsm6ds3.c:133:6:Lsm6ds3_printRotationAngles	5

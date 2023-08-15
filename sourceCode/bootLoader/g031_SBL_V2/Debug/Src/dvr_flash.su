@@ -1,0 +1,16 @@
+../Src/dvr_flash.c:14:6:FLASH_Lock	8	static
+../Src/dvr_flash.c:18:6:FLASH_Unlock	8	static
+../Src/dvr_flash.c:25:6:FLASH_OB_Unlock	8	static
+../Src/dvr_flash.c:36:6:FLASH_OB_Lock	8	static
+../Src/dvr_flash.c:52:14:FLASH_GetBankStatus	16	static
+../Src/dvr_flash.c:80:14:FLASH_GetBank1Status	16	static
+../Src/dvr_flash.c:101:14:FLASH_WaitForLastBank1Operation	32	static
+../Src/dvr_flash.c:119:14:FLASH_WaitForLastBankOperation	32	static
+../Src/dvr_flash.c:142:14:FLASH_ErasePage	24	static
+../Src/dvr_flash.c:156:14:FLASH_EraseAllPages	16	static
+../Src/dvr_flash.c:162:6:flashProgramDoubleWorld	24	static
+../Src/dvr_flash.c:165:14:FLASH_ProgramDoubleWord	48	static,ignoring_inline_asm
+../Src/dvr_flash.c:183:6:FLASH_ClearFlag	16	static
+../Src/dvr_flash.c:187:5:FlashWritePage	40	static
+../Src/dvr_flash.c:209:6:FLASH_ReadOutProtection	16	static
+../Src/dvr_flash.c:221:10:FLASH_GetReadOutProtectionStatus	8	static

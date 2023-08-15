@@ -1,0 +1,8 @@
+../Core/Src/xprintf.c:26:6:xputc	16	static
+../Core/Src/xprintf.c:44:6:xputs	16	static
+../Core/Src/xprintf.c:53:6:xfputs	24	static
+../Core/Src/xprintf.c:88:6:xvprintf	72	static
+../Core/Src/xprintf.c:165:6:xprintf	16	static
+../Core/Src/xprintf.c:179:6:xsprintf	28	static
+../Core/Src/xprintf.c:199:6:xfprintf	28	static
+../Core/Src/xprintf.c:225:6:put_dump	40	static

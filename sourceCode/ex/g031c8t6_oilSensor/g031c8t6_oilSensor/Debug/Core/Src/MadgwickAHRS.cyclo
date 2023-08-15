@@ -1,0 +1,14 @@
+MadgwickAHRS.c:24:6:Madgwick_init	1
+MadgwickAHRS.c:35:6:Madgwick_update	7
+MadgwickAHRS.c:140:6:Madgwick_updateIMU	4
+MadgwickAHRS.c:214:14:Madgwick_invSqrt	1
+MadgwickAHRS.c:225:6:Madgwick_computeAngles	1
+MadgwickAHRS.c:233:11:Madgwick_getRoll	2
+MadgwickAHRS.c:237:11:Madgwick_getPitch	2
+MadgwickAHRS.c:241:11:Madgwick_getYaw	2
+MadgwickAHRS.c:247:11:Madgwick_getRollRadians	2
+MadgwickAHRS.c:251:11:Madgwick_getPitchRadians	2
+MadgwickAHRS.c:255:11:Madgwick_getYawRadians	2
+MadgwickAHRS.c:259:11:getPitch	1
+MadgwickAHRS.c:262:11:getRoll	1
+MadgwickAHRS.c:265:11:getYaw	1

@@ -1,0 +1,4 @@
+EMA.c:41:8:calcMA	1
+EMA.c:50:8:calcEMA	1
+EMA.c:58:6:addStock	2
+EMA.c:68:8:getAverage	6

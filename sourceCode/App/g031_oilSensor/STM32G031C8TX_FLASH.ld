@@ -42,10 +42,14 @@ _Min_Heap_Size = 0x200; /* required amount of heap */
 _Min_Stack_Size = 0x400; /* required amount of stack */
 
 /* Memories definition */
+/*
+FLASH    (rx)    : ORIGIN = 0x8002800,   LENGTH = 54K
+ FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 64K
+*/
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 8K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 64K
+  FLASH    (rx)    : ORIGIN = 0x8002800,   LENGTH = 54K
 }
 
 /* Sections */

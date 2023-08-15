@@ -1,0 +1,3 @@
+drv_spi.c:23:6:SPI2_LowLevel_Init	1
+drv_spi.c:68:6:SPIx_Init	1
+drv_spi.c:94:9:SPIx_readWrite	3

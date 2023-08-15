@@ -1,0 +1,5 @@
+../Core/Src/drv_io.c:12:6:gpio_clock_init	8	static
+../Core/Src/drv_io.c:19:6:gpio_pin_int	16	static
+../Core/Src/drv_io.c:30:6:GpioInterruptInit	16	static
+../Core/Src/drv_io.c:33:6:gpio_write	16	static
+../Core/Src/drv_io.c:41:9:gpio_read	16	static

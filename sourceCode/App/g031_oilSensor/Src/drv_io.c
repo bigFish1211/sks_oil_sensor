@@ -36,46 +36,6 @@ typedef enum {
 
 void GpioInterruptInit(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin){
 
-	uint32_t position = 0x00u;
-	uint32_t iocurrent;
-	uint32_t temp;
-	//mode input
-	gpio_port->MODER &= ~(0x03<<(gpio_pin*2));
-
-	temp = EXTI->EXTICR[position >> 2u];
-	temp &= ~(0x0FuL << (8u * (position & 0x03u)));
-	temp |= (GPIO_GET_INDEX(GPIOx) << (8u * (position & 0x03u)));
-	EXTI->EXTICR[position >> 2u] = temp;
-
-	/* Clear Rising Falling edge configuration */
-	temp = EXTI->RTSR1;
-	temp &= ~(iocurrent);
-	if ((GPIO_Init->Mode & TRIGGER_RISING) != 0x00u) {
-		temp |= iocurrent;
-	}
-	EXTI->RTSR1 = temp;
-
-	temp = EXTI->FTSR1;
-	temp &= ~(iocurrent);
-	if ((GPIO_Init->Mode & TRIGGER_FALLING) != 0x00u) {
-		temp |= iocurrent;
-	}
-	EXTI->FTSR1 = temp;
-
-	/* Clear EXTI line configuration */
-	temp = EXTI->EMR1;
-	temp &= ~(iocurrent);
-	if ((GPIO_Init->Mode & EXTI_EVT) != 0x00u) {
-		temp |= iocurrent;
-	}
-	EXTI->EMR1 = temp;
-
-	temp = EXTI->IMR1;
-	temp &= ~(iocurrent);
-	if ((GPIO_Init->Mode & EXTI_IT) != 0x00u) {
-		temp |= iocurrent;
-	}
-	EXTI->IMR1 = temp;
 }
 
 void gpio_write(GPIO_TypeDef *gpio_port, uint16_t gpio_pin, uint8_t gpio_pinState){
