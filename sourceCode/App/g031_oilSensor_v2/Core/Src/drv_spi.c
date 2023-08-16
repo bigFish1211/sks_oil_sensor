@@ -23,6 +23,12 @@
 static void SPI2_LowLevel_Init(void);
 static void SPIx_Init(SPI_TypeDef *SPIx);
 
+void spi1_cs_low(void){
+
+}
+void spi1_cs_high(void){
+
+}
 void spi2_cs_low(void){
 	gpio_write(SPI2_CS_PORT, SPI2_CS_PIN, gpio_pin_reset);
 }
@@ -30,6 +36,9 @@ void spi2_cs_high(void){
 	gpio_write(SPI2_CS_PORT, SPI2_CS_PIN, gpio_pin_set);
 }
 
+void spi1Init(void){
+
+}
 void spi2Init(void){
 	SPI2_LowLevel_Init();
 	SPIx_Init(SPI2);

@@ -1,5 +1,0 @@
-../Core/Src/mainTask.c:113:5:mainTask	8	static
-../Core/Src/mainTask.c:140:13:setup	8	static
-../Core/Src/mainTask.c:154:6:HAL_TIM_IC_CaptureCallback	16	static
-../Core/Src/mainTask.c:176:13:handlerSensorData	48	static
-../Core/Src/mainTask.c:269:13:displaySensorData	120	static

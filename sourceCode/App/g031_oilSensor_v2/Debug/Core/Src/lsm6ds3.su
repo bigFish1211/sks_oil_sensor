@@ -8,4 +8,4 @@
 ../Core/Src/lsm6ds3.c:102:5:Lsm6ds3_readRegister	24	static
 ../Core/Src/lsm6ds3.c:113:5:Lsm6ds3_readRegisters	40	static
 ../Core/Src/lsm6ds3.c:125:5:Lsm6ds3_writeRegister	16	static
-../Core/Src/lsm6ds3.c:135:6:Lsm6ds3_printRotationAngles	48	static
+../Core/Src/lsm6ds3.c:133:6:Lsm6ds3_printRotationAngles	48	static

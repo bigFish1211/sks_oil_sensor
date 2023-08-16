@@ -1,0 +1,5 @@
+../Core/Src/spi.c:22:6:SPIx_init	16	static
+../Core/Src/spi.c:33:5:SPIx_ReadRegister	40	static
+../Core/Src/spi.c:75:5:SPIx_WriteRegister	32	static
+../Core/Src/spi.c:111:16:SPI_SendByte	24	static
+../Core/Src/spi.c:134:16:SPI_readByte	32	static

@@ -1,0 +1,14 @@
+../Core/Src/KalmanFilter.c:41:6:Start_Kalman_Algorithm	72	static
+../Core/Src/KalmanFilter.c:90:6:Execute_Kalman_Filter	104	static
+../Core/Src/KalmanFilter.c:170:7:Kalman_GetPitch	8	static
+../Core/Src/KalmanFilter.c:174:7:Kalman_GetRoll	8	static
+../Core/Src/KalmanFilter.c:178:7:Kalman_Getyaw	8	static
+../Core/Src/KalmanFilter.c:197:6:Kalman_Getyaw_execute	24	static
+../Core/Src/KalmanFilter.c:217:6:Kalman_IncTick	8	static
+../Core/Src/KalmanFilter.c:226:10:Kalman_GetTick	8	static
+../Core/Src/KalmanFilter.c:232:6:Kalman_SetFlag	8	static
+../Core/Src/KalmanFilter.c:236:9:Kalman_GetFlag	8	static
+../Core/Src/KalmanFilter.c:240:6:Kalman_ClearFlag	8	static
+../Core/Src/KalmanFilter.c:244:14:KalmanX_getAngle	56	static
+../Core/Src/KalmanFilter.c:274:14:KalmanY_getAngle	56	static
+../Core/Src/KalmanFilter.c:306:6:LSM6DS3_calibaration	16	static

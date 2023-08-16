@@ -113,19 +113,17 @@ int Lsm6ds3_readRegister(uint8_t address)
 int Lsm6ds3_readRegisters(uint8_t address, uint8_t* data, size_t length)
 {
 	address |= 0x80;
-	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
+	spi2_cs_low();
 	SPIx_readWrite(LSM6DS3_SPI, address);
 	for(int i=0; i<length; i++){
 		*(data+i) = SPIx_readWrite(LSM6DS3_SPI, 0x00);
 	}
-	HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_SET);
+	spi2_cs_high();
 	return 1;
 }
 
 int Lsm6ds3_writeRegister(uint8_t address, uint8_t value)
 {
-	//HAL_GPIO_WritePin(CS_GPIO_Port, CS_Pin, GPIO_PIN_RESET);
-	//gpio_write(gpio_port, gpio_pin, gpio_pinState);
 	spi2_cs_low();
 	SPIx_readWrite(LSM6DS3_SPI, address);
 	SPIx_readWrite(LSM6DS3_SPI, value);

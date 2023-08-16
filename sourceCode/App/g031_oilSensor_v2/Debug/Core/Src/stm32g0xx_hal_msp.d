@@ -31,7 +31,11 @@ Core/Src/stm32g0xx_hal_msp.o: ../Core/Src/stm32g0xx_hal_msp.c \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
- ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h
+ ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
+ ../Core/Inc/drv_io.h \
+ ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g031xx.h \
+ ../Core/Inc/drv_spi.h ../Core/Inc/dvr_flash.h ../Core/Inc/dvr_uart.h \
+ ../Core/Inc/system_g031.h ../Core/Inc/xprintf.h
 ../Core/Inc/main.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -66,3 +70,10 @@ Core/Src/stm32g0xx_hal_msp.o: ../Core/Src/stm32g0xx_hal_msp.c \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
+../Core/Inc/drv_io.h:
+../Drivers/CMSIS/Device/ST/STM32G0xx/Include/stm32g031xx.h:
+../Core/Inc/drv_spi.h:
+../Core/Inc/dvr_flash.h:
+../Core/Inc/dvr_uart.h:
+../Core/Inc/system_g031.h:
+../Core/Inc/xprintf.h:

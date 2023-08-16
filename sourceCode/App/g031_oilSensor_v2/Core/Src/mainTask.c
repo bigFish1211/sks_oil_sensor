@@ -11,6 +11,7 @@
 #include "define.h"
 #include "EMA.h"
 #include "command.h"
+#include "main.h"
 //////////////////////////////////////////////////////////////
 #include <stdint.h>
 #include <stdio.h>
@@ -23,15 +24,13 @@
 #include "xprintf.h"
 #include "system_g031.h"
 ///////////////////////////////////////////////////////////////
+#if 0
 extern ADC_HandleTypeDef hadc1;
 extern TIM_HandleTypeDef htim2;
 
 extern float roll;
 extern float pitch;
 extern float yaw;
-
-volatile uint32_t ulMiliCount = 0;
-volatile uint32_t ulSecCount = 0;
 
 static void handlerSensorData(void);
 static void displaySensorData(void);
@@ -118,11 +117,10 @@ int mainTask(void) {
 			time_ = g_appConfig.miliCount;
 		}
 
-///////////////////////////////////////////////////
 #if USING_EMA
 		if (g_appConfig.wirteConfigNow) {
 			g_appConfig.wirteConfigNow = 0;
-			printf("SKS_OIL_SENSOR wirte now\r\n");
+			xprintf("SKS_OIL_SENSOR wirte now\r\n");
 			//write_config();
 		}
 
@@ -138,17 +136,16 @@ int mainTask(void) {
 }
 
 static void setup(void){
-	//MX_GPIO_Init();
+	systemInit();
 	gpio_clock_init();
 	spi2Init();
 	usart_x0_init(115200);
 	xdev_out(usart_x0_send);
 	Madgwick_init(SAMPLE_RATE);
 	if (!Lsm6ds3_int()) {
-		printf("LSM6DS3 installation failed\r\n");
+		xprintf("LSM6DS3 installation failed\r\n");
 	}
 	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_4);
-	//load_config();
 }
 
 void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
@@ -166,7 +163,11 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim) {
 						sensorCapture.freq_update =1;
 
 						//__HAL_TIM_SET_COUNTER(&htim2, 0);
-						TIM2->CNT = 0;
+						HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_4);
+						//TIM2->DIER &= ~TIM_DIER_CC4IE;
+						TIM2->CNT &= 0;
+						HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_4);
+						//TIM2->DIER |= TIM_DIER_CC4IE;
 						sensorCapture.isFirstCap = 0;
 					}
 				}
@@ -267,10 +268,7 @@ static void handlerSensorData(void) {
 
 char buf__[100] = {0};
 static void displaySensorData(void) {
-	printf("F=%x EF=%x F15=%x N=%04x.0 XN=%04x.0 AN=%04x.0 CN=%04x.0 MN=%04x.0 SN=%04x.0 x=%0.0f y=%0.0f z=%0.0f T=%d E=%x FU=%x EM=%x fM=%d\r\n", sensorCapture.freq, ((uint32_t)sensorAttr.ema_freq), 0, sensorAttr.N, 0, 0, 0, 0, 0,
-			roll,pitch,yaw,
-			0, 0, sensorConfig.full, sensorConfig.empty, 0);
 }
-
+#endif
 
 
