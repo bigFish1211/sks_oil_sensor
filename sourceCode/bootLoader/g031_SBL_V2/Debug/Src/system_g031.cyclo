@@ -1,0 +1,7 @@
+core_cm0plus.h:850:22:__NVIC_SetPriority	2
+core_cm0plus.h:1056:26:SysTick_Config	2
+system_g031.c:23:6:systemInit	1
+system_g031.c:28:13:SysTick_CLKSourceConfig	2
+system_g031.c:35:13:systickConfig	1
+system_g031.c:40:13:SetSysClock	4
+system_g031.c:85:6:RCC_DeInit	4

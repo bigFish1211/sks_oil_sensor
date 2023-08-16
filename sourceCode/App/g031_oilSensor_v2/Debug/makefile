@@ -55,6 +55,9 @@ g031_oilSensor_v2.list \
 OBJCOPY_HEX += \
 g031_oilSensor_v2.hex \
 
+OBJCOPY_BIN += \
+g031_oilSensor_v2.bin \
+
 
 # All Target
 all: main-build
@@ -63,8 +66,8 @@ all: main-build
 main-build: g031_oilSensor_v2.elf secondary-outputs
 
 # Tool invocations
-g031_oilSensor_v2.elf g031_oilSensor_v2.map: $(OBJS) $(USER_OBJS) D:\github\sks_oil_sensor\sourceCode\App\g031_oilSensor_v2\STM32G031C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "g031_oilSensor_v2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"D:\github\sks_oil_sensor\sourceCode\App\g031_oilSensor_v2\STM32G031C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="g031_oilSensor_v2.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+g031_oilSensor_v2.elf g031_oilSensor_v2.map: $(OBJS) $(USER_OBJS) D:\gitHub\sks_oil_sensor\sourceCode\App\g031_oilSensor_v2\STM32G031C8TX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "g031_oilSensor_v2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"D:\gitHub\sks_oil_sensor\sourceCode\App\g031_oilSensor_v2\STM32G031C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="g031_oilSensor_v2.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -83,12 +86,17 @@ g031_oilSensor_v2.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS
 	@echo 'Finished building: $@'
 	@echo ' '
 
+g031_oilSensor_v2.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "g031_oilSensor_v2.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) default.size.stdout g031_oilSensor_v2.elf g031_oilSensor_v2.hex g031_oilSensor_v2.list g031_oilSensor_v2.map
+	-$(RM) default.size.stdout g031_oilSensor_v2.bin g031_oilSensor_v2.elf g031_oilSensor_v2.hex g031_oilSensor_v2.list g031_oilSensor_v2.map
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

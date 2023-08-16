@@ -51,7 +51,7 @@ typedef void (*pFunction)(void);
 #define CONVERTHEX(c)   (IS_09(c) ? (c - '0') : CONVERTHEX_alpha(c))
 
 //#if (FLASH_SIZE == 0x10000)
-#define UBOOT_CONFIG_ADDRESS    		0x800FC00   //Page 63
+#define UBOOT_CONFIG_ADDRESS    		0x800F000   //Page 30
 #define BOOT_IMAGE_PAGES	    		25  		//20KB - 1KB/page
 #define BOOT_PRIMARY_ADDRESS    		ApplicationAddress							  //Page 255
 #define BOOT_SECONDARY_ADDRESS    		(ApplicationAddress+BOOT_IMAGE_PAGES*PAGE_SIZE)  //Page 255

@@ -1,0 +1,4 @@
+DataUtil.c:18:6:read_device_config	7
+DataUtil.c:49:6:write_device_config	1
+DataUtil.c:53:6:init_config	1
+DataUtil.c:58:6:write_default_config	2

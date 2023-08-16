@@ -39,7 +39,7 @@ int main(void) {
 static int setup(void) {
 	int ret = 0;
 	systemInit();
-	usart_x0_init(115200);
+	usart_x0_init(19200);
 	CRC_ClockInit();
 	xdev_out(SerialPutChar);
 	return ret;

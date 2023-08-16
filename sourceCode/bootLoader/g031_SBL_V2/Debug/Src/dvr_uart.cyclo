@@ -1,0 +1,8 @@
+dvr_uart.c:34:6:usart_x0_init	1
+dvr_uart.c:40:6:usart_x0_send	2
+dvr_uart.c:45:6:SerialPutChar	1
+dvr_uart.c:48:10:SerialKeyPressed	2
+dvr_uart.c:57:9:Rcv_Byte	3
+dvr_uart.c:70:9:RcvBuff	3
+dvr_uart.c:84:13:COMX0_pin_init	1
+dvr_uart.c:114:13:uartx_init	1

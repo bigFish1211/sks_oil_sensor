@@ -105,6 +105,9 @@ static void output_data(void);
 static void LSM6DS3_get_angle(void);
 int main(void) {
 #ifdef USING_BOOTLOADER
+	SCB->VTOR = (uint32_t) APPLICATION_ADDRESS;
+	__DSB();
+	__enable_irq();
 #endif
 
 #if SKS_DEBUG_NOW
@@ -158,7 +161,7 @@ int main(void) {
 
 static void setup(void) {
 	systemInit();
-	 MX_TIM2_Init();
+	MX_TIM2_Init();
 	gpio_clock_init();
 	spi2Init();
 	usart_x0_init(19200);

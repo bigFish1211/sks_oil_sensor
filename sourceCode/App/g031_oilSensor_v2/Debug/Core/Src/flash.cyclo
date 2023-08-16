@@ -1,11 +1,6 @@
-flash.c:16:6:NMEAChecksum	2
-flash.c:28:13:flash_lock	1
-flash.c:32:13:flash_unlock	2
-flash.c:39:5:flashEraserPage	3
-flash.c:54:5:flashWiteWord	3
-flash.c:64:5:flash_ProgramDoubleWord	3
-flash.c:78:5:FlashWritePage	3
-flash.c:97:5:FlashReadPage	2
-flash.c:106:6:write_config	2
-flash.c:119:13:make_default_config	1
-flash.c:129:6:load_config	4
+flash.c:17:6:NMEAChecksum	2
+flash.c:29:5:flash_write_config	6
+flash.c:50:6:flash_read_config	2
+flash.c:59:6:write_config	2
+flash.c:73:6:make_default_config	2
+flash.c:96:6:load_config	10

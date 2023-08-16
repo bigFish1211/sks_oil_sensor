@@ -12,6 +12,7 @@
 #include <stdint.h>
 
 #define USING_BOOTLOADER			1
+#define APPLICATION_ADDRESS     	0x08002800
 
 #define SKS_CONFIG_RECORD_SIZE		256
 #define SF_CONFIG_SIGN				'd'
@@ -28,7 +29,7 @@
 
 #define SKS_TRUNC_ERROR_SEC			5   //bo so giay bi loi
 
-#define SKS_MEM_DEBUG				1
+#define SKS_MEM_DEBUG				0
 /*
  * Version LLS2.2.3.0F0-20220404:
  * 		- Chinh sua phan WHO_IM_I de support cac model Accelo.. khac nhau

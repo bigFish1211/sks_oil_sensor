@@ -1,5 +1,0 @@
-NTC.c:72:17:Average	2
-NTC.c:83:17:ADC_Sesor_fitter	5
-NTC.c:95:10:getAdcValue	1
-NTC.c:107:7:tempNTC	5
-NTC.c:137:5:getBoardTemp	2

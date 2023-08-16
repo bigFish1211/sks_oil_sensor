@@ -1,0 +1,5 @@
+drv_io.c:12:6:gpio_clock_init	1
+drv_io.c:19:6:gpio_pin_int	3
+drv_io.c:30:6:GpioInterruptInit	1
+drv_io.c:33:6:gpio_write	2
+drv_io.c:41:9:gpio_read	2

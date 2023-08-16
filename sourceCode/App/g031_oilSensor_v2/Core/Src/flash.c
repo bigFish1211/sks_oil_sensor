@@ -40,7 +40,7 @@ int flash_write_config(uint32_t address, char *pdata, int len) {
 			return 0;
 		}
 		if (*(uint64_t*) flash_address != *pRecord) {
-
+			return 0;
 		}
 	}
 	FLASH_Lock();
@@ -66,7 +66,7 @@ void write_config(void) {
 			pointerSize < SKS_CONFIG_RECORD_SIZE ?
 					pointerSize : SKS_CONFIG_RECORD_SIZE;
 	memcpy(buffConfig, &g_config, size);
-	buffConfig[SKS_CONFIG_RECORD_SIZE - 1] = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 1);
+	buffConfig[SKS_CONFIG_RECORD_SIZE - 1] = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 2);
 	flash_write_config(BANK1_CONFIG_START_ADDR, buffConfig,	SKS_CONFIG_RECORD_SIZE);
 }
 
@@ -99,8 +99,8 @@ void load_config(void) {
 
 	flash_read_config(BANK1_CONFIG_START_ADDR, buffConfig,
 	SKS_CONFIG_RECORD_SIZE);
-	char crc = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 1);
-	if ((buffConfig[0] == SF_CONFIG_SIGN) && (crc == buffConfig[SKS_CONFIG_RECORD_SIZE - 1]))
+	char crc = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 2);
+	if ((buffConfig[0] == SF_CONFIG_SIGN) && (crc == buffConfig[SKS_CONFIG_RECORD_SIZE - 2]))
 	{
 		int pointerSize = sizeof(DEVICE_CONFIG);
 		int size =

@@ -1,5 +1,0 @@
-../Core/Src/NTC.c:72:17:Average	32	static
-../Core/Src/NTC.c:83:17:ADC_Sesor_fitter	16	static
-../Core/Src/NTC.c:95:10:getAdcValue	152	static
-../Core/Src/NTC.c:107:7:tempNTC	64	static
-../Core/Src/NTC.c:137:5:getBoardTemp	32	static
