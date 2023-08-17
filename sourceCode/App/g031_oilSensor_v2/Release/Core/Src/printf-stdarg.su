@@ -1,0 +1,8 @@
+../Core/Src/printf-stdarg.c:229:1:mini_itoa.part.0	40	static
+../Core/Src/printf-stdarg.c:288:5:_puts.isra	16	static
+../Core/Src/printf-stdarg.c:279:5:_putc.isra	8	static
+../Core/Src/printf-stdarg.c:273:1:mini_vsnprintf	72	static
+../Core/Src/printf-stdarg.c:361:5:mini_snprintf	16	static
+../Core/Src/printf-stdarg.c:479:1:ustrncpy	16	static
+../Core/Src/printf-stdarg.c:569:1:uvsnprintf	56	static
+../Core/Src/printf-stdarg.c:1193:5:usnprintf	16	static

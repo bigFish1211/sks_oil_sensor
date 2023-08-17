@@ -1,0 +1,7 @@
+../Core/Src/drv_spi.c:26:6:spi1_cs_low	0	static
+../Core/Src/drv_spi.c:29:6:spi1_cs_high	0	static
+../Core/Src/drv_spi.c:32:6:spi2_cs_low	8	static
+../Core/Src/drv_spi.c:35:6:spi2_cs_high	8	static
+../Core/Src/drv_spi.c:39:6:spi1Init	0	static
+../Core/Src/drv_spi.c:42:6:spi2Init	8	static
+../Core/Src/drv_spi.c:117:9:SPIx_readWrite	0	static

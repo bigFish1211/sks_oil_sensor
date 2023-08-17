@@ -36,6 +36,8 @@ void usart_x0_init(uint32_t baudrate) {
 	COMX0_pin_init();
 	uartx_init(COMX0, baudrate);
 	COMX0->CR1 |= USART_CR1_RXNEIE_RXFNEIE;//enable RX interrupt
+	NVIC_SetPriority(COMX0_IRQn, 1);
+	NVIC_EnableIRQ(COMX0_IRQn);
 }
 
 void usart_x0_send(uint8_t c){

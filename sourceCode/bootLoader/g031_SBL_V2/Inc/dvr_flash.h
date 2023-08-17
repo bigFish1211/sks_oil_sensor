@@ -14,6 +14,9 @@
 
 #define BASE_ADDR                        (0x8000000)
 
+#define RDP_LEVEL_0                  	0x000000AAU
+#define RDP_LEVEL_1                  	0x000000BBU
+#define RDP_LEVEL_2                  	0x000000CCU
 
 #define PAGE_SIZE                         (0x800)    /* 2 Kbytes */
 #define BASE_ADDR                        (0x8000000)    /* 2 Kbytes */

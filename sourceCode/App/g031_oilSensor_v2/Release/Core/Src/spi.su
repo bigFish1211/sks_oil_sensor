@@ -1,0 +1,3 @@
+../Core/Src/spi.c:22:6:SPIx_init	8	static
+../Core/Src/spi.c:33:5:SPIx_ReadRegister	24	static
+../Core/Src/spi.c:75:5:SPIx_WriteRegister	16	static

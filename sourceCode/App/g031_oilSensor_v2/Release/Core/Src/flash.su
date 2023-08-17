@@ -1,0 +1,6 @@
+../Core/Src/flash.c:17:6:NMEAChecksum	8	static
+../Core/Src/flash.c:29:5:flash_write_config	32	static
+../Core/Src/flash.c:52:6:flash_read_config	8	static
+../Core/Src/flash.c:74:6:write_config	272	static
+../Core/Src/flash.c:88:6:make_default_config	8	static
+../Core/Src/flash.c:111:6:load_config	272	static

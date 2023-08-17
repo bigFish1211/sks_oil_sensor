@@ -27,7 +27,7 @@ char NMEAChecksum(char *data, int len) {
 }
 
 int flash_write_config(uint32_t address, char *pdata, int len) {
-	uint32_t *pRecord = (uint64_t*) pdata;
+	uint64_t *pRecord = pdata;
 	uint32_t flash_address = address;
 	FLASH_Unlock();
 	FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PROGERR | FLASH_FLAG_WRPRTERR);
@@ -40,6 +40,8 @@ int flash_write_config(uint32_t address, char *pdata, int len) {
 			return 0;
 		}
 		if (*(uint64_t*) flash_address != *pRecord) {
+			xprintf("flash write fail\r\n");
+
 			return 0;
 		}
 	}
@@ -48,12 +50,25 @@ int flash_write_config(uint32_t address, char *pdata, int len) {
 }
 
 void flash_read_config(uint32_t address, char *pdata, int len) {
+#if 1
 	int i;
 	uint32_t flash_address = address;
 	uint32_t *ptr = (uint32_t*)pdata;
 	for (i = 0; i < len; i+=4,ptr++,flash_address+=4) {
-		*ptr=*(__IO uint32_t *)flash_address;
+
+		*ptr=*(uint32_t *)flash_address;
 	}
+#else
+	int i = 0;
+		uint32_t *pInt = address;
+		uint32_t *pDest =(uint32_t*)pdata;
+		for (i = 0; i < len/4; i++)
+		{
+			FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_PROGERR | FLASH_FLAG_WRPRTERR);
+			//flash_clearflag();
+			pDest[i] = pInt[i];
+		}
+#endif
 }
 
 void write_config(void) {
@@ -66,7 +81,7 @@ void write_config(void) {
 			pointerSize < SKS_CONFIG_RECORD_SIZE ?
 					pointerSize : SKS_CONFIG_RECORD_SIZE;
 	memcpy(buffConfig, &g_config, size);
-	buffConfig[SKS_CONFIG_RECORD_SIZE - 1] = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 2);
+	buffConfig[SKS_CONFIG_RECORD_SIZE - 1] = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 1);
 	flash_write_config(BANK1_CONFIG_START_ADDR, buffConfig,	SKS_CONFIG_RECORD_SIZE);
 }
 
@@ -99,8 +114,9 @@ void load_config(void) {
 
 	flash_read_config(BANK1_CONFIG_START_ADDR, buffConfig,
 	SKS_CONFIG_RECORD_SIZE);
-	char crc = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 2);
-	if ((buffConfig[0] == SF_CONFIG_SIGN) && (crc == buffConfig[SKS_CONFIG_RECORD_SIZE - 2]))
+	char crc = NMEAChecksum(buffConfig, SKS_CONFIG_RECORD_SIZE - 1);
+	if (buffConfig[0] == SF_CONFIG_SIGN)
+	if ((buffConfig[0] == SF_CONFIG_SIGN) && (crc == buffConfig[SKS_CONFIG_RECORD_SIZE - 1]))
 	{
 		int pointerSize = sizeof(DEVICE_CONFIG);
 		int size =

@@ -207,22 +207,19 @@ int FlashWritePage(uint32_t addr, uint8_t *pdata, uint16_t len) {
 }
 
 void FLASH_ReadOutProtection(uint32_t RDPLevel){
-/*	uint32_t optr;
+	uint32_t optr;
 	optr =  FLASH->OPTR;
 	optr  &= ~ FLASH_OPTR_RDP;
-	// FLASH->OPTR &= ~ FLASH_OPTR_RDP;
-	 FLASH->OPTR |= (optr|RCC);
-	// FLASH->CR |= FLASH_CR_OBL_LAUNCH;
+	 FLASH->OPTR |= (optr|RDP_LEVEL_1);
 	FLASH->CR |= FLASH_CR_OPTSTRT;
-	//FLASH_WaitForLastOperation(ProgramTimeout);
 	FLASH_WaitForLastBankOperation(ProgramTimeout);
-	FLASH->CR &= ~FLASH_CR_OPTSTRT;*/
+	FLASH->CR &= ~FLASH_CR_OPTSTRT;
 }
 uint32_t FLASH_GetReadOutProtectionStatus(void) {
-	/*uint32_t rdplvl = FLASH->OPTR & FLASH_OPTR_RDP;
+	uint32_t rdplvl = FLASH->OPTR & FLASH_OPTR_RDP;
 	if ((rdplvl != RDP_LEVEL_0) && (rdplvl != RDP_LEVEL_2)) {
 		return (RDP_LEVEL_1);
 	} else {
 		return rdplvl;
-	}*/
+	}
 }

@@ -1,0 +1,3 @@
+../Core/Src/NTC.c:95:10:getAdcValue	136	static
+../Core/Src/NTC.c:107:7:tempNTC	32	static
+../Core/Src/NTC.c:137:5:getBoardTemp	8	static

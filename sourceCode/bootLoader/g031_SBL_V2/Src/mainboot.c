@@ -6,7 +6,7 @@
 #include "global.h"
 #include "main.h"
 
-#define ENABLE_PROTECT_CODE			0
+#define ENABLE_PROTECT_CODE			1
 
 pFunction Jump_To_Application;
 uint32_t JumpAddress;
@@ -18,14 +18,13 @@ void mainboot(void) {
 
 #if ENABLE_PROTECT_CODE
 	if (FLASH_GetReadOutProtectionStatus() != RDP_LEVEL_1) {
-			//xprintf("Self Protect");
 			FLASH_Unlock();
 			FLASH_OB_Unlock();
 			FLASH_ReadOutProtection(RDP_LEVEL_1);
 			FLASH->CR |= FLASH_CR_OBL_LAUNCH;
 			FLASH_OB_Lock();
-			//unsigned long uTick = ulTickCount;
-			while ((ulTickCount - uTick) < 10)
+			unsigned long uTick = ulMiliCount;
+			while ((ulMiliCount - uTick) < 10)
 				;
 			NVIC_SystemReset();
 		}
@@ -75,7 +74,7 @@ void mainboot(void) {
 			if (image_ok > 0) {
 				xprintf("SUCCESS!!!\r\n");
 				if (((*(__IO uint32_t*) ApplicationAddress ) & 0x2FFE0000) == 0x20000000) {
-					xprintf("BOOTING...\r\n");
+					xprintf("BOOTING[G0]...\r\n");
 					/*DISABLE ALL INTERUPT BEFORE JUMP TO APPLICATION*/
 					/* TIM2 enable counter */
 					unsigned long now = ulMiliCount;
