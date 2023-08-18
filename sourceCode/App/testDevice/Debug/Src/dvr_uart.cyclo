@@ -1,0 +1,7 @@
+core_cm0plus.h:741:22:__NVIC_EnableIRQ	2
+core_cm0plus.h:850:22:__NVIC_SetPriority	2
+dvr_uart.c:37:6:usart_x0_init	1
+dvr_uart.c:54:6:usart_x0_send	2
+dvr_uart.c:60:13:COMX0_pin_init	1
+dvr_uart.c:90:13:uartx_init	1
+dvr_uart.c:112:6:USART1_IRQHandler	3

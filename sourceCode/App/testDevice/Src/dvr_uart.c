@@ -12,6 +12,7 @@
 #define USART_IDLE_INTERRUPT				1
 #define USART_RX_INTERRUPT					0
 #define USART_RX_DMA						1
+#define USART_TX_INTERRUPT_EN				1
 
 #define SYS_CLOCK 							64000000ul
 
@@ -54,6 +55,7 @@ void usart_x0_send(uint8_t c){
 	while ((COMX0->ISR & USART_ISR_TXE_TXFNF) != USART_ISR_TXE_TXFNF);
 	COMX0->TDR = c;
 }
+
 
 static void COMX0_pin_init(void) {
 	uint32_t temp = 0;

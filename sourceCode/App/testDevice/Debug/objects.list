@@ -1,3 +1,4 @@
+"./Src/cirbuf.o"
 "./Src/drv_dma.o"
 "./Src/dvr_uart.o"
 "./Src/main.o"

@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_ranges 00000138  00000000  00000000  00013190  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0000d518  00000000  00000000  000132c8  2**0
+ 16 .debug_macro  0000c0e7  00000000  00000000  000132c8  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00001f38  00000000  00000000  000207e0  2**0
+ 17 .debug_line   00001f71  00000000  00000000  0001f3af  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000490dd  00000000  00000000  00022718  2**0
+ 18 .debug_str    0004910d  00000000  00000000  00021320  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0006b7f5  2**0
+ 19 .comment      00000050  00000000  00000000  0006a42d  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  0000043c  00000000  00000000  0006b848  2**2
+ 20 .debug_frame  0000043c  00000000  00000000  0006a480  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -673,6 +673,7 @@ void usart_x0_send(uint8_t c){
  80004b4:	40013800 	.word	0x40013800
 
 080004b8 <COMX0_pin_init>:
+
 
 static void COMX0_pin_init(void) {
  80004b8:	b580      	push	{r7, lr}
