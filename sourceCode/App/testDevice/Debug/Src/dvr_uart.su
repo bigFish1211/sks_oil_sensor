@@ -1,0 +1,7 @@
+../Drivers/CMSIS/Include/core_cm0plus.h:741:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
+../Drivers/CMSIS/Include/core_cm0plus.h:850:22:__NVIC_SetPriority	24	static
+../Src/dvr_uart.c:36:6:usart_x0_init	16	static
+../Src/dvr_uart.c:53:6:usart_x0_send	16	static
+../Src/dvr_uart.c:58:13:COMX0_pin_init	16	static
+../Src/dvr_uart.c:88:13:uartx_init	24	static
+../Src/dvr_uart.c:110:6:USART1_IRQHandler	16	static
