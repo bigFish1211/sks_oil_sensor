@@ -18,11 +18,12 @@
 
 #include <stdint.h>
 #include "main.h"
+#include "global.h"
 volatile uint32_t ulMiliCount = 0;
 volatile uint32_t ulSecCount = 0;
 static uint32_t ulTickCount = 0;
 
-#define COM_X0_RX_SIZE			20
+
 uint8_t com_x0_rx_buf[COM_X0_RX_SIZE];
 
 uint32_t lastPushData = 0;
@@ -31,6 +32,10 @@ static void setup(void);
 int main(void) {
 	setup();
 	while (1) {
+		if(com0_getData){
+			com0_getData = 0;
+			xprintf("%s\r\n",buffer);
+		}
 		/*if ((uint32_t) (ulMiliCount - lastPushData) > 5000) {
 			lastPushData = ulMiliCount;
 			xprintf("hello it'test uart\r\n");

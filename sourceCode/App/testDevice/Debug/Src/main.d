@@ -7,7 +7,7 @@ Src/main.o: ../Src/main.c ../Inc/main.h ../Inc/dvr_uart.h \
  ../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/system_stm32g0xx.h \
- ../Inc/system_g031.h ../Inc/xprintf.h
+ ../Inc/system_g031.h ../Inc/xprintf.h ../Inc/global.h
 ../Inc/main.h:
 ../Inc/dvr_uart.h:
 ../Inc/drv_dma.h:
@@ -20,3 +20,4 @@ Src/main.o: ../Src/main.c ../Inc/main.h ../Inc/dvr_uart.h \
 ../Drivers/CMSIS/Device/ST/STM32G0xx/Include/system_stm32g0xx.h:
 ../Inc/system_g031.h:
 ../Inc/xprintf.h:
+../Inc/global.h:

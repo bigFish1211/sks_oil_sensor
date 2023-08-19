@@ -8,6 +8,10 @@
 #include <stdint.h>
 #include "dvr_uart.h"
 #include "stm32g031xx.h"
+#include "global.h"
+#include <string.h>
+#include "drv_dma.h"
+
 
 #define USART_IDLE_INTERRUPT				1
 #define USART_RX_INTERRUPT					0
@@ -109,13 +113,37 @@ static void uartx_init(USART_TypeDef *UARTx, uint32_t baudrate) {
 }
 
 
-void USART1_IRQHandler(void) {
-	if (USART1->ISR & USART_ISR_RXNE_RXFNE) {
-		USART1->ICR |= USART_RQR_RXFRQ;
-		uint8_t cChar = USART1->RDR;
+uint8_t buffer[MAX_BUFF_SIZE];
+uint16_t buferLen =0;
+uint8_t com0_getData =0;
+void COMX0_IRQHandler(void) {
+	if (COMX0->ISR & USART_ISR_RXNE_RXFNE) {
+		COMX0->ICR |= USART_RQR_RXFRQ;
+		uint8_t cChar = COMX0->RDR;
 	}
-	if (USART1->ISR & USART_ISR_IDLE){
-		USART1->ICR |= USART_ICR_IDLECF;
+
+	if (COMX0->ISR & USART_ISR_TXFE) {
+		COMX0->ICR |= USART_RQR_TXFRQ;
+	}
+
+	if ((COMX0->ISR & USART_ISR_IDLE) && (COMX0->CR1 & USART_CR1_IDLEIE)) {
+		uint16_t remaining_rx_data = DMA1_Channel1->CNDTR;
+		COMX0->ICR |= USART_ICR_IDLECF;
+		if ((remaining_rx_data) && (remaining_rx_data < COM_X0_RX_SIZE)) {
+			COMX0->CR1 &= ~USART_CR1_IDLEIE;	//disable idle Interupt
+			COMX0->CR3 &= !USART_CR3_DMAR;	//disable DMA tranfer
+			DMA1_Channel1->CCR &= ~DMA_CCR_EN;
+			buferLen = COM_X0_RX_SIZE - remaining_rx_data;
+			memset(buffer,0,sizeof(buffer));
+			memcpy(buffer, com_x0_rx_buf, buferLen);
+			dma_config(DMA1_Channel1, (uint32_t) &COMX0->RDR, (uint32_t) com_x0_rx_buf, COM_X0_RX_SIZE);
+			com0_getData =1;
+			DMA1_Channel1->CCR |= DMA_CCR_EN;
+			COMX0->CR3 |= USART_CR3_DMAR;	//disable DMA tranfer
+			COMX0->CR1 |= USART_CR1_IDLEIE;	//disable idle Interupt
+
+		}
+
 	}
 }
 

@@ -25,7 +25,7 @@ void dma_init(DMA_Channel_TypeDef *DMA_channelx){
 	//read form peripheral
 	DMA_channelx->CCR &= ~DMA_CCR_DIR;
 	//enable CIRC mode
-	DMA_channelx->CCR |= DMA_CCR_CIRC;
+	DMA_channelx->CCR &= ~DMA_CCR_CIRC;
 	//enable memory increment
 	DMA_channelx->CCR |= DMA_CCR_MINC;
 	//set peripheral data size //8bit
