@@ -1,0 +1,3 @@
+cirbuf.c:10:5:__circbuf_pop	6
+cirbuf.c:39:5:__circbuf_push	4
+cirbuf.c:60:5:__circbuf_free_space	2
