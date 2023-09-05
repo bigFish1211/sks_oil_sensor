@@ -1,0 +1,2 @@
+../Src/utils.c:11:9:circ_bbuf_push	16	static
+../Src/utils.c:44:9:circ_bbuf_pop	16	static

@@ -11,12 +11,15 @@
 #include "global.h"
 #include <string.h>
 #include "drv_dma.h"
+#include "utils.h"
 
 
 #define USART_IDLE_INTERRUPT				1
 #define USART_RX_INTERRUPT					0
 #define USART_RX_DMA						1
 #define USART_TX_INTERRUPT_EN				1
+
+#define COM1_BUF_TX_MAX						256
 
 #define SYS_CLOCK 							64000000ul
 
@@ -34,6 +37,8 @@
 #define COMX0_IRQn                 			USART1_IRQn
 #define COMX0_IRQHandler		    		USART1_IRQHandler
 
+
+CIRC_BBUF_DEF(com1_buf_tx, COM1_BUF_TX_MAX);
 
 static void COMX0_pin_init(void) ;
 static void uartx_init(USART_TypeDef *UARTx, uint32_t baudrate) ;
@@ -60,6 +65,20 @@ void usart_x0_send(uint8_t c){
 	COMX0->TDR = c;
 }
 
+void com1_putChar(char ch){
+
+}
+void com1_putString(const char *str, int len){
+	for (int i = 0; i < len; i++) {
+		while(circ_bbuf_push(&com1_buf_tx,str[i])!=0);
+	}
+
+}
+void usart_x0_print(const char *str){
+	uint8_t n;
+	n = (uint8_t) strlen((const char*) str);
+	com1_putString(str, n);
+}
 
 static void COMX0_pin_init(void) {
 	uint32_t temp = 0;

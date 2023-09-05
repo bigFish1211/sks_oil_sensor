@@ -27,23 +27,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
  11 .ARM.attributes 00000028  00000000  00000000  00011084  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00001d6c  00000000  00000000  000110ac  2**0
+ 12 .debug_info   00001f06  00000000  00000000  000110ac  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 13 .debug_abbrev 0000094a  00000000  00000000  00012e18  2**0
+ 13 .debug_abbrev 00000977  00000000  00000000  00012fb2  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 14 .debug_aranges 00000190  00000000  00000000  00013768  2**3
+ 14 .debug_aranges 000001a8  00000000  00000000  00013930  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 15 .debug_ranges 00000138  00000000  00000000  000138f8  2**3
+ 15 .debug_ranges 00000150  00000000  00000000  00013ad8  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0000c159  00000000  00000000  00013a30  2**0
+ 16 .debug_macro  0000d5f5  00000000  00000000  00013c28  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00001fe2  00000000  00000000  0001fb89  2**0
+ 17 .debug_line   00002068  00000000  00000000  0002121d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    00049202  00000000  00000000  00021b6b  2**0
+ 18 .debug_str    000492f5  00000000  00000000  00023285  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  0006ad6d  2**0
+ 19 .comment      00000050  00000000  00000000  0006c57a  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00000484  00000000  00000000  0006adc0  2**2
+ 20 .debug_frame  000004e4  00000000  00000000  0006c5cc  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -587,7 +587,7 @@ __STATIC_INLINE void __NVIC_SetPriority(IRQn_Type IRQn, uint32_t priority)
  8000438:	e000ed00 	.word	0xe000ed00
 
 0800043c <usart_x0_init>:
-
+CIRC_BBUF_DEF(com1_buf_tx, COM1_BUF_TX_MAX);
 
 static void COMX0_pin_init(void) ;
 static void uartx_init(USART_TypeDef *UARTx, uint32_t baudrate) ;
@@ -673,7 +673,10 @@ void usart_x0_send(uint8_t c){
  80004b4:	40013800 	.word	0x40013800
 
 080004b8 <COMX0_pin_init>:
-
+	uint8_t n;
+	n = (uint8_t) strlen((const char*) str);
+	com1_putString(str, n);
+}
 
 static void COMX0_pin_init(void) {
  80004b8:	b580      	push	{r7, lr}

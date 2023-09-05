@@ -9,13 +9,13 @@ c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externalt
 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-init.o)
                               c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o (__libc_init_array)
 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memcpy-stub.o)
-                              ./Src/cirbuf.o (memcpy)
+                              ./Src/dvr_uart.o (memcpy)
 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
                               c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o (memset)
+c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-strlen.o)
+                              ./Src/dvr_uart.o (strlen)
 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_udivsi3.o)
                               ./Src/dvr_uart.o (__aeabi_uidiv)
-c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_divsi3.o)
-                              ./Src/cirbuf.o (__aeabi_idivmod)
 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_dvmd_tls.o)
                               c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_udivsi3.o) (__aeabi_idiv0)
 
@@ -33,77 +33,6 @@ Discarded input sections
  .ARM.exidx     0x0000000000000000       0x10 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o
  .ARM.attributes
                 0x0000000000000000       0x1b c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .group         0x0000000000000000        0xc ./Src/cirbuf.o
- .text          0x0000000000000000        0x0 ./Src/cirbuf.o
- .data          0x0000000000000000        0x0 ./Src/cirbuf.o
- .bss           0x0000000000000000        0x0 ./Src/cirbuf.o
- .text.__circbuf_pop
-                0x0000000000000000       0x9c ./Src/cirbuf.o
- .text.__circbuf_push
-                0x0000000000000000       0x92 ./Src/cirbuf.o
- .text.__circbuf_free_space
-                0x0000000000000000       0x36 ./Src/cirbuf.o
- .debug_info    0x0000000000000000      0x212 ./Src/cirbuf.o
- .debug_abbrev  0x0000000000000000      0x110 ./Src/cirbuf.o
- .debug_aranges
-                0x0000000000000000       0x30 ./Src/cirbuf.o
- .debug_ranges  0x0000000000000000       0x20 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0x13f ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0xa54 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x22 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x4c ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x18 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x94 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x3c ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x34 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0x174 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x16 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x43 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x57 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x34 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x10 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x58 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x71 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x1c ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0x12a ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0x341 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x10 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x35 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x20 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0x103 ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x6a ./Src/cirbuf.o
- .debug_macro   0x0000000000000000      0x1df ./Src/cirbuf.o
- .debug_macro   0x0000000000000000       0x2e ./Src/cirbuf.o
- .debug_line    0x0000000000000000      0x5d7 ./Src/cirbuf.o
- .debug_str     0x0000000000000000     0x6fd2 ./Src/cirbuf.o
- .comment       0x0000000000000000       0x51 ./Src/cirbuf.o
- .debug_frame   0x0000000000000000       0x70 ./Src/cirbuf.o
- .ARM.attributes
-                0x0000000000000000       0x2c ./Src/cirbuf.o
  .group         0x0000000000000000        0xc ./Src/drv_dma.o
  .group         0x0000000000000000        0xc ./Src/drv_dma.o
  .group         0x0000000000000000        0xc ./Src/drv_dma.o
@@ -121,11 +50,6 @@ Discarded input sections
  .text          0x0000000000000000        0x0 ./Src/drv_dma.o
  .data          0x0000000000000000        0x0 ./Src/drv_dma.o
  .bss           0x0000000000000000        0x0 ./Src/drv_dma.o
- .debug_macro   0x0000000000000000      0xa54 ./Src/drv_dma.o
- .debug_macro   0x0000000000000000       0x22 ./Src/drv_dma.o
- .debug_macro   0x0000000000000000      0x103 ./Src/drv_dma.o
- .debug_macro   0x0000000000000000       0x6a ./Src/drv_dma.o
- .debug_macro   0x0000000000000000      0x1df ./Src/drv_dma.o
  .group         0x0000000000000000        0xc ./Src/dvr_uart.o
  .group         0x0000000000000000        0xc ./Src/dvr_uart.o
  .group         0x0000000000000000        0xc ./Src/dvr_uart.o
@@ -175,6 +99,16 @@ Discarded input sections
  .text          0x0000000000000000        0x0 ./Src/dvr_uart.o
  .data          0x0000000000000000        0x0 ./Src/dvr_uart.o
  .bss           0x0000000000000000        0x0 ./Src/dvr_uart.o
+ .bss.com1_buf_tx_data_space
+                0x0000000000000000      0x101 ./Src/dvr_uart.o
+ .data.com1_buf_tx
+                0x0000000000000000        0xc ./Src/dvr_uart.o
+ .text.com1_putChar
+                0x0000000000000000       0x14 ./Src/dvr_uart.o
+ .text.com1_putString
+                0x0000000000000000       0x44 ./Src/dvr_uart.o
+ .text.usart_x0_print
+                0x0000000000000000       0x2e ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000      0xa54 ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000       0x22 ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000       0x8e ./Src/dvr_uart.o
@@ -182,18 +116,6 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x103 ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000       0x6a ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000      0x1df ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x18 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x3c ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x34 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000      0x341 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x16 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x43 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x34 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x10 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x58 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x71 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x1c ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000      0x12a ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000       0x28 ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000       0x1c ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000       0x22 ./Src/dvr_uart.o
@@ -201,8 +123,21 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x4da ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000      0x11f ./Src/dvr_uart.o
  .debug_macro   0x0000000000000000     0xac09 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x35 ./Src/dvr_uart.o
- .debug_macro   0x0000000000000000       0x20 ./Src/dvr_uart.o
+ .group         0x0000000000000000        0xc ./Src/log.o
+ .text          0x0000000000000000        0x0 ./Src/log.o
+ .data          0x0000000000000000        0x0 ./Src/log.o
+ .bss           0x0000000000000000        0x0 ./Src/log.o
+ .debug_info    0x0000000000000000       0x21 ./Src/log.o
+ .debug_abbrev  0x0000000000000000       0x13 ./Src/log.o
+ .debug_aranges
+                0x0000000000000000       0x18 ./Src/log.o
+ .debug_macro   0x0000000000000000       0x11 ./Src/log.o
+ .debug_macro   0x0000000000000000      0xa54 ./Src/log.o
+ .debug_line    0x0000000000000000       0x2d ./Src/log.o
+ .debug_str     0x0000000000000000     0x2be2 ./Src/log.o
+ .comment       0x0000000000000000       0x51 ./Src/log.o
+ .ARM.attributes
+                0x0000000000000000       0x2c ./Src/log.o
  .group         0x0000000000000000        0xc ./Src/main.o
  .group         0x0000000000000000        0xc ./Src/main.o
  .group         0x0000000000000000        0xc ./Src/main.o
@@ -525,6 +460,39 @@ Discarded input sections
  .debug_macro   0x0000000000000000      0x11f ./Src/system_g031.o
  .debug_macro   0x0000000000000000     0xac09 ./Src/system_g031.o
  .debug_macro   0x0000000000000000       0x16 ./Src/system_g031.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .group         0x0000000000000000        0xc ./Src/utils.o
+ .text          0x0000000000000000        0x0 ./Src/utils.o
+ .data          0x0000000000000000        0x0 ./Src/utils.o
+ .bss           0x0000000000000000        0x0 ./Src/utils.o
+ .text.circ_bbuf_push
+                0x0000000000000000       0xd6 ./Src/utils.o
+ .text.circ_bbuf_pop
+                0x0000000000000000       0x98 ./Src/utils.o
+ .debug_info    0x0000000000000000      0x18f ./Src/utils.o
+ .debug_abbrev  0x0000000000000000       0xc8 ./Src/utils.o
+ .debug_aranges
+                0x0000000000000000       0x28 ./Src/utils.o
+ .debug_ranges  0x0000000000000000       0x18 ./Src/utils.o
+ .debug_macro   0x0000000000000000       0x6d ./Src/utils.o
+ .debug_macro   0x0000000000000000      0xa54 ./Src/utils.o
+ .debug_macro   0x0000000000000000       0x22 ./Src/utils.o
+ .debug_macro   0x0000000000000000       0x8e ./Src/utils.o
+ .debug_macro   0x0000000000000000       0x51 ./Src/utils.o
+ .debug_macro   0x0000000000000000      0x103 ./Src/utils.o
+ .debug_macro   0x0000000000000000       0x6a ./Src/utils.o
+ .debug_macro   0x0000000000000000      0x1df ./Src/utils.o
+ .debug_line    0x0000000000000000      0x45f ./Src/utils.o
+ .debug_str     0x0000000000000000     0x3c0c ./Src/utils.o
+ .comment       0x0000000000000000       0x51 ./Src/utils.o
+ .debug_frame   0x0000000000000000       0x50 ./Src/utils.o
+ .ARM.attributes
+                0x0000000000000000       0x2c ./Src/utils.o
  .group         0x0000000000000000        0xc ./Src/xprintf.o
  .group         0x0000000000000000        0xc ./Src/xprintf.o
  .group         0x0000000000000000        0xc ./Src/xprintf.o
@@ -578,14 +546,13 @@ Discarded input sections
  .text          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
  .data          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
  .bss           0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
+ .text          0x0000000000000000        0xe c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-strlen.o)
+ .data          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-strlen.o)
+ .bss           0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-strlen.o)
+ .ARM.attributes
+                0x0000000000000000       0x1c c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-strlen.o)
  .data          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_udivsi3.o)
  .bss           0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_udivsi3.o)
- .text          0x0000000000000000      0x1d4 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_divsi3.o)
- .data          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_divsi3.o)
- .bss           0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_divsi3.o)
- .debug_frame   0x0000000000000000       0x20 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_divsi3.o)
- .ARM.attributes
-                0x0000000000000000       0x1e c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_divsi3.o)
  .data          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_dvmd_tls.o)
  .bss           0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_dvmd_tls.o)
  .text          0x0000000000000000        0x0 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtend.o
@@ -611,13 +578,14 @@ Linker script and memory map
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crti.o
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/crtbegin.o
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp/crt0.o
-LOAD ./Src/cirbuf.o
 LOAD ./Src/drv_dma.o
 LOAD ./Src/dvr_uart.o
+LOAD ./Src/log.o
 LOAD ./Src/main.o
 LOAD ./Src/syscalls.o
 LOAD ./Src/sysmem.o
 LOAD ./Src/system_g031.o
+LOAD ./Src/utils.o
 LOAD ./Src/xprintf.o
 LOAD ./Startup/startup_stm32g031c8tx.o
 START GROUP
@@ -947,101 +915,121 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libm.a
 LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a
 
-.debug_info     0x0000000000000000     0x1d6c
+.debug_info     0x0000000000000000     0x1f06
  .debug_info    0x0000000000000000      0x344 ./Src/drv_dma.o
- .debug_info    0x0000000000000344      0x943 ./Src/dvr_uart.o
- .debug_info    0x0000000000000c87      0x63a ./Src/main.o
- .debug_info    0x00000000000012c1      0x6e4 ./Src/system_g031.o
- .debug_info    0x00000000000019a5      0x3a5 ./Src/xprintf.o
- .debug_info    0x0000000000001d4a       0x22 ./Startup/startup_stm32g031c8tx.o
+ .debug_info    0x0000000000000344      0xadd ./Src/dvr_uart.o
+ .debug_info    0x0000000000000e21      0x63a ./Src/main.o
+ .debug_info    0x000000000000145b      0x6e4 ./Src/system_g031.o
+ .debug_info    0x0000000000001b3f      0x3a5 ./Src/xprintf.o
+ .debug_info    0x0000000000001ee4       0x22 ./Startup/startup_stm32g031c8tx.o
 
-.debug_abbrev   0x0000000000000000      0x94a
+.debug_abbrev   0x0000000000000000      0x977
  .debug_abbrev  0x0000000000000000      0x11e ./Src/drv_dma.o
- .debug_abbrev  0x000000000000011e      0x283 ./Src/dvr_uart.o
- .debug_abbrev  0x00000000000003a1      0x22d ./Src/main.o
- .debug_abbrev  0x00000000000005ce      0x219 ./Src/system_g031.o
- .debug_abbrev  0x00000000000007e7      0x151 ./Src/xprintf.o
- .debug_abbrev  0x0000000000000938       0x12 ./Startup/startup_stm32g031c8tx.o
+ .debug_abbrev  0x000000000000011e      0x2b0 ./Src/dvr_uart.o
+ .debug_abbrev  0x00000000000003ce      0x22d ./Src/main.o
+ .debug_abbrev  0x00000000000005fb      0x219 ./Src/system_g031.o
+ .debug_abbrev  0x0000000000000814      0x151 ./Src/xprintf.o
+ .debug_abbrev  0x0000000000000965       0x12 ./Startup/startup_stm32g031c8tx.o
 
-.debug_aranges  0x0000000000000000      0x190
+.debug_aranges  0x0000000000000000      0x1a8
  .debug_aranges
                 0x0000000000000000       0x30 ./Src/drv_dma.o
  .debug_aranges
-                0x0000000000000030       0x50 ./Src/dvr_uart.o
+                0x0000000000000030       0x68 ./Src/dvr_uart.o
  .debug_aranges
-                0x0000000000000080       0x40 ./Src/main.o
+                0x0000000000000098       0x40 ./Src/main.o
  .debug_aranges
-                0x00000000000000c0       0x50 ./Src/system_g031.o
+                0x00000000000000d8       0x50 ./Src/system_g031.o
  .debug_aranges
-                0x0000000000000110       0x58 ./Src/xprintf.o
+                0x0000000000000128       0x58 ./Src/xprintf.o
  .debug_aranges
-                0x0000000000000168       0x28 ./Startup/startup_stm32g031c8tx.o
+                0x0000000000000180       0x28 ./Startup/startup_stm32g031c8tx.o
 
-.debug_ranges   0x0000000000000000      0x138
+.debug_ranges   0x0000000000000000      0x150
  .debug_ranges  0x0000000000000000       0x20 ./Src/drv_dma.o
- .debug_ranges  0x0000000000000020       0x40 ./Src/dvr_uart.o
- .debug_ranges  0x0000000000000060       0x30 ./Src/main.o
- .debug_ranges  0x0000000000000090       0x40 ./Src/system_g031.o
- .debug_ranges  0x00000000000000d0       0x48 ./Src/xprintf.o
- .debug_ranges  0x0000000000000118       0x20 ./Startup/startup_stm32g031c8tx.o
+ .debug_ranges  0x0000000000000020       0x58 ./Src/dvr_uart.o
+ .debug_ranges  0x0000000000000078       0x30 ./Src/main.o
+ .debug_ranges  0x00000000000000a8       0x40 ./Src/system_g031.o
+ .debug_ranges  0x00000000000000e8       0x48 ./Src/xprintf.o
+ .debug_ranges  0x0000000000000130       0x20 ./Startup/startup_stm32g031c8tx.o
 
-.debug_macro    0x0000000000000000     0xc159
+.debug_macro    0x0000000000000000     0xd5f5
  .debug_macro   0x0000000000000000       0xc5 ./Src/drv_dma.o
- .debug_macro   0x00000000000000c5       0x8e ./Src/drv_dma.o
- .debug_macro   0x0000000000000153       0x51 ./Src/drv_dma.o
- .debug_macro   0x00000000000001a4       0x28 ./Src/drv_dma.o
- .debug_macro   0x00000000000001cc       0x1c ./Src/drv_dma.o
- .debug_macro   0x00000000000001e8       0x22 ./Src/drv_dma.o
- .debug_macro   0x000000000000020a       0xd1 ./Src/drv_dma.o
- .debug_macro   0x00000000000002db      0x4da ./Src/drv_dma.o
- .debug_macro   0x00000000000007b5      0x11f ./Src/drv_dma.o
- .debug_macro   0x00000000000008d4     0xac09 ./Src/drv_dma.o
- .debug_macro   0x000000000000b4dd      0x2d2 ./Src/dvr_uart.o
- .debug_macro   0x000000000000b7af       0x52 ./Src/dvr_uart.o
- .debug_macro   0x000000000000b801       0x16 ./Src/dvr_uart.o
- .debug_macro   0x000000000000b817       0x97 ./Src/dvr_uart.o
- .debug_macro   0x000000000000b8ae       0xfd ./Src/dvr_uart.o
- .debug_macro   0x000000000000b9ab       0x10 ./Src/dvr_uart.o
- .debug_macro   0x000000000000b9bb       0x10 ./Src/dvr_uart.o
- .debug_macro   0x000000000000b9cb       0x1c ./Src/dvr_uart.o
- .debug_macro   0x000000000000b9e7       0x52 ./Src/dvr_uart.o
- .debug_macro   0x000000000000ba39       0x22 ./Src/dvr_uart.o
- .debug_macro   0x000000000000ba5b       0x10 ./Src/dvr_uart.o
- .debug_macro   0x000000000000ba6b       0x52 ./Src/dvr_uart.o
- .debug_macro   0x000000000000babd       0xd5 ./Src/dvr_uart.o
- .debug_macro   0x000000000000bb92       0x1c ./Src/dvr_uart.o
- .debug_macro   0x000000000000bbae       0x3d ./Src/dvr_uart.o
- .debug_macro   0x000000000000bbeb       0x16 ./Src/dvr_uart.o
- .debug_macro   0x000000000000bc01      0x145 ./Src/dvr_uart.o
- .debug_macro   0x000000000000bd46       0x16 ./Src/dvr_uart.o
- .debug_macro   0x000000000000bd5c       0x16 ./Src/dvr_uart.o
- .debug_macro   0x000000000000bd72      0x252 ./Src/main.o
- .debug_macro   0x000000000000bfc4       0x16 ./Src/main.o
- .debug_macro   0x000000000000bfda       0x3a ./Src/main.o
- .debug_macro   0x000000000000c014       0xca ./Src/system_g031.o
- .debug_macro   0x000000000000c0de       0x23 ./Src/xprintf.o
- .debug_macro   0x000000000000c101       0x58 ./Src/xprintf.o
+ .debug_macro   0x00000000000000c5      0xa54 ./Src/drv_dma.o
+ .debug_macro   0x0000000000000b19       0x22 ./Src/drv_dma.o
+ .debug_macro   0x0000000000000b3b       0x8e ./Src/drv_dma.o
+ .debug_macro   0x0000000000000bc9       0x51 ./Src/drv_dma.o
+ .debug_macro   0x0000000000000c1a      0x103 ./Src/drv_dma.o
+ .debug_macro   0x0000000000000d1d       0x6a ./Src/drv_dma.o
+ .debug_macro   0x0000000000000d87      0x1df ./Src/drv_dma.o
+ .debug_macro   0x0000000000000f66       0x28 ./Src/drv_dma.o
+ .debug_macro   0x0000000000000f8e       0x1c ./Src/drv_dma.o
+ .debug_macro   0x0000000000000faa       0x22 ./Src/drv_dma.o
+ .debug_macro   0x0000000000000fcc       0xd1 ./Src/drv_dma.o
+ .debug_macro   0x000000000000109d      0x4da ./Src/drv_dma.o
+ .debug_macro   0x0000000000001577      0x11f ./Src/drv_dma.o
+ .debug_macro   0x0000000000001696     0xac09 ./Src/drv_dma.o
+ .debug_macro   0x000000000000c29f      0x2e2 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c581       0x52 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c5d3       0x18 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c5eb       0x3c ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c627       0x34 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c65b       0x16 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c671       0x97 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000c708      0x341 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ca49       0xfd ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cb46       0x10 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cb56       0x16 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cb6c       0x43 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cbaf       0x34 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cbe3       0x10 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cbf3       0x58 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cc4b       0x71 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ccbc       0x1c ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ccd8      0x12a ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ce02       0x10 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ce12       0x1c ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ce2e       0x52 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ce80       0x22 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cea2       0x10 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000ceb2       0x52 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cf04       0xd5 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cfd9       0x1c ./Src/dvr_uart.o
+ .debug_macro   0x000000000000cff5       0x3d ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d032       0x16 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d048      0x145 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d18d       0x16 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d1a3       0x16 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d1b9       0x35 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d1ee       0x20 ./Src/dvr_uart.o
+ .debug_macro   0x000000000000d20e      0x252 ./Src/main.o
+ .debug_macro   0x000000000000d460       0x16 ./Src/main.o
+ .debug_macro   0x000000000000d476       0x3a ./Src/main.o
+ .debug_macro   0x000000000000d4b0       0xca ./Src/system_g031.o
+ .debug_macro   0x000000000000d57a       0x23 ./Src/xprintf.o
+ .debug_macro   0x000000000000d59d       0x58 ./Src/xprintf.o
 
-.debug_line     0x0000000000000000     0x1fe2
+.debug_line     0x0000000000000000     0x2068
  .debug_line    0x0000000000000000      0x4a6 ./Src/drv_dma.o
- .debug_line    0x00000000000004a6      0x860 ./Src/dvr_uart.o
- .debug_line    0x0000000000000d06      0x769 ./Src/main.o
- .debug_line    0x000000000000146f      0x62a ./Src/system_g031.o
- .debug_line    0x0000000000001a99      0x4c5 ./Src/xprintf.o
- .debug_line    0x0000000000001f5e       0x84 ./Startup/startup_stm32g031c8tx.o
+ .debug_line    0x00000000000004a6      0x8e6 ./Src/dvr_uart.o
+ .debug_line    0x0000000000000d8c      0x769 ./Src/main.o
+ .debug_line    0x00000000000014f5      0x62a ./Src/system_g031.o
+ .debug_line    0x0000000000001b1f      0x4c5 ./Src/xprintf.o
+ .debug_line    0x0000000000001fe4       0x84 ./Startup/startup_stm32g031c8tx.o
 
-.debug_str      0x0000000000000000    0x49202
+.debug_str      0x0000000000000000    0x492f5
  .debug_str     0x0000000000000000    0x44778 ./Src/drv_dma.o
                                       0x44921 (size before relaxing)
- .debug_str     0x0000000000044778     0x460a ./Src/dvr_uart.o
-                                      0x48f9f (size before relaxing)
- .debug_str     0x0000000000048d82      0x18b ./Src/main.o
+ .debug_str     0x0000000000044778     0x4736 ./Src/dvr_uart.o
+                                      0x490d8 (size before relaxing)
+ .debug_str     0x0000000000048eae      0x18b ./Src/main.o
                                       0x48d10 (size before relaxing)
- .debug_str     0x0000000000048f0d      0x154 ./Src/system_g031.o
+ .debug_str     0x0000000000049039      0x154 ./Src/system_g031.o
                                       0x44c40 (size before relaxing)
- .debug_str     0x0000000000049061      0x137 ./Src/xprintf.o
+ .debug_str     0x000000000004918d      0x137 ./Src/xprintf.o
                                        0x2ea3 (size before relaxing)
- .debug_str     0x0000000000049198       0x6a ./Startup/startup_stm32g031c8tx.o
+ .debug_str     0x00000000000492c4       0x31 ./Startup/startup_stm32g031c8tx.o
+                                         0x6a (size before relaxing)
 
 .comment        0x0000000000000000       0x50
  .comment       0x0000000000000000       0x50 ./Src/drv_dma.o
@@ -1051,13 +1039,13 @@ LOAD c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.exte
  .comment       0x0000000000000050       0x51 ./Src/system_g031.o
  .comment       0x0000000000000050       0x51 ./Src/xprintf.o
 
-.debug_frame    0x0000000000000000      0x484
+.debug_frame    0x0000000000000000      0x4e4
  .debug_frame   0x0000000000000000       0x6c ./Src/drv_dma.o
- .debug_frame   0x000000000000006c       0xf0 ./Src/dvr_uart.o
- .debug_frame   0x000000000000015c       0xa4 ./Src/main.o
- .debug_frame   0x0000000000000200       0xe0 ./Src/system_g031.o
- .debug_frame   0x00000000000002e0      0x110 ./Src/xprintf.o
- .debug_frame   0x00000000000003f0       0x2c c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-init.o)
- .debug_frame   0x000000000000041c       0x28 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memcpy-stub.o)
- .debug_frame   0x0000000000000444       0x20 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
- .debug_frame   0x0000000000000464       0x20 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_udivsi3.o)
+ .debug_frame   0x000000000000006c      0x150 ./Src/dvr_uart.o
+ .debug_frame   0x00000000000001bc       0xa4 ./Src/main.o
+ .debug_frame   0x0000000000000260       0xe0 ./Src/system_g031.o
+ .debug_frame   0x0000000000000340      0x110 ./Src/xprintf.o
+ .debug_frame   0x0000000000000450       0x2c c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-init.o)
+ .debug_frame   0x000000000000047c       0x28 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memcpy-stub.o)
+ .debug_frame   0x00000000000004a4       0x20 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/../../../../arm-none-eabi/lib/thumb/v6-m/nofp\libc_nano.a(lib_a-memset.o)
+ .debug_frame   0x00000000000004c4       0x20 c:/st/stm32cubeide_1.6.1/stm32cubeide/plugins/com.st.stm32cube.ide.mcu.externaltools.gnu-tools-for-stm32.10.3-2021.10.win32_1.0.0.202111181127/tools/bin/../lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp\libgcc.a(_udivsi3.o)
