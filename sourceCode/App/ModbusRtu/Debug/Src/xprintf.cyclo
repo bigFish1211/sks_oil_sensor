@@ -1,0 +1,8 @@
+xprintf.c:26:6:xputc	3
+xprintf.c:44:6:xputs	2
+xprintf.c:53:6:xfputs	2
+xprintf.c:88:6:xvprintf	36
+xprintf.c:165:6:xprintf	1
+xprintf.c:179:6:xsprintf	1
+xprintf.c:199:6:xfprintf	1
+xprintf.c:225:6:put_dump	11
